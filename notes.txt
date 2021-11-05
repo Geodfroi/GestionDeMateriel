@@ -1,0 +1,18 @@
+- option d'exporter la db vers excel sheet pour owner of db.
+- send keys to user by way of mail to register. - pre-register emails in db ?
+
+- mod admin (service) et mode client.
+	=> addUser(name, login) in admin mode
+	=> remove user;
+	=> log in as user
+ 
+- check for valid email address : send url to veridy address.
+- accept only HEdS email.
+- contact us field
+- profile page avec option de changer de clé
+- envoyer SMS au lieu de email avec options dans profiles.
+	=> chercher SMS providers.
+	= https://www.aspsms.ch/en/prices/
+	=> What's app API ?
+
+- model : user, StorageItem
