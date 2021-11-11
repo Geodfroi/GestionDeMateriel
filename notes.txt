@@ -1,3 +1,5 @@
+21.11.09
+
 - option d'exporter la db vers excel sheet pour owner of db.
 - send keys to user by way of mail to register. - pre-register emails in db ?
 
@@ -8,11 +10,16 @@
  
 - check for valid email address : send url to veridy address.
 - accept only HEdS email.
-- contact us field
-- profile page avec option de changer de clé
-- envoyer SMS au lieu de email avec options dans profiles.
-	=> chercher SMS providers.
-	= https://www.aspsms.ch/en/prices/
-	=> What's app API ?
+- contact us field.
+- profile page avec option de changer de clé.
+- add comment to entry to be recalled.
+- test option : send confirmation email the first time logged in.
+- profile: set delay before warning by email. use floating labels select.
+
+- profile: add additional mail address.
+- choisir date par texte ou date picker.
 
 - model : user, StorageItem
+
+- èiblish to hiroku.
+- publich to microsoft azure.
