@@ -1,0 +1,17 @@
+Merci Joël! Les solutions que tu proposent sont très bien. J'avais commencé, il y a un an, à investiguer une solution de notes dans le lecteur de Storyline, mais intégré slide/slide c'est mieux!
+
+Maintenant, je vais voir avec les demandeurs sur quels cours ils veulent l'utiliser et on va faire tester aux étudiants! La génération du pdf reste suffisante selon moi. J'ai pas encore tout testé en vrai pour la génération du pdf. Je regarde ça vendredi.
+
+Pour la suite, j'ai un petit projet de gestion de matériel et de péremption à te proposer.
+
+Il s'agirait de créer en PHP ou HTML (mais PHP me semble mieux)., un système qui permet de :
+
+rentrer des produits dans un catalogue (base de donnée), leur emplacement (salle, sac, placard déterminé) et leur date de preemption).
+
+15j avant la péremption, une ou des personnes reçoivent un mail pour signaler qu'il faut renouveler ce / ces produits.
+
+La possibilité à la personne qui a fait le renouvellement de modifier la nouvelle date de péremption.
+
+le tout serait géré depuis une page web.
+
+Ce projet t'intéresse? Tu as le temps pour cela, nous n'avons pas d'impératifs de temps.
