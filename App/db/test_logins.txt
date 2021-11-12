@@ -1,0 +1,12 @@
+*admin
+username : Joel
+password : 123123
+
+username: Florence Nightingale
+password: crimea
+
+username: Henry Dunant
+password: cr-rouge
+
+username: Clara Barto
+password: gettisburg

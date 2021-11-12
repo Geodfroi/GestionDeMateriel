@@ -1,22 +1,23 @@
-<?php
+<!-- <?php 
 
 ################################
 ## Joël Piguet - 2021.11.11 ###
 ##############################
 
-namespace routes;
+// namespace routes;
 
-use routes\BaseRoute;
-use function helpers\render_template;
+// use helpers\Authenticate;
+// use routes\BaseRoute;
+// use function helpers\render_template;
 
-class DefaultRoute extends BaseRoute
-{
-    public function  getPageContent(): string
-    {
-        // if (Auth::userIsAuthenticated()) {
-        //     $this->requestRedirect('/profile');
-        // }
+// class DefaultRoute extends BaseRoute
+// {
+//     public function getPageContent(): string
+//     {
+//         if (Authenticate::isLoggedIn()) {
+//             $this->requestRedirect('/user');
+//         }
 
-        return render_template('home_template');
-    }
-}
+//         return render_template('home_template');
+//     }
+// }

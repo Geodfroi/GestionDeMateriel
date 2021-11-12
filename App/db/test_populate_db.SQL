@@ -1,9 +1,9 @@
 USE HEdS_inv_exp;
 
-INSERT INTO users (id, username, email, is_admin) VALUES (1, 'Joël', 'aurore.azure@gmail.com', 1);
-INSERT INTO users (id,username, email) VALUES (2, 'Florence Nightingale', 'hospital@crimea.com');
-INSERT INTO users (id,username, email) VALUES (3, 'Henry Dunant', 'h.dunant@redcross.ch');
-INSERT INTO users (id,username, email) VALUES (4, 'Clara Barton', 'clara-b@civilwar.org');
+INSERT INTO users (id, password, email, is_admin) VALUES (1, '$2y$10$Sytf53Pfav5E0A1yTDf39uJE669PUjp/0OXYDM8lhlfNjoqrq.0a.', 'aurore.azure@gmail.com', 1);
+INSERT INTO users (id, password, email) VALUES (2, '$2y$10$yw4QX5NjU8g21i5qxnQXbOGhNjDoZ8r0eBiSSJrNTbEFtmTs8VDXC', 'flo-night@crimea.com');
+INSERT INTO users (id, password, email) VALUES (3, '$2y$10$rZGyarSuElY1WKcqRMrcVeRUoMWn0iJaitiygV66wb5N3DgHRnpva', 'h.dunant@redcross.ch');
+INSERT INTO users (id, password, email) VALUES (4, '$2y$10$cKK0yQsz9Ywj3u/Jav4D2OUexjmW8GzWP27jgjSDFPnvlpWYaqrfG',  'clarab@civilwar.org');
 
 INSERT INTO items (user_id, item_name, location, expiration_date) VALUES (2, 'Vin rouge', 'celier', '2022-08-01' );
 INSERT INTO items (user_id, item_name, location) VALUES (2, 'Papier A4 x 1000', 'bureau 202');

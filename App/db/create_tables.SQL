@@ -5,8 +5,8 @@ USE HEdS_inv_exp;
 -- App Users
 CREATE TABLE `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `username`      varchar(50)     NOT NULL UNIQUE,
     `email`         varchar(255)    NOT NULL UNIQUE,
+    `password`      varchar(255)    NOT NULL,
     `creation_date` datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `is_admin`      boolean         DEFAULT false
 );

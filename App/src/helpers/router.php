@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.11 ###
+## Joël Piguet - 2021.11.12 ###
 ##############################
 
 namespace helpers;
 
 use routes\BaseRoute;
-use routes\DefaultRoute;
+use routes\LoginRoute;
+use routes\UserRoute;
 
 /**
  * Get proper route from path contained in $_SERVER['PATH_INFO']; 
@@ -18,16 +19,11 @@ use routes\DefaultRoute;
 function getRoute(): ?BaseRoute
 {
     switch ($_SERVER['PATH_INFO'] ?? '/') {
-
+        case '/login':
+            return new LoginRoute();
+        case '/user':
         case '/':
-            return new DefaultRoute();
-            // return new class extends Handler
-            // {
-            //     public function handle(): string
-            //     
-            //         return (new Def('home'))->render();
-            //     }
-            // };
+            return new UserRoute();
         default:
             return new class extends BaseRoute
             {

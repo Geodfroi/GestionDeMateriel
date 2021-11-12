@@ -1,10 +1,10 @@
 <?php
 
-namespace routes;
-
 ################################
 ## Joël Piguet - 2021.11.11 ###
 ##############################
+
+namespace routes;
 
 abstract class BaseRoute
 {
