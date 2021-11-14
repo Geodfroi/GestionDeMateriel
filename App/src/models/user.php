@@ -12,20 +12,15 @@ use \DateTime;
 
 class User
 {
-    /** @var int */
-    private $id;
+    private int $id;
 
-    /** @var string */
-    private $email;
+    private string $email;
 
-    /** @var string */
-    private $password;
+    private string $password;
 
-    /** @var DateTime */
-    private $creation_date;
+    private DateTime $creation_date;
 
-    /** @var bool */
-    private $is_admin;
+    private bool $is_admin;
 
     /**
      * construct user from db from an associative array
@@ -44,8 +39,25 @@ class User
         return $this->id;
     }
 
-    public function getEmail(): string
+    /**
+     * Check password against hash password field contained in user.
+     * 
+     * @param string $password Input password in plain text.
+     * @return bool True if password is correct.
+     */
+    public function verifyPassword(string $password): bool
     {
-        return $this->email;
+        // password_verify transforms plain text $password into hash password of 60 caracters, then compares it to the hash value contained in the user password property.
+        return password_verify($password, $this->password);
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('User %04d> %s, created %s%s', $this->id, $this->email, $this->creation_date->format('Y.m.d'), $this->is_admin ? ' (has admin privileges)' : '');
     }
 }
+
+    // public function getEmail(): string
+    // {
+    //     return $this->email;
+    // }

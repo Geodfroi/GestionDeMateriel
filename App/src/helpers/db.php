@@ -13,7 +13,7 @@ use models\User;
 use PDOException;
 
 /**
- * Database class accessible throughout the application by calling getInstance() method. 
+ * Database class accessible throughout the application by calling it'ss get_instance() method. 
  */
 class Database
 {
@@ -27,18 +27,19 @@ class Database
     {
         try {
             $dsn = 'mysql:host=' . HOST . ';port=' . PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4';
-            echo $dsn;
             $options = [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ];
             $this->pdo = new PDO($dsn, ADMIN_ID, ADMIN_PASSWORD, $options);
         } catch (PDOException $e) {
-            echo 'Connection failed: ' . $e->getMessage();
+            echo 'Connection failed: ' . $e->getMessage() . PHP_EOL;
         }
     }
 
     /**
      * Simpleton pattern insures there is only one instance of Database class in the whole application
+     * 
+     * @return Database Always return the same instance of Database class.
      */
     public static function getInstance()
     {
@@ -49,55 +50,32 @@ class Database
         return $instance;
     }
 
-    public function getUserByEMail(string $email): ?User
+    /**
+     * Return a single user data by email.
+     * 
+     * @param string $email user email.
+     * @return ?User user class instance.
+     */
+    public function getUserByEmail(string $email): ?User
     {
-        // $stmt = $this->pdo->prepare("SELECT * FROM users");
-        // if ($stmt->execute()) {
-        //     echo "1";
-        //     // echo $data;
-        //     echo $stmt->columnCount();
-        //     return null;
-        //     // return new User($data);
-        // }
-        // return null;
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            email, 
+            password, 
+            creation_date, 
+            is_admin 
+        FROM users WHERE email = :email');
 
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
-        if ($stmt->execute([':email' => $email]) && ($data = $stmt->fetch(PDO::FETCH_ASSOC))) {
-            echo '1';
-            echo $data;
-            return new User($data);
+        $preparedStatement->bindParam(':email', $email);
+        try {
+            if ($preparedStatement->execute()) {
+                $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+                return $data ? new User($data) : null;
+            }
+        } catch (\PDOException $e) {
+            echo 'failure to retrieve user from database: ' . $e->getMessage() . PHP_EOL;
         }
+
         return null;
-
-
-        // // echo $this->pdo;
-        // echo $email;
-        // $preparedStatement = $this->pdo->prepare('SELECT 
-        //     id, 
-        //     email, 
-        //     password, 
-        //     creation_date, 
-        //     is_admin 
-        // FROM users WHERE email = :email');
-
-        // $preparedStatement->bindParam(':email', $email);
-        // $preparedStatement->execute();
-
-
-
-        // // if ($preparedStatement->execute()) {
-        // // echo 'executed';
-        // # return result as associative array;
-
-        // $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
-        // echo '1';
-        // echo $data;
-        // if ($data) {
-        //     return new User($data);
-        // }
-        // // } else {
-        // //     echo 'not executed';
-        // // }
-        // return null;
     }
 }

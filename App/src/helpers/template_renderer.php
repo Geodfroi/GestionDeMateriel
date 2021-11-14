@@ -1,20 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
 ################################
-## Joël Piguet - 2021.11.11 ###
+## Joël Piguet - 2021.11.14 ###
 ##############################
 
 namespace helpers;
 
 /**
  * Load a php template in memory and returns a content string.
- * 
+ *
  * @param string $name The name of the template.
  * @param array $data The variables to be used in php templates.
  */
-function render_template(string $name, array $data = []): string
+function renderTemplate(string $name, array $data = []): string
 {
     // extract array variables into the local scope so they can be to be used in the template scripts.
     extract($data, EXTR_OVERWRITE);

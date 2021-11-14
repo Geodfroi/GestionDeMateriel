@@ -3,13 +3,23 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.11 ###
+## Joël Piguet - 2021.11.14 ###
 ##############################
 
 namespace helpers;
 
+use Exception;
+
+/**
+ * Collection of static functions linked to authentification bundled into a class.
+ */
 class Authenticate
 {
+    public static function login(int $id)
+    {
+        throw new Exception('not implemented');
+    }
+
     public static function isLoggedIn(): bool
     {
         return isset($_SESSION['user_id']);
