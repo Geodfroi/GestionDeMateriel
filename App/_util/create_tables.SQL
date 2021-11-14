@@ -8,6 +8,7 @@ CREATE TABLE `users` (
     `email`         varchar(255)    NOT NULL UNIQUE,
     `password`      varchar(255)    NOT NULL,
     `creation_date` datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_login`    datetime        DEFAULT CURRENT_TIMESTAMP,
     `is_admin`      boolean         DEFAULT false
 );
 

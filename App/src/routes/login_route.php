@@ -6,7 +6,7 @@
 
 namespace routes;
 
-
+use Exception;
 use helpers\Database;
 use helpers\Authenticate;
 use routes\Routes;
@@ -66,6 +66,16 @@ class LoginRoute extends BaseRoute
         $form_errors['password'] = PASSWORD_INVALID;
     }
 
+    /**
+     * Send a new password to user and register new password to database
+     * 
+     * @param string $email User email.
+     */
+    private function handleNewPasswordRequest($email)
+    {
+        throw new Exception('not implemented');
+    }
+
     public function getBodyContent(): string
     {
         if (Authenticate::isLoggedIn()) {
@@ -76,11 +86,19 @@ class LoginRoute extends BaseRoute
         $form_errors = [];
         $email  = '';
         $user = '';
+        $password_changed = false;
 
-        if (count($_POST)) {
-
+        if (isset($_GET['old-email'])) {
+            $email  = $_GET['old-email'];
+            $user = Database::getInstance()->getUserByEmail($email);
+            if (isset($user)) {
+                $this->handleNewPasswordRequest($user->getEmail());
+                $password_changed = true;
+            }
+        } else if (count($_POST)) {
             $email  = trim($_POST['email']) ?? '';
             $password = trim($_POST['password']) ?? '';
+
             $user = Database::getInstance()->getUserByEmail($email);
 
             if (!isset($user))
@@ -89,12 +107,16 @@ class LoginRoute extends BaseRoute
                 if (!$user->verifyPassword($password)) {
                     $this->handlePasswordError($password, $form_errors);
                 } else {
-                    Authenticate::login($user->getId());
+                    Authenticate::login($user);
                     $this->requestRedirect(Routes::USER);
                     return "";
                 }
             }
         }
-        return $this->renderTemplate(['form_errors' => $form_errors, 'email' => $email]);
+        return $this->renderTemplate([
+            'form_errors' => $form_errors,
+            'email' => $email,
+            'password_changed' => $password_changed,
+        ]);
     }
 }

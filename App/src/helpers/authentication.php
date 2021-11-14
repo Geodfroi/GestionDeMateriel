@@ -3,26 +3,47 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.15 ###
 ##############################
 
 namespace helpers;
 
-use Exception;
+use models\User;
+
+const USER_ID = 'user_id';
 
 /**
- * Collection of static functions linked to authentification bundled into a class.
+ * Collection of static functions linked to authentification bundled into a class. 
  */
 class Authenticate
 {
-    public static function login(int $id)
+    /**
+     * Log-in user into session. The user will stay logged-in as long as the browser is open.
+     * 
+     * @param User $user User instance.
+     */
+    public static function login(User $user)
     {
-        throw new Exception('not implemented');
+        $_SESSION[USER_ID] = $user->getId();
+        Database::getInstance()->updateLogTime($user->getId());
     }
 
     public static function isLoggedIn(): bool
     {
-        return isset($_SESSION['user_id']);
+        return isset($_SESSION[USER_ID]);
+    }
+
+    /**
+     * Retrieve logged-in user.
+     * 
+     * @return ?User Logged-in User if found, otherwise null;
+     */
+    public static function getUser(): ?User
+    {
+        if (isset($_SESSION[USER_ID])) {
+            Database::getInstance()->getUserById($_SESSION[USER_ID]);
+        }
+        return null;
     }
 }
 
@@ -32,23 +53,12 @@ class Authenticate
 
 // class Auth
 // {
-//     public static function getLastLogin(): DateTime
-//     {
-//         return DateTime::createFromFormat('U', (string)($_SESSION['loginTime'] ?? ''));
-//     }
-
 //     public static function getUser(): ?User
 //     {
 //         if (self::userIsAuthenticated()) {
 //             return Database::instance()->getUserById((int)$_SESSION['userid']);
 //         }
 //         return null;
-//     }
-
-//     public static function authenticate(int $id)
-//     {
-//         $_SESSION['userid'] = $id;
-//         $_SESSION['loginTime'] = time();
 //     }
 
 //     public static function logout()

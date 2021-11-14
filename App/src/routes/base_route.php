@@ -50,7 +50,7 @@ abstract class BaseRoute
      */
     public function getHeaderTitle(): string
     {
-        return DEFAULT_PAGE_TITLE;
+        return APP_NAME;
     }
 
     /**

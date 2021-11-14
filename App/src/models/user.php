@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.15 ###
 ##############################
 
 namespace models;
@@ -20,6 +20,8 @@ class User
 
     private DateTime $creation_date;
 
+    private DateTime $last_login;
+
     private bool $is_admin;
 
     /**
@@ -31,7 +33,13 @@ class User
         $this->email = (string)($input['email'] ?? '');
         $this->password = (string)($input['password'] ?? '');
         $this->creation_date = new DateTime($input['creation_date']);
+        $this->last_login = new DateTime($input['last_login']);
         $this->is_admin = (bool)$input['is_admin'];
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 
     public function getId(): int
@@ -53,11 +61,6 @@ class User
 
     public function __toString(): string
     {
-        return sprintf('User %04d> %s, created %s%s', $this->id, $this->email, $this->creation_date->format('Y.m.d'), $this->is_admin ? ' (has admin privileges)' : '');
+        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, $this->creation_date->format('Y.m.d'), $this->last_login->format('Y.m.d H:i:s'), $this->is_admin ? ' (has admin privileges)' : '');
     }
 }
-
-    // public function getEmail(): string
-    // {
-    //     return $this->email;
-    // }

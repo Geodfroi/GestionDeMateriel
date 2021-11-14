@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.15 ###
 ##############################
 
 namespace helpers;
 
+use Exception;
 use \PDO;
 use models\User;
 use PDOException;
@@ -50,11 +51,16 @@ class Database
         return $instance;
     }
 
+    public function getEntries(int $userId, int $max_count, $offset)
+    {
+        throw new Exception('Not implemented');
+    }
+
     /**
      * Return a single user data by email.
      * 
-     * @param string $email user email.
-     * @return ?User user class instance.
+     * @param string $email User email.
+     * @return ?User User class instance.
      */
     public function getUserByEmail(string $email): ?User
     {
@@ -63,6 +69,7 @@ class Database
             email, 
             password, 
             creation_date, 
+            last_login,
             is_admin 
         FROM users WHERE email = :email');
 
@@ -77,5 +84,59 @@ class Database
         }
 
         return null;
+    }
+
+    /**
+     * Return a single user data by id.
+     * 
+     * @param int $id User id.
+     * @return ?User User class instance.
+     */
+    public function getUserById(int $id): ?User
+    {
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            email, 
+            password, 
+            creation_date, 
+            last_login,
+            is_admin 
+        FROM users WHERE id = :id');
+
+        $preparedStatement->bindParam(':id', $id);
+
+        try {
+            if ($preparedStatement->execute()) {
+                $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+                return $data ? new User($data) : null;
+            }
+        } catch (\PDOException $e) {
+            echo 'failure to retrieve user from database: ' . $e->getMessage() . PHP_EOL;
+        }
+        return null;
+    }
+
+
+    /**
+     * Update user last_login field to now.
+     * 
+     * @param int $userId ID of user.
+     */
+    public function updateLogTime(int $userId): bool
+    {
+        $preparedStatement = $this->pdo->prepare('UPDATE users SET last_login=:last_login WHERE id = :id');
+        $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
+
+        $preparedStatement->bindParam(':last_login', $now);
+        $preparedStatement->bindParam(':id', $userId);
+
+        try {
+            if ($preparedStatement->execute()) {
+                return true;
+            }
+        } catch (\PDOException $e) {
+            echo 'failure to update user last_login: ' . $e->getMessage() . PHP_EOL;
+        }
+        return false;
     }
 }
