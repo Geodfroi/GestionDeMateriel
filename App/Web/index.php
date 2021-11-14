@@ -17,8 +17,8 @@ $templateData = [];
 
 if ($route = getRoute()) {
     if (!$route->isRedirecting()) {
-        $templateData['page_content'] = $route->getPageContent();
         $templateData['page_title'] = $route->getPageTitle();
+        $templateData['page_content'] = $route->getPageContent();
     }
 }
 

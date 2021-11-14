@@ -1,4 +1,4 @@
-21.11.09
+21.11.14
 
 - option d'exporter la db vers excel sheet pour owner of db.
 - send keys to user by way of mail to register. - pre-register emails in db ?
@@ -23,3 +23,6 @@
 
 - èiblish to hiroku.
 - publich to microsoft azure.
+
+'oublié votre password ? '
+- implement exceptions
