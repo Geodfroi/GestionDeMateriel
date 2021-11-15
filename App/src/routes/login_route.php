@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.15 ###
 ##############################
 
 namespace routes;
@@ -10,7 +10,6 @@ use Exception;
 use helpers\Database;
 use helpers\Authenticate;
 use routes\Routes;
-use models\User;
 
 const EMAIL_EMPTY = 'Un e-mail est nécessaire pour vous connecter.';
 const PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
@@ -18,17 +17,16 @@ const EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
 const USER_NOT_FOUND = "Il n'existe pas d'usager employant cette adresse e-mail.";
 const PASSWORD_INVALID = "Le mot de passe n'est pas correct.";
 
-const LOGIN_TEMPLATE = "login_template";
 
 /**
- * Route class containing behavior linked to login_remplate
+ * Route class containing behavior linked to login_template
  */
 class LoginRoute extends BaseRoute
 {
 
     public function __construct()
     {
-        parent::__construct(LOGIN_TEMPLATE);
+        parent::__construct('login_template');
     }
 
     /**
@@ -79,7 +77,7 @@ class LoginRoute extends BaseRoute
     public function getBodyContent(): string
     {
         if (Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Routes::USER);
+            $this->requestRedirect(Routes::ARTICLES);
             return '';
         }
 
@@ -108,7 +106,7 @@ class LoginRoute extends BaseRoute
                     $this->handlePasswordError($password, $form_errors);
                 } else {
                     Authenticate::login($user);
-                    $this->requestRedirect(Routes::USER);
+                    $this->requestRedirect(Routes::ARTICLES);
                     return "";
                 }
             }

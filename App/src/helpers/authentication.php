@@ -41,7 +41,7 @@ class Authenticate
     public static function getUser(): ?User
     {
         if (isset($_SESSION[USER_ID])) {
-            Database::getInstance()->getUserById($_SESSION[USER_ID]);
+            return Database::getInstance()->getUserById($_SESSION[USER_ID]);
         }
         return null;
     }

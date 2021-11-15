@@ -3,15 +3,17 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.15 ###
 ##############################
 
 namespace helpers;
 
-use routes\Routes;
+use routes\AdminRoute;
+use routes\ArticlesRoute;
 use routes\BaseRoute;
 use routes\LoginRoute;
-use routes\UserRoute;
+use routes\ProfileRoute;
+use routes\Routes;
 
 /**
  * Get proper route from path contained in $_SERVER['PATH_INFO']; 
@@ -22,11 +24,15 @@ use routes\UserRoute;
 function getRoute(): BaseRoute
 {
     switch ($_SERVER['PATH_INFO'] ?? '/') {
+        case Routes::ADMIN:
+            return new AdminRoute();
         case Routes::LOGIN:
             return new LoginRoute();
-        case Routes::USER:
+        case ROUTES::PROFILE:
+            return new ProfileRoute();
+        case Routes::ARTICLES:
         case '/':
-            return new UserRoute();
+            return new ArticlesRoute();
         default:
             return new class extends BaseRoute
             {
@@ -41,10 +47,6 @@ function getRoute(): BaseRoute
     // switch ($_SERVER['PATH_INFO'] ?? '/') {
     //     case '/signup':
     //         return new Signup();
-    //     case '/contacts':
-    //         return new Contacts();
-    //     case '/profile':
-    //         return new Profile();
     //     case '/login':
     //         return new Login();
     //     case '/logout':

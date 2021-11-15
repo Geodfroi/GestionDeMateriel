@@ -1,7 +1,7 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.15 ###
 ##############################
-?>
 
-<div>User content here</div>
+?>
+<div>profile template</div>

@@ -13,10 +13,10 @@ CREATE TABLE `users` (
 );
 
 -- Inventory item
-CREATE TABLE `items` (
+CREATE TABLE `articles` (
     `id`                int             UNSIGNED NOT NULL  AUTO_INCREMENT PRIMARY KEY,
     `user_id`           int             NOT NULL,
-    `item_name`         varchar(255)    NOT NULL,
+    `article_name`         varchar(255)    NOT NULL,
     `location`          varchar(255)    NOT NULL,
     `expiration_date`   datetime,
     `creation_date`     datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP

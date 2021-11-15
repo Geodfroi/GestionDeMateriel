@@ -8,10 +8,15 @@ declare(strict_types=1);
 
 namespace helpers;
 
-use Exception;
 use \PDO;
 use models\User;
+use models\Article;
 use PDOException;
+
+// class QueryOrder
+// {
+//     const OrderByName = 0;
+// }
 
 /**
  * Database class accessible throughout the application by calling it'ss get_instance() method. 
@@ -51,9 +56,41 @@ class Database
         return $instance;
     }
 
-    public function getEntries(int $userId, int $max_count, $offset)
+    /**
+     * Retrieve the user articles;
+     * 
+     * @param int $user_id User id;
+     * @param int $limit The maximum number of items to be returned.
+     * @param int $skip The number of result items to be skipped before including them to the result array.
+     * @return array An array of articles.
+     */
+    public function getUserArticles(int $user_id, int $limit, int $offset = 0): array
     {
-        throw new Exception('Not implemented');
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            user_id, 
+            article_name, 
+            location, 
+            expiration_date,
+            creation_date 
+        FROM articles WHERE user_id = :uid LIMIT :lim OFFSET :off');
+
+        $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
+
+        $articles = [];
+        try {
+            if ($preparedStatement->execute()) {
+                // fetch next as associative array until there are none to be fetched.
+                while ($data = $preparedStatement->fetch()) {
+                    array_push($articles, new Article($data));
+                }
+            }
+        } catch (\PDOException $e) {
+            echo 'failure to retrieve articles from database: ' . $e->getMessage() . PHP_EOL;
+        }
+        return $articles;
     }
 
     /**
@@ -73,7 +110,7 @@ class Database
             is_admin 
         FROM users WHERE email = :email');
 
-        $preparedStatement->bindParam(':email', $email);
+        $preparedStatement->bindParam(':email', $email, PDO::PARAM_STR);
         try {
             if ($preparedStatement->execute()) {
                 $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
@@ -103,7 +140,7 @@ class Database
             is_admin 
         FROM users WHERE id = :id');
 
-        $preparedStatement->bindParam(':id', $id);
+        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
 
         try {
             if ($preparedStatement->execute()) {
@@ -127,8 +164,8 @@ class Database
         $preparedStatement = $this->pdo->prepare('UPDATE users SET last_login=:last_login WHERE id = :id');
         $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
 
-        $preparedStatement->bindParam(':last_login', $now);
-        $preparedStatement->bindParam(':id', $userId);
+        $preparedStatement->bindParam(':last_login', $now, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':id', $userId, PDO::PARAM_INT);
 
         try {
             if ($preparedStatement->execute()) {
