@@ -27,3 +27,5 @@
 - implement exceptions
 - proper error log in Database.
 - order by user_route
+
+-footer: HEsO - service des innovations pédagogiques, nov 2021.
