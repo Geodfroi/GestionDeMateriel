@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.16 ###
 ##############################
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh 
 
 use function helpers\renderTemplate;
-use function helpers\getRoute;
+use routes\Routes;
 
 require_once __DIR__ . '/../boot.php';
 
@@ -18,7 +18,7 @@ session_start();
 $templateData = [];
 
 // each route correspond to a path (i.e '/login') and is responsible to dynamically generate customized html content.
-if ($route = getRoute()) {
+if ($route = Routes::getRoute()) {
     if (!$route->isRedirecting()) {
         $templateData['page_title'] = $route->getHeaderTitle();
         $templateData['page_content'] = $route->getBodyContent();

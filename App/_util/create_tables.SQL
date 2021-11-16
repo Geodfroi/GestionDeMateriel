@@ -18,7 +18,7 @@ CREATE TABLE `articles` (
     `user_id`           int             NOT NULL,
     `article_name`      varchar(255)    NOT NULL,
     `location`          varchar(255)    NOT NULL,
-    `comments`          varchar(255)
+    `comments`          varchar(255),
     `expiration_date`   timestamp       NOT NULL,
     `creation_date`     timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

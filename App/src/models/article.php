@@ -25,15 +25,18 @@ class Article
     private string $location;
 
     /**
-     * @param int UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
+     * UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
      */
     private int $expiration_date;
 
     /**
-     * @param int UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
+     *  UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
      */
     private int $creation_date;
 
+    /**
+     * Free comments set by the user appended to the email remainder sent when the expiration date is close.
+     */
     private string $comments;
 
     /**

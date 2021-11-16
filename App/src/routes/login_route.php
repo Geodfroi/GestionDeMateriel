@@ -42,7 +42,7 @@ class LoginRoute extends BaseRoute
         $user = '';
         $password_changed = false;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($_GET['old-email'])) {
             // handle demand for new password.
             $email  = $_GET['old-email'];
             $user = Database::getInstance()->getUserByEmail($email);
@@ -51,7 +51,9 @@ class LoginRoute extends BaseRoute
                 $this->handleNewPasswordRequest($user->getEmail());
                 $password_changed = true;
             }
-        } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // handle login post request.
             $email  = trim($_POST['email']) ?? '';
             $password = trim($_POST['password']) ?? '';

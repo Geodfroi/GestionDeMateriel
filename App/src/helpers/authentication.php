@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.15 ###
+## Joël Piguet - 2021.11.16 ###
 ##############################
 
 namespace helpers;
@@ -28,6 +28,18 @@ class Authenticate
         Database::getInstance()->updateLogTime($user->getId());
     }
 
+    /**
+     * Remove credentials from _SESSION and cookies.
+     */
+    public static function logout()
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION = []; // clear the stored values in current $_SESSION global variable.
+            session_regenerate_id(true); // send header to browser to remove id cookie.
+            session_destroy();
+        }
+    }
+
     public static function isLoggedIn(): bool
     {
         return isset($_SESSION[USER_ID]);
@@ -46,27 +58,3 @@ class Authenticate
         return null;
     }
 }
-
-
-// use DateTime;
-// use Models\User;
-
-// class Auth
-// {
-//     public static function getUser(): ?User
-//     {
-//         if (self::userIsAuthenticated()) {
-//             return Database::instance()->getUserById((int)$_SESSION['userid']);
-//         }
-//         return null;
-//     }
-
-//     public static function logout()
-//     {
-//         if (session_status() === PHP_SESSION_ACTIVE) {
-//             $_SESSION = []; // clear the stored values in current call $_SESSION
-//             session_regenerate_id(true);
-//             session_destroy();
-//         }
-//     }
-// }

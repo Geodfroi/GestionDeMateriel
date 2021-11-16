@@ -12,12 +12,8 @@
 - accept only HEdS email.
 - contact us field.
 - profile page avec option de changer de clé.
-- add comment to entry to be recalled.
 - test option : send confirmation email the first time logged in.
 - profile: set delay before warning by email. use floating labels select.
-
-- profile: add additional mail address.
-- choisir date par texte ou date picker.
 
 - model : user, StorageItem
 
@@ -28,4 +24,3 @@
 - proper error log in Database.
 - order by user_route
 
--footer: HEsO - service des innovations pédagogiques, nov 2021.
