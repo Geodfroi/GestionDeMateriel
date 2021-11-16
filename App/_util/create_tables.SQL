@@ -7,8 +7,8 @@ CREATE TABLE `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `email`         varchar(255)    NOT NULL UNIQUE,
     `password`      varchar(255)    NOT NULL,
-    `creation_date` datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `last_login`    datetime        DEFAULT CURRENT_TIMESTAMP,
+    `creation_date` timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `last_login`    timestamp       DEFAULT CURRENT_TIMESTAMP,
     `is_admin`      boolean         DEFAULT false
 );
 
@@ -16,8 +16,9 @@ CREATE TABLE `users` (
 CREATE TABLE `articles` (
     `id`                int             UNSIGNED NOT NULL  AUTO_INCREMENT PRIMARY KEY,
     `user_id`           int             NOT NULL,
-    `article_name`         varchar(255)    NOT NULL,
+    `article_name`      varchar(255)    NOT NULL,
     `location`          varchar(255)    NOT NULL,
-    `expiration_date`   datetime,
-    `creation_date`     datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP
+    `comments`          varchar(255)
+    `expiration_date`   timestamp       NOT NULL,
+    `creation_date`     timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

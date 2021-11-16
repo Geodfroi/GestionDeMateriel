@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.15 ###
+## Joël Piguet - 2021.11.16 ###
 ##############################
 
 namespace helpers;
 
 use \PDO;
+use helpers\DateFormatter;
 use models\User;
 use models\Article;
 use PDOException;
@@ -70,7 +71,8 @@ class Database
             id, 
             user_id, 
             article_name, 
-            location, 
+            location,
+            comments, 
             expiration_date,
             creation_date 
         FROM articles WHERE user_id = :uid LIMIT :lim OFFSET :off');
@@ -84,7 +86,7 @@ class Database
             if ($preparedStatement->execute()) {
                 // fetch next as associative array until there are none to be fetched.
                 while ($data = $preparedStatement->fetch()) {
-                    array_push($articles, new Article($data));
+                    array_push($articles, Article::fromDatabaseRow($data));
                 }
             }
         } catch (\PDOException $e) {
@@ -114,7 +116,7 @@ class Database
         try {
             if ($preparedStatement->execute()) {
                 $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
-                return $data ? new User($data) : null;
+                return $data ? User::fromDatabaseRow($data) : null;
             }
         } catch (\PDOException $e) {
             echo 'failure to retrieve user from database: ' . $e->getMessage() . PHP_EOL;
@@ -145,13 +147,46 @@ class Database
         try {
             if ($preparedStatement->execute()) {
                 $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
-                return $data ? new User($data) : null;
+                return $data ? User::fromDatabaseRow($data) : null;
             }
         } catch (\PDOException $e) {
             echo 'failure to retrieve user from database: ' . $e->getMessage() . PHP_EOL;
         }
         return null;
     }
+
+    /**
+     * Insert an article to the database.
+     * 
+     * @param Article Article to insert.
+     * @return bool True if the insert is successful.
+     */
+    public function insertArticle(Article $article): bool
+    {
+        $preparedStatement = $this->pdo->prepare(
+            'INSERT INTO articles 
+            (user_id, article_name, location, expiration_date) 
+            VALUES 
+            (:uid, :art, :loc, :exp)'
+        );
+
+        $uid = $article->getUser_id();
+        $name = $article->getArticleName();
+        $location = $article->getLocation();
+        $date = DateFormatter::printSQLTimestamp($article->getExpirationDate());
+        $preparedStatement->bindParam(':uid', $uid, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':art', $name, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':loc', $location, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':exp', $date, PDO::PARAM_STR);
+
+        try {
+            return $preparedStatement->execute();
+        } catch (\PDOException $e) {
+            echo 'failure to insert article to database: ' . $e->getMessage() . PHP_EOL;
+        }
+        return false;
+    }
+
 
 
     /**

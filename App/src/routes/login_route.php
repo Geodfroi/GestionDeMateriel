@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.15 ###
+## Joël Piguet - 2021.11.16 ###
 ##############################
 
 namespace routes;
@@ -29,50 +29,6 @@ class LoginRoute extends BaseRoute
         parent::__construct('login_template');
     }
 
-    /**
-     * Fill $form_errors array with proper email error text to be displayed.
-     * 
-     * @param string $email User email.
-     * @param Array[string] &$form_errors Error array passed by reference to be modified in-function.
-     */
-    private function handleEmailError($email, &$form_errors)
-    {
-        if ($email  === '') {
-            $form_errors['email'] = EMAIL_EMPTY;
-            return;
-        }
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            $form_errors['email'] = EMAIL_INVALID;
-            return;
-        }
-        $form_errors['email'] = USER_NOT_FOUND;
-    }
-
-    /**
-     * Fill $form_errors array with proper password error text to be displayed.
-     * 
-     * @param string $password User password.
-     * @param Array[string] &$form_errors Error array passed by reference to be modified in-function.
-     */
-    private function handlePasswordError($password, &$form_errors)
-    {
-        if ($password === '') {
-            $form_errors['password'] = PASSWORD_EMPTY;
-            return;
-        }
-        $form_errors['password'] = PASSWORD_INVALID;
-    }
-
-    /**
-     * Send a new password to user and register new password to database
-     * 
-     * @param string $email User email.
-     */
-    private function handleNewPasswordRequest($email)
-    {
-        throw new Exception('not implemented');
-    }
 
     public function getBodyContent(): string
     {
@@ -86,35 +42,89 @@ class LoginRoute extends BaseRoute
         $user = '';
         $password_changed = false;
 
-        if (isset($_GET['old-email'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            // handle demand for new password.
             $email  = $_GET['old-email'];
             $user = Database::getInstance()->getUserByEmail($email);
+
             if (isset($user)) {
                 $this->handleNewPasswordRequest($user->getEmail());
                 $password_changed = true;
             }
-        } else if (count($_POST)) {
+        } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // handle login post request.
             $email  = trim($_POST['email']) ?? '';
             $password = trim($_POST['password']) ?? '';
 
-            $user = Database::getInstance()->getUserByEmail($email);
+            if ($this->validate_email_input($email, $form_errors)) {
+                $user = Database::getInstance()->getUserByEmail($email);
+            }
 
-            if (!isset($user))
-                $this->handleEmailError($email, $form_errors);
-            else {
-                if (!$user->verifyPassword($password)) {
-                    $this->handlePasswordError($password, $form_errors);
-                } else {
-                    Authenticate::login($user);
-                    $this->requestRedirect(Routes::ARTICLES);
-                    return "";
+            if (!isset($user)) {
+                $form_errors['email'] = USER_NOT_FOUND;
+            } else {
+                if ($this->validate_password_input($password, $form_errors)) {
+                    if ($user->verifyPassword($password)) {
+                        Authenticate::login($user);
+                        $this->requestRedirect(Routes::ARTICLES);
+                        return "";
+                    } else {
+                        $form_errors['password'] = PASSWORD_INVALID;
+                    }
                 }
             }
         }
         return $this->renderTemplate([
-            'form_errors' => $form_errors,
             'email' => $email,
+            'form_errors' => $form_errors,
             'password_changed' => $password_changed,
         ]);
+    }
+
+    /**
+     * Validate input and fill $form_errors array with proper email error text to be displayed if it fails.
+     * 
+     * @param string $email User email.
+     * @param Array[string] &$form_errors Error array passed by reference to be modified in-function.
+     * @return bool True if properly filled-in.
+     */
+    private function validate_email_input($email, &$form_errors): bool
+    {
+        if ($email  === '') {
+            $form_errors['email'] = EMAIL_EMPTY;
+            return false;
+        }
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+        if (!$email) {
+            $form_errors['email'] = EMAIL_INVALID;
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate input and fill $form_errors array with proper password error text to be displayed if it fails.
+     * 
+     * @param string $password User password.
+     * @param Array[string] &$form_errors Error array passed by reference to be modified in-function.
+     * @return bool True if properly filled;
+     */
+    private function validate_password_input($password, &$form_errors)
+    {
+        if ($password === '') {
+            $form_errors['password'] = PASSWORD_EMPTY;
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Send a new password to user and register new password to database
+     * 
+     * @param string $email User email.
+     */
+    private function handleNewPasswordRequest($email)
+    {
+        throw new Exception('not implemented');
     }
 }

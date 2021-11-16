@@ -8,7 +8,7 @@ INSERT INTO users (id, password, email) VALUES (4, '$2y$10$cKK0yQsz9Ywj3u/Jav4D2
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (2, 'Vin rouge', 'celier', '2022-08-01' );
 INSERT INTO articles (user_id, article_name, location) VALUES (2, 'Papier A4 x 1000', 'bureau 202');
 
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A1', 'Placard 3A', '2023-08-01' );
+INSERT INTO articles (user_id, article_name, location, expiration_date, comments) VALUES (3, 'Produit nettoyage A1', 'Placard 3A', '2023-08-01', 'this is a comment');
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2', 'Placard 3A', '2023-06-01' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A3', 'Placard 3A', '2023-06-01' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A4', 'Placard 3A', '2023-06-01' );

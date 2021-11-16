@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../boot.php';
 
 use helpers\Database;
+use models\Article;
 
 // $array = Database::getInstance()->getUserArticles(3, 10, 0);
 
@@ -10,4 +11,6 @@ use helpers\Database;
 //     echo $art . PHP_EOL;
 // }
 
-echo Database::getInstance()->getUserById(1);
+$article = Article::fromForm(2, 'soap', 'cuinise', time(), '');
+echo $article;
+echo Database::getInstance()->insertArticle($article);

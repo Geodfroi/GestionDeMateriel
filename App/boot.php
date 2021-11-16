@@ -1,11 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.15 ###
+## Joël Piguet - 2021.11.16 ###
 ##############################
 
 require_once __DIR__ . '/db_settings.php';
 require_once __DIR__ . '/src/helpers/authentication.php';
+require_once __DIR__ . '/src/helpers/date_formatter.php';
 require_once __DIR__ . '/src/helpers/db.php';
 require_once __DIR__ . '/src/helpers/mailing.php';
 require_once __DIR__ . '/src/helpers/router.php';

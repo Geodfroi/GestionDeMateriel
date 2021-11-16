@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.15 ###
+## Joël Piguet - 2021.11.16 ###
 ##############################
 
 namespace models;
 
 use \DateTime;
+use \helpers\DateFormatter;
 
 class User
 {
@@ -18,23 +19,33 @@ class User
 
     private string $password;
 
-    private DateTime $creation_date;
+    /**
+     * @param int UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
+     */
+    private int $creation_date;
 
-    private DateTime $last_login;
+    /**
+     * @param int UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
+     */
+    private int $last_login;
 
     private bool $is_admin;
 
     /**
-     * construct user from db from an associative array
+     * Load user instance from database row.
+     * 
+     * @return User A user instance.
      */
-    public function __construct(array $input)
+    public static function fromDatabaseRow(array $input)
     {
-        $this->id = (int)($input['id'] ?? 0);
-        $this->email = (string)($input['email'] ?? '');
-        $this->password = (string)($input['password'] ?? '');
-        $this->creation_date = new DateTime($input['creation_date']);
-        $this->last_login = new DateTime($input['last_login']);
-        $this->is_admin = (bool)$input['is_admin'];
+        $instance = new self();
+        $instance->id = (int)($input['id'] ?? 0);
+        $instance->email = (string)($input['email'] ?? '');
+        $instance->password = (string)($input['password'] ?? '');
+        $instance->creation_date = DateFormatter::toUnixTime($input['creation_date']);
+        $instance->last_login = DateFormatter::toUnixTime($input['last_login']);
+        $instance->is_admin = (bool)$input['is_admin'];
+        return $instance;
     }
 
     public function getEmail(): string
@@ -61,6 +72,6 @@ class User
 
     public function __toString(): string
     {
-        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, $this->creation_date->format('Y.m.d'), $this->last_login->format('Y.m.d H:i:s'), $this->is_admin ? ' (has admin privileges)' : '');
+        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, DateFormatter::printSQLTimestamp($this->creation_date), DateFormatter::printSQLTimestamp($this->last_login), $this->is_admin ? ' (has admin privileges)' : '');
     }
 }
