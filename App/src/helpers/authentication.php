@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace helpers;
 
-use models\User;
+use models\UserModel;
 
 const USER_ID = 'user_id';
 
@@ -25,7 +25,7 @@ class Authenticate
      * 
      * @param User $user User instance.
      */
-    public static function login(User $user)
+    public static function login(UserModel $user)
     {
         $_SESSION[USER_ID] = $user->getId();
         Database::getInstance()->updateLogTime($user->getId());
@@ -54,7 +54,7 @@ class Authenticate
      * 
      * @return ?User Logged-in User if found, otherwise null;
      */
-    public static function getUser(): ?User
+    public static function getUser(): ?UserModel
     {
         if (isset($_SESSION[USER_ID])) {
             return Database::getInstance()->getUserById($_SESSION[USER_ID]);

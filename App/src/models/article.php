@@ -3,19 +3,15 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.17 ###
 ##############################
 
 namespace models;
 
 use helpers\DateFormatter;
 
-class Article
+class ArticleModel
 {
-    const NAME_MAX_LENGTH = 20;
-    const LOCATION_MAX_LENGHT = 40;
-    const COMMENTS_MAX_LENGHT = 240;
-
     private int $id;
 
     private int $user_id;
@@ -44,7 +40,7 @@ class Article
      * 
      * @return Article An article instance.
      */
-    public static function fromDatabaseRow(array $input): Article
+    public static function fromDatabaseRow(array $input): ArticleModel
     {
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
@@ -66,7 +62,7 @@ class Article
      * @param int $expiration_date Expiration date of the stored article in UTC format.
      * @return Article An article instance.
      */
-    public static function fromForm(int $user_id, string $article_name, string $location, int $expiration_date, string $comments): Article
+    public static function fromForm(int $user_id, string $article_name, string $location, int $expiration_date, string $comments): ArticleModel
     {
         $instance = new self();
         $instance->id = -1;

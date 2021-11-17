@@ -10,6 +10,7 @@ require_once __DIR__ . '/src/helpers/date_formatter.php';
 require_once __DIR__ . '/src/helpers/db.php';
 require_once __DIR__ . '/src/helpers/mailing.php';
 require_once __DIR__ . '/src/helpers/template_renderer.php';
+require_once __DIR__ . '/src/helpers/template_util.php';
 require_once __DIR__ . '/src/models/article.php';
 require_once __DIR__ . '/src/models/user.php';
 

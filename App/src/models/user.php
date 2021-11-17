@@ -8,10 +8,9 @@ declare(strict_types=1);
 
 namespace models;
 
-use \DateTime;
 use \helpers\DateFormatter;
 
-class User
+class UserModel
 {
     private int $id;
 
@@ -34,9 +33,9 @@ class User
     /**
      * Load user instance from database row.
      * 
-     * @return User A user instance.
+     * @return UserModel A user instance.
      */
-    public static function fromDatabaseRow(array $input)
+    public static function fromDatabaseRow(array $input): UserModel
     {
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
