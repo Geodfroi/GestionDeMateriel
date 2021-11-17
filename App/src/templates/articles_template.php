@@ -30,7 +30,6 @@ use routes\Routes;
         </table>
     </div>
     <div class="row">
-        <a href="<?php echo Routes::ARTICLE_EDIT ?>" class="btn btn-primary">Ajouter un article</a>
-
+        <a href="<?php echo Routes::ARTICLE_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
     </div>
 </div>
