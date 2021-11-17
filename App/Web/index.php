@@ -25,5 +25,6 @@ if ($route = Routes::getRoute()) {
     }
 }
 
+
 // insert dynamically generated html content into the main template.
 echo renderTemplate('main_template', $templateData);

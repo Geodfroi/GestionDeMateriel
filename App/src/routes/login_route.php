@@ -33,14 +33,20 @@ class LoginRoute extends BaseRoute
     public function getBodyContent(): string
     {
         if (Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Routes::ARTICLES);
-            return '';
+
+            if (isset($_GET['logout'])) {
+                Authenticate::logout();
+                $alert['logout'] = '';
+            } else {
+                $this->requestRedirect(Routes::ARTICLES);
+                return '';
+            }
         }
 
         $form_errors = [];
+        $alert = [];
         $email  = '';
         $user = '';
-        $password_changed = false;
 
         if (isset($_GET['old-email'])) {
             // handle demand for new password.
@@ -48,10 +54,12 @@ class LoginRoute extends BaseRoute
             $user = Database::getInstance()->getUserByEmail($email);
 
             if (isset($user)) {
-                $this->handleNewPasswordRequest($user->getEmail());
-                $password_changed = true;
+                // $this->handleNewPasswordRequest($user->getEmail());
+                $alert['new-password'] = '';
             }
         }
+
+
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // handle login post request.
@@ -76,10 +84,11 @@ class LoginRoute extends BaseRoute
                 }
             }
         }
+
         return $this->renderTemplate([
             'email' => $email,
             'form_errors' => $form_errors,
-            'password_changed' => $password_changed,
+            'alert' => $alert,
         ]);
     }
 

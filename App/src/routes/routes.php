@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.17 ###
 ##############################
 
 namespace routes;
@@ -22,9 +22,10 @@ class Routes
 {
     const ADMIN = '/admin';
     const ARTICLES = '/articles';
+    const ARTICLE_EDIT = '/artedit';
     const CONTACT = '/contact';
     const LOGIN = '/login';
-    const LOGOUT = '/logout';
+    const LOGOUT = '/login?logout=true';
     const PROFILE = '/profile';
 
     /**
@@ -42,14 +43,13 @@ class Routes
                 return new ContactRoute();
             case Routes::LOGIN:
                 return new LoginRoute();
-            case Routes::LOGOUT:
-                Authenticate::logout();
-                return new LoginRoute();
             case ROUTES::PROFILE:
                 return new ProfileRoute();
             case Routes::ARTICLES:
             case '/':
                 return new ArticlesRoute();
+            case Routes::ARTICLE_EDIT:
+                return new ArticleEdit();
             default:
                 return new class extends BaseRoute
                 {

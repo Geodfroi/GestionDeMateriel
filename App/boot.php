@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.17 ###
 ##############################
 
 require_once __DIR__ . '/db_settings.php';
@@ -16,6 +16,7 @@ require_once __DIR__ . '/src/models/user.php';
 require_once __DIR__ . '/src/routes/base_route.php'; // must be included before other routes as it contains the route base class.
 require_once __DIR__ . '/src/routes/admin_route.php';
 require_once __DIR__ . '/src/routes/articles_route.php';
+require_once __DIR__ . '/src/routes/article_edit_route.php';
 require_once __DIR__ . '/src/routes/contact_route.php';
 require_once __DIR__ . '/src/routes/login_route.php';
 require_once __DIR__ . '/src/routes/profile_route.php';

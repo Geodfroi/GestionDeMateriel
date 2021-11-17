@@ -17,7 +17,6 @@ function setActive(string $route): string
 {
     return $_SERVER['PATH_INFO'] === $route ? 'active' : '';
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -47,14 +46,18 @@ function setActive(string $route): string
                         <a class="nav-link <?php echo setActive(Routes::CONTACT) ?>" href="<?php echo Routes::CONTACT ?>">Contact</a>
 
                         <?php if (Authenticate::isLoggedIn()) { ?>
-                            <a class="nav-link <?php echo setActive(Routes::LOGOUT) ?>" href="<?php echo Routes::LOGOUT ?>">Déconnexion</a>
+                            <a class="nav-link" href="<?php echo Routes::LOGOUT ?>">Déconnexion</a>
                         <?php } else { ?>
-                            <a class="nav-link <?php echo setActive(Routes::LOGIN) ?>" href="<?php echo Routes::LOGIN ?>">Connexion</a>
+                            <a class="nav-link" href="<?php echo Routes::LOGIN ?>">Connexion</a>
                         <?php } ?>
                     </div>
                 </div>
+
+                <!-- Display user log-in -->
+                <?php if (Authenticate::isLoggedIn()) { ?>
+                    <div><?php echo Authenticate::getUser()->getEmail() ?></div>
+                <?php } ?>
             </div>
-        </nav>
     </header>
 
     <main class="flex-shrink-0">

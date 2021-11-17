@@ -11,7 +11,7 @@ use helpers\Authenticate;
 use helpers\Database;
 use models\Article;
 
-const DEBUG_LIMIT = 8;
+const DEBUG_LIMIT = 12;
 const DEBUG_OFFSET = 0;
 
 const ARTICLE_ADD_EMPTY = "Il faut donner un nom à l'article à ajouter.";

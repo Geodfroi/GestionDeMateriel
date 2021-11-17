@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.17 ###
 ##############################
 
 namespace models;
@@ -20,12 +20,12 @@ class User
     private string $password;
 
     /**
-     * @param int UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
+     * UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
      */
     private int $creation_date;
 
     /**
-     * @param int UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
+     * UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
      */
     private int $last_login;
 
