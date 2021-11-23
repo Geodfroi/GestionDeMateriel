@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.22 ###
+## Joël Piguet - 2021.11.23 ###
 ##############################
 
 use routes\Routes;
@@ -9,8 +9,11 @@ use helpers\TemplateUtil;
 ?>
 <div class="container">
     <div class="row col-8">
+        <div>ID: <?php echo $values['id'] ?></div>
         <form method="post" action="<?php echo Routes::ARTICLE_EDIT ?>">
             <label class="h4 m-4">Ajouter un article</article></label>
+
+            <input type="hidden" name="id" value="<?php echo $values['id'] ?>">
 
             <div class="mb-2">
                 <label for="form-name" class="form-label col-3">Nom de l'article:</label>
@@ -52,7 +55,13 @@ use helpers\TemplateUtil;
                 <?php } ?>
             </div>
 
-            <button type="submit" name="new-article" class="btn btn-primary">Ajouter</button>
+            <button type="submit" name="<?php echo $values['id'] === 'no-id' ? 'new-article' : 'update-article' ?>" class="btn btn-primary">
+                <?php if ($values['id'] === 'no-id') { ?>
+                    Ajouter
+                <?php } else { ?>
+                    Modifier
+                <?php } ?>
+            </button>
             <a href="/" class="btn btn-secondary">Cancel</a>
         </form>
     </div>

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.22 ###
+## Joël Piguet - 2021.11.23 ###
 ##############################
 
 namespace routes;
@@ -34,7 +34,6 @@ class Routes
      */
     public static function getRoute(): BaseRoute
     {
-        var_dump($_SERVER['PATH_INFO']);
         switch ($_SERVER['PATH_INFO'] ?? '/') {
             case Routes::ADMIN:
                 return new AdminRoute();

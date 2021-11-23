@@ -11,7 +11,6 @@ use helpers\Database;
 use models\Article;
 
 use DateTime;
-use Error;
 
 class ArticleEdit extends BaseRoute
 {
@@ -41,25 +40,30 @@ class ArticleEdit extends BaseRoute
 
     public function getBodyContent(): string
     {
+        // An invisible field in the form will hold the id value if the form is used to update an existing Article.
         $errors = [];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['new-article'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if (isset($_GET['update'])) {
 
-                if (
-                    $this->validate_article_name($article_name, $errors) &&
-                    ($this->validate_location($location, $errors)) &&
-                    ($this->validate_exp_date($exp_date_str, $errors)) &&
-                    ($this->validate_comments($comments, $errors))
-                ) {
+                // load input fields with existing values to update item.
+                $article = Database::getInstance()->getArticleById($_GET['update']);
+                $article_id = $article->getId();
+                $article_name = $article->getArticleName();
+                $exp_date_str = $article->getExpirationDate()->format('Y-m-d');
+                $location = $article->getLocation();
+                $comments = $article->getComments();
+            }
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            if (isset($_POST['new-article'])) {
+                if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
 
                     $user_id = Authenticate::getUser()->getId();
-                    $date = DateTime::createFromFormat('Y-m-d', $exp_date_str);
 
-
-                    $article = Article::fromForm($user_id, $article_name, $location, $date, $comments);
-
-                    error_log($article);
+                    $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
                     if (Database::getInstance()->insertArticle($article)) {
                         $this->requestRedirect(Routes::ARTICLES . '?alert=added_success');
@@ -68,9 +72,26 @@ class ArticleEdit extends BaseRoute
                     }
                 }
             }
+
+            if (isset($_POST['update-article'])) {
+                if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
+
+                    $user_id = Authenticate::getUser()->getId();
+
+                    $article = Database::getInstance()->getArticleById($_POST['id']);
+                    $article->updateFields($article_name, $location, $exp_date_str, $comments);
+
+                    if (Database::getInstance()->updateArticle($article)) {
+                        $this->requestRedirect(Routes::ARTICLES . '?alert=updated_success');
+                    } else {
+                        $this->requestRedirect(Routes::ARTICLES . '?alert=updated_failure');
+                    }
+                }
+            }
         }
 
         $values = [
+            'id' => $article_id ?? 'no-id',
             'article-name' => $article_name ?? '',
             'expiration-date' => $exp_date_str ?? '',
             'location' => $location ?? '',
@@ -83,6 +104,23 @@ class ArticleEdit extends BaseRoute
         ]);
     }
 
+    /**
+     * Validate form inputs before using it to add/update article.
+     * 
+     * @param array &$string $article_name Article name by reference.
+     * @param string &$location Article's location within the school by reference.
+     * @param string &$exp_date Expiration date.
+     * @param string &$comments Comments to be attached to the reminder by reference.
+     * @param array &$errors Error array passed by reference to store error message.
+     * @return bool True if validation is successful.
+     */
+    private function validate_inputs(?string &$article_name, ?string &$location, ?string &$exp_date, ?string &$comments, array &$errors): bool
+    {
+        return $this->validate_article_name($article_name, $errors) &&
+            ($this->validate_location($location, $errors)) &&
+            ($this->validate_exp_date($exp_date, $errors)) &&
+            ($this->validate_comments($comments, $errors));
+    }
 
     /**
      * Article name validation. Article name must not be empty, exceed a set length and under a set number of caracters.

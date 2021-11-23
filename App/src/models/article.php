@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace models;
 
-use helpers\DateFormatter;
 use DateTime;
 
 class Article
@@ -24,6 +23,7 @@ class Article
     private DateTime $expiration_date;
 
     private DateTime $creation_date;
+
 
     /**
      * Free comments set by the user appended to the email remainder sent when the expiration date is close.
@@ -47,9 +47,6 @@ class Article
         $instance->expiration_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['expiration_date']);
         $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
 
-        // $instance->expiration_date =  DateFormatter::toUnixTime($input['expiration_date']);
-        // $instance->creation_date = DateFormatter::toUnixTime($input['creation_date']);
-
         return $instance;
     }
 
@@ -59,18 +56,18 @@ class Article
      * @param int $user_id The article's owner's id.
      * @param string $article_name The article's designation in the database.
      * @param string $location The article's storage location.
-     * @param DateTime $expiration_date Expiration date of the stored article in UTC format.
+     * @param string $expiration_date Expiration date of the stored article as a string.
+     * @param string $comments User comments on article.
      * @return Article An article instance.
      */
-    public static function fromForm(int $user_id, string $article_name, string $location, DateTime $expiration_date, string $comments): Article
+    public static function fromForm(int $user_id, string $article_name, string $location, string $expiration_date, string $comments): Article
     {
         $instance = new self();
-        $instance->id = -1;
         $instance->user_id = $user_id;
         $instance->article_name = $article_name;
         $instance->location = $location;
         $instance->comments = $comments;
-        $instance->expiration_date = $expiration_date;
+        $instance->expiration_date = DateTime::createFromFormat('Y-m-d', $expiration_date);
         $instance->creation_date = new DateTime();
         return $instance;
     }
@@ -80,7 +77,12 @@ class Article
         return $this->expiration_date;
     }
 
-    public function getUser_id(): int
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -100,13 +102,24 @@ class Article
         return $this->comments;
     }
 
+    /**
+     * Update instance fields with new values. 
+     * 
+     * @param string $article_name The article's designation in the database.
+     * @param string $location The article's storage location.
+     * @param string $expiration_date Expiration date of the stored article as a string.
+     * @param string $comments User comments on article.
+     */
+    public function updateFields(string $article_name, string $location, string $expiration_date, string $comments)
+    {
+        $this->article_name = $article_name;
+        $this->location = $location;
+        $this->comments = $comments;
+        $this->expiration_date = DateTime::createFromFormat('Y-m-d', $expiration_date);
+    }
+
     public function __toString(): string
     {
         return sprintf('Article %04d> %s in %s, expires %s; user_id: %04d; created: %s;', $this->id,  $this->article_name, $this->location, $this->expiration_date->format('Y-m-d'), $this->user_id, $this->creation_date->format('Y-m-d'));
     }
-
-    // public function __toString(): string
-    // {
-    //     return sprintf('Article %04d> %s in %s, expires %s; user_id: %04d; created: %s;', $this->id,  $this->article_name, $this->location, DateFormatter::printSQLTimestamp($this->expiration_date, true), $this->user_id, DateFormatter::printSQLTimestamp($this->creation_date));
-    // }
 }

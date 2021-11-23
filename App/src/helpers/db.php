@@ -57,6 +57,61 @@ class Database
     }
 
     /**
+     * Delete the article from db by id.
+     * 
+     * @param int $id Article's id.
+     * @return bool True if the delete is successful.
+     */
+    public function deleteArticleByID(int $id): bool
+    {
+        $preparedStatement = $this->pdo->prepare('DELETE FROM articles WHERE id = :id');
+        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to delete article from database: ' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Retrive a single Article by it's id.
+     * 
+     * @param int $id Article's id.
+     * @return Article|null
+     */
+    public function getArticleById(int $id): ?Article
+    {
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            user_id, 
+            article_name, 
+            location,
+            comments, 
+            expiration_date,
+            creation_date 
+        FROM Articles WHERE id = :id');
+
+        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+
+            $data = $preparedStatement->fetch(); // retrieve only first row found; fine since id is unique.
+            if ($data) {
+                return Article::fromDatabaseRow($data);
+            } else {
+                error_log('failure to retrieve Article from database: no row with index [' . $id . '] was found.');
+            }
+        } else {
+            list(,, $error) = $preparedStatement->errorInfo();
+            error_log('failure to retrieve Article from database: ' . $error . PHP_EOL);
+        }
+
+        return null;
+    }
+
+    /**
      * Retrieve the User Articles;
      * 
      * @param int $User_id User id;
@@ -155,10 +210,10 @@ class Database
     /**
      * Insert an Article to the database.
      * 
-     * @param Article Article to insert.
+     * @param Article $article Article to insert.
      * @return bool True if the insert is successful.
      */
-    public function insertArticle(Article $Article): bool
+    public function insertArticle(Article $article): bool
     {
         $preparedStatement = $this->pdo->prepare(
             'INSERT INTO articles 
@@ -177,31 +232,56 @@ class Database
             )'
         );
 
-        $uid = $Article->getUser_id();
-        $name = $Article->getArticleName();
-        $location = $Article->getLocation();
-        $date = $Article->getExpirationDate()->format('Y-m-d H:i:s');
-
-        // $date = $Article->getExpirationDate();
-        // $date = DateFormatter::printSQLTimestamp($Article->getExpirationDate(), true);
-
-        error_log(strval($uid));
-        error_log($name);
-        error_log($location);
-        error_log($date);
+        $uid = $article->getUserId();
+        $name = $article->getArticleName();
+        $location = $article->getLocation();
+        $date = $article->getExpirationDate()->format('Y-m-d H:i:s');
 
         $preparedStatement->bindParam(':uid', $uid, PDO::PARAM_INT);
         $preparedStatement->bindParam(':art', $name, PDO::PARAM_STR);
         $preparedStatement->bindParam(':loc', $location, PDO::PARAM_STR);
         $preparedStatement->bindParam(':date', $date, PDO::PARAM_STR);
 
-
-        error_log('insert-try');
         if ($preparedStatement->execute()) {
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log($error . PHP_EOL);
+        error_log('failure to insert article: ' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Update article in database.
+     * 
+     * @param Article Article to be updated.
+     * @return bool True if update is successful.
+     */
+    public function updateArticle(Article $article): bool
+    {
+        $preparedStatement = $this->pdo->prepare('UPDATE articles SET
+            article_name = :name,
+            location = :loc,
+            expiration_date = :date,
+            comments = :com
+        WHERE id = :id');
+
+        $name = $article->getArticleName();
+        $location = $article->getLocation();
+        $date = $article->getExpirationDate()->format('Y-m-d H:i:s');
+        $comments = $article->getComments();
+        $id = $article->getId();
+
+        $preparedStatement->bindParam(':name', $name, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':loc', $location, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':date', $date, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':com', $comments, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to update article: ' . $error . PHP_EOL);
         return false;
     }
 
@@ -212,7 +292,7 @@ class Database
      */
     public function updateLogTime(int $UserId): bool
     {
-        $preparedStatement = $this->pdo->prepare('UPDATE Users SET last_login=:last_login WHERE id = :id');
+        $preparedStatement = $this->pdo->prepare('UPDATE users SET last_login=:last_login WHERE id = :id');
         $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
 
         $preparedStatement->bindParam(':last_login', $now, PDO::PARAM_STR);
@@ -222,7 +302,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log($error . PHP_EOL);
+        error_log('failure to update user log time' . $error . PHP_EOL);
         return false;
     }
 }

@@ -20,3 +20,5 @@ use helpers\Authenticate;
 
 // $user_ip = Authenticate::getUserIP();
 // echo $user_ip;
+
+$article = Database::getInstance()->getArticleById(25);

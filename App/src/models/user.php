@@ -69,8 +69,4 @@ class User
     {
         return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, $this->creation_date->format('Y-m-d'), $this->last_login->format('Y-m-d'), $this->is_admin ? ' (has admin privileges)' : '');
     }
-    // public function __toString(): string
-    // {
-    //     return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, DateFormatter::printSQLTimestamp($this->creation_date), DateFormatter::printSQLTimestamp($this->last_login), $this->is_admin ? ' (has admin privileges)' : '');
-    // }
 }
