@@ -12,11 +12,11 @@ use helpers\Authenticate;
 //     echo $art . PHP_EOL;
 // }
 
-// $article = Article::fromForm(2, 'soap', 'cuinise', time(), '');
-// echo $article;
+// $article = Article::fromForm(2, 'soap', 'cuisine', time(), '');
+
 // echo Database::getInstance()->insertArticle($article);
 
-echo $_SERVER['REMOTE_ADDR'];
+// echo $_SERVER['REMOTE_ADDR'];
 
 // $user_ip = Authenticate::getUserIP();
 // echo $user_ip;

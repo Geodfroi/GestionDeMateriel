@@ -3,15 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.17 ###
+## Joël Piguet - 2021.11.23 ###
 ##############################
 
 namespace helpers;
 
 use \PDO;
-use helpers\DateFormatter;
-use models\UserModel;
-use models\ArticleModel;
+use models\User;
+use models\Article;
 use PDOException;
 
 // class QueryOrder
@@ -39,7 +38,7 @@ class Database
             ];
             $this->pdo = new PDO($dsn, ADMIN_ID, ADMIN_PASSWORD, $options);
         } catch (PDOException $e) {
-            echo 'Connection failed: ' . $e->getMessage() . PHP_EOL;
+            error_log('Connection failed: ' . $e->getMessage() . PHP_EOL);
         }
     }
 
@@ -58,50 +57,51 @@ class Database
     }
 
     /**
-     * Retrieve the UserModel ArticleModels;
+     * Retrieve the User Articles;
      * 
-     * @param int $UserModel_id UserModel id;
+     * @param int $User_id User id;
      * @param int $limit The maximum number of items to be returned.
      * @param int $skip The number of result items to be skipped before including them to the result array.
-     * @return array An array of ArticleModels.
+     * @return array An array of Articles.
      */
-    public function getUserArticles(int $UserModel_id, int $limit, int $offset = 0): array
+    public function getUserArticles(int $User_id, int $limit, int $offset = 0): array
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
-            User_id, 
-            Article_name, 
+            user_id, 
+            article_name, 
             location,
             comments, 
             expiration_date,
             creation_date 
-        FROM Articles WHERE User_id = :uid LIMIT :lim OFFSET :off');
+        FROM Articles WHERE user_id = :uid LIMIT :lim OFFSET :off');
 
-        $preparedStatement->bindParam(':uid', $UserModel_id, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':uid', $User_id, PDO::PARAM_INT);
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 
-        $ArticleModels = [];
-        try {
-            if ($preparedStatement->execute()) {
-                // fetch next as associative array until there are none to be fetched.
-                while ($data = $preparedStatement->fetch()) {
-                    array_push($ArticleModels, ArticleModel::fromDatabaseRow($data));
-                }
+        $Articles = [];
+
+        if ($preparedStatement->execute()) {
+            // fetch next as associative array until there are none to be fetched.
+            while ($data = $preparedStatement->fetch()) {
+                array_push($Articles, Article::fromDatabaseRow($data));
             }
-        } catch (\PDOException $e) {
-            echo 'failure to retrieve ArticleModels from database: ' . $e->getMessage() . PHP_EOL;
+        } else {
+            list(,, $error) = $preparedStatement->errorInfo();
+            error_log('failure to retrieve Article list from database: ' . $error . PHP_EOL);
         }
-        return $ArticleModels;
+
+        return $Articles;
     }
 
     /**
-     * Return a single UserModel data by email.
+     * Return a single User data by email.
      * 
-     * @param string $email UserModel email.
-     * @return ?UserModel UserModel class instance.
+     * @param string $email User email.
+     * @return ?User User class instance.
      */
-    public function getUserByEmail(string $email): ?UserModel
+    public function getUserByEmail(string $email): ?User
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
@@ -113,25 +113,23 @@ class Database
         FROM Users WHERE email = :email');
 
         $preparedStatement->bindParam(':email', $email, PDO::PARAM_STR);
-        try {
-            if ($preparedStatement->execute()) {
-                $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
-                return $data ? UserModel::fromDatabaseRow($data) : null;
-            }
-        } catch (\PDOException $e) {
-            echo 'failure to retrieve UserModel from database: ' . $e->getMessage() . PHP_EOL;
-        }
 
+        if ($preparedStatement->execute()) {
+            $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+            return $data ? User::fromDatabaseRow($data) : null;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to retrieve User from database: ' . $error . PHP_EOL);
         return null;
     }
 
     /**
-     * Return a single UserModel data by id.
+     * Return a single User data by id.
      * 
-     * @param int $id UserModel id.
-     * @return ?UserModel UserModel class instance.
+     * @param int $id User id.
+     * @return ?User User class instance.
      */
-    public function getUserById(int $id): ?UserModel
+    public function getUserById(int $id): ?User
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
@@ -144,71 +142,87 @@ class Database
 
         $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
 
-        try {
-            if ($preparedStatement->execute()) {
-                $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
-                return $data ? UserModel::fromDatabaseRow($data) : null;
-            }
-        } catch (\PDOException $e) {
-            echo 'failure to retrieve UserModel from database: ' . $e->getMessage() . PHP_EOL;
+
+        if ($preparedStatement->execute()) {
+            $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+            return $data ? User::fromDatabaseRow($data) : null;
         }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to retrieve User from database: ' . $error . PHP_EOL);
         return null;
     }
 
     /**
-     * Insert an ArticleModel to the database.
+     * Insert an Article to the database.
      * 
-     * @param ArticleModel ArticleModel to insert.
+     * @param Article Article to insert.
      * @return bool True if the insert is successful.
      */
-    public function insertArticle(ArticleModel $ArticleModel): bool
+    public function insertArticle(Article $Article): bool
     {
         $preparedStatement = $this->pdo->prepare(
-            'INSERT INTO Articles 
-            (User_id, Article_name, location, expiration_date) 
+            'INSERT INTO articles 
+            (
+                user_id, 
+                article_name, 
+                location, 
+                expiration_date
+            ) 
             VALUES 
-            (:uid, :art, :loc, :exp)'
+            (
+                :uid, 
+                :art, 
+                :loc, 
+                :date
+            )'
         );
 
-        $uid = $ArticleModel->getUser_id();
-        $name = $ArticleModel->getArticleName();
-        $location = $ArticleModel->getLocation();
-        $date = DateFormatter::printSQLTimestamp($ArticleModel->getExpirationDate());
+        $uid = $Article->getUser_id();
+        $name = $Article->getArticleName();
+        $location = $Article->getLocation();
+        $date = $Article->getExpirationDate()->format('Y-m-d H:i:s');
+
+        // $date = $Article->getExpirationDate();
+        // $date = DateFormatter::printSQLTimestamp($Article->getExpirationDate(), true);
+
+        error_log(strval($uid));
+        error_log($name);
+        error_log($location);
+        error_log($date);
+
         $preparedStatement->bindParam(':uid', $uid, PDO::PARAM_INT);
         $preparedStatement->bindParam(':art', $name, PDO::PARAM_STR);
         $preparedStatement->bindParam(':loc', $location, PDO::PARAM_STR);
-        $preparedStatement->bindParam(':exp', $date, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':date', $date, PDO::PARAM_STR);
 
-        try {
-            return $preparedStatement->execute();
-        } catch (\PDOException $e) {
-            echo 'failure to insert ArticleModel to database: ' . $e->getMessage() . PHP_EOL;
+
+        error_log('insert-try');
+        if ($preparedStatement->execute()) {
+            return true;
         }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log($error . PHP_EOL);
         return false;
     }
 
-
-
     /**
-     * Update UserModel last_login field to now.
+     * Update User last_login field to now.
      * 
-     * @param int $UserModelId ID of UserModel.
+     * @param int $UserId ID of User.
      */
-    public function updateLogTime(int $UserModelId): bool
+    public function updateLogTime(int $UserId): bool
     {
         $preparedStatement = $this->pdo->prepare('UPDATE Users SET last_login=:last_login WHERE id = :id');
         $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
 
         $preparedStatement->bindParam(':last_login', $now, PDO::PARAM_STR);
-        $preparedStatement->bindParam(':id', $UserModelId, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':id', $UserId, PDO::PARAM_INT);
 
-        try {
-            if ($preparedStatement->execute()) {
-                return true;
-            }
-        } catch (\PDOException $e) {
-            echo 'failure to update UserModel last_login: ' . $e->getMessage() . PHP_EOL;
+        if ($preparedStatement->execute()) {
+            return true;
         }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log($error . PHP_EOL);
         return false;
     }
 }

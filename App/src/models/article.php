@@ -3,14 +3,15 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.17 ###
+## Joël Piguet - 2021.11.23 ###
 ##############################
 
 namespace models;
 
 use helpers\DateFormatter;
+use DateTime;
 
-class ArticleModel
+class Article
 {
     private int $id;
 
@@ -20,15 +21,9 @@ class ArticleModel
 
     private string $location;
 
-    /**
-     * UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
-     */
-    private int $expiration_date;
+    private DateTime $expiration_date;
 
-    /**
-     *  UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
-     */
-    private int $creation_date;
+    private DateTime $creation_date;
 
     /**
      * Free comments set by the user appended to the email remainder sent when the expiration date is close.
@@ -40,7 +35,7 @@ class ArticleModel
      * 
      * @return Article An article instance.
      */
-    public static function fromDatabaseRow(array $input): ArticleModel
+    public static function fromDatabaseRow(array $input): Article
     {
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
@@ -48,8 +43,13 @@ class ArticleModel
         $instance->article_name = (string)($input['article_name'] ?? '');
         $instance->location = (string)($input['location'] ?? '');
         $instance->comments = (string)($input['comments'] ?? '');
-        $instance->expiration_date = DateFormatter::toUnixTime($input['expiration_date']);
-        $instance->creation_date = DateFormatter::toUnixTime($input['creation_date']);
+
+        $instance->expiration_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['expiration_date']);
+        $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
+
+        // $instance->expiration_date =  DateFormatter::toUnixTime($input['expiration_date']);
+        // $instance->creation_date = DateFormatter::toUnixTime($input['creation_date']);
+
         return $instance;
     }
 
@@ -59,10 +59,10 @@ class ArticleModel
      * @param int $user_id The article's owner's id.
      * @param string $article_name The article's designation in the database.
      * @param string $location The article's storage location.
-     * @param int $expiration_date Expiration date of the stored article in UTC format.
+     * @param DateTime $expiration_date Expiration date of the stored article in UTC format.
      * @return Article An article instance.
      */
-    public static function fromForm(int $user_id, string $article_name, string $location, int $expiration_date, string $comments): ArticleModel
+    public static function fromForm(int $user_id, string $article_name, string $location, DateTime $expiration_date, string $comments): Article
     {
         $instance = new self();
         $instance->id = -1;
@@ -71,11 +71,11 @@ class ArticleModel
         $instance->location = $location;
         $instance->comments = $comments;
         $instance->expiration_date = $expiration_date;
-        $instance->creation_date = time();
+        $instance->creation_date = new DateTime();
         return $instance;
     }
 
-    public function getExpirationDate(): int
+    public function getExpirationDate(): DateTime
     {
         return $this->expiration_date;
     }
@@ -102,6 +102,11 @@ class ArticleModel
 
     public function __toString(): string
     {
-        return sprintf('Article %04d> %s in %s, expires %s; user_id: %04d; created: %s;', $this->id,  $this->article_name, $this->location, DateFormatter::printSQLTimestamp($this->expiration_date, true), $this->user_id, DateFormatter::printSQLTimestamp($this->creation_date));
+        return sprintf('Article %04d> %s in %s, expires %s; user_id: %04d; created: %s;', $this->id,  $this->article_name, $this->location, $this->expiration_date->format('Y-m-d'), $this->user_id, $this->creation_date->format('Y-m-d'));
     }
+
+    // public function __toString(): string
+    // {
+    //     return sprintf('Article %04d> %s in %s, expires %s; user_id: %04d; created: %s;', $this->id,  $this->article_name, $this->location, DateFormatter::printSQLTimestamp($this->expiration_date, true), $this->user_id, DateFormatter::printSQLTimestamp($this->creation_date));
+    // }
 }

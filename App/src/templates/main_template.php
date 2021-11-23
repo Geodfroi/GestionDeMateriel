@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.22 ###
 ##############################
 
 use helpers\Authenticate;
@@ -15,7 +15,10 @@ use routes\Routes;
  */
 function setActive(string $route): string
 {
-    return $_SERVER['PATH_INFO'] === $route ? 'active' : '';
+    if (isset($_SERVER['PATH_INFO']) && ($_SERVER['PATH_INFO'] === $route)) {
+        return 'active';
+    }
+    return '';
 }
 ?>
 

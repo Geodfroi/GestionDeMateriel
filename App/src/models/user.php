@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.17 ###
+## Joël Piguet - 2021.11.23 ###
 ##############################
 
 namespace models;
 
-use \helpers\DateFormatter;
+use DateTime;
 
-class UserModel
+class User
 {
     private int $id;
 
@@ -18,31 +18,27 @@ class UserModel
 
     private string $password;
 
-    /**
-     * UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
-     */
-    private int $creation_date;
+    private DateTime $creation_date;
 
-    /**
-     * UTC time ellapsed in seconds since January 1 1970 00:00:00 GMT.
-     */
-    private int $last_login;
+    private DateTime $last_login;
 
     private bool $is_admin;
 
     /**
      * Load user instance from database row.
      * 
-     * @return UserModel A user instance.
+     * @return User A user instance.
      */
-    public static function fromDatabaseRow(array $input): UserModel
+    public static function fromDatabaseRow(array $input): User
     {
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
         $instance->email = (string)($input['email'] ?? '');
         $instance->password = (string)($input['password'] ?? '');
-        $instance->creation_date = DateFormatter::toUnixTime($input['creation_date']);
-        $instance->last_login = DateFormatter::toUnixTime($input['last_login']);
+
+        $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
+        $instance->last_login =   DateTime::createFromFormat('Y-m-d H:i:s', $input['last_login']);
+
         $instance->is_admin = (bool)$input['is_admin'];
         return $instance;
     }
@@ -71,6 +67,10 @@ class UserModel
 
     public function __toString(): string
     {
-        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, DateFormatter::printSQLTimestamp($this->creation_date), DateFormatter::printSQLTimestamp($this->last_login), $this->is_admin ? ' (has admin privileges)' : '');
+        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, $this->creation_date->format('Y-m-d'), $this->last_login->format('Y-m-d'), $this->is_admin ? ' (has admin privileges)' : '');
     }
+    // public function __toString(): string
+    // {
+    //     return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, DateFormatter::printSQLTimestamp($this->creation_date), DateFormatter::printSQLTimestamp($this->last_login), $this->is_admin ? ' (has admin privileges)' : '');
+    // }
 }

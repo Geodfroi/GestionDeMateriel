@@ -1,19 +1,17 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.17 ###
+## Joël Piguet - 2021.11.22 ###
 ##############################
 
 namespace routes;
 
 use routes\AdminRoute;
-use routes\ArticlesRoute;
+use routes\ArticlesList;
 use routes\BaseRoute;
 use routes\ContactRoute;
-use routes\LoginRoute;
+use routes\Login;
 use routes\ProfileRoute;
-
-use helpers\Authenticate;
 
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
@@ -21,8 +19,8 @@ use helpers\Authenticate;
 class Routes
 {
     const ADMIN = '/admin';
-    const ARTICLES = '/articles';
-    const ARTICLE_EDIT = '/artedit';
+    const ARTICLES = '/articlesList';
+    const ARTICLE_EDIT = '/articleEdit';
     const CONTACT = '/contact';
     const LOGIN = '/login';
     const LOGOUT = '/login?logout=true';
@@ -36,24 +34,30 @@ class Routes
      */
     public static function getRoute(): BaseRoute
     {
+        var_dump($_SERVER['PATH_INFO']);
         switch ($_SERVER['PATH_INFO'] ?? '/') {
             case Routes::ADMIN:
                 return new AdminRoute();
             case Routes::CONTACT:
                 return new ContactRoute();
             case Routes::LOGIN:
-                return new LoginRoute();
+                return new Login();
             case ROUTES::PROFILE:
                 return new ProfileRoute();
             case Routes::ARTICLES:
             case '/':
-                return new ArticlesRoute();
+                return new ArticlesList();
             case Routes::ARTICLE_EDIT:
                 return new ArticleEdit();
             default:
                 return new class extends BaseRoute
                 {
-                    public function handle(): string
+                    public function __construct()
+                    {
+                        parent::__construct('');
+                    }
+
+                    public function getBodyContent(): string
                     {
                         $this->requestRedirect('/');
                         return '';
