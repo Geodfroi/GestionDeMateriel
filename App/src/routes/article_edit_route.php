@@ -14,6 +14,8 @@ use DateTime;
 
 class ArticleEdit extends BaseRoute
 {
+
+
     const ARTICLE_ADD_EMPTY = "Il faut donner un nom à l'article à ajouter.";
     const ARTICLE_NAME_TOO_SHORT = "Le nom de l'article doit compter au moins  %s caractères.";
     const ARTICLE_NAME_TOO_LONG = "Le nom de l'article ne doit pas dépasser %s caractères.";
@@ -71,15 +73,17 @@ class ArticleEdit extends BaseRoute
                         $this->requestRedirect(Routes::ARTICLES . '?alert=added_failure');
                     }
                 }
-            }
+            } else if (isset($_POST['update-article'])) {
 
-            if (isset($_POST['update-article'])) {
+                $article_id  = $_POST['id'];
+
                 if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
-
                     $user_id = Authenticate::getUser()->getId();
 
                     $article = Database::getInstance()->getArticleById($_POST['id']);
                     $article->updateFields($article_name, $location, $exp_date_str, $comments);
+
+                    error_log($article->__toString());
 
                     if (Database::getInstance()->updateArticle($article)) {
                         $this->requestRedirect(Routes::ARTICLES . '?alert=updated_success');
@@ -100,7 +104,7 @@ class ArticleEdit extends BaseRoute
 
         return $this->renderTemplate([
             'errors' => $errors,
-            'values' => $values,
+            'values' => $values
         ]);
     }
 
@@ -116,10 +120,21 @@ class ArticleEdit extends BaseRoute
      */
     private function validate_inputs(?string &$article_name, ?string &$location, ?string &$exp_date, ?string &$comments, array &$errors): bool
     {
-        return $this->validate_article_name($article_name, $errors) &&
-            ($this->validate_location($location, $errors)) &&
-            ($this->validate_exp_date($exp_date, $errors)) &&
-            ($this->validate_comments($comments, $errors));
+        // Avoid && or || between conditions because all validation methods must be run without short-circuit.
+        $validated   = true;
+        if (!$this->validate_article_name($article_name, $errors)) {
+            $validated  = false;
+        }
+        if (!$this->validate_location($location, $errors)) {
+            $validated  = false;
+        }
+        if (!$this->validate_exp_date($exp_date, $errors)) {
+            $validated  = false;
+        }
+        if (!$this->validate_comments($comments, $errors)) {
+            $validated  = false;
+        }
+        return $validated;
     }
 
     /**

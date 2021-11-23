@@ -9,7 +9,6 @@ use helpers\TemplateUtil;
 ?>
 <div class="container">
     <div class="row col-8">
-        <div>ID: <?php echo $values['id'] ?></div>
         <form method="post" action="<?php echo Routes::ARTICLE_EDIT ?>">
             <label class="h4 m-4">Ajouter un article</article></label>
 

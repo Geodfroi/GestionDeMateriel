@@ -13,10 +13,6 @@ use models\User;
 use models\Article;
 use PDOException;
 
-// class QueryOrder
-// {
-//     const OrderByName = 0;
-// }
 
 /**
  * Database class accessible throughout the application by calling it'ss get_instance() method. 
@@ -117,11 +113,15 @@ class Database
      * @param int $User_id User id;
      * @param int $limit The maximum number of items to be returned.
      * @param int $skip The number of result items to be skipped before including them to the result array.
+     * @param int $orderby Order parameter. Use ArticleOrder constants as parameter.
      * @return array An array of Articles.
      */
-    public function getUserArticles(int $User_id, int $limit, int $offset = 0): array
+    public function getUserArticles(int $user_id, int $limit, int $offset = 0, int $orderby = ArticleOrder::ORDER_BY_DATE_DESC): array
     {
-        $preparedStatement = $this->pdo->prepare('SELECT 
+        [$order_column, $order_dir] = ArticleOrder::getOrderParameters($orderby);
+
+        //Only data can be bound inside $preparedStatement, order-by params must be set before in the query string.
+        $query_str = sprintf('SELECT 
             id, 
             user_id, 
             article_name, 
@@ -129,9 +129,12 @@ class Database
             comments, 
             expiration_date,
             creation_date 
-        FROM Articles WHERE user_id = :uid LIMIT :lim OFFSET :off');
+        FROM articles WHERE user_id = :uid 
+        ORDER BY %s %s LIMIT :lim OFFSET :off', $order_column, $order_dir);
 
-        $preparedStatement->bindParam(':uid', $User_id, PDO::PARAM_INT);
+        $preparedStatement = $this->pdo->prepare($query_str);
+
+        $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 
@@ -271,7 +274,7 @@ class Database
         $comments = $article->getComments();
         $id = $article->getId();
 
-        $preparedStatement->bindParam(':name', $name, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':name', $name, PDO::PARAM_STR);
         $preparedStatement->bindParam(':loc', $location, PDO::PARAM_STR);
         $preparedStatement->bindParam(':date', $date, PDO::PARAM_STR);
         $preparedStatement->bindParam(':com', $comments, PDO::PARAM_STR);
@@ -304,5 +307,44 @@ class Database
         list(,, $error) = $preparedStatement->errorInfo();
         error_log('failure to update user log time' . $error . PHP_EOL);
         return false;
+    }
+}
+
+/**
+ * Order enum implemented as const of a class.
+ */
+class ArticleOrder
+{
+    const ORDER_BY_NAME_DESC = 0;
+    const ORDER_BY_NAME_ASC = 1;
+    const ORDER_BY_LOCATION_DESC = 2;
+    const ORDER_BY_LOCATION_ASC = 3;
+    const ORDER_BY_DATE_DESC = 4;
+    const ORDER_BY_DATE_ASC = 5;
+
+    /**
+     * Return orderby query element.
+     * 
+     * @param int $const ArticleOrder const value.
+     * @return Array orderby string parameters.
+     */
+    public static function getOrderParameters(int $const): array
+    {
+        switch ($const) {
+            case ArticleOrder::ORDER_BY_NAME_DESC:
+                return ['article_name', 'DESC'];
+            case ArticleOrder::ORDER_BY_NAME_ASC:
+                return ['article_name', 'ASC'];
+            case ArticleOrder::ORDER_BY_LOCATION_DESC:
+                return ['location', 'DESC'];
+            case ArticleOrder::ORDER_BY_LOCATION_ASC:
+                return ['location', 'ASC'];
+            case ArticleOrder::ORDER_BY_DATE_DESC:
+                return ['expiration_date', 'DESC'];
+            case ArticleOrder::ORDER_BY_DATE_ASC:
+                return ['expiration_date', 'ASC'];
+            default:
+                return ['expiration_date', 'ASC'];
+        }
     }
 }

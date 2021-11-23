@@ -8,13 +8,13 @@ namespace routes;
 
 use helpers\Authenticate;
 use helpers\Database;
+use helpers\ArticleOrder;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
  */
 class ArticlesList extends BaseRoute
 {
-
     const ADD_SUCCESS = "L'article a été correctement enregistré.";
     const ADD_FAILURE = "L'article n'a pas pu être enregistré. Veuillez réessayer.";
     const REMOVE_SUCCESS = "L'article a été enlevé avec succès";
@@ -39,6 +39,7 @@ class ArticlesList extends BaseRoute
         $alerts = [];
         $articles = [];
         $user = Authenticate::getUser();
+        $orderby = ArticleOrder::ORDER_BY_DATE_DESC;
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
@@ -60,16 +61,20 @@ class ArticlesList extends BaseRoute
                         $alerts['failure'] = ArticlesList::REMOVE_FAILURE;
                     }
                 }
+            } else if (isset($_GET['orderby'])) {
+                $orderby = intval($_GET['orderby']);
             }
         }
 
+        error_log("order: " .  $orderby);
         if (isset($user)) {
-            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesList::DISPLAY_COUNT, ArticlesList::DEBUG_OFFSET);
+            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesList::DISPLAY_COUNT, ArticlesList::DEBUG_OFFSET, $orderby);
         }
 
         return $this->renderTemplate([
             'articles' =>  $articles,
             'alerts' => $alerts,
+            'orderby' => $orderby,
         ]);
     }
 }
