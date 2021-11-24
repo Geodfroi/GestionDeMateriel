@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.22 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace routes;
@@ -9,7 +9,6 @@ namespace routes;
 use helpers\Database;
 use helpers\Authenticate;
 use routes\Routes;
-
 
 /**
  * Route class containing behavior linked to login_template
@@ -44,7 +43,14 @@ class Login extends BaseRoute
                 Authenticate::logout();
                 $alerts['logout'] = '';
             } else {
-                $this->requestRedirect(Routes::ARTICLES);
+
+                $user = Authenticate::getUser();
+                if ($user->isAdmin()) {
+                    $this->requestRedirect(Routes::ADMIN);
+                } else {
+                    $this->requestRedirect(Routes::ARTICLES);
+                }
+
                 return '';
             }
         }
@@ -76,7 +82,11 @@ class Login extends BaseRoute
                 if ($this->validate_password_input($values['password'], $errors)) {
                     if ($user->verifyPassword($values['password'])) {
                         Authenticate::login($user);
-                        $this->requestRedirect(Routes::ARTICLES);
+                        if ($user->isAdmin()) {
+                            $this->requestRedirect(Routes::ADMIN);
+                        } else {
+                            $this->requestRedirect(Routes::ARTICLES);
+                        }
                         return "";
                     } else {
                         $errors['password'] = Login::PASSWORD_INVALID;
@@ -91,6 +101,8 @@ class Login extends BaseRoute
             'alerts' => $alerts,
         ]);
     }
+
+
 
     /**
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.

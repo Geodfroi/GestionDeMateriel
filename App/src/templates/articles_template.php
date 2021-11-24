@@ -1,15 +1,15 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 use routes\Routes;
-use helpers\ArticleOrder;
+use helpers\ArtOrder;
 
 ?>
 
 <div class="container mt-3">
-
+    <!-- <div class="div"> <?php echo $page ?></div> -->
     <div class="row col-12">
         <?php if (isset($alerts['success'])) { ?>
             <div class='alert alert-success alert-dismissible fade show' role='alert'><?php echo $alerts['success'] ?>
@@ -31,25 +31,24 @@ use helpers\ArticleOrder;
                     // Display clickable ordering icons (caret-down, caret-up and circle) besides header labels.
                     ?>
                     <th>Article
-
-                        <?php if ($orderby ===  ArticleOrder::ORDER_BY_NAME_DESC) { ?><a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_NAME_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArticleOrder::ORDER_BY_NAME_ASC) { ?>
-                                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_NAME_DESC ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
+                        <?php if ($orderby ===  ArtOrder::NAME_DESC) { ?><a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::NAME_ASC . '&page=' . $page ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
+                                <?php } else if ($orderby ===  ArtOrder::NAME_ASC) { ?>
+                                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::NAME_DESC . '&page=' . $page ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
                                         <?php } else { ?>
-                                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_NAME_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
-                    <th>Location <?php if ($orderby ===  ArticleOrder::ORDER_BY_LOCATION_DESC) { ?>
-                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_LOCATION_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArticleOrder::ORDER_BY_LOCATION_ASC) { ?>
-                                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_LOCATION_DESC ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
+                                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::NAME_ASC . '&page=' . $page ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
+                    <th>Location <?php if ($orderby ===  ArtOrder::LOCATION_DESC) { ?>
+                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::LOCATION_ASC . '&page=' . $page ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
+                                <?php } else if ($orderby ===  ArtOrder::LOCATION_ASC) { ?>
+                                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::LOCATION_DESC . '&page=' . $page ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
                                         <?php } else { ?>
-                                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_LOCATION_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
+                                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::LOCATION_ASC . '&page=' . $page ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
                     </th>
-                    <th>Date de péremption <?php if ($orderby ===  ArticleOrder::ORDER_BY_DATE_DESC) { ?>
-                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_DATE_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArticleOrder::ORDER_BY_DATE_ASC) { ?>
-                                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_DATE_DESC ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
+                    <th>Date de péremption <?php if ($orderby ===  ArtOrder::DATE_DESC) { ?>
+                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::DATE_ASC . '&page=' . $page ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
+                                <?php } else if ($orderby ===  ArtOrder::DATE_ASC) { ?>
+                                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::DATE_DESC . '&page=' . $page ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
                                         <?php } else { ?>
-                                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArticleOrder::ORDER_BY_DATE_DESC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?></th>
+                                            <a href="<?php echo Routes::ARTICLES . '?orderby=' . ArtOrder::DATE_DESC . '&page=' . $page ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?></th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -69,6 +68,31 @@ use helpers\ArticleOrder;
             </tbody>
         </table>
     </div>
+
+    <nav aria-label="list-pagination">
+        <ul class="pagination justify-content-end">
+
+            <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
+                <a href="<?php echo Routes::ARTICLES . '?orderby=' . $orderby . '&page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+                    <span aria-hidden="true" class="bi-chevron-double-left">
+                    </span>
+                </a>
+            </li>
+
+            <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
+                <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
+                    <a href="<?php echo Routes::ARTICLES . '?orderby=' . $orderby . '&page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                </li>
+            <?php  } ?>
+
+            <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
+                <a href="<?php echo Routes::ARTICLES . '?orderby=' . $orderby . '&page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+                    <span aria-hidden="true" class="bi-chevron-double-right"></span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
     <div class="row">
         <a href="<?php echo Routes::ARTICLE_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
     </div>

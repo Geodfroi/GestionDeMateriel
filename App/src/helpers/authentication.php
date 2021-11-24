@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.17 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace helpers;
@@ -12,8 +12,8 @@ use models\User;
 
 const USER_ID = 'user_id';
 
-const COOKIE_NAME = 'cookie_user';
-const COOKIE_HOURS = 2 * 7 * 24 * 60 * 60; // cookie expires after two weeks by default;
+// const COOKIE_NAME = 'cookie_user';
+// const COOKIE_HOURS = 2 * 7 * 24 * 60 * 60; // cookie expires after two weeks by default;
 
 /**
  * Collection of static functions linked to authentification bundled into a class. 
@@ -40,7 +40,7 @@ class Authenticate
             $_SESSION = []; // clear the stored values in current $_SESSION global variable.
             session_regenerate_id(true); // send header to browser to remove id cookie.
             session_destroy();
-            setcookie(COOKIE_NAME, -1,  -1000); // reset cookie with negative life expectancy will delete it.
+            // setcookie(COOKIE_NAME, '-1',  -1000); // reset cookie with negative life expectancy will delete it.
         }
     }
 

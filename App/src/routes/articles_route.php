@@ -1,14 +1,15 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace routes;
 
+use Error;
 use helpers\Authenticate;
 use helpers\Database;
-use helpers\ArticleOrder;
+use helpers\ArtOrder;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
@@ -23,7 +24,6 @@ class ArticlesList extends BaseRoute
     const UPDATE_FAILURE = "L'article n'a pas pu être mis à jour.";
 
     const DISPLAY_COUNT = 12;
-    const DEBUG_OFFSET = 0;
 
     public function __construct()
     {
@@ -39,10 +39,10 @@ class ArticlesList extends BaseRoute
         $alerts = [];
         $articles = [];
         $user = Authenticate::getUser();
-        $orderby = ArticleOrder::ORDER_BY_DATE_DESC;
+        $orderby = ArtOrder::DATE_DESC;
+        $page = 1;
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
             if (isset($_GET['alert'])) {
                 if ($_GET['alert'] === 'added_success') {
                     $alerts['success'] = ArticlesList::ADD_SUCCESS;
@@ -63,18 +63,24 @@ class ArticlesList extends BaseRoute
                 }
             } else if (isset($_GET['orderby'])) {
                 $orderby = intval($_GET['orderby']);
+                $page = intval($_GET['page']);
             }
         }
 
-        error_log("order: " .  $orderby);
+        $item_count = Database::getInstance()->getUserArticlesCount($user->getId());
+        $offset =   ($page - 1) * ArticlesList::DISPLAY_COUNT;
+        $page_count = ceil($item_count / ArticlesList::DISPLAY_COUNT);
+
         if (isset($user)) {
-            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesList::DISPLAY_COUNT, ArticlesList::DEBUG_OFFSET, $orderby);
+            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesList::DISPLAY_COUNT, $offset, $orderby);
         }
 
         return $this->renderTemplate([
             'articles' =>  $articles,
             'alerts' => $alerts,
             'orderby' => $orderby,
+            'page' => $page,
+            'page_count' => $page_count,
         ]);
     }
 }

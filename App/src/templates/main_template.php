@@ -44,11 +44,15 @@ function setActive(string $route): string
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link <?php echo setActive(Routes::ARTICLES) ?>" href="<?php echo Routes::ARTICLES ?>">Articles</a>
-                        <a class="nav-link <?php echo setActive(Routes::PROFILE) ?>" href="<?php echo Routes::PROFILE ?> ">Profile</a>
-                        <a class="nav-link <?php echo setActive(Routes::CONTACT) ?>" href="<?php echo Routes::CONTACT ?>">Contact</a>
 
                         <?php if (Authenticate::isLoggedIn()) { ?>
+                            <?php if (Authenticate::getUser()->isAdmin()) { ?>
+                                <a class="nav-link <?php echo setActive(Routes::ADMIN) ?>" href="<?php echo Routes::ADMIN ?>">Admin</a>
+                            <?php } else { ?>
+                                <a class="nav-link <?php echo setActive(Routes::ARTICLES) ?>" href="<?php echo Routes::ARTICLES ?>">Articles</a>
+                                <a class="nav-link <?php echo setActive(Routes::PROFILE) ?>" href="<?php echo Routes::PROFILE ?> ">Profile</a>
+                                <a class="nav-link <?php echo setActive(Routes::CONTACT) ?>" href="<?php echo Routes::CONTACT ?>">Contact</a>
+                            <?php } ?>
                             <a class="nav-link" href="<?php echo Routes::LOGOUT ?>">Déconnexion</a>
                         <?php } else { ?>
                             <a class="nav-link" href="<?php echo Routes::LOGIN ?>">Connexion</a>

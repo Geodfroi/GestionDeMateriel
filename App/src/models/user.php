@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace models;
@@ -41,6 +41,11 @@ class User
 
         $instance->is_admin = (bool)$input['is_admin'];
         return $instance;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
     }
 
     public function getEmail(): string

@@ -21,4 +21,15 @@ use helpers\Authenticate;
 // $user_ip = Authenticate::getUserIP();
 // echo $user_ip;
 
-$article = Database::getInstance()->getArticleById(25);
+// $article = Database::getInstance()->getArticleById(25);
+
+// for ($i = 0; $i < 20; $i++) {
+//     $name = 'item_' . strval($i);
+//     $article = Article::fromForm(1, $name, 'cuisine', '2023-11-11');
+//     if (Database::getInstance()->insertArticle($article)) {
+//         echo 'inserted';
+//     }
+// }
+
+$item_count = Database::getInstance()->getUserArticlesCount(1);
+echo $item_count;

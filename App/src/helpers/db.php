@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace helpers;
 
 use \PDO;
-use models\User;
-use models\Article;
 use PDOException;
 
+use models\User;
+use models\Article;
 
 /**
  * Database class accessible throughout the application by calling it'ss get_instance() method. 
@@ -87,7 +87,7 @@ class Database
             comments, 
             expiration_date,
             creation_date 
-        FROM Articles WHERE id = :id');
+        FROM articles WHERE id = :id');
 
         $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
 
@@ -97,28 +97,54 @@ class Database
             if ($data) {
                 return Article::fromDatabaseRow($data);
             } else {
-                error_log('failure to retrieve Article from database: no row with index [' . $id . '] was found.');
+                error_log('failure to retrieve article from database: no row with index [' . $id . '] was found.');
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log('failure to retrieve Article from database: ' . $error . PHP_EOL);
+            error_log('failure to retrieve article from database: ' . $error . PHP_EOL);
         }
 
         return null;
     }
 
     /**
-     * Retrieve the User Articles;
+     * Get number of articles owned by user.
      * 
-     * @param int $User_id User id;
-     * @param int $limit The maximum number of items to be returned.
-     * @param int $skip The number of result items to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use ArticleOrder constants as parameter.
-     * @return array An array of Articles.
+     * @param int User id.
+     * @return int # of articles or -1 if query fails.
      */
-    public function getUserArticles(int $user_id, int $limit, int $offset = 0, int $orderby = ArticleOrder::ORDER_BY_DATE_DESC): array
+    public function getUserArticlesCount(int $user_id): int
     {
-        [$order_column, $order_dir] = ArticleOrder::getOrderParameters($orderby);
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            COUNT(*)
+            FROM articles
+            WHERE user_id = :uid
+        ');
+
+        $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            $r = $preparedStatement->fetchColumn();
+            return intval($r);
+        }
+
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to retrieve article count from database: ' . $error . PHP_EOL);
+        return -1;
+    }
+
+    /**
+     * Retrieve the User articles;
+     * 
+     * @param int $user_id User id;
+     * @param int $limit The maximum number of items to be returned.
+     * @param int $offset The number of result items to be skipped before including them to the result array.
+     * @param int $orderby Order parameter. Use ArtOrder constants as parameter.
+     * @return array An array of articles.
+     */
+    public function getUserArticles(int $user_id, int $limit, int $offset = 0, int $orderby = ArtOrder::DATE_DESC): array
+    {
+        [$order_column, $order_dir] = ArtOrder::getOrderParameters($orderby);
 
         //Only data can be bound inside $preparedStatement, order-by params must be set before in the query string.
         $query_str = sprintf('SELECT 
@@ -138,19 +164,19 @@ class Database
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 
-        $Articles = [];
+        $articles = [];
 
         if ($preparedStatement->execute()) {
             // fetch next as associative array until there are none to be fetched.
             while ($data = $preparedStatement->fetch()) {
-                array_push($Articles, Article::fromDatabaseRow($data));
+                array_push($articles, Article::fromDatabaseRow($data));
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log('failure to retrieve Article list from database: ' . $error . PHP_EOL);
+            error_log('failure to retrieve article list from database: ' . $error . PHP_EOL);
         }
 
-        return $Articles;
+        return $articles;
     }
 
     /**
@@ -211,7 +237,7 @@ class Database
     }
 
     /**
-     * Insert an Article to the database.
+     * Insert an article to the database.
      * 
      * @param Article $article Article to insert.
      * @return bool True if the insert is successful.
@@ -313,35 +339,35 @@ class Database
 /**
  * Order enum implemented as const of a class.
  */
-class ArticleOrder
+class ArtOrder
 {
-    const ORDER_BY_NAME_DESC = 0;
-    const ORDER_BY_NAME_ASC = 1;
-    const ORDER_BY_LOCATION_DESC = 2;
-    const ORDER_BY_LOCATION_ASC = 3;
-    const ORDER_BY_DATE_DESC = 4;
-    const ORDER_BY_DATE_ASC = 5;
+    const NAME_DESC = 0;
+    const NAME_ASC = 1;
+    const LOCATION_DESC = 2;
+    const LOCATION_ASC = 3;
+    const DATE_DESC = 4;
+    const DATE_ASC = 5;
 
     /**
      * Return orderby query element.
      * 
-     * @param int $const ArticleOrder const value.
+     * @param int $const ArtOrder const value.
      * @return Array orderby string parameters.
      */
     public static function getOrderParameters(int $const): array
     {
         switch ($const) {
-            case ArticleOrder::ORDER_BY_NAME_DESC:
+            case ArtOrder::NAME_DESC:
                 return ['article_name', 'DESC'];
-            case ArticleOrder::ORDER_BY_NAME_ASC:
+            case ArtOrder::NAME_ASC:
                 return ['article_name', 'ASC'];
-            case ArticleOrder::ORDER_BY_LOCATION_DESC:
+            case ArtOrder::LOCATION_DESC:
                 return ['location', 'DESC'];
-            case ArticleOrder::ORDER_BY_LOCATION_ASC:
+            case ArtOrder::LOCATION_ASC:
                 return ['location', 'ASC'];
-            case ArticleOrder::ORDER_BY_DATE_DESC:
+            case ArtOrder::DATE_DESC:
                 return ['expiration_date', 'DESC'];
-            case ArticleOrder::ORDER_BY_DATE_ASC:
+            case ArtOrder::DATE_ASC:
                 return ['expiration_date', 'ASC'];
             default:
                 return ['expiration_date', 'ASC'];

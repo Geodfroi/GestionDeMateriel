@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace models;
@@ -60,7 +60,7 @@ class Article
      * @param string $comments User comments on article.
      * @return Article An article instance.
      */
-    public static function fromForm(int $user_id, string $article_name, string $location, string $expiration_date, string $comments): Article
+    public static function fromForm(int $user_id, string $article_name, string $location, string $expiration_date, string $comments = ''): Article
     {
         $instance = new self();
         $instance->user_id = $user_id;
