@@ -6,6 +6,62 @@
 use routes\Routes;
 use helpers\ArtOrder;
 
+$page = $_SESSION[ART_PAGE] ?? 1;
+$orderby = $_SESSION[ART_ORDER_BY] ?? ArtOrder::DATE_DESC;
+
+/**
+ * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
+ * 
+ * @param string $header Table header name
+ * @return string Icon class name.
+ */
+function disCaretArt(string $header): string
+{
+    $order = $_SESSION[ART_ORDER_BY];
+    if ($header === 'article') {
+        if ($order === ArtOrder::NAME_ASC) {
+            return 'bi-caret-up';
+        } else if ($order === ArtOrder::NAME_DESC) {
+            return 'bi-caret-down';
+        }
+    } else if ($header === 'location') {
+        if ($order === ArtOrder::LOCATION_ASC) {
+            return 'bi-caret-up';
+        } else if ($order === ArtOrder::LOCATION_DESC) {
+            return 'bi-caret-down';
+        }
+    } else if ($header === 'per_date') {
+        if ($order === ArtOrder::DATE_ASC) {
+            return 'bi-caret-up';
+        } else if ($order === ArtOrder::DATE_DESC) {
+            return 'bi-caret-down';
+        }
+    }
+    return '';
+}
+
+/**
+ * Compile header link depending on _SESSION[ADMIN_ORDER_BY]
+ * 
+ * @param string $header Table header name
+ * @return string Header link to display in href.
+ */
+function disLinkArt(string $header): string
+{
+    $root = Routes::ART_TABLE . '?orderby=';
+    $order = $_SESSION[ART_ORDER_BY];
+
+    // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
+    if ($header === 'article') {
+        return $order === ArtOrder::NAME_ASC ? $root . ArtOrder::NAME_DESC : $root . ArtOrder::NAME_ASC;
+    } else if ($header === 'location') {
+        return $order === ArtOrder::LOCATION_ASC ? $root . ArtOrder::LOCATION_DESC : $root . ArtOrder::LOCATION_ASC;
+    } else if ($header === 'per_date') {
+        return $order === ArtOrder::DATE_DESC ? $root . ArtOrder::DATE_ASC : $root . ArtOrder::DATE_DESC;
+    }
+    return '';
+}
+
 ?>
 
 <div class="container mt-3">
@@ -28,10 +84,14 @@ use helpers\ArtOrder;
 
             <thead>
                 <tr>
-                    <?php
-                    // Display clickable ordering icons (caret-down, caret-up and circle) besides header labels.
-                    ?>
-                    <th>Article
+                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('article') ?>">Article <span class="<?php echo disCaretArt('article') ?>"></span></a>
+
+                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('location') ?>">Location <span class="<?php echo disCaretArt('location') ?>"></span></a>
+
+                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Date de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
+
+
+                        <!-- <th>
                         <?php if ($orderby ===  ArtOrder::NAME_DESC) { ?><a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
                                 <?php } else if ($orderby ===  ArtOrder::NAME_ASC) { ?>
                                     <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::NAME_DESC  ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
@@ -44,12 +104,12 @@ use helpers\ArtOrder;
                                         <?php } else { ?>
                                             <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::LOCATION_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
                     </th>
-                    <th>Date de péremption <?php if ($orderby ===  ArtOrder::DATE_DESC) { ?>
+                    <th> <?php if ($orderby ===  ArtOrder::DATE_DESC) { ?>
                             <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
                                 <?php } else if ($orderby ===  ArtOrder::DATE_ASC) { ?>
                                     <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_DESC ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
                                         <?php } else { ?>
-                                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_DESC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?></th>
+                                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_DESC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?></th> -->
 
                     <th>Comments</th>
                     <th>Actions</th>
@@ -77,7 +137,7 @@ use helpers\ArtOrder;
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo Routes::ART_TABLE . '&page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo Routes::ART_TABLE . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
@@ -85,12 +145,12 @@ use helpers\ArtOrder;
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
                 <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo Routes::ART_TABLE . '&page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                    <a href="<?php echo Routes::ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
             <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo Routes::ART_TABLE . '&page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo Routes::ART_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>
@@ -105,3 +165,4 @@ use helpers\ArtOrder;
 
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>
+<div>TODO: put tab logout link under email on the left</div>

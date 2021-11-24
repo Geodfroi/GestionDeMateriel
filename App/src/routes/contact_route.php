@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace routes;
@@ -13,7 +13,7 @@ class ContactRoute extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('contact_template');
+        parent::__construct('contact_template', ROUTES::CONTACT);
     }
 
     public function getBodyContent(): string

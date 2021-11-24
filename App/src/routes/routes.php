@@ -17,6 +17,7 @@ class Routes
     const CONTACT = '/contact';
     const LOGIN = '/login';
     const LOGOUT = '/login?logout=true';
+    const HOME = '/';
     const PROFILE = '/profile';
 
     /**
@@ -27,20 +28,21 @@ class Routes
      */
     public static function getRoute(): BaseRoute
     {
-        switch ($_SERVER['PATH_INFO'] ?? '/') {
+        switch ($_SERVER['PATH_INFO'] ?? Routes::HOME) {
             case Routes::ADMIN:
                 return new AdminRoute();
+            case Routes::ART_EDIT:
+                return new ArticleEdit();
+            case Routes::ART_TABLE:
+                return new ArticlesTable();
             case Routes::CONTACT:
                 return new ContactRoute();
+            case Routes::HOME:
+                return new HomeRoute();
             case Routes::LOGIN:
                 return new Login();
             case ROUTES::PROFILE:
                 return new ProfileRoute();
-            case Routes::ART_TABLE:
-            case '/':
-                return new ArticlesTable();
-            case Routes::ART_EDIT:
-                return new ArticleEdit();
             default:
                 return new class extends BaseRoute
                 {

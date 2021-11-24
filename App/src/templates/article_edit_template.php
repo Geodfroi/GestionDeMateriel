@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 use routes\Routes;
@@ -9,7 +9,7 @@ use helpers\TemplateUtil;
 ?>
 <div class="container">
     <div class="row col-8">
-        <form method="post" action="<?php echo Routes::ARTICLE_EDIT ?>">
+        <form method="post" action="<?php echo Routes::ART_EDIT ?>">
             <label class="h4 m-4">Ajouter un article</article></label>
 
             <input type="hidden" name="id" value="<?php echo $values['id'] ?>">

@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.22 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 use helpers\TemplateUtil;
@@ -33,9 +33,9 @@ use routes\Routes;
                     <input id="form-email" type="email" name='email' aria-describedby="id-descr" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'email') ?>
                         " value=<?php echo TemplateUtil::escape($values['email']); ?>>
 
-                    <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
-
-                    <?php if (!isset($errors['email'])) { ?>
+                    <?php if (isset($errors['email'])) { ?>
+                        <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
+                    <?php } else { ?>
                         <div id="id-descr" class="form-text">Entrer votre adresse e-mail pour vous identifier.</div>
                     <?php } ?>
 
@@ -44,7 +44,9 @@ use routes\Routes;
                     <label for="form-password" class="form-label">Mot de passe</label>
                     <input id="form-password" type="password" name='password' class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'password') ?>">
 
-                    <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
+                    <?php if (isset($errors['password'])) { ?>
+                        <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
+                    <?php } ?>
 
                 </div>
                 <button type="submit" name="login-form" class="btn btn-primary">Transmettre</button>

@@ -43,14 +43,7 @@ class Login extends BaseRoute
                 Authenticate::logout();
                 $alerts['logout'] = '';
             } else {
-
-                $user = Authenticate::getUser();
-                if ($user->isAdmin()) {
-                    $this->requestRedirect(Routes::ADMIN);
-                } else {
-                    $this->requestRedirect(Routes::ART_TABLE);
-                }
-
+                $this->requestRedirect(Routes::HOME);
                 return '';
             }
         }
@@ -82,11 +75,7 @@ class Login extends BaseRoute
                 if ($this->validate_password_input($values['password'], $errors)) {
                     if ($user->verifyPassword($values['password'])) {
                         Authenticate::login($user);
-                        if ($user->isAdmin()) {
-                            $this->requestRedirect(Routes::ADMIN);
-                        } else {
-                            $this->requestRedirect(Routes::ART_TABLE);
-                        }
+                        $this->requestRedirect(Routes::HOME);
                         return "";
                     } else {
                         $errors['password'] = Login::PASSWORD_INVALID;
@@ -101,8 +90,6 @@ class Login extends BaseRoute
             'alerts' => $alerts,
         ]);
     }
-
-
 
     /**
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
@@ -148,6 +135,6 @@ class Login extends BaseRoute
      */
     private function handleNewPasswordRequest($email)
     {
-        echo 'handleNewPasswordRequest not implemented';
+        echo 'login_route:: handleNewPasswordRequest not implemented';
     }
 }

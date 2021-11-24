@@ -51,7 +51,7 @@ class Article
     }
 
     /**
-     * Create an article instance from input form.
+     * Create an article instance from input form waiting to be inserted into db.
      * 
      * @param int $user_id The article's owner's id.
      * @param string $article_name The article's designation in the database.

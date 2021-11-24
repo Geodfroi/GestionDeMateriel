@@ -14,15 +14,29 @@ class User
 {
     private int $id;
 
+    private DateTime $creation_date;
+
     private string $email;
 
-    private string $password;
-
-    private DateTime $creation_date;
+    private bool $is_admin;
 
     private DateTime $last_login;
 
-    private bool $is_admin;
+    /**
+     * Password hash encrypted with PASSWORD_BCRYPT algorithm. No plaintext password are ever stored into the database.
+     */
+    private string $password_hash;
+
+    /**
+     * Encrypt password in plain text into a 30 caracters encrypted hashed string.
+     * 
+     * @param string $password_plain Password in plain text.
+     * @return string Encrypted string password.
+     */
+    public static function encryptPassword(string $password_plain): string
+    {
+        return password_hash($password_plain, PASSWORD_BCRYPT);
+    }
 
     /**
      * Load user instance from database row.
@@ -34,7 +48,7 @@ class User
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
         $instance->email = (string)($input['email'] ?? '');
-        $instance->password = (string)($input['password'] ?? '');
+        $instance->password_hash = (string)($input['password'] ?? '');
 
         $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
         $instance->last_login =   DateTime::createFromFormat('Y-m-d H:i:s', $input['last_login']);
@@ -43,9 +57,29 @@ class User
         return $instance;
     }
 
-    public function isAdmin(): bool
+    /**
+     * Create new user from input form waiting to be inserted into db.
+     * 
+     * @param string $email User email.
+     * @param string $password User password waiting to be encrypted.
+     * @param bool $is_admin True if the new user has admin privileges.
+     */
+    public static function fromForm(string $email, string $plain_password, bool $is_admin = false): User
     {
-        return $this->is_admin;
+        $instance = new self();
+        $instance->id = -1;
+        $instance->email = $email;
+        $instance->password_hash = USER::encryptPassword($plain_password);
+        $instance->creation_date = new DateTime();
+        $instance->last_login = new DateTime();
+        $instance->is_admin = $is_admin;
+
+        return $instance;
+    }
+
+    public function getCreationDate(): DateTime
+    {
+        return $this->creation_date;
     }
 
     public function getEmail(): string
@@ -58,16 +92,32 @@ class User
         return $this->id;
     }
 
+    public function getLastLogin(): DateTime
+    {
+        return $this->last_login;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password_hash;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
+    }
+
     /**
      * Check password against hash password field contained in user.
      * 
-     * @param string $password Input password in plain text.
+     * @param string $plain_password Input password in plain text.
      * @return bool True if password is correct.
      */
-    public function verifyPassword(string $password): bool
+    public function verifyPassword(string $plain_password): bool
     {
+        error_log('pl: ' . strval(strlen($this->password_hash)));
         // password_verify transforms plain text $password into hash password of 60 caracters, then compares it to the hash value contained in the user password property.
-        return password_verify($password, $this->password);
+        return password_verify($plain_password, $this->password_hash);
     }
 
     public function __toString(): string

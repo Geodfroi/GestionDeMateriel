@@ -135,32 +135,6 @@ class Database
     }
 
     /**
-     * Count users in database user table.
-     * 
-     * @param bool $excludeAdmins Count only common users.
-     */
-    public function getUsersCount(bool $excludeAdmins = true)
-    {
-        $query = 'SELECT 
-            COUNT(*)
-            FROM users';
-        if ($excludeAdmins) {
-            $query .= " WHERE is_admin = False";
-        }
-        error_log($query);
-
-        $preparedStatement = $this->pdo->prepare($query);
-        if ($preparedStatement->execute()) {
-            $r = $preparedStatement->fetchColumn();
-            return intval($r);
-        }
-
-        list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to count users from database: ' . $error . PHP_EOL);
-        return -1;
-    }
-
-    /**
      * Retrieve the User articles;
      * 
      * @param int $user_id User id;
@@ -262,6 +236,7 @@ class Database
         error_log('failure to retrieve User from database: ' . $error . PHP_EOL);
         return null;
     }
+
     /**
      * Retrive user array from database.
      * 
@@ -273,43 +248,70 @@ class Database
      */
     public function getUsers(int $limit, int $offset = 0, int $orderby = UserOrder::EMAIL_ASC, bool $excludeAdmins = true): array
     {
+        error_log('excludeAdmins : ' . $excludeAdmins);
+
         [$order_column, $order_dir] = UserOrder::getOrderParameters($orderby);
 
-        // //Only data can be bound inside $preparedStatement, order-by params must be set before in the query string.
-        // $query_str = sprintf('SELECT 
-        //     id, 
-        //     user_id, 
-        //     article_name, 
-        //     location,
-        //     comments, 
-        //     expiration_date,
-        //     creation_date 
-        // FROM articles WHERE user_id = :uid 
-        // ORDER BY %s %s LIMIT :lim OFFSET :off', $order_column, $order_dir);
+        // //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.
+        $query_str = 'SELECT 
+             id, 
+             email, 
+             password, 
+             creation_date,
+             last_login, 
+             is_admin
+         FROM users';
+        if ($excludeAdmins) {
+            $query_str .= " WHERE is_admin = False";
+        }
+        $query_str .= sprintf(' ORDER BY %s %s LIMIT :lim OFFSET :off', $order_column, $order_dir);
 
-        // $preparedStatement = $this->pdo->prepare($query_str);
+        $preparedStatement = $this->pdo->prepare($query_str);
+        $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 
-        // $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
-        // $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
-        // $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
+        $users = [];
 
-        // $articles = [];
+        if ($preparedStatement->execute()) {
+            // fetch next as associative array until there are none to be fetched.
+            while ($data = $preparedStatement->fetch()) {
+                array_push($users, User::fromDatabaseRow($data));
+            }
+        } else {
+            list(,, $error) = $preparedStatement->errorInfo();
+            error_log('failure to retrieve user list from database: ' . $error . PHP_EOL);
+        }
 
-        // if ($preparedStatement->execute()) {
-        //     // fetch next as associative array until there are none to be fetched.
-        //     while ($data = $preparedStatement->fetch()) {
-        //         array_push($articles, Article::fromDatabaseRow($data));
-        //     }
-        // } else {
-        //     list(,, $error) = $preparedStatement->errorInfo();
-        //     error_log('failure to retrieve article list from database: ' . $error . PHP_EOL);
-        // }
-
-        // return $articles;
+        return $users;
     }
 
     /**
-     * Insert an article to the database.
+     * Count users in database user table.
+     * 
+     * @param bool $excludeAdmins Count only common users.
+     */
+    public function getUsersCount(bool $excludeAdmins = true)
+    {
+        $query = 'SELECT 
+            COUNT(*)
+            FROM users';
+        if ($excludeAdmins) {
+            $query .= " WHERE is_admin = False";
+        }
+
+        $preparedStatement = $this->pdo->prepare($query);
+        if ($preparedStatement->execute()) {
+            $r = $preparedStatement->fetchColumn();
+            return intval($r);
+        }
+
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to count users from database: ' . $error . PHP_EOL);
+        return -1;
+    }
+
+    /**
+     * Insert an article into the database.
      * 
      * @param Article $article Article to insert.
      * @return bool True if the insert is successful.
@@ -348,6 +350,45 @@ class Database
         }
         list(,, $error) = $preparedStatement->errorInfo();
         error_log('failure to insert article: ' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**     
+     * Insert a User into the database.
+     * 
+     * @param User $user User to insert.
+     * @return bool True if the insert is successful.
+     */
+    public function insertUser(User $user): bool
+    {
+        $preparedStatement = $this->pdo->prepare(
+            'INSERT INTO users 
+            (
+                email,
+                password,
+                is_admin
+            ) 
+            VALUES 
+            (
+                :em, 
+                :pass, 
+                :adm
+            )'
+        );
+
+        $em = $user->getEmail();
+        $pass = $user->getPassword();
+        $adm = $user->isAdmin();
+
+        $preparedStatement->bindParam(':em', $em, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':pass', $pass, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':adm', $adm, PDO::PARAM_BOOL);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to insert user: ' . $error . PHP_EOL);
         return false;
     }
 
@@ -411,41 +452,14 @@ class Database
 /**
  * Order enum implemented as const of a class.
  */
-class UserOrder
-{
-    const EMAIL_DESC = 0;
-    const EMAIL_ASC = 1;
-
-    /**
-     * Return orderby query element.
-     * 
-     * @param int $const UserOrder const value.
-     * @return Array orderby string parameters.
-     */
-    public static function getOrderParameters(int $const): array
-    {
-        switch ($const) {
-            case UserOrder::EMAIL_DESC:
-                return ['email', 'DESC'];
-            case UserOrder::EMAIL_ASC:
-                return ['email', 'ASC'];
-            default:
-                return ['email', 'ASC'];
-        }
-    }
-}
-
-/**
- * Order enum implemented as const of a class.
- */
 class ArtOrder
 {
-    const NAME_DESC = 0;
-    const NAME_ASC = 1;
-    const LOCATION_DESC = 2;
-    const LOCATION_ASC = 3;
-    const DATE_DESC = 4;
-    const DATE_ASC = 5;
+    const DATE_ASC = 0;
+    const DATE_DESC = 1;
+    const LOCATION_ASC = 2;
+    const LOCATION_DESC = 3;
+    const NAME_ASC = 4;
+    const NAME_DESC = 5;
 
     /**
      * Return orderby query element.
@@ -456,19 +470,59 @@ class ArtOrder
     public static function getOrderParameters(int $const): array
     {
         switch ($const) {
-            case ArtOrder::NAME_DESC:
-                return ['article_name', 'DESC'];
-            case ArtOrder::NAME_ASC:
-                return ['article_name', 'ASC'];
-            case ArtOrder::LOCATION_DESC:
-                return ['location', 'DESC'];
-            case ArtOrder::LOCATION_ASC:
-                return ['location', 'ASC'];
+            case ArtOrder::DATE_ASC:
+                return ['expiration_date', 'ASC'];
             case ArtOrder::DATE_DESC:
                 return ['expiration_date', 'DESC'];
-            case ArtOrder::DATE_ASC:
+            case ArtOrder::LOCATION_ASC:
+                return ['location', 'ASC'];
+            case ArtOrder::LOCATION_DESC:
+                return ['location', 'DESC'];
+            case ArtOrder::NAME_ASC:
+                return ['article_name', 'ASC'];
+            case ArtOrder::NAME_DESC:
+                return ['article_name', 'DESC'];
             default:
                 return ['expiration_date', 'ASC'];
+        }
+    }
+}
+
+/**
+ * Order enum implemented as const of a class.
+ */
+class UserOrder
+{
+    const CREATED_ASC = 0;
+    const CREATED_DESC = 1;
+    const EMAIL_ASC = 2;
+    const EMAIL_DESC = 3;
+    const LOGIN_ASC = 4;
+    const LOGIN_DESC = 5;
+
+    /**
+     * Return orderby query element.
+     * 
+     * @param int $const UserOrder const value.
+     * @return Array orderby string parameters.
+     */
+    public static function getOrderParameters(int $const): array
+    {
+        switch ($const) {
+            case UserOrder::CREATED_ASC:
+                return ['creation_date', 'ASC'];
+            case UserOrder::CREATED_DESC:
+                return ['creation_date', 'DESC'];
+            case UserOrder::EMAIL_ASC:
+                return ['email', 'ASC'];
+            case UserOrder::EMAIL_DESC:
+                return ['email', 'DESC'];
+            case UserOrder::LOGIN_ASC:
+                return ['last_login', 'ASC'];
+            case UserOrder::LOGIN_DESC:
+                return ['last_login', 'DESC'];
+            default:
+                return ['email', 'ASC'];
         }
     }
 }

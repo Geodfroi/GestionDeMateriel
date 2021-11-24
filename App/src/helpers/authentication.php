@@ -10,10 +10,8 @@ namespace helpers;
 
 use models\User;
 
-const USER_ID = 'user_id';
 
-// const COOKIE_NAME = 'cookie_user';
-// const COOKIE_HOURS = 2 * 7 * 24 * 60 * 60; // cookie expires after two weeks by default;
+
 
 /**
  * Collection of static functions linked to authentification bundled into a class. 
@@ -28,6 +26,8 @@ class Authenticate
     public static function login(User $user)
     {
         $_SESSION[USER_ID] = $user->getId();
+        $_SESSION[USER_IS_ADMIN]  = $user->isAdmin();
+
         Database::getInstance()->updateLogTime($user->getId());
     }
 
@@ -42,6 +42,11 @@ class Authenticate
             session_destroy();
             // setcookie(COOKIE_NAME, '-1',  -1000); // reset cookie with negative life expectancy will delete it.
         }
+    }
+
+    public static function isAdmin()
+    {
+        return isset($_SESSION[USER_IS_ADMIN]) && $_SESSION[USER_IS_ADMIN];
     }
 
     public static function isLoggedIn(): bool

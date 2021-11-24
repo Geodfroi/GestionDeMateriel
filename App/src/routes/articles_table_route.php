@@ -8,7 +8,6 @@ namespace routes;
 
 use helpers\Authenticate;
 use helpers\Database;
-use helpers\ArtOrder;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
@@ -57,30 +56,25 @@ class ArticlesTable extends BaseRoute
                     }
                 }
             } else if (isset($_GET['orderby'])) {
-                $_SESSION['articles_orderby'] = intval($_GET['orderby']);
+                $_SESSION[ART_ORDER_BY] = intval($_GET['orderby']);
             } else if (isset($_GET['page'])) {
-                $_SESSION['article_page'] = intval($_GET['page']);
+                $_SESSION[ART_PAGE] = intval($_GET['page']);
             }
         }
 
-        $orderby = $_SESSION['articles_orderby'] ?? ArtOrder::DATE_DESC;
-        $page = $_SESSION['article_page'] ?? 1;
-
         $user = Authenticate::getUser();
         $item_count = Database::getInstance()->getUserArticlesCount($user->getId());
-        $offset =   ($page - 1) * ArticlesTable::DISPLAY_COUNT;
+        $offset =   ($_SESSION[ART_PAGE] - 1) * ArticlesTable::DISPLAY_COUNT;
         $page_count = ceil($item_count / ArticlesTable::DISPLAY_COUNT);
 
         $articles = [];
         if (isset($user)) {
-            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesTable::DISPLAY_COUNT, $offset, $orderby);
+            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesTable::DISPLAY_COUNT, $offset, $_SESSION[ART_ORDER_BY]);
         }
 
         return $this->renderTemplate([
             'articles' =>  $articles,
             'alerts' => $alerts,
-            'orderby' => $orderby,
-            'page' => $page,
             'page_count' => $page_count,
         ]);
     }

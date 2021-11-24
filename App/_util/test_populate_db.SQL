@@ -17,7 +17,6 @@ INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A7', 'Placard 3A', '2023-06-01' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A8', 'Placard 3A', '2023-06-01' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A9', 'Placard 3A', '2023-06-01' );
-
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A9', 'Placard 3A', '2023-06-01' );
 
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2022-08-13' );
