@@ -23,7 +23,7 @@ class Login extends BaseRoute
 
     public function __construct()
     {
-        parent::__construct('login_template');
+        parent::__construct('login_template', Routes::LOGIN);
     }
 
 
@@ -48,7 +48,7 @@ class Login extends BaseRoute
                 if ($user->isAdmin()) {
                     $this->requestRedirect(Routes::ADMIN);
                 } else {
-                    $this->requestRedirect(Routes::ARTICLES);
+                    $this->requestRedirect(Routes::ART_TABLE);
                 }
 
                 return '';
@@ -85,7 +85,7 @@ class Login extends BaseRoute
                         if ($user->isAdmin()) {
                             $this->requestRedirect(Routes::ADMIN);
                         } else {
-                            $this->requestRedirect(Routes::ARTICLES);
+                            $this->requestRedirect(Routes::ART_TABLE);
                         }
                         return "";
                     } else {

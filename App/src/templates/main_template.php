@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.22 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 use helpers\Authenticate;
@@ -35,6 +35,7 @@ function setActive(string $route): string
 </head>
 
 <body class="d-flex flex-column h-100">
+
     <header>
         <nav class="navbar navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
@@ -47,11 +48,12 @@ function setActive(string $route): string
 
                         <?php if (Authenticate::isLoggedIn()) { ?>
                             <?php if (Authenticate::getUser()->isAdmin()) { ?>
-                                <a class="nav-link <?php echo setActive(Routes::ADMIN) ?>" href="<?php echo Routes::ADMIN ?>">Admin</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::ADMIN ? 'active' : '' ?>" href="<?php echo Routes::ADMIN ?>">Admin</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::ART_TABLE ? 'active' : '' ?>" href="<?php echo Routes::ART_TABLE ?>">Articles</a>
                             <?php } else { ?>
-                                <a class="nav-link <?php echo setActive(Routes::ARTICLES) ?>" href="<?php echo Routes::ARTICLES ?>">Articles</a>
-                                <a class="nav-link <?php echo setActive(Routes::PROFILE) ?>" href="<?php echo Routes::PROFILE ?> ">Profile</a>
-                                <a class="nav-link <?php echo setActive(Routes::CONTACT) ?>" href="<?php echo Routes::CONTACT ?>">Contact</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::ART_TABLE ? 'active' : '' ?>" href="<?php echo Routes::ART_TABLE ?>">Articles</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::PROFILE ? 'active' : '' ?>" href="<?php echo Routes::PROFILE ?> ">Profile</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::CONTACT ? 'active' : '' ?>" href="<?php echo Routes::CONTACT ?>">Contact</a>
                             <?php } ?>
                             <a class="nav-link" href="<?php echo Routes::LOGOUT ?>">Déconnexion</a>
                         <?php } else { ?>
@@ -83,9 +85,15 @@ function setActive(string $route): string
             </div>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <!-- <script src=<?php echo JS_PATH . DIRECTORY_SEPARATOR .  "bootstrap.bundle.min.js" ?>></script> -->
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script>
+        // activate tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.14 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace routes;
@@ -17,9 +17,13 @@ abstract class BaseRoute
 
     /**
      * Link a Route with its designated template in the constructor.
+     * 
+     * @param string $templateName Template to use in renderTemplate call.
+     * @param string $route Route's name to store in SESSION global variable (used to highlight current page in nav bar).
      */
-    public function __construct(string $templateName)
+    public function __construct(string $templateName, string $route)
     {
+        $_SESSION['route'] = $route;
         $this->templateName = $templateName;
     }
 

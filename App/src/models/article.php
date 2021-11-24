@@ -72,6 +72,16 @@ class Article
         return $instance;
     }
 
+    public function getArticleName(): string
+    {
+        return $this->article_name;
+    }
+
+    public function getComments(): string
+    {
+        return $this->comments;
+    }
+
     public function getExpirationDate(): DateTime
     {
         return $this->expiration_date;
@@ -82,24 +92,14 @@ class Article
         return $this->id;
     }
 
-    public function getUserId(): int
-    {
-        return $this->user_id;
-    }
-
     public function getLocation(): string
     {
         return $this->location;
     }
 
-    public function getArticleName(): string
+    public function getUserId(): int
     {
-        return $this->article_name;
-    }
-
-    public function getComments(): string
-    {
-        return $this->comments;
+        return $this->user_id;
     }
 
     /**

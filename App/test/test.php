@@ -31,5 +31,5 @@ use helpers\Authenticate;
 //     }
 // }
 
-$item_count = Database::getInstance()->getUserArticlesCount(1);
+$item_count = Database::getInstance()->getUsersCount(false);
 echo $item_count;

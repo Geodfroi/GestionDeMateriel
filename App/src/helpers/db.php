@@ -107,6 +107,7 @@ class Database
         return null;
     }
 
+
     /**
      * Get number of articles owned by user.
      * 
@@ -129,7 +130,33 @@ class Database
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to retrieve article count from database: ' . $error . PHP_EOL);
+        error_log('failure to count articles from database: ' . $error . PHP_EOL);
+        return -1;
+    }
+
+    /**
+     * Count users in database user table.
+     * 
+     * @param bool $excludeAdmins Count only common users.
+     */
+    public function getUsersCount(bool $excludeAdmins = true)
+    {
+        $query = 'SELECT 
+            COUNT(*)
+            FROM users';
+        if ($excludeAdmins) {
+            $query .= " WHERE is_admin = False";
+        }
+        error_log($query);
+
+        $preparedStatement = $this->pdo->prepare($query);
+        if ($preparedStatement->execute()) {
+            $r = $preparedStatement->fetchColumn();
+            return intval($r);
+        }
+
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to count users from database: ' . $error . PHP_EOL);
         return -1;
     }
 
@@ -235,6 +262,51 @@ class Database
         error_log('failure to retrieve User from database: ' . $error . PHP_EOL);
         return null;
     }
+    /**
+     * Retrive user array from database.
+     * 
+     * @param bool $excludeAdmins Count only common users.
+     * @param int $limit The maximum number of users to be returned.
+     * @param int $offset The number of result users to be skipped before including them to the result array.
+     * @param int $orderby Order parameter. Use UserOrder constants as parameter.
+     * @return array Array of users.
+     */
+    public function getUsers(int $limit, int $offset = 0, int $orderby = UserOrder::EMAIL_ASC, bool $excludeAdmins = true): array
+    {
+        [$order_column, $order_dir] = UserOrder::getOrderParameters($orderby);
+
+        // //Only data can be bound inside $preparedStatement, order-by params must be set before in the query string.
+        // $query_str = sprintf('SELECT 
+        //     id, 
+        //     user_id, 
+        //     article_name, 
+        //     location,
+        //     comments, 
+        //     expiration_date,
+        //     creation_date 
+        // FROM articles WHERE user_id = :uid 
+        // ORDER BY %s %s LIMIT :lim OFFSET :off', $order_column, $order_dir);
+
+        // $preparedStatement = $this->pdo->prepare($query_str);
+
+        // $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
+        // $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
+        // $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
+
+        // $articles = [];
+
+        // if ($preparedStatement->execute()) {
+        //     // fetch next as associative array until there are none to be fetched.
+        //     while ($data = $preparedStatement->fetch()) {
+        //         array_push($articles, Article::fromDatabaseRow($data));
+        //     }
+        // } else {
+        //     list(,, $error) = $preparedStatement->errorInfo();
+        //     error_log('failure to retrieve article list from database: ' . $error . PHP_EOL);
+        // }
+
+        // return $articles;
+    }
 
     /**
      * Insert an article to the database.
@@ -339,6 +411,33 @@ class Database
 /**
  * Order enum implemented as const of a class.
  */
+class UserOrder
+{
+    const EMAIL_DESC = 0;
+    const EMAIL_ASC = 1;
+
+    /**
+     * Return orderby query element.
+     * 
+     * @param int $const UserOrder const value.
+     * @return Array orderby string parameters.
+     */
+    public static function getOrderParameters(int $const): array
+    {
+        switch ($const) {
+            case UserOrder::EMAIL_DESC:
+                return ['email', 'DESC'];
+            case UserOrder::EMAIL_ASC:
+                return ['email', 'ASC'];
+            default:
+                return ['email', 'ASC'];
+        }
+    }
+}
+
+/**
+ * Order enum implemented as const of a class.
+ */
 class ArtOrder
 {
     const NAME_DESC = 0;
@@ -368,7 +467,6 @@ class ArtOrder
             case ArtOrder::DATE_DESC:
                 return ['expiration_date', 'DESC'];
             case ArtOrder::DATE_ASC:
-                return ['expiration_date', 'ASC'];
             default:
                 return ['expiration_date', 'ASC'];
         }

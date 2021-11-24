@@ -1,17 +1,10 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.24 ###
 ##############################
 
 namespace routes;
-
-use routes\AdminRoute;
-use routes\ArticlesList;
-use routes\BaseRoute;
-use routes\ContactRoute;
-use routes\Login;
-use routes\ProfileRoute;
 
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
@@ -19,8 +12,8 @@ use routes\ProfileRoute;
 class Routes
 {
     const ADMIN = '/admin';
-    const ARTICLES = '/articlesList';
-    const ARTICLE_EDIT = '/articleEdit';
+    const ART_TABLE = '/articlesList';
+    const ART_EDIT = '/articleEdit';
     const CONTACT = '/contact';
     const LOGIN = '/login';
     const LOGOUT = '/login?logout=true';
@@ -43,17 +36,17 @@ class Routes
                 return new Login();
             case ROUTES::PROFILE:
                 return new ProfileRoute();
-            case Routes::ARTICLES:
+            case Routes::ART_TABLE:
             case '/':
-                return new ArticlesList();
-            case Routes::ARTICLE_EDIT:
+                return new ArticlesTable();
+            case Routes::ART_EDIT:
                 return new ArticleEdit();
             default:
                 return new class extends BaseRoute
                 {
                     public function __construct()
                     {
-                        parent::__construct('');
+                        parent::__construct('', '');
                     }
 
                     public function getBodyContent(): string

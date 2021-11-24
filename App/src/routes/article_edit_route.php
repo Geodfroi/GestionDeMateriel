@@ -14,8 +14,6 @@ use DateTime;
 
 class ArticleEdit extends BaseRoute
 {
-
-
     const ARTICLE_ADD_EMPTY = "Il faut donner un nom à l'article à ajouter.";
     const ARTICLE_NAME_TOO_SHORT = "Le nom de l'article doit compter au moins  %s caractères.";
     const ARTICLE_NAME_TOO_LONG = "Le nom de l'article ne doit pas dépasser %s caractères.";
@@ -37,7 +35,7 @@ class ArticleEdit extends BaseRoute
 
     function __construct()
     {
-        parent::__construct('article_edit_template');
+        parent::__construct('article_edit_template', Routes::ART_EDIT);
     }
 
     public function getBodyContent(): string
@@ -68,9 +66,9 @@ class ArticleEdit extends BaseRoute
                     $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
                     if (Database::getInstance()->insertArticle($article)) {
-                        $this->requestRedirect(Routes::ARTICLES . '?alert=added_success');
+                        $this->requestRedirect(Routes::ART_TABLE . '?alert=added_success');
                     } else {
-                        $this->requestRedirect(Routes::ARTICLES . '?alert=added_failure');
+                        $this->requestRedirect(Routes::ART_TABLE . '?alert=added_failure');
                     }
                 }
             } else if (isset($_POST['update-article'])) {
@@ -86,9 +84,9 @@ class ArticleEdit extends BaseRoute
                     error_log($article->__toString());
 
                     if (Database::getInstance()->updateArticle($article)) {
-                        $this->requestRedirect(Routes::ARTICLES . '?alert=updated_success');
+                        $this->requestRedirect(Routes::ART_TABLE . '?alert=updated_success');
                     } else {
-                        $this->requestRedirect(Routes::ARTICLES . '?alert=updated_failure');
+                        $this->requestRedirect(Routes::ART_TABLE . '?alert=updated_failure');
                     }
                 }
             }
