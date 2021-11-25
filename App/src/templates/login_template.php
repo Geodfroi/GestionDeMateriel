@@ -58,7 +58,7 @@ use routes\Routes;
         <div class="col-6 mx-auto">
             <!-- Display a link to propose to send a new password to email. -->
             <?php if (isset($errors['password']) && strlen($values['email']) > 0) { ?>
-                <a href='<?php echo Routes::LOGIN . '?old-email=' . $values['email'] ?>'>Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
+                <a href='<?php echo LOGIN . '?old-email=' . $values['email'] ?>'>Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
             <?php } ?>
         </div>
     </div>

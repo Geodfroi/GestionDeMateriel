@@ -1,21 +1,11 @@
-21.11.14
+21.11.25
 
-- option d'exporter la db vers excel sheet pour owner of db.
+- option d'exporter la db vers excel sheet pour owner of db ?
 - send keys to user by way of mail to register. - pre-register emails in db ?
-
-- mod admin (service) et mode client.
-	=> addUser(name, login) in admin mode
-	=> remove user;
-	=> log in as user
  
-- check for valid email address : send url to veridy address.
-- accept only HEdS email.
+- accept only HEdS email ?.
 - contact us field.
-- profile page avec option de changer de clé.
+
 - test option : send confirmation email the first time logged in.
-- profile: set delay before warning by email. use floating labels select.
-
-- model : user, StorageItem
-
-- èiblish to hiroku.
+- publich to hiroku ?.
 - publich to microsoft azure.

@@ -1,13 +1,15 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace routes;
 
+use helpers\ArtOrder;
 use helpers\Authenticate;
 use helpers\Database;
+
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
@@ -25,14 +27,17 @@ class ArticlesTable extends BaseRoute
 
     public function __construct()
     {
-        parent::__construct("articles_table_template", ROUTES::ART_TABLE);
+        parent::__construct("articles_table_template", ART_TABLE);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Routes::LOGIN);
+            $this->requestRedirect(LOGIN);
         }
+
+        $_SESSION[ART_PAGE] ??= 1;
+        $_SESSION[ART_ORDER_BY] ??= ArtOrder::DATE_DESC;
 
         $alerts = [];
 

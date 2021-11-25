@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.16 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh 
 
-use function helpers\renderTemplate;
+use helpers\Util;
 use routes\Routes;
 
 require_once __DIR__ . '/../boot.php';
@@ -27,4 +27,4 @@ if ($route = Routes::getRoute()) {
 
 
 // insert dynamically generated html content into the main template.
-echo renderTemplate('main_template', $templateData);
+echo Util::renderTemplate('main_template', $templateData);

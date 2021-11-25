@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.23 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace routes;
@@ -15,7 +15,7 @@ use DateTime;
 class ArticleEdit extends BaseRoute
 {
     const ARTICLE_ADD_EMPTY = "Il faut donner un nom à l'article à ajouter.";
-    const ARTICLE_NAME_TOO_SHORT = "Le nom de l'article doit compter au moins  %s caractères.";
+    const ARTICLE_NAME_TOO_SHORT = "Le nom de l'article doit compter au moins %s caractères.";
     const ARTICLE_NAME_TOO_LONG = "Le nom de l'article ne doit pas dépasser %s caractères.";
     const COMMENTS_NAME_TOO_LONG = "Les commentaires ne doivent pas dépasser %s caractèrs.";
     const LOCATION_EMPTY = "Il est nécessaire de préciser l'emplacement.";
@@ -26,16 +26,10 @@ class ArticleEdit extends BaseRoute
     const DATE_INVALID = "La date fournie est invalide.";
     const DATE_FUTURE = "La date fournie est trop loin dans le future.";
 
-    const NAME_MIN_LENGHT = 6;
-    const NAME_MAX_LENGTH = 20;
-    const LOCATION_MIN_LENGHT = 6;
-    const LOCATION_MAX_LENGHT = 40;
-    const COMMENTS_MAX_LENGHT = 240;
-    const DATE_FUTURE_LIMIT = '2050-01-01';
 
     function __construct()
     {
-        parent::__construct('article_edit_template', Routes::ART_EDIT);
+        parent::__construct('article_edit_template', ART_EDIT);
     }
 
     public function getBodyContent(): string
@@ -66,9 +60,9 @@ class ArticleEdit extends BaseRoute
                     $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
                     if (Database::getInstance()->insertArticle($article)) {
-                        $this->requestRedirect(Routes::ART_TABLE . '?alert=added_success');
+                        $this->requestRedirect(ART_TABLE . '?alert=added_success');
                     } else {
-                        $this->requestRedirect(Routes::ART_TABLE . '?alert=added_failure');
+                        $this->requestRedirect(ART_TABLE . '?alert=added_failure');
                     }
                 }
             } else if (isset($_POST['update-article'])) {
@@ -81,12 +75,10 @@ class ArticleEdit extends BaseRoute
                     $article = Database::getInstance()->getArticleById($_POST['id']);
                     $article->updateFields($article_name, $location, $exp_date_str, $comments);
 
-                    error_log($article->__toString());
-
                     if (Database::getInstance()->updateArticle($article)) {
-                        $this->requestRedirect(Routes::ART_TABLE . '?alert=updated_success');
+                        $this->requestRedirect(ART_TABLE . '?alert=updated_success');
                     } else {
-                        $this->requestRedirect(Routes::ART_TABLE . '?alert=updated_failure');
+                        $this->requestRedirect(ART_TABLE . '?alert=updated_failure');
                     }
                 }
             }
@@ -151,13 +143,13 @@ class ArticleEdit extends BaseRoute
             return false;
         }
 
-        if (strlen($article_name) < ArticleEdit::NAME_MIN_LENGHT) {
-            $errors['article-name'] = sprintf(ArticleEdit::ARTICLE_NAME_TOO_SHORT, ArticleEdit::NAME_MIN_LENGHT);
+        if (strlen($article_name) < ARTICLE_NAME_MIN_LENGHT) {
+            $errors['article-name'] = sprintf(ArticleEdit::ARTICLE_NAME_TOO_SHORT, ARTICLE_NAME_MIN_LENGHT);
             return false;
         }
 
-        if (strlen($article_name) > ArticleEdit::NAME_MAX_LENGTH) {
-            $errors['article-name'] = sprintf(ArticleEdit::ARTICLE_NAME_TOO_LONG, ArticleEdit::NAME_MAX_LENGTH);
+        if (strlen($article_name) > ARTICLE_NAME_MAX_LENGTH) {
+            $errors['article-name'] = sprintf(ArticleEdit::ARTICLE_NAME_TOO_LONG, ARTICLE_NAME_MAX_LENGTH);
             return false;
         }
         return true;
@@ -184,7 +176,7 @@ class ArticleEdit extends BaseRoute
 
         static $future_limit;
         if (is_null($future_limit)) {
-            $future_limit = DateTime::createFromFormat('Y-m-d', ArticleEdit::DATE_FUTURE_LIMIT);
+            $future_limit = DateTime::createFromFormat('Y-m-d', ARTICLE_DATE_FUTURE_LIMIT);
         }
 
         if ($validated_date) {
@@ -222,13 +214,13 @@ class ArticleEdit extends BaseRoute
             return false;
         }
 
-        if (strlen($location) < ArticleEdit::LOCATION_MIN_LENGHT) {
-            $errors['location'] = sprintf(ArticleEdit::LOCATION_NAME_TOO_SHORT, ArticleEdit::LOCATION_MIN_LENGHT);
+        if (strlen($location) < ARTICLE_LOCATION_MIN_LENGHT) {
+            $errors['location'] = sprintf(ArticleEdit::LOCATION_NAME_TOO_SHORT, ARTICLE_LOCATION_MIN_LENGHT);
             return false;
         }
 
-        if (strlen($location) > ArticleEdit::LOCATION_MAX_LENGHT) {
-            $errors['location'] = sprintf(ArticleEdit::LOCATION_NAME_TOO_LONG, ArticleEdit::LOCATION_MAX_LENGHT);
+        if (strlen($location) > ARTICLE_LOCATION_MAX_LENGHT) {
+            $errors['location'] = sprintf(ArticleEdit::LOCATION_NAME_TOO_LONG, ARTICLE_LOCATION_MAX_LENGHT);
             return false;
         }
         return true;
@@ -245,8 +237,8 @@ class ArticleEdit extends BaseRoute
     {
         $comments = trim($_POST['comments']) ?? '';
 
-        if (strlen($comments) > ArticleEdit::COMMENTS_MAX_LENGHT) {
-            $errors['comments'] = sprintf(ArticleEdit::COMMENTS_NAME_TOO_LONG, ArticleEdit::COMMENTS_MAX_LENGHT);
+        if (strlen($comments) > ARTICLE_COMMENTS_MAX_LENGHT) {
+            $errors['comments'] = sprintf(ArticleEdit::COMMENTS_NAME_TOO_LONG, ARTICLE_COMMENTS_MAX_LENGHT);
             return false;
         }
         return true;

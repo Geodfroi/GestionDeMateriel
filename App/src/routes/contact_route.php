@@ -13,7 +13,7 @@ class ContactRoute extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('contact_template', ROUTES::CONTACT);
+        parent::__construct('contact_template', CONTACT);
     }
 
     public function getBodyContent(): string

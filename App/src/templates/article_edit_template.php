@@ -1,32 +1,32 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 use routes\Routes;
 use helpers\TemplateUtil;
 
 ?>
+
 <div class="container">
     <div class="row col-8">
-        <form method="post" action="<?php echo Routes::ART_EDIT ?>">
+        <form method="post" action="<?php echo ART_EDIT ?>">
             <label class="h4 m-4">Ajouter un article</article></label>
 
             <input type="hidden" name="id" value="<?php echo $values['id'] ?>">
 
             <div class="mb-2">
                 <label for="form-name" class="form-label col-3">Nom de l'article:</label>
-                <input id="form-name" name="article-name" type="text col-12" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'article-name') ?>" value="<?php echo TemplateUtil::escape($values['article-name']) ?>">
+                <input id="form-name" name="article-name" type="text" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'article-name') ?>" value="<?php echo TemplateUtil::escape($values['article-name']) ?>">
 
                 <?php if (isset($errors['article-name'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['article-name'] ?> </div>
                 <?php } ?>
-
             </div>
 
             <div class="mb-2">
                 <label for="form-location" class="form-label col-3">Emplacement:</label>
-                <input id="form-location" name="location" type="text col-12" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'location') ?>" value="<?php echo TemplateUtil::escape($values['location']) ?>">
+                <input id="form-location" name="location" type="text" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'location') ?>" value="<?php echo TemplateUtil::escape($values['location']) ?>">
 
                 <?php if (isset($errors['location'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['location'] ?></div>
@@ -44,7 +44,6 @@ use helpers\TemplateUtil;
 
             </div>
 
-
             <div class=" mb-2">
                 <textarea id="form-comments" name="comments" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'comments') ?>" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments"><?php echo TemplateUtil::escape($values['comments']) ?></textarea>
                 <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>
@@ -61,7 +60,7 @@ use helpers\TemplateUtil;
                     Modifier
                 <?php } ?>
             </button>
-            <a href="/" class="btn btn-secondary">Cancel</a>
+            <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>

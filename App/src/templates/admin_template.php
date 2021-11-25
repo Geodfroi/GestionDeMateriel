@@ -1,13 +1,13 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 use routes\Routes;
 use helpers\UserOrder;
 
-$page = $_SESSION[ADMIN_PAGE] ?? 1;
-$orderby = $_SESSION[ADMIN_ORDER_BY] ?? UserOrder::EMAIL_ASC;
+$page = $_SESSION[ADMIN_PAGE];
+$orderby = $_SESSION[ADMIN_ORDER_BY];
 
 /**
  * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
@@ -18,7 +18,6 @@ $orderby = $_SESSION[ADMIN_ORDER_BY] ?? UserOrder::EMAIL_ASC;
 function disCaretAdm(string $header): string
 {
     global $order;
-    // $order = $_SESSION[ADMIN_ORDER_BY];
     if ($header === 'email') {
         if ($order === UserOrder::EMAIL_DESC) {
             return 'bi-caret-down';
@@ -49,9 +48,8 @@ function disCaretAdm(string $header): string
  */
 function disLinkAdm(string $header): string
 {
-    $root = Routes::ADMIN . '?orderby=';
+    $root = ADMIN . '?orderby=';
     global $order;
-    // $order = $_SESSION[ADMIN_ORDER_BY];
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie creation is listed most recent first.
     if ($header === 'email') {
@@ -107,7 +105,7 @@ function disLinkAdm(string $header): string
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo Routes::ADMIN  . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo ADMIN  . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
@@ -115,12 +113,12 @@ function disLinkAdm(string $header): string
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
                 <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo Routes::ADMIN . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                    <a href="<?php echo ADMIN . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
             <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo Routes::ADMIN . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo ADMIN . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>
@@ -128,7 +126,7 @@ function disLinkAdm(string $header): string
     </nav>
 
     <div class="row">
-        <a href="<?php echo Routes::ADMIN ?>" class="btn btn-primary">Ajouter une saisie</a>
+        <a href="<?php echo USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
     </div>
 </div>
 

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace routes;
@@ -11,14 +11,6 @@ namespace routes;
  */
 class Routes
 {
-    const ADMIN = '/admin';
-    const ART_TABLE = '/articlesList';
-    const ART_EDIT = '/articleEdit';
-    const CONTACT = '/contact';
-    const LOGIN = '/login';
-    const LOGOUT = '/login?logout=true';
-    const HOME = '/';
-    const PROFILE = '/profile';
 
     /**
      * Get proper route from path contained in $_SERVER['PATH_INFO']; 
@@ -28,21 +20,23 @@ class Routes
      */
     public static function getRoute(): BaseRoute
     {
-        switch ($_SERVER['PATH_INFO'] ?? Routes::HOME) {
-            case Routes::ADMIN:
+        switch ($_SERVER['PATH_INFO'] ?? HOME) {
+            case ADMIN:
                 return new AdminRoute();
-            case Routes::ART_EDIT:
+            case ART_EDIT:
                 return new ArticleEdit();
-            case Routes::ART_TABLE:
+            case ART_TABLE:
                 return new ArticlesTable();
-            case Routes::CONTACT:
+            case CONTACT:
                 return new ContactRoute();
-            case Routes::HOME:
+            case HOME:
                 return new HomeRoute();
-            case Routes::LOGIN:
+            case LOGIN:
                 return new Login();
-            case ROUTES::PROFILE:
+            case PROFILE:
                 return new ProfileRoute();
+            case USER_EDIT:
+                return new UserEdit();
             default:
                 return new class extends BaseRoute
                 {

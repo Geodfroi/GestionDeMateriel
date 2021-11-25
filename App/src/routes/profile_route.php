@@ -13,7 +13,7 @@ class ProfileRoute extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('profile_template', Routes::PROFILE);
+        parent::__construct('profile_template', PROFILE);
     }
 
     public function getBodyContent(): string

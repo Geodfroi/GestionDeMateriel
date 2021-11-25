@@ -1,13 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace routes;
 
 use helpers\Authenticate;
 use helpers\Database;
+use helpers\UserOrder;
 
 
 /**
@@ -19,14 +20,17 @@ class AdminRoute extends BaseRoute
 
     function __construct()
     {
-        parent::__construct('admin_template', Routes::ADMIN);
+        parent::__construct('admin_template', ADMIN);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Routes::LOGIN);
+            $this->requestRedirect(LOGIN);
         }
+
+        $_SESSION[ADMIN_PAGE] ??= 1;
+        $_SESSION[ADMIN_ORDER_BY] ??= UserOrder::EMAIL_ASC;
 
         $alerts = [];
 

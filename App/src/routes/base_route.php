@@ -1,12 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace routes;
 
-use function helpers\renderTemplate as rt;
+use helpers\Util;
 
 /**
  * Abstract class of all routes containing common utility functions.
@@ -72,6 +72,6 @@ abstract class BaseRoute
      */
     protected function renderTemplate(array $data = []): string
     {
-        return rt($this->templateName, $data);
+        return Util::renderTemplate($this->templateName, $data);
     }
 }

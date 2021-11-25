@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace routes;
@@ -23,19 +23,13 @@ class Login extends BaseRoute
 
     public function __construct()
     {
-        parent::__construct('login_template', Routes::LOGIN);
+        parent::__construct('login_template', LOGIN);
     }
-
 
     public function getBodyContent(): string
     {
-        $values = [
-            'email' => '',
-            'password' => '',
-        ];
         $errors = [];
         $alerts = [];
-        $user = '';
 
         if (Authenticate::isLoggedIn()) {
 
@@ -43,15 +37,15 @@ class Login extends BaseRoute
                 Authenticate::logout();
                 $alerts['logout'] = '';
             } else {
-                $this->requestRedirect(Routes::HOME);
+                $this->requestRedirect(HOME);
                 return '';
             }
         }
 
         if (isset($_GET['old-email'])) {
             // handle demand for new password.
-            $values['email']  = $_GET['old-email'];
-            $user = Database::getInstance()->getUserByEmail($values['email']);
+            $email  = $_GET['old-email'];
+            $user = Database::getInstance()->getUserByEmail($email);
 
             if (isset($user)) {
                 $this->handleNewPasswordRequest($user->getEmail());
@@ -61,21 +55,17 @@ class Login extends BaseRoute
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            // handle login post request.
-            $values['email'] = trim($_POST['email']) ?? '';
-            $values['password'] = trim($_POST['password']) ?? '';
-
-            if ($this->validate_email_input($values['email'], $errors)) {
-                $user = Database::getInstance()->getUserByEmail($values['email']);
+            if ($this->validate_email_input($email, $errors)) {
+                $user = Database::getInstance()->getUserByEmail($email);
             }
 
             if (!isset($user)) {
                 $errors['email'] = Login::USER_NOT_FOUND;
             } else {
-                if ($this->validate_password_input($values['password'], $errors)) {
-                    if ($user->verifyPassword($values['password'])) {
+                if ($this->validate_password_input($password, $errors)) {
+                    if ($user->verifyPassword($password)) {
                         Authenticate::login($user);
-                        $this->requestRedirect(Routes::HOME);
+                        $this->requestRedirect(HOME);
                         return "";
                     } else {
                         $errors['password'] = Login::PASSWORD_INVALID;
@@ -83,6 +73,11 @@ class Login extends BaseRoute
                 }
             }
         }
+
+        $values = [
+            'email' => $email ?? '',
+            'password' => $password ?? '',
+        ];
 
         return $this->renderTemplate([
             'values' => $values,
@@ -94,12 +89,14 @@ class Login extends BaseRoute
     /**
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
-     * @param string $email User email.
+     * @param string $email User email by reference.
      * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled-in.
      */
-    private function validate_email_input($email, &$errors): bool
+    private function validate_email_input(&$email, &$errors): bool
     {
+        $email = trim($_POST['email']) ?? '';
+
         if ($email  === '') {
             $errors['email'] = Login::EMAIL_EMPTY;
             return false;
@@ -115,12 +112,13 @@ class Login extends BaseRoute
     /**
      * Validate input and fill $errors array with proper password error text to be displayed if it fails.
      * 
-     * @param string $password User password.
+     * @param string $password User password by reference
      * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled;
      */
-    private function validate_password_input($password, &$errors)
+    private function validate_password_input(&$password, &$errors)
     {
+        $password = trim($_POST['password']) ?? '';
         if ($password === '') {
             $errors['password'] = Login::PASSWORD_EMPTY;
             return false;

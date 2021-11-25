@@ -1,13 +1,13 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 use routes\Routes;
 use helpers\ArtOrder;
 
-$page = $_SESSION[ART_PAGE] ?? 1;
-$orderby = $_SESSION[ART_ORDER_BY] ?? ArtOrder::DATE_DESC;
+$page = $_SESSION[ART_PAGE];
+$orderby = $_SESSION[ART_ORDER_BY];
 
 /**
  * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
@@ -17,7 +17,8 @@ $orderby = $_SESSION[ART_ORDER_BY] ?? ArtOrder::DATE_DESC;
  */
 function disCaretArt(string $header): string
 {
-    $order = $_SESSION[ART_ORDER_BY];
+    global $order;
+
     if ($header === 'article') {
         if ($order === ArtOrder::NAME_ASC) {
             return 'bi-caret-up';
@@ -48,8 +49,8 @@ function disCaretArt(string $header): string
  */
 function disLinkArt(string $header): string
 {
-    $root = Routes::ART_TABLE . '?orderby=';
-    $order = $_SESSION[ART_ORDER_BY];
+    $root = ART_TABLE . '?orderby=';
+    global $order;
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
     if ($header === 'article') {
@@ -90,27 +91,6 @@ function disLinkArt(string $header): string
 
                     <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Date de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
 
-
-                        <!-- <th>
-                        <?php if ($orderby ===  ArtOrder::NAME_DESC) { ?><a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArtOrder::NAME_ASC) { ?>
-                                    <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::NAME_DESC  ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
-                                        <?php } else { ?>
-                                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
-                    <th>Location <?php if ($orderby ===  ArtOrder::LOCATION_DESC) { ?>
-                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::LOCATION_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArtOrder::LOCATION_ASC) { ?>
-                                    <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::LOCATION_DESC ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
-                                        <?php } else { ?>
-                                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::LOCATION_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
-                    </th>
-                    <th> <?php if ($orderby ===  ArtOrder::DATE_DESC) { ?>
-                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArtOrder::DATE_ASC) { ?>
-                                    <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_DESC ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
-                                        <?php } else { ?>
-                                            <a href="<?php echo Routes::ART_TABLE . '?orderby=' . ArtOrder::DATE_DESC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?></th> -->
-
                     <th>Comments</th>
                     <th>Actions</th>
                 </tr>
@@ -123,9 +103,9 @@ function disLinkArt(string $header): string
                         <td><?php echo $article->getExpirationDate()->format('d/m/Y') ?></td>
                         <td><span class="bi-text-left <?php echo strlen($article->getComments()) == 0 ? 'text-secondary' : 'text-info' ?>" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span></td>
                         <td>
-                            <a class="link-secondary" href=<?php echo Routes::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Editer" data-bs-placement="bottom"></i></a>
+                            <a class="link-secondary" href=<?php echo ART_EDIT . '?update=' . $article->getId() ?>><i class="bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Editer" data-bs-placement="bottom"></i></a>
                             <span style=" font-size: 1.2rem;">|</span>
-                            <a class="link-danger" href=<?php echo Routes::ART_TABLE . '?delete=' . $article->getId() ?>><i class="bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Effacer" data-bs-placement="bottom"></i></a>
+                            <a class="link-danger" href=<?php echo ART_TABLE . '?delete=' . $article->getId() ?>><i class="bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Effacer" data-bs-placement="bottom"></i></a>
                         </td>
                     </tr>
                 <?php } ?>
@@ -137,7 +117,7 @@ function disLinkArt(string $header): string
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo Routes::ART_TABLE . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo ART_TABLE . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
@@ -145,12 +125,12 @@ function disLinkArt(string $header): string
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
                 <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo Routes::ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                    <a href="<?php echo ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
             <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo Routes::ART_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo ART_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>
@@ -158,7 +138,7 @@ function disLinkArt(string $header): string
     </nav>
 
     <div class="row">
-        <a href="<?php echo Routes::ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
+        <a href="<?php echo ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
     </div>
 </div>
 
@@ -166,3 +146,10 @@ function disLinkArt(string $header): string
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>
 <div>TODO: put tab logout link under email on the left</div>
+
+<!-- <th>
+                        <?php if ($orderby ===  ArtOrder::NAME_DESC) { ?><a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
+                                <?php } else if ($orderby ===  ArtOrder::NAME_ASC) { ?>
+                                    <a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_DESC  ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
+                                        <?php } else { ?>
+                                            <a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>

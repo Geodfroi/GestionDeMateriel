@@ -48,16 +48,16 @@ function setActive(string $route): string
 
                         <?php if (Authenticate::isLoggedIn()) { ?>
                             <?php if (Authenticate::getUser()->isAdmin()) { ?>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::ADMIN ? 'active' : '' ?>" href="<?php echo Routes::ADMIN ?>">Admin</a>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::ART_TABLE ? 'active' : '' ?>" href="<?php echo Routes::ART_TABLE ?>">Articles</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === ADMIN ? 'active' : '' ?>" href="<?php echo ADMIN ?>">Admin</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === ART_TABLE ? 'active' : '' ?>" href="<?php echo ART_TABLE ?>">Articles</a>
                             <?php } else { ?>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::ART_TABLE ? 'active' : '' ?>" href="<?php echo Routes::ART_TABLE ?>">Articles</a>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::PROFILE ? 'active' : '' ?>" href="<?php echo Routes::PROFILE ?> ">Profile</a>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Routes::CONTACT ? 'active' : '' ?>" href="<?php echo Routes::CONTACT ?>">Contact</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === ART_TABLE ? 'active' : '' ?>" href="<?php echo ART_TABLE ?>">Articles</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === PROFILE ? 'active' : '' ?>" href="<?php echo PROFILE ?> ">Profile</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === CONTACT ? 'active' : '' ?>" href="<?php echo CONTACT ?>">Contact</a>
                             <?php } ?>
-                            <a class="nav-link" href="<?php echo Routes::LOGOUT ?>">Déconnexion</a>
+                            <a class="nav-link" href="<?php echo LOGOUT ?>">Déconnexion</a>
                         <?php } else { ?>
-                            <a class="nav-link" href="<?php echo Routes::LOGIN ?>">Connexion</a>
+                            <a class="nav-link" href="<?php echo LOGIN ?>">Connexion</a>
                         <?php } ?>
                     </div>
                 </div>

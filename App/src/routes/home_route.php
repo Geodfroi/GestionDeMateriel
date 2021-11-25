@@ -15,19 +15,19 @@ class HomeRoute extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('', Routes::HOME);
+        parent::__construct('', HOME);
     }
 
     public function getBodyContent(): string
     {
         if (Authenticate::isLoggedIn()) {
             if (Authenticate::isAdmin()) {
-                $this->requestRedirect(Routes::ADMIN);
+                $this->requestRedirect(ADMIN);
             } else {
-                $this->requestRedirect(Routes::ART_TABLE);
+                $this->requestRedirect(ART_TABLE);
             }
         } else {
-            $this->requestRedirect(Routes::LOGIN);
+            $this->requestRedirect(LOGIN);
         }
         return '';
     }
