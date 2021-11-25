@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace helpers;
@@ -32,7 +32,7 @@ class Database
             $options = [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ];
-            $this->pdo = new PDO($dsn, ADMIN_ID, ADMIN_PASSWORD, $options);
+            $this->pdo = new PDO($dsn, DB_ADMIN_ID, DB_ADMIN_PASSWORD, $options);
         } catch (PDOException $e) {
             error_log('Connection failed: ' . $e->getMessage() . PHP_EOL);
         }
@@ -52,13 +52,14 @@ class Database
         return $instance;
     }
 
+
     /**
      * Delete the article from db by id.
      * 
-     * @param int $id Article's id.
+     * @param int $id Article id.
      * @return bool True if the delete is successful.
      */
-    public function deleteArticleByID(int $id): bool
+    public function deleteArticleById(int $id): bool
     {
         $preparedStatement = $this->pdo->prepare('DELETE FROM articles WHERE id = :id');
         $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
@@ -68,6 +69,43 @@ class Database
         }
         list(,, $error) = $preparedStatement->errorInfo();
         error_log('failure to delete article from database: ' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Delete all articles belonging to user.
+     * 
+     * @param int $user_id The user id.
+     * @return bool True if the delete is successful.
+     */
+    public function deleteUserArticles($user_id): bool
+    {
+        $preparedStatement = $this->pdo->prepare('DELETE FROM articles WHERE user_id = :uid');
+        $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to delete user articles from database: ' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Delete the user from db by id.
+     * 
+     * @param int $id User id.
+     * @return bool True if the delete is successful.
+     */
+    public function deleteUserByID($id): bool
+    {
+        $preparedStatement = $this->pdo->prepare('DELETE FROM users WHERE id = :id');
+        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to delete user from database: ' . $error . PHP_EOL);
         return false;
     }
 
@@ -106,7 +144,6 @@ class Database
 
         return null;
     }
-
 
     /**
      * Get number of articles owned by user.

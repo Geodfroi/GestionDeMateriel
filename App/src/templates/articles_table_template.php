@@ -3,7 +3,6 @@
 ## Joël Piguet - 2021.11.25 ###
 ##############################
 
-use routes\Routes;
 use helpers\ArtOrder;
 
 $page = $_SESSION[ART_PAGE];
@@ -103,11 +102,29 @@ function disLinkArt(string $header): string
                         <td><?php echo $article->getExpirationDate()->format('d/m/Y') ?></td>
                         <td><span class="bi-text-left <?php echo strlen($article->getComments()) == 0 ? 'text-secondary' : 'text-info' ?>" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span></td>
                         <td>
-                            <a class="link-secondary" href=<?php echo ART_EDIT . '?update=' . $article->getId() ?>><i class="bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Editer" data-bs-placement="bottom"></i></a>
-                            <span style=" font-size: 1.2rem;">|</span>
-                            <a class="link-danger" href=<?php echo ART_TABLE . '?delete=' . $article->getId() ?>><i class="bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Effacer" data-bs-placement="bottom"></i></a>
+                            <a class="link-secondary" href=<?php echo ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Editer" data-bs-placement="bottom"></i></a>
+                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
                     </tr>
+
+                    <!-- Modal window for article delete confirmation -->
+                    <div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delete-modalLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+                                </div>
+                                <div class="modal-body">
+                                    Voulez-vous vraiment supprimer [<?php echo $article->getArticleName() ?>] ?
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="<?php echo ART_TABLE . '?delete=' . $article->getId() ?>" class="btn btn-primary">Confirmer</a>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 <?php } ?>
             </tbody>
         </table>
@@ -147,10 +164,4 @@ function disLinkArt(string $header): string
 <div>TODO: better adaptive layout</div>
 <div>TODO: put tab logout link under email on the left</div>
 <div>TODO: confirm delete</div>
-
-<!-- <th>
-                        <?php if ($orderby ===  ArtOrder::NAME_DESC) { ?><a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>
-                                <?php } else if ($orderby ===  ArtOrder::NAME_ASC) { ?>
-                                    <a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_DESC  ?> "><i class="bi-caret-up" style="font-size: 1.2rem"></i><a>
-                                        <?php } else { ?>
-                                            <a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-circle" style="font-size: 1.0rem;"></ <?php } ?> </th>
+<div>TODO: delete comment column and put icon besides NAME_ASC</div>

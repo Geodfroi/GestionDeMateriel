@@ -36,9 +36,9 @@ const ADMIN_ORDER_BY = 'admin_orderby';
 const ADMIN_PAGE = 'admin_page';
 const ART_ORDER_BY = 'articles_orderby';
 const ART_PAGE = 'articles_page';
-const USER_ID = 'user_id';
-const USER_IS_ADMIN = 'is_admin';
 
+const ADMIN_ID = 'admin_id';
+const USER_ID = 'user_id';
 
 // const COOKIE_NAME = 'cookie_user';
 // const COOKIE_HOURS = 2 * 7 * 24 * 60 * 60; // cookie expires after two weeks by default;

@@ -14,8 +14,6 @@ $is_admin = $values['is-admin'];
         <form method="post" action="<?php echo USER_EDIT ?>">
             <label class="h4 m-4">Ajouter un utilisateur.</article></label>
 
-            <input type="hidden" name="id" value="<?php echo $values['id'] ?>">
-
             <div class="mb-2">
                 <label for="form-email" class="form-label col-12">E-mail de l'utilisateur:</label>
                 <input id="form-email" name="email" type="email" class="form-control <?php echo TUtil::showValid($errors, $values, 'email') ?>" value="<?php echo TUtil::escape($values['email']) ?>">
@@ -42,28 +40,21 @@ $is_admin = $values['is-admin'];
             </div>
 
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                <?php if ($values['id'] === 'no-id') { ?>
-                    Ajouter
-                <?php } else { ?>
-                    Modifier
-                <?php } ?>
-            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-modal">Ajouter</button>
             <a href="<?php echo ADMIN ?>" class="btn btn-secondary">Annuler</a>
 
             <!-- Modal window for user creation confirmation -->
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade" id="create-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="create-modalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+                            <h5 class="modal-title" id="create-modalLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
                         </div>
                         <div class="modal-body">
-                            </i>A l'ajout d'un utilisateur, un e-mail lui est automatiquement envoyé pour lui confirmer son inscription.
-                        </div>
+                            A l'ajout de l'utilisateur, un e-mail lui est automatiquement envoyé pour lui confirmer son inscription.</div>
                         <div class="modal-footer">
+                            <button type="submit" name="new-user" class="btn btn-primary">Confirmer</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" name="<?php echo $values['id'] === 'no-id' ? 'new-user' : 'update-user' ?>" class="btn btn-primary">Confirmer</button>
                         </div>
                     </div>
                 </div>

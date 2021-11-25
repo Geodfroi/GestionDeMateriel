@@ -3,8 +3,7 @@
 ## Joël Piguet - 2021.11.24 ###
 ##############################
 
-use helpers\TemplateUtil;
-use routes\Routes;
+use helpers\TUtil;
 
 ?>
 
@@ -30,8 +29,8 @@ use routes\Routes;
                 <label class="h4 m-4">Formulaire d'identification</label>
                 <div class="mb-3">
                     <label for="form-email" class="form-label">Adresse e-mail</label>
-                    <input id="form-email" type="email" name='email' aria-describedby="id-descr" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'email') ?>
-                        " value=<?php echo TemplateUtil::escape($values['email']); ?>>
+                    <input id="form-email" type="email" name='email' aria-describedby="id-descr" class="form-control <?php echo TUtil::showValid($errors, $values, 'email') ?>
+                        " value=<?php echo TUtil::escape($values['email']); ?>>
 
                     <?php if (isset($errors['email'])) { ?>
                         <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
@@ -42,7 +41,7 @@ use routes\Routes;
                 </div>
                 <div class="mt-3 mb-3">
                     <label for="form-password" class="form-label">Mot de passe</label>
-                    <input id="form-password" type="password" name='password' class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'password') ?>">
+                    <input id="form-password" type="password" name='password' class="form-control <?php echo TUtil::showValid($errors, $values, 'password') ?>">
 
                     <?php if (isset($errors['password'])) { ?>
                         <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>

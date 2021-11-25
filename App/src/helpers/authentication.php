@@ -3,21 +3,41 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.25 ###
 ##############################
 
 namespace helpers;
 
 use models\User;
 
-
-
-
 /**
  * Collection of static functions linked to authentification bundled into a class. 
  */
 class Authenticate
 {
+    /**
+     * Retrieve logged-in user.
+     * 
+     * @return ?User Logged-in User if found, otherwise null;
+     */
+    public static function getUser(): ?User
+    {
+        if (isset($_SESSION[USER_ID])) {
+            return Database::getInstance()->getUserById($_SESSION[USER_ID]);
+        }
+        return null;
+    }
+
+    public static function isAdmin()
+    {
+        return isset($_SESSION[ADMIN_ID]);
+    }
+
+    public static function isLoggedIn(): bool
+    {
+        return isset($_SESSION[USER_ID]);
+    }
+
     /**
      * Log-in user into session. The user will stay logged-in as long as the browser is open.
      * 
@@ -26,9 +46,21 @@ class Authenticate
     public static function login(User $user)
     {
         $_SESSION[USER_ID] = $user->getId();
-        $_SESSION[USER_IS_ADMIN]  = $user->isAdmin();
+
+        // USER_ID and ADMIN_ID are separate to allow admin to log-in as a different user and keep admin privileges.
+        if ($user->isAdmin()) {
+            $_SESSION[ADMIN_ID] = $user->getId();
+        }
 
         Database::getInstance()->updateLogTime($user->getId());
+    }
+
+    /**
+     * Log-in to a user account as an admin.
+     */
+    public static function login_as(int $id)
+    {
+        $_SESSION[USER_ID] = $id;
     }
 
     /**
@@ -42,28 +74,5 @@ class Authenticate
             session_destroy();
             // setcookie(COOKIE_NAME, '-1',  -1000); // reset cookie with negative life expectancy will delete it.
         }
-    }
-
-    public static function isAdmin()
-    {
-        return isset($_SESSION[USER_IS_ADMIN]) && $_SESSION[USER_IS_ADMIN];
-    }
-
-    public static function isLoggedIn(): bool
-    {
-        return isset($_SESSION[USER_ID]);
-    }
-
-    /**
-     * Retrieve logged-in user.
-     * 
-     * @return ?User Logged-in User if found, otherwise null;
-     */
-    public static function getUser(): ?User
-    {
-        if (isset($_SESSION[USER_ID])) {
-            return Database::getInstance()->getUserById($_SESSION[USER_ID]);
-        }
-        return null;
     }
 }

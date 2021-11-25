@@ -15,6 +15,7 @@ class UserEdit extends BaseRoute
 {
     const EMAIL_EMPTY = 'Un e-mail est nécessaire pour créer un utilisateur.';
     const EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
+    const EMAIL_USED = "Cet adresse e-mail est déjà utilisée par un autre utilisateur.";
     const PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
     const PASSWORD_SHORT = 'Le mot de passe doit avoir au minimum %s caractères.';
     const PASSWORD_WEAK = 'Le mot de passe doit comporter des chiffres et des lettres.';
@@ -50,12 +51,13 @@ class UserEdit extends BaseRoute
 
                     $user = User::fromForm($email, $password, $is_admin);
 
-
-
-                    $this->requestRedirect(ADMIN . '?alert=added_success');
+                    if (Database::getInstance()->insertUser($user)) {
+                        $this->requestRedirect(ADMIN . '?alert=added_success');
+                    } else {
+                        $this->requestRedirect(ADMIN . '?alert=added_failure');
+                    }
                     return '';
                 }
-            } else if (isset($_POST['update-user'])) {
             } else if (isset($_POST['regen-password'])) {
                 $password = $this->getRandomPassword();
                 $this->validate_email($email, $errors);
@@ -64,7 +66,6 @@ class UserEdit extends BaseRoute
 
         return $this->renderTemplate([
             'values' => [
-                'id' => $user_id ?? 'no-id',
                 'email' => $email ?? '',
                 'password' => $password ?? $this->getRandomPassword(),
                 'is-admin' => $is_admin  ?? false,
@@ -107,6 +108,11 @@ class UserEdit extends BaseRoute
             $errors['email'] = UserEdit::EMAIL_INVALID;
             return false;
         }
+        if (Database::getInstance()->getUserByEmail($email)) {
+            $errors['email'] = UserEdit::EMAIL_USED;
+            return false;
+        }
+
         return true;
     }
 

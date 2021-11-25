@@ -8,7 +8,6 @@ namespace routes;
 
 use helpers\Database;
 use helpers\Authenticate;
-use routes\Routes;
 
 /**
  * Route class containing behavior linked to login_template
