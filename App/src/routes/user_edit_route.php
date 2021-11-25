@@ -9,6 +9,7 @@ namespace routes;
 use helpers\Authenticate;
 use helpers\Database;
 use helpers\Util;
+use models\User;
 
 class UserEdit extends BaseRoute
 {
@@ -39,26 +40,52 @@ class UserEdit extends BaseRoute
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if ($this->validate_email($email, $errors)) {
-                if ($this->validate_password($password, $errors)) {
+            $is_admin = isset($_POST['is_admin']);
+
+            if (isset($_POST['new-user'])) {
+                $p_val = $this->validate_password($password, $errors);
+                $e_val = $this->validate_email($email, $errors);
+
+                if ($p_val && $e_val) {
+
+                    $user = User::fromForm($email, $password, $is_admin);
+
+
+
                     $this->requestRedirect(ADMIN . '?alert=added_success');
                     return '';
                 }
+            } else if (isset($_POST['update-user'])) {
+            } else if (isset($_POST['regen-password'])) {
+                $password = $this->getRandomPassword();
+                $this->validate_email($email, $errors);
             }
         }
 
-        $values = [
-            'id' => $user_id ?? 'no-id',
-            'email' => $email ?? '',
-            'password' => $password ?? Util::randomString(DEFAULT_PASSWORD_LENGTH),
-        ];
-
         return $this->renderTemplate([
-            'values' => $values,
+            'values' => [
+                'id' => $user_id ?? 'no-id',
+                'email' => $email ?? '',
+                'password' => $password ?? $this->getRandomPassword(),
+                'is-admin' => $is_admin  ?? false,
+            ],
             'errors' => $errors,
         ]);
     }
 
+    /**
+     * Generate a valid random password.
+     */
+    private function getRandomPassword()
+    {
+        $password_candidate = Util::randomString(DEFAULT_PASSWORD_LENGTH);
+        $has_number = preg_match('@[0-9]@', $password_candidate);
+        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
+        if ($has_number && $has_letters) {
+            return $password_candidate;
+        }
+        return $this->getRandomPassword();
+    }
 
     /**
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.

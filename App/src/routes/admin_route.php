@@ -42,11 +42,13 @@ class AdminRoute extends BaseRoute
                 $_SESSION[ADMIN_PAGE] = intval($_GET['page']);
             }
 
-            // if (isset($_GET['alert'])) {
-            //     if ($_GET['alert'] === 'added_success') {
-            //         $alerts['success'] = ArticlesTable::ADD_SUCCESS;
-            //     } else if ($_GET['alert'] === 'added_failure') {
-            //         $alerts['failure'] = ArticlesTable::ADD_FAILURE;
+            if (isset($_GET['alert'])) {
+                if ($_GET['alert'] === 'added_success') {
+                    $alerts['success'] = ArticlesTable::ADD_SUCCESS;
+                } else if ($_GET['alert'] === 'added_failure') {
+                    $alerts['failure'] = ArticlesTable::ADD_FAILURE;
+                }
+            }
             //     } else if ($_GET['alert'] === 'updated_success') {
             //         $alerts['success'] = ArticlesTable::UPDATE_SUCCESS;
             //     } else if ($_GET['alert'] === 'updated_failure') {
@@ -65,7 +67,6 @@ class AdminRoute extends BaseRoute
         $item_count = Database::getInstance()->getUsersCount(true);
         $offset =   ($_SESSION[ADMIN_PAGE] - 1) * AdminRoute::DISPLAY_COUNT;
         $page_count = ceil($item_count / AdminRoute::DISPLAY_COUNT);
-
         $users = Database::getInstance()->getUsers(AdminRoute::DISPLAY_COUNT, $offset, $_SESSION[ADMIN_ORDER_BY], true);
 
         return $this->renderTemplate([

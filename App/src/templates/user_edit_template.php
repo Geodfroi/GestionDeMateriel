@@ -3,8 +3,9 @@
 ## Joël Piguet - 2021.11.25 ###
 ##############################
 
-use routes\Routes;
-use helpers\TemplateUtil;
+use helpers\TUtil;
+
+$is_admin = $values['is-admin'];
 
 ?>
 
@@ -16,36 +17,61 @@ use helpers\TemplateUtil;
             <input type="hidden" name="id" value="<?php echo $values['id'] ?>">
 
             <div class="mb-2">
-                <label for="form-email" class="form-label col-3">E-mail de l'utilisateur:</label>
-                <input id="form-email" name="email" type="email" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'email') ?>" value="<?php echo TemplateUtil::escape($values['email']) ?>">
+                <label for="form-email" class="form-label col-12">E-mail de l'utilisateur:</label>
+                <input id="form-email" name="email" type="email" class="form-control <?php echo TUtil::showValid($errors, $values, 'email') ?>" value="<?php echo TUtil::escape($values['email']) ?>">
 
                 <?php if (isset($errors['email'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
                 <?php } ?>
             </div>
 
-            <div class="input-group mb-2">
+            <div class="input-group mb-3">
                 <label for="form-password" class="form-label col-12">Password:</label>
-                <input id="form-password" name="password" type="text" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'password') ?>" value="<?php echo TemplateUtil::escape($values['password']) ?>">
+                <input id="form-password" name="password" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'password') ?>" value="<?php echo TUtil::escape($values['password']) ?>">
 
-                <a href="" class="btn btn-secondary">Regénérer</a>
+                <button type="submit" name="regen-password" class="btn btn-secondary">Regénérer</button>
 
                 <?php if (isset($errors['password'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
                 <?php } ?>
             </div>
 
-            <button type="submit" name="<?php echo $values['id'] === 'no-id' ? 'new-user' : 'update-user' ?>" class="btn btn-primary">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" name="is_admin" id="flexSwitchCheckDefault" <?php echo $is_admin ? 'checked' : '' ?>>
+                <label class="form-check-label" for="flexSwitchCheckDefault>">Accorder les privilèges administratif à cet utilisateur.</label>
+            </div>
+
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                 <?php if ($values['id'] === 'no-id') { ?>
                     Ajouter
                 <?php } else { ?>
                     Modifier
                 <?php } ?>
             </button>
-            <a href="<?php echo ADMIN ?>" class="btn btn-secondary">Cancel</a>
+            <a href="<?php echo ADMIN ?>" class="btn btn-secondary">Annuler</a>
+
+            <!-- Modal window for user creation confirmation -->
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+                        </div>
+                        <div class="modal-body">
+                            </i>A l'ajout d'un utilisateur, un e-mail lui est automatiquement envoyé pour lui confirmer son inscription.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" name="<?php echo $values['id'] === 'no-id' ? 'new-user' : 'update-user' ?>" class="btn btn-primary">Confirmer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </form>
+
     </div>
 </div>
-</div>
 
-<div class="div">TODO: layout for small screen</div>
+<div class="div">TODO: layout for small screen.</div>

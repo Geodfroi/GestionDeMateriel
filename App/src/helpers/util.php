@@ -60,7 +60,7 @@ class Util
 /**
  * Utility class containing static functions useful for template editing.
  */
-class TemplateUtil
+class TUtil
 {
     /**
      * Print parameter to form while escaping caracters.
@@ -82,7 +82,7 @@ class TemplateUtil
      * @param mixed $key Value key
      * @return string Class tag or empty string.
      */
-    public static function setValidity(array $error, array $values, string $key): string
+    public static function showValid(array $error, array $values, string $key): string
     {
         if (isset($error[$key]))
             return ' is-invalid';

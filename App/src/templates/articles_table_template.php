@@ -146,6 +146,7 @@ function disLinkArt(string $header): string
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>
 <div>TODO: put tab logout link under email on the left</div>
+<div>TODO: confirm delete</div>
 
 <!-- <th>
                         <?php if ($orderby ===  ArtOrder::NAME_DESC) { ?><a href="<?php echo ART_TABLE . '?orderby=' . ArtOrder::NAME_ASC ?> "><i class="bi-caret-down" style="font-size: 1.2rem;"></i><a>

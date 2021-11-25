@@ -4,7 +4,7 @@
 ##############################
 
 use routes\Routes;
-use helpers\TemplateUtil;
+use helpers\TUtil;
 
 ?>
 
@@ -17,7 +17,7 @@ use helpers\TemplateUtil;
 
             <div class="mb-2">
                 <label for="form-name" class="form-label col-3">Nom de l'article:</label>
-                <input id="form-name" name="article-name" type="text" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'article-name') ?>" value="<?php echo TemplateUtil::escape($values['article-name']) ?>">
+                <input id="form-name" name="article-name" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'article-name') ?>" value="<?php echo TUtil::escape($values['article-name']) ?>">
 
                 <?php if (isset($errors['article-name'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['article-name'] ?> </div>
@@ -26,7 +26,7 @@ use helpers\TemplateUtil;
 
             <div class="mb-2">
                 <label for="form-location" class="form-label col-3">Emplacement:</label>
-                <input id="form-location" name="location" type="text" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'location') ?>" value="<?php echo TemplateUtil::escape($values['location']) ?>">
+                <input id="form-location" name="location" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'location') ?>" value="<?php echo TUtil::escape($values['location']) ?>">
 
                 <?php if (isset($errors['location'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['location'] ?></div>
@@ -36,7 +36,7 @@ use helpers\TemplateUtil;
 
             <div class=" mb-2">
                 <label for="form-expiration" class="form-label col-3">Date de péremption:</label>
-                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'expiration-date') ?>" value="<?php echo TemplateUtil::escape($values['expiration-date']) ?>">
+                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> class="form-control <?php echo TUtil::showValid($errors, $values, 'expiration-date') ?>" value="<?php echo TUtil::escape($values['expiration-date']) ?>">
 
                 <?php if (isset($errors['expiration-date'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['expiration-date'] ?></div>
@@ -45,7 +45,7 @@ use helpers\TemplateUtil;
             </div>
 
             <div class=" mb-2">
-                <textarea id="form-comments" name="comments" class="form-control <?php echo TemplateUtil::setValidity($errors, $values, 'comments') ?>" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments"><?php echo TemplateUtil::escape($values['comments']) ?></textarea>
+                <textarea id="form-comments" name="comments" class="form-control <?php echo TUtil::showValid($errors, $values, 'comments') ?>" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments"><?php echo TUtil::escape($values['comments']) ?></textarea>
                 <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>
 
                 <?php if (isset($errors['comments'])) { ?>
@@ -63,5 +63,4 @@ use helpers\TemplateUtil;
             <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
-</div>
 </div>
