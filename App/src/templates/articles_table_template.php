@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.28 ###
 ##############################
 
 use helpers\ArtOrder;
@@ -66,6 +66,8 @@ function disLinkArt(string $header): string
 
 <div class="container mt-3">
 
+
+
     <!-- <button class="btn btn-secondary" data-bs-toggle="tooltip" title="Tooltip on bottom" data-bs-placement="bottom">aaa</button> -->
     <div class="row col-12">
         <?php if (isset($alerts['success'])) { ?>
@@ -90,41 +92,43 @@ function disLinkArt(string $header): string
 
                     <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Date de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
 
-                    <th>Comments</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($articles as $article) { ?>
+                <?php for ($n = 0; $n < count($articles); $n++) {
+                    $article = $articles[$n]; ?>
                     <tr>
-                        <td><?php echo $article->getArticleName() ?></td>
+                        <td><?php echo $article->getArticleName()  ?>
+                            <?php if (strlen($article->getComments()) > 0) { ?>
+                                <span class="bi-text-left text-info" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span>
+                            <?php } ?>
+                        </td>
                         <td><?php echo $article->getLocation() ?></td>
                         <td><?php echo $article->getExpirationDate()->format('d/m/Y') ?></td>
-                        <td><span class="bi-text-left <?php echo strlen($article->getComments()) == 0 ? 'text-secondary' : 'text-info' ?>" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span></td>
                         <td>
                             <a class="link-secondary" href=<?php echo ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Editer" data-bs-placement="bottom"></i></a>
-                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
-                    </tr>
 
-                    <!-- Modal window for article delete confirmation -->
-                    <div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delete-modalLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
-                                </div>
-                                <div class="modal-body">
-                                    Voulez-vous vraiment supprimer [<?php echo $article->getArticleName() ?>] ?
-                                </div>
-                                <div class="modal-footer">
-                                    <a href="<?php echo ART_TABLE . '?delete=' . $article->getId() ?>" class="btn btn-primary">Confirmer</a>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <!-- Modal window for article delete confirmation -->
+                        <div class="modal fade" id=<?php echo "delete-modal-$n" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=<?php echo "delete-modalLabel-$n" ?> aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id=<?php echo "delete-modalLabel-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        Voulez-vous vraiment supprimer [<?php echo $article->getArticleName() ?>] ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="<?php echo ART_TABLE . '?delete=' . $article->getId() ?>" class="btn btn-primary">Confirmer</a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    </tr>
                 <?php } ?>
             </tbody>
         </table>
@@ -159,9 +163,6 @@ function disLinkArt(string $header): string
     </div>
 </div>
 
-
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>
 <div>TODO: put tab logout link under email on the left</div>
-<div>TODO: confirm delete</div>
-<div>TODO: delete comment column and put icon besides NAME_ASC</div>

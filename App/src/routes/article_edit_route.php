@@ -84,17 +84,15 @@ class ArticleEdit extends BaseRoute
             }
         }
 
-        $values = [
-            'id' => $article_id ?? 'no-id',
-            'article-name' => $article_name ?? '',
-            'expiration-date' => $exp_date_str ?? '',
-            'location' => $location ?? '',
-            'comments' => $comments ?? '',
-        ];
-
         return $this->renderTemplate([
             'errors' => $errors,
-            'values' => $values
+            'values' => [
+                'id' => $article_id ?? 'no-id',
+                'article-name' => $article_name ?? '',
+                'expiration-date' => $exp_date_str ?? '',
+                'location' => $location ?? '',
+                'comments' => $comments ?? '',
+            ]
         ]);
     }
 

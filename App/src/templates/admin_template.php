@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.28 ###
 ##############################
 
 use helpers\UserOrder;
@@ -64,7 +64,6 @@ function disLinkAdm(string $header): string
 ?>
 
 <div class="container mt-3">
-    <!-- <div class="div"> <?php echo $page ?></div> -->
     <div class="row col-12">
         <?php if (isset($alerts['success'])) { ?>
             <div class='alert alert-success alert-dismissible fade show' role='alert'><?php echo $alerts['success'] ?>
@@ -89,49 +88,44 @@ function disLinkAdm(string $header): string
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($users as $user) { ?>
+                <?php for ($n = 0; $n < count($users); $n++) {
+                    $user = $users[$n]; ?>
                     <tr>
-                        <td><?php echo $user->getEmail() . '  ' ?>
+                        <td><?php echo $user->getEmail() ?>
                             <?php if ($user->isAdmin()) { ?>
                                 <i class="bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
                             <?php } ?>
                         </td>
                         <td><?php echo $user->getCreationDate()->format('d/m/Y') ?></td>
                         <td><?php echo $user->getLastLogin()->format('d/m/Y') ?></td>
-                        <th>
-                            <a class="link-secondary" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                        <td>
+                            <a class="link-secondary" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
 
                             <?php if (!$user->isAdmin()) { ?>
                                 <a href="<?php echo ADMIN . '?connect=' . $user->getId() ?>" class="link-secondary text-info ms-2"><i class="bi bi-usb-plug" role="img" style="font-size: 1.2rem;" aria-label="connect-as" data-bs-toggle="tooltip" title="Se connecter en tant que [<?php echo $user->getEmail() ?>]" data-bs-placement="bottom"></i></a>
                             <?php } ?>
-
-
-                        </th>
-                    </tr>
-
-                    <!-- Modal window for user delete confirmation -->
-                    <div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delete-modalLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
-                                </div>
-                                <div class="modal-body">
-                                    Voulez-vous vraiment supprimer [<?php echo $user->getEmail() ?>] ? Tous les articles associés à ce compte seront également supprimés.
-                                </div>
-                                <div class="modal-footer">
-                                    <a href="<?php echo ADMIN . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        </td>
+                        <!-- Modal window for user delete confirmation -->
+                        <div class="modal fade" id=<?php echo "delete-modal-$n" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=<?php echo "delete-modalLabel-$n" ?> aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id=<?php echo "delete-modalLabel-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        Voulez-vous vraiment supprimer [<?php echo $user->getEmail() ?>] ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="<?php echo ADMIN . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    </tr>
                 <?php } ?>
             </tbody>
         </table>
-
-
     </div>
 
     <nav aria-label="list-pagination">
@@ -165,9 +159,6 @@ function disLinkAdm(string $header): string
 
 
 <div>TODO: option supprimer user</div>
-<div>TODO: LOG-IN comme user</div>
-<div>TODO: Créer nouvel user/password et envoyer mail au nouvel user.</div>
-<div>TODO: only display non-admin user in list.</div>
 <div>TODO: send email to new user when account is created.</div>
 
 <!-- <div><span class="text-secondary row-6">Pour modifier le profil d'un utilisateur ou manager ses articles, il faut utiliser l'action [Connecter en tant qu'utilisateur].</span></div> -->

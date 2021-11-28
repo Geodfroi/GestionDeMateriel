@@ -3,7 +3,6 @@
 ## Joël Piguet - 2021.11.25 ###
 ##############################
 
-use routes\Routes;
 use helpers\TUtil;
 
 ?>

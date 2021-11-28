@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.15 ###
+## Joël Piguet - 2021.11.28 ###
 ##############################
 
 namespace routes;
@@ -11,6 +11,7 @@ namespace routes;
  */
 class ProfileRoute extends BaseRoute
 {
+
     function __construct()
     {
         parent::__construct('profile_template', PROFILE);
@@ -18,6 +19,25 @@ class ProfileRoute extends BaseRoute
 
     public function getBodyContent(): string
     {
-        return $this->renderTemplate();
+        $display = 0;
+
+        $errors = [];
+
+        if (isset($_GET['change_password'])) {
+            $display = 1;
+        } else if (isset($_GET['add_email'])) {
+            $display = 2;
+        } else if (isset($_GET['modify_delay'])) {
+            $display = 3;
+        }
+
+        return $this->renderTemplate([
+            'display' => $display,
+            'errors' => $errors,
+            'values' => [
+                'password-first' => $password_first ?? '',
+                'password-second' => $password_second ?? '',
+            ],
+        ]);
     }
 }
