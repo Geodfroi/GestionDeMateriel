@@ -114,7 +114,7 @@ function disLinkAdm(string $header): string
                                         <h5 class="modal-title" id=<?php echo "delete-modalLabel-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
                                     </div>
                                     <div class="modal-body">
-                                        Voulez-vous vraiment supprimer [<?php echo $user->getEmail() ?>] ?
+                                        Voulez-vous vraiment supprimer [<?php echo $user->getEmail() ?>] ? Les articles associés à cet utilisateur seront également supprimés.
                                     </div>
                                     <div class="modal-footer">
                                         <a href="<?php echo ADMIN . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
