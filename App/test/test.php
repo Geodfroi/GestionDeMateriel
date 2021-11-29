@@ -21,7 +21,7 @@ use helpers\UserOrder;
 //     }
 // }
 
-$users = Database::getInstance()->getUsers(50, 0, UserOrder::CREATED_ASC, false);
-foreach ($users as $value) {
-    echo $value . PHP_EOL;
-}
+// $users = Database::getInstance()->getUsers(50, 0, UserOrder::CREATED_ASC, false);
+// foreach ($users as $value) {
+//     echo $value . PHP_EOL;
+// }

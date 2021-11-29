@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.29 ###
 ##############################
 
 namespace helpers;
@@ -13,6 +13,17 @@ namespace helpers;
  */
 class Util
 {
+    /**
+     * Encrypt password in plain text into a 30 caracters encrypted hashed string.
+     * 
+     * @param string $password_plain Password in plain text.
+     * @return string Encrypted string password.
+     */
+    public static function encryptPassword(string $password_plain): string
+    {
+        return password_hash($password_plain, PASSWORD_BCRYPT);
+    }
+
     /**
      * Get a randomly generated string of set lenght.
      * https://www.w3docs.com/snippets/php/how-to-generate-a-random-string-with-php.html
@@ -54,6 +65,38 @@ class Util
         $rendered = ob_get_clean();
 
         return (string)$rendered;
+    }
+
+    /**
+     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
+     * https://www.codexworld.com/how-to/validate-password-strength-in-php/
+     * 
+     * @param string|null $password_candidate Proposed user password by reference.
+     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
+     * @return bool True if password is properly formatted;
+     */
+    public static function validate_password(&$password_candidate, array &$errors): bool
+    {
+        $PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
+        $PASSWORD_SHORT = 'Le mot de passe doit avoir au minimum %s caractères.';
+        $PASSWORD_WEAK = 'Le mot de passe doit comporter des chiffres et des lettres.';
+
+        $password_candidate = trim($_POST['password']) ?? '';
+        if ($password_candidate === '') {
+            $errors['password'] = $PASSWORD_EMPTY;
+            return false;
+        }
+        if (strlen($password_candidate) < USER_PASSWORD_MIN_LENGTH) {
+            $errors['password'] = sprintf($PASSWORD_SHORT, USER_PASSWORD_MIN_LENGTH);
+            return false;
+        }
+        $has_number = preg_match('@[0-9]@', $password_candidate);
+        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
+        if (!$has_number || (!$has_letters)) {
+            $errors['password'] = $PASSWORD_WEAK;
+            return false;
+        }
+        return true;
     }
 }
 

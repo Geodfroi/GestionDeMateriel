@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.29 ###
 ##############################
 
 use helpers\Authenticate;
@@ -23,6 +23,7 @@ use helpers\Authenticate;
 <body class="d-flex flex-column h-100">
 
     <header>
+
         <nav class="navbar navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
                 <span class="navbar-brand me-4" href="#">Gestionnaire d'inventaire</span>
@@ -55,8 +56,7 @@ use helpers\Authenticate;
     </header>
 
     <main class="flex-shrink-0">
-        <?php
-        echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page"; ?>
+        <?php echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page"; ?>
     </main>
 
     <footer class="footer mt-auto py-3 bg-light w-100 border-up">
@@ -80,5 +80,7 @@ use helpers\Authenticate;
         })
     </script>
 </body>
+
+
 
 </html>

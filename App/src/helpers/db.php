@@ -467,21 +467,43 @@ class Database
     /**
      * Update User last_login field to now.
      * 
-     * @param int $UserId ID of User.
+     * @param int $user_id ID of User.
      */
-    public function updateLogTime(int $UserId): bool
+    public function updateLogTime(int $user_id): bool
     {
         $preparedStatement = $this->pdo->prepare('UPDATE users SET last_login=:last_login WHERE id = :id');
         $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
 
         $preparedStatement->bindParam(':last_login', $now, PDO::PARAM_STR);
-        $preparedStatement->bindParam(':id', $UserId, PDO::PARAM_INT);
+        $preparedStatement->bindParam(':id', $user_id, PDO::PARAM_INT);
 
         if ($preparedStatement->execute()) {
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
         error_log('failure to update user log time' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Update user password.
+     * 
+     * @param int $user_id User id.
+     * @param string $new_password Updated password.
+     * @return bool True is update is successful.
+     */
+    public function updateUserPassword(int $user_id, string $new_password): bool
+    {
+        $preparedStatement = $this->pdo->prepare('UPDATE users SET password=:pass WHERE id = :id');
+
+        $preparedStatement->bindParam(':pass', $new_password, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':id', $user_id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to update user password' . $error . PHP_EOL);
         return false;
     }
 }

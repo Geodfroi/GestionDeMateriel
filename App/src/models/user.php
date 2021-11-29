@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.11.29 ###
 ##############################
 
 namespace models;
 
+use helpers\Util;
 use DateTime;
 
 class User
@@ -26,17 +27,6 @@ class User
      * Password hash encrypted with PASSWORD_BCRYPT algorithm. No plaintext password are ever stored into the database.
      */
     private string $password_hash;
-
-    /**
-     * Encrypt password in plain text into a 30 caracters encrypted hashed string.
-     * 
-     * @param string $password_plain Password in plain text.
-     * @return string Encrypted string password.
-     */
-    public static function encryptPassword(string $password_plain): string
-    {
-        return password_hash($password_plain, PASSWORD_BCRYPT);
-    }
 
     /**
      * Load user instance from database row.
@@ -69,7 +59,7 @@ class User
         $instance = new self();
         $instance->id = -1;
         $instance->email = $email;
-        $instance->password_hash = USER::encryptPassword($plain_password);
+        $instance->password_hash = Util::encryptPassword($plain_password);
         $instance->creation_date = new DateTime();
         $instance->last_login = new DateTime();
         $instance->is_admin = $is_admin;

@@ -65,6 +65,7 @@ function disLinkAdm(string $header): string
 
 <div class="container mt-3">
     <div class="row col-12">
+
         <?php if (isset($alerts['success'])) { ?>
             <div class='alert alert-success alert-dismissible fade show' role='alert'><?php echo $alerts['success'] ?>
                 <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
@@ -158,7 +159,6 @@ function disLinkAdm(string $header): string
 </div>
 
 
-<div>TODO: option supprimer user</div>
 <div>TODO: send email to new user when account is created.</div>
 
 <!-- <div><span class="text-secondary row-6">Pour modifier le profil d'un utilisateur ou manager ses articles, il faut utiliser l'action [Connecter en tant qu'utilisateur].</span></div> -->

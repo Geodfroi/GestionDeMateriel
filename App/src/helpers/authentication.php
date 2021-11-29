@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.29 ###
 ##############################
 
 namespace helpers;
@@ -26,6 +26,19 @@ class Authenticate
             return Database::getInstance()->getUserById($_SESSION[USER_ID]);
         }
         return null;
+    }
+
+    /**
+     * Retrieve current user id.
+     * 
+     * @return int Current user id or -1 if no user is defined.
+     */
+    public static function getUserId(): int
+    {
+        if (isset($_SESSION[USER_ID])) {
+            return $_SESSION[USER_ID];
+        }
+        return -1;
     }
 
     public static function isAdmin()

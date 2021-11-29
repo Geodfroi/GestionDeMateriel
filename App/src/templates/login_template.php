@@ -7,24 +7,22 @@ use helpers\TUtil;
 
 ?>
 
+
 <div class="container">
+
+    <div class="row">
+        <div class="col-12">
+            <?php if (isset($alert['type'])) { ?>
+                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
+
     <div class="row-12 justify-content-center">
         <div class="col-6 mx-auto mb-5">
             <form method="post" action="/login">
-
-                <!-- display new password info alert -->
-                <?php if (isset($alerts['new-password'])) { ?>
-                    <div class='alert alert-info alert-dismissible fade show' role='alert'>Un nouveau mot de passe a été envoyé à '<?php echo $values['email'] ?>'
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                    </div>
-                <?php } ?>
-
-                <!-- user logout info alert -->
-                <?php if (isset($alerts['disconnect'])) { ?>
-                    <div class='alert alert-info alert-dismissible fade show' role='alert'>L'usager précédent s'est déconnecté.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                    </div>"
-                <?php } ?>
 
                 <label class="h4 m-4">Formulaire d'identification</label>
                 <div class="mb-3">

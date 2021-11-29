@@ -67,14 +67,14 @@ class ArticlesTable extends BaseRoute
             }
         }
 
-        $user = Authenticate::getUser();
-        $item_count = Database::getInstance()->getUserArticlesCount($user->getId());
+        $user_id = Authenticate::getUserId();
+        $item_count = Database::getInstance()->getUserArticlesCount($user_id);
         $offset =   ($_SESSION[ART_PAGE] - 1) * ArticlesTable::DISPLAY_COUNT;
         $page_count = ceil($item_count / ArticlesTable::DISPLAY_COUNT);
 
         $articles = [];
         if (isset($user)) {
-            $articles = Database::getInstance()->getUserArticles($user->getId(), ArticlesTable::DISPLAY_COUNT, $offset, $_SESSION[ART_ORDER_BY]);
+            $articles = Database::getInstance()->getUserArticles($user_id, ArticlesTable::DISPLAY_COUNT, $offset, $_SESSION[ART_ORDER_BY]);
         }
 
         return $this->renderTemplate([

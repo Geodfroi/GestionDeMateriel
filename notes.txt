@@ -10,3 +10,5 @@
 - publich to hiroku ?.
 - publich to microsoft azure.
 - backup of database.
+- add to top
+- make header, footer stick

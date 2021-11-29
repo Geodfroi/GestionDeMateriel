@@ -55,7 +55,7 @@ class ArticleEdit extends BaseRoute
             if (isset($_POST['new-article'])) {
                 if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
 
-                    $user_id = Authenticate::getUser()->getId();
+                    $user_id = Authenticate::getUserId();
 
                     $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
@@ -70,7 +70,7 @@ class ArticleEdit extends BaseRoute
                 $article_id  = $_POST['id'];
 
                 if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
-                    $user_id = Authenticate::getUser()->getId();
+                    $user_id = Authenticate::getUserId();
 
                     $article = Database::getInstance()->getArticleById($_POST['id']);
                     $article->updateFields($article_name, $location, $exp_date_str, $comments);

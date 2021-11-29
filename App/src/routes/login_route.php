@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.29 ###
 ##############################
 
 namespace routes;
@@ -28,13 +28,15 @@ class Login extends BaseRoute
     public function getBodyContent(): string
     {
         $errors = [];
-        $alerts = [];
 
         if (Authenticate::isLoggedIn()) {
 
             if (isset($_GET['logout'])) {
                 Authenticate::logout();
-                $alerts['logout'] = '';
+                $alert = [
+                    'type' => 'info',
+                    'msg' => "L'usager précédent s'est déconnecté.",
+                ];
             } else {
                 $this->requestRedirect(HOME);
                 return '';
@@ -42,13 +44,18 @@ class Login extends BaseRoute
         }
 
         if (isset($_GET['old-email'])) {
+
             // handle demand for new password.
             $email  = $_GET['old-email'];
             $user = Database::getInstance()->getUserByEmail($email);
 
             if (isset($user)) {
-                $this->handleNewPasswordRequest($user->getEmail());
-                $alerts['new-password'] = '';
+                // Un nouveau mot de passe a été envoyé à '<?php echo $values['email'] 
+                // $this->handleNewPasswordRequest($user->getEmail());
+                $alert = [
+                    'type' => 'warning',
+                    'msg' => "renew-password not implemented",
+                ];
             }
         }
 
@@ -73,15 +80,13 @@ class Login extends BaseRoute
             }
         }
 
-        $values = [
-            'email' => $email ?? '',
-            'password' => $password ?? '',
-        ];
-
         return $this->renderTemplate([
-            'values' => $values,
             'errors' => $errors,
-            'alerts' => $alerts,
+            'values' => [
+                'email' => $email ?? '',
+                'password' => $password ?? '',
+            ],
+            'alert' => $alert ?? '',
         ]);
     }
 
