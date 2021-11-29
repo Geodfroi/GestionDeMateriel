@@ -61,14 +61,14 @@ class Login extends BaseRoute
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if ($this->validate_email_input($email, $errors)) {
+            if ($this->validateEmailInput($email, $errors)) {
                 $user = Database::getInstance()->getUserByEmail($email);
             }
 
             if (!isset($user)) {
                 $errors['email'] = Login::USER_NOT_FOUND;
             } else {
-                if ($this->validate_password_input($password, $errors)) {
+                if ($this->validatePasswordInput($password, $errors)) {
                     if ($user->verifyPassword($password)) {
                         Authenticate::login($user);
                         $this->requestRedirect(HOME);
@@ -97,7 +97,7 @@ class Login extends BaseRoute
      * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled-in.
      */
-    private function validate_email_input(&$email, &$errors): bool
+    private function validateEmailInput(&$email, &$errors): bool
     {
         $email = trim($_POST['email']) ?? '';
 
@@ -120,7 +120,7 @@ class Login extends BaseRoute
      * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled;
      */
-    private function validate_password_input(&$password, &$errors)
+    private function validatePasswordInput(&$password, &$errors)
     {
         $password = trim($_POST['password']) ?? '';
         if ($password === '') {

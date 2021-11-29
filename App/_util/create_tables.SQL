@@ -6,7 +6,8 @@ USE HEdS_inv_exp;
 CREATE TABLE `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `email`         varchar(255)    NOT NULL UNIQUE,
-    `alt_email`     varchar(255),
+    `contact_email` varchar(255),
+    `contact_delay` varchar(255)    NOT NULL DEFAULT '3-14',
     `password`      varchar(255)    NOT NULL,
     `creation_date` timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `last_login`    timestamp       DEFAULT CURRENT_TIMESTAMP,

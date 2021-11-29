@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.29 ###
 ##############################
 
 namespace helpers;
@@ -227,6 +227,7 @@ class Database
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
+            contact_email,
             email, 
             password, 
             creation_date, 
@@ -255,6 +256,7 @@ class Database
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
+            contact_email,
             email, 
             password, 
             creation_date, 
@@ -285,13 +287,12 @@ class Database
      */
     public function getUsers(int $limit, int $offset = 0, int $orderby = UserOrder::EMAIL_ASC, bool $excludeAdmins = true): array
     {
-        error_log('excludeAdmins : ' . $excludeAdmins);
-
         [$order_column, $order_dir] = UserOrder::getOrderParameters($orderby);
 
         // //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.
         $query_str = 'SELECT 
              id, 
+             contact_email,
              email, 
              password, 
              creation_date,
@@ -482,6 +483,50 @@ class Database
         }
         list(,, $error) = $preparedStatement->errorInfo();
         error_log('failure to update user log time' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Update user contact delay.
+     * 
+     * @param int $user_id User id.
+     * @param string $delay Updated contact delay as a string of concatenated numbers
+     * @return bool True is update is successful.
+     */
+    public function updateUserContactDelay(int $user_id, string $delay): bool
+    {
+        $preparedStatement = $this->pdo->prepare('UPDATE users SET contact_delay=:delay WHERE id = :id');
+
+        $preparedStatement->bindParam(':delay', $delay, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':id', $user_id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to update user contact delay' . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Update user contact adress.
+     * 
+     * @param int $user_id User id.
+     * @param string $email Updated contact email.
+     * @return bool True is update is successful.
+     */
+    public function updateUserContactEmail(int $user_id, string $email): bool
+    {
+        $preparedStatement = $this->pdo->prepare('UPDATE users SET contact_email=:email WHERE id = :id');
+
+        $preparedStatement->bindParam(':email', $email, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':id', $user_id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log('failure to update user contact email' . $error . PHP_EOL);
         return false;
     }
 

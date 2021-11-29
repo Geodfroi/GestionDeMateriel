@@ -63,25 +63,77 @@ use helpers\TUtil;
             </form>
 
         <?php } elseif ($display == 2) { ?>
-            add email
+            <!-- Add contact email form -->
+
+            <div class="row mt-4 mb-3">
+                <div class="col-12 col-md-8 mx-auto">
+                    <label for="login-input" class="form-label">Votre e-mail d'inscription. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Votre e-mail d'inscription sert d'identifiant dans notre base de donnée et ne peut ainsi pas être modifié." data-bs-placement="right"></i></label>
+                    <input id="login-input" class="form-control" type="text" value="<?php echo $values['login-email'] ?>" disabled readonly>
+                </div>
+            </div>
+
+            <form method="post" action="<?php echo PROFILE ?>">
+                <div class="row mb-4">
+                    <div class="col-12 col-md-8 mx-auto">
+
+                        <label for="contact-input" class="form-label">Votre e-mail de contact pour recevoir les courriers de rappels. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Prenez-garde à correctement entrer votre adresse: l'application ne vérifie pas que l'adresse fournie existe." data-bs-placement="right"></i></label>
+                        <input id="contact-input" name="contact-email" type="email" class="form-control<?php echo TUtil::showValid($errors, $values, 'contact-email') ?>" value="<?php echo TUtil::escape($values['contact-email']) ?>">
+
+                        <?php if (isset($errors['contact-email'])) { ?>
+                            <div class='invalid-feedback'><?php echo $errors['contact-email'] ?> </div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" name="set-email" class="btn btn-primary col-12 col-md-6 mx-auto mb-2">Modifier</button>
+                </div>
+            </form>
+
         <?php } elseif ($display == 3) { ?>
-            modify delay
+            <!-- Set delay before contact email form -->
+
+            <form method="post" action="<?php echo PROFILE ?>">
+                <div class="row mb-4 mt-4">
+                    <div class="col-12 col-md-8 mx-auto">
+                        <label class="h-6 mb-4">Définir la date de l'envoi des e-mails de rappel de la date de péremption du produit. Il est possible de cocher plusieurs options, auquel cas plusieurs e-mails seront envoyés dans les délais spécifiés</label>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="delay-3" value="" id="delay-3" <?php echo in_array(3, $values['delays']) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="delay-3">
+                                Envoyer un e-mail de rappel trois jours avant la péremption du produit.
+                            </label>
+                        </div>
+                        <div class="form-check  mb-3">
+                            <input class="form-check-input" type="checkbox" value="" name="delay-7" id="delay-7" <?php echo in_array(7, $values['delays']) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="delay-7">
+                                Envoyer un e-mail de rappel une semaine avant la péremption du produit.
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" name="delay-14" id="delay-14" <?php echo in_array(14, $values['delays']) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="delay-14">
+                                Envoyer un e-mail de rappel deux semaine avant la péremption du produit.
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" name="delay-28" id="delay-28" <?php echo in_array(28, $values['delays']) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="delay-28">
+                                Envoyer un e-mail de rappel un mois avant la péremption du produit.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" name="set-delay" class="btn btn-primary col-12 col-md-6 mx-auto mb-2">Modifier</button>
+                </div>
+            </form>
         <?php } ?>
 
         <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo PROFILE ?>">Revenir</a></div>
     <?php }  ?>
 </div>
 
-
-
-
-<!-- <a href="" class="link-secondary text-info ms-2"><i class="bi bi-usb-plug" role="img" style="font-size: 1.2rem;" aria-label="connect-as" data-bs-toggle="tooltip" title="Se connecter en tant que  "></i></a> -->
-
 <div>
-
-    <div class=" div">Profile template: </div>
-    <div class="div">TODO - changer de password.</div>
     <div class="div"> TODO - ajouter une adresse email privée de contact.</div>
     <div class="div"> TODO - changer le délai avant que les mails de notification arrivent (défaut 2 semaines).</div>
-
 </div>

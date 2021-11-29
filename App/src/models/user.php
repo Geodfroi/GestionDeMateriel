@@ -15,6 +15,8 @@ class User
 {
     private int $id;
 
+    private string $contact_delay;
+
     private DateTime $creation_date;
 
     private string $email;
@@ -37,6 +39,8 @@ class User
     {
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
+        $instance->contact_delay = (string)($input['contact_delay'] ?? '3-14');
+        $instance->contact_email = (string)($input['contact_email'] ?? '');
         $instance->email = (string)($input['email'] ?? '');
         $instance->password_hash = (string)($input['password'] ?? '');
 
@@ -58,6 +62,8 @@ class User
     {
         $instance = new self();
         $instance->id = -1;
+        $instance->contact_email = '';
+        $instance->contact_delay = '3-14';
         $instance->email = $email;
         $instance->password_hash = Util::encryptPassword($plain_password);
         $instance->creation_date = new DateTime();
@@ -70,6 +76,16 @@ class User
     public function getCreationDate(): DateTime
     {
         return $this->creation_date;
+    }
+
+    public function getContactDelays(): array
+    {
+        return explode('-', $this->contact_delay);
+    }
+
+    public function getContactEmail(): string
+    {
+        return $this->contact_email;
     }
 
     public function getEmail(): string
