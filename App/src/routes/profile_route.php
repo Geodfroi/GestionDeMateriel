@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 namespace routes;
@@ -9,7 +9,6 @@ namespace routes;
 use helpers\Authenticate;
 use helpers\Database;
 use helpers\Util;
-
 
 /**
  * Route class containing behavior linked to profile_template. This route displays user info.
@@ -26,6 +25,10 @@ class ProfileRoute extends BaseRoute
     const CONTACT_SET_SUCCESS = "Votre nouvelle adresse de contact [%s] a été définie avec succès.";
     const CONTACT_RESET_SUCCESS = "Vos e-mail de rappels sont désormais envoyé à [%s].";
 
+    const DELAYS_NONE = "Il est nécessaire de cocher au moins une option.";
+    const DELAY_SET_SUCCESS = "Les délais de contact avant péremption ont été modifié avec succès.";
+    const DELAY_SET_FAILURE = "Les délais de contact avant péremption n'ont pas pu être modifié.";
+
     function __construct()
     {
         parent::__construct('profile_template', PROFILE);
@@ -38,27 +41,33 @@ class ProfileRoute extends BaseRoute
             return '';
         }
 
-
+        // display variable identify which sub-section of the templates is displayed.
         $display = 0;
         $errors = [];
 
-        if (isset($_GET['change_password'])) {
+        if (isset($_GET['set_alias'])) {
             $display = 1;
-        } else if (isset($_GET['add_email'])) {
+        } else if (isset($_GET['change_password'])) {
             $display = 2;
+        } else if (isset($_GET['add_email'])) {
+            $display = 3;
             $login_email = Authenticate::getUser()->getEmail();
             $contact_email = Authenticate::getUser()->getContactEmail();
             if ($contact_email === '') {
                 $contact_email = $login_email;
             }
         } else if (isset($_GET['modify_delay'])) {
-            $display = 3;
+            $display = 4;
             $delays = Authenticate::getUser()->getContactDelays();
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['new-password'])) {
+
+            if (isset($_POST['set-alias'])) {
                 $display = 1;
+                return 'not implemented';
+            } else if (isset($_POST['new-password'])) {
+                $display = 2;
 
                 if (Util::validate_password($password, $errors)) {
                     if ($this->validateRepeat($password, $errors)) {
@@ -81,7 +90,7 @@ class ProfileRoute extends BaseRoute
                     }
                 }
             } else if (isset($_POST['set-email'])) {
-                $display = 2;
+                $display = 3;
                 $login_email = Authenticate::getUser()->getEmail();
                 error_log('c: ' .  $login_email);
 
@@ -116,9 +125,42 @@ class ProfileRoute extends BaseRoute
                     }
                 }
             } else if (isset($_POST['set-delay'])) {
-                $display = 3;
-                var_dump($_POST);
-                return 'not implemented';
+                $display = 4;
+
+                $delays = [];
+                if (isset($_POST['delay-3'])) {
+                    array_push($delays, '3');
+                }
+                if (isset($_POST['delay-7'])) {
+                    array_push($delays, '7');
+                }
+                if (isset($_POST['delay-14'])) {
+                    array_push($delays, '14');
+                }
+                if (isset($_POST['delay-30'])) {
+                    array_push($delays, '30');
+                }
+
+                if (count($delays) == 0) {
+                    $errors['delays']  = ProfileRoute::DELAYS_NONE;
+                } else {
+
+                    $display = 0;
+                    $str = implode('-', $delays);
+                    $user_id = Authenticate::getUserId();
+
+                    if (Database::getInstance()->updateUserContactDelay($user_id, $str)) {
+                        $alert = [
+                            'type' => 'success',
+                            'msg' => sprintf(ProfileRoute::DELAY_SET_SUCCESS),
+                        ];
+                    } else {
+                        $alert = [
+                            'type' => 'warning',
+                            'msg' => sprintf(ProfileRoute::DELAY_SET_FAILURE),
+                        ];
+                    }
+                }
             }
         }
 
@@ -127,6 +169,7 @@ class ProfileRoute extends BaseRoute
             'display' => $display,
             'errors' => $errors,
             'values' => [
+                'alias' => $alias ?? '',
                 'password' => $password ?? '',
                 'password-repeat' => $password_repeat ?? '',
                 'login-email' => $login_email ?? '',

@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 use helpers\TUtil;
@@ -25,7 +25,16 @@ use helpers\TUtil;
 
             <div class="mb-2">
                 <label for="form-location" class="form-label col-3">Emplacement:</label>
-                <input id="form-location" name="location" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'location') ?>" value="<?php echo TUtil::escape($values['location']) ?>">
+
+                <div class="input-group">
+                    <input id="form-location" name="location" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'location') ?>" value="<?php echo TUtil::escape($values['location']) ?>">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li id="loc-preset-1"><span class="dropdown-item"><?php echo LOCATION_PRESET_1 ?></span></li>
+                        <li id="loc-preset-2"><span class="dropdown-item"><?php echo LOCATION_PRESET_2 ?></span></li>
+                        <li id="loc-preset-3"><span class="dropdown-item"><?php echo LOCATION_PRESET_3 ?></span></li>
+                    </ul>
+                </div>
 
                 <?php if (isset($errors['location'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['location'] ?></div>
@@ -63,3 +72,16 @@ use helpers\TUtil;
         </form>
     </div>
 </div>
+
+<script>
+    let loc_input = document.getElementById('form-location');
+    document.getElementById('loc-preset-1').addEventListener('click', e => {
+        loc_input.value = "<?php echo LOCATION_PRESET_1 ?>";
+    })
+    document.getElementById('loc-preset-2').addEventListener('click', e => {
+        loc_input.value = "<?php echo LOCATION_PRESET_2 ?>";
+    })
+    document.getElementById('loc-preset-3').addEventListener('click', e => {
+        loc_input.value = "<?php echo LOCATION_PRESET_3 ?>";
+    })
+</script>

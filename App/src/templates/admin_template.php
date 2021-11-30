@@ -1,12 +1,11 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.28 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 use helpers\UserOrder;
 
 $page = $_SESSION[ADMIN_PAGE];
-$orderby = $_SESSION[ADMIN_ORDER_BY];
 
 /**
  * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
@@ -16,23 +15,23 @@ $orderby = $_SESSION[ADMIN_ORDER_BY];
  */
 function disCaretAdm(string $header): string
 {
-    global $order;
+    $orderby = $_SESSION[ADMIN_ORDER_BY];
     if ($header === 'email') {
-        if ($order === UserOrder::EMAIL_DESC) {
+        if ($orderby === UserOrder::EMAIL_DESC) {
             return 'bi-caret-down';
-        } else if ($order === UserOrder::EMAIL_ASC) {
+        } else if ($orderby === UserOrder::EMAIL_ASC) {
             return 'bi-caret-up';
         }
     } else if ($header === 'login') {
-        if ($order === UserOrder::LOGIN_DESC) {
+        if ($orderby === UserOrder::LOGIN_DESC) {
             return 'bi-caret-down';
-        } else if ($order === UserOrder::LOGIN_ASC) {
+        } else if ($orderby === UserOrder::LOGIN_ASC) {
             return 'bi-caret-up';
         }
     } else if ($header === 'creation') {
-        if ($order === UserOrder::CREATED_DESC) {
+        if ($orderby === UserOrder::CREATED_DESC) {
             return 'bi-caret-down';
-        } else if ($order === UserOrder::CREATED_ASC) {
+        } else if ($orderby === UserOrder::CREATED_ASC) {
             return 'bi-caret-up';
         }
     }
@@ -48,15 +47,15 @@ function disCaretAdm(string $header): string
 function disLinkAdm(string $header): string
 {
     $root = ADMIN . '?orderby=';
-    global $order;
+    $orderby = $_SESSION[ADMIN_ORDER_BY];
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie creation is listed most recent first.
     if ($header === 'email') {
-        return $order === UserOrder::EMAIL_ASC ? $root . UserOrder::EMAIL_DESC : $root . UserOrder::EMAIL_ASC;
+        return $orderby === UserOrder::EMAIL_ASC ? $root . UserOrder::EMAIL_DESC : $root . UserOrder::EMAIL_ASC;
     } else if ($header === 'login') {
-        return $order === UserOrder::LOGIN_DESC ? $root . UserOrder::LOGIN_ASC : $root . UserOrder::LOGIN_DESC;
+        return $orderby === UserOrder::LOGIN_DESC ? $root . UserOrder::LOGIN_ASC : $root . UserOrder::LOGIN_DESC;
     } else if ($header === 'creation') {
-        return $order === UserOrder::CREATED_DESC ? $root . UserOrder::CREATED_ASC : $root . UserOrder::CREATED_DESC;
+        return $orderby === UserOrder::CREATED_DESC ? $root . UserOrder::CREATED_ASC : $root . UserOrder::CREATED_DESC;
     }
     return '';
 }
@@ -158,7 +157,5 @@ function disLinkAdm(string $header): string
     </div>
 </div>
 
-
 <div>TODO: send email to new user when account is created.</div>
-
-<!-- <div><span class="text-secondary row-6">Pour modifier le profil d'un utilisateur ou manager ses articles, il faut utiliser l'action [Connecter en tant qu'utilisateur].</span></div> -->
+<div>TODO: alias for column created by</div>

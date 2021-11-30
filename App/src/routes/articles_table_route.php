@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 namespace routes;
@@ -9,7 +9,6 @@ namespace routes;
 use helpers\ArtOrder;
 use helpers\Authenticate;
 use helpers\Database;
-
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
@@ -73,7 +72,7 @@ class ArticlesTable extends BaseRoute
         $page_count = ceil($item_count / ArticlesTable::DISPLAY_COUNT);
 
         $articles = [];
-        if (isset($user)) {
+        if (isset($user_id)) {
             $articles = Database::getInstance()->getUserArticles($user_id, ArticlesTable::DISPLAY_COUNT, $offset, $_SESSION[ART_ORDER_BY]);
         }
 

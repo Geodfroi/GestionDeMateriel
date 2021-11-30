@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 namespace routes;
@@ -37,6 +37,7 @@ class ArticleEdit extends BaseRoute
         // An invisible field in the form will hold the id value if the form is used to update an existing Article.
         $errors = [];
 
+        error_log($_SERVER['REQUEST_METHOD']);
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_GET['update'])) {
 
@@ -47,6 +48,8 @@ class ArticleEdit extends BaseRoute
                 $exp_date_str = $article->getExpirationDate()->format('Y-m-d');
                 $location = $article->getLocation();
                 $comments = $article->getComments();
+            } else if (isset($_GET['loc'])) {
+                var_dump($_GET);
             }
         }
 

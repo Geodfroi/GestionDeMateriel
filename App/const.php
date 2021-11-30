@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 // App constants
@@ -30,7 +30,6 @@ const HOME = '/';
 const PROFILE = '/profile';
 const USER_EDIT = '/userEdit';
 
-
 // SESSION global variables keys.
 const ADMIN_ORDER_BY = 'admin_orderby';
 const ADMIN_PAGE = 'admin_page';
@@ -40,10 +39,9 @@ const ART_PAGE = 'articles_page';
 const ADMIN_ID = 'admin_id';
 const USER_ID = 'user_id';
 
+const LOCATION_PRESET_1 = "Pharmacie 1er étage";
+const LOCATION_PRESET_2 = "Cabinet d'entretien";
+const LOCATION_PRESET_3 = "Derrière les coussins du canapé";
+
 // const COOKIE_NAME = 'cookie_user';
 // const COOKIE_HOURS = 2 * 7 * 24 * 60 * 60; // cookie expires after two weeks by default;
-
-// const CSS_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'css';
-// const HELPER_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'helpers';
-// const JS_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'js';
-// const WEB_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'web';

@@ -227,7 +227,9 @@ class Database
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
+            alias,
             contact_email,
+            contact_delay,
             email, 
             password, 
             creation_date, 
@@ -256,7 +258,9 @@ class Database
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
+            alias,
             contact_email,
+            contact_delay,
             email, 
             password, 
             creation_date, 

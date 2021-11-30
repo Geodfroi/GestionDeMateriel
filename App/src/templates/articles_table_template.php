@@ -1,12 +1,11 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.28 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 use helpers\ArtOrder;
 
 $page = $_SESSION[ART_PAGE];
-$orderby = $_SESSION[ART_ORDER_BY];
 
 /**
  * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
@@ -16,24 +15,24 @@ $orderby = $_SESSION[ART_ORDER_BY];
  */
 function disCaretArt(string $header): string
 {
-    global $order;
+    $orderby = $_SESSION[ART_ORDER_BY];
 
     if ($header === 'article') {
-        if ($order === ArtOrder::NAME_ASC) {
+        if ($orderby === ArtOrder::NAME_ASC) {
             return 'bi-caret-up';
-        } else if ($order === ArtOrder::NAME_DESC) {
+        } else if ($orderby === ArtOrder::NAME_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'location') {
-        if ($order === ArtOrder::LOCATION_ASC) {
+        if ($orderby === ArtOrder::LOCATION_ASC) {
             return 'bi-caret-up';
-        } else if ($order === ArtOrder::LOCATION_DESC) {
+        } else if ($orderby === ArtOrder::LOCATION_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'per_date') {
-        if ($order === ArtOrder::DATE_ASC) {
+        if ($orderby === ArtOrder::DATE_ASC) {
             return 'bi-caret-up';
-        } else if ($order === ArtOrder::DATE_DESC) {
+        } else if ($orderby === ArtOrder::DATE_DESC) {
             return 'bi-caret-down';
         }
     }
@@ -49,15 +48,17 @@ function disCaretArt(string $header): string
 function disLinkArt(string $header): string
 {
     $root = ART_TABLE . '?orderby=';
-    global $order;
+    $orderby = $_SESSION[ART_ORDER_BY];
+    error_log('$orderby: ' . $_SESSION[ART_ORDER_BY]);
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
     if ($header === 'article') {
-        return $order === ArtOrder::NAME_ASC ? $root . ArtOrder::NAME_DESC : $root . ArtOrder::NAME_ASC;
+
+        return $orderby === ArtOrder::NAME_ASC ? $root . ArtOrder::NAME_DESC : $root . ArtOrder::NAME_ASC;
     } else if ($header === 'location') {
-        return $order === ArtOrder::LOCATION_ASC ? $root . ArtOrder::LOCATION_DESC : $root . ArtOrder::LOCATION_ASC;
+        return $orderby === ArtOrder::LOCATION_ASC ? $root . ArtOrder::LOCATION_DESC : $root . ArtOrder::LOCATION_ASC;
     } else if ($header === 'per_date') {
-        return $order === ArtOrder::DATE_DESC ? $root . ArtOrder::DATE_ASC : $root . ArtOrder::DATE_DESC;
+        return $orderby === ArtOrder::DATE_DESC ? $root . ArtOrder::DATE_ASC : $root . ArtOrder::DATE_DESC;
     }
     return '';
 }
@@ -163,6 +164,7 @@ function disLinkArt(string $header): string
     </div>
 </div>
 
+<div>TODO: filters</div>
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>
 <div>TODO: put tab logout link under email on the left</div>

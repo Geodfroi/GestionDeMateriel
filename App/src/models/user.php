@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.11.30 ###
 ##############################
 
 namespace models;
@@ -14,6 +14,11 @@ use DateTime;
 class User
 {
     private int $id;
+
+    /**
+     * Display alias in table instead of e-mail to identify the user.
+     */
+    private string $alias;
 
     private string $contact_delay;
 
@@ -39,6 +44,7 @@ class User
     {
         $instance = new self();
         $instance->id = (int)($input['id'] ?? 0);
+        $instance->alias = (string)($input['alias'] ?? '');
         $instance->contact_delay = (string)($input['contact_delay'] ?? '3-14');
         $instance->contact_email = (string)($input['contact_email'] ?? '');
         $instance->email = (string)($input['email'] ?? '');
@@ -71,6 +77,11 @@ class User
         $instance->is_admin = $is_admin;
 
         return $instance;
+    }
+
+    public function getAlias(): string
+    {
+        return $this->alias;
     }
 
     public function getCreationDate(): DateTime
