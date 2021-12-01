@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.30 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace models;
@@ -38,6 +38,7 @@ class User
     /**
      * Load user instance from database row.
      * 
+     * @param array $input Input from database.
      * @return User A user instance.
      */
     public static function fromDatabaseRow(array $input): User

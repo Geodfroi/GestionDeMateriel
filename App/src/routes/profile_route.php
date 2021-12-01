@@ -57,7 +57,7 @@ class ProfileRoute extends BaseRoute
                 if ($this->validateAlias($alias)) {
                     $display = 0;
                     if ($alias !== $user->getAlias()) {
-                        if (Database::getInstance()->updateUserAlias($user_id, $alias)) {
+                        if (Database::users()->updateAlias($user_id, $alias)) {
 
                             if (strlen($alias) > 0) {
                                 $this->setAlert(AlertType::SUCCESS, ALIAS_UPDATE_SUCCESS);
@@ -78,7 +78,7 @@ class ProfileRoute extends BaseRoute
                         $display = 0;
                         $encrypted = util::encryptPassword($password);
 
-                        if (Database::getInstance()->updateUserPassword($user_id, $encrypted)) {
+                        if (Database::users()->updatePassword($user_id, $encrypted)) {
                             $this->setAlert(AlertType::SUCCESS, PASSWORD_UPDATE_SUCCESS);
                         } else {
                             $this->setAlert(AlertType::FAILURE, PASSWORD_UPDATE_FAILURE);
@@ -98,7 +98,7 @@ class ProfileRoute extends BaseRoute
                         $contact_email  = '';
                     }
 
-                    if (Database::getInstance()->updateUserContactEmail($user_id, $contact_email)) {
+                    if (Database::users()->updateContactEmail($user_id, $contact_email)) {
 
                         // if contact is null or empty, then contact is the login email.
                         if (strlen($contact_email) > 0) {
@@ -134,7 +134,7 @@ class ProfileRoute extends BaseRoute
                     $display = 0;
                     $str = implode('-', $delays);
 
-                    if (Database::getInstance()->updateUserContactDelay($user_id, $str)) {
+                    if (Database::users()->updateContactDelay($user_id, $str)) {
                         $this->setAlert(AlertType::SUCCESS,  DELAY_SET_SUCCESS);
                     } else {
                         $this->setAlert(AlertType::FAILURE,  DELAY_SET_FAILURE);

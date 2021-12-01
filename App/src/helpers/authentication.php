@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace helpers;
@@ -23,7 +23,7 @@ class Authenticate
     public static function getUser(): ?User
     {
         if (isset($_SESSION[USER_ID])) {
-            return Database::getInstance()->getUserById($_SESSION[USER_ID]);
+            return Database::users()->queryById($_SESSION[USER_ID]);
         }
         return null;
     }
@@ -65,7 +65,7 @@ class Authenticate
             $_SESSION[ADMIN_ID] = $user->getId();
         }
 
-        Database::getInstance()->updateLogTime($user->getId());
+        Database::users()->updateLogTime($user->getId());
     }
 
     /**

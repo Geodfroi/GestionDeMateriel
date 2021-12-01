@@ -45,13 +45,13 @@ class UserTable extends BaseRoute
             } else
             if (isset($_GET['delete'])) {
                 $user_id = $_GET['delete'];
-                $user = Database::getInstance()->getUserById($user_id);
+                $user = Database::users()->queryById($user_id);
 
-                if (Database::getInstance()->deleteUserByID($user_id)) {
-                    if (Database::getInstance()->deleteUserArticles($user_id)) {
+                if (Database::users()->delete($user_id)) {
+                    if (Database::articles()->deleteUserArticles($user_id)) {
                         $this->setAlert(AlertType::SUCCESS, USER_REMOVE_SUCCESS);
                     } else {
-                        Database::getInstance()->insertUser($user); // insert back user if article delete was unsuccessful.
+                        Database::users()->insert($user); // insert back user if article delete was unsuccessful.
                         $this->setAlert(AlertType::FAILURE, USER_REMOVE_FAILURE);
                     }
                 } else {
@@ -64,10 +64,10 @@ class UserTable extends BaseRoute
             }
         }
 
-        $item_count = Database::getInstance()->getUsersCount(false);
+        $item_count = Database::users()->queryCount(false);
         $offset =   ($_SESSION[USERS_PAGE] - 1) * TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / TABLE_DISPLAY_COUNT);
-        $users = Database::getInstance()->getUsers(TABLE_DISPLAY_COUNT, $offset, $_SESSION[USERS_ORDERBY], false);
+        $users = Database::users()->queryAll(TABLE_DISPLAY_COUNT, $offset, $_SESSION[USERS_ORDERBY], false);
 
         return $this->renderTemplate([
             'users' =>  $users,

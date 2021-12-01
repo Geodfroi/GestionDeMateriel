@@ -58,8 +58,9 @@ use helpers\TUtil;
             <form method="post" action=<?php echo PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="password" type="password" id="password" class="form-control <?php echo TUtil::showValid($errors, $values, 'password') ?>" value=<?php echo TUtil::escape($values['password']) ?>>
-
+                        <input name="password" type="password" id="password" value=<?php echo TUtil::escape($password) ?> class="form-control
+                            <?php echo isset($errors['password']) ? ' is-invalid' : '' ?>
+                            <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['password'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
                         <?php } else { ?>
@@ -69,7 +70,9 @@ use helpers\TUtil;
                 </div>
                 <div class="row mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="password-repeat" type="password" id="password-repeat" class="form-control <?php echo TUtil::showValid($errors, $values, 'password-repeat')  ?>" value=<?php echo TUtil::escape($values['password-repeat']) ?>>
+                        <input name="password-repeat" type="password" id="password-repeat" alue=<?php echo TUtil::escape($password_repeat) ?> class="form-control 
+                            <?php echo isset($errors['password-repeat']) ? ' is-invalid' : '' ?>
+                            <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['password-repeat'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['password-repeat'] ?> </div>
                         <?php } else { ?>
@@ -89,7 +92,7 @@ use helpers\TUtil;
             <div class="row mt-4 mb-3">
                 <div class="col-12 col-md-8 mx-auto">
                     <label for="login-input" class="form-label">Votre e-mail d'inscription. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Votre e-mail d'inscription sert d'identifiant dans notre base de donnée et ne peut ainsi pas être modifié." data-bs-placement="right"></i></label>
-                    <input id="login-input" class="form-control" type="text" value="<?php echo $values['login-email'] ?>" disabled readonly>
+                    <input id="login-input" class="form-control" type="text" value="<?php echo $login_email ?>" disabled readonly>
                 </div>
             </div>
 
@@ -98,8 +101,9 @@ use helpers\TUtil;
                     <div class="col-12 col-md-8 mx-auto">
 
                         <label for="contact-input" class="form-label">Votre e-mail de contact pour recevoir les courriers de rappels. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Prenez-garde à correctement entrer votre adresse: l'application ne vérifie pas que l'adresse fournie existe." data-bs-placement="right"></i></label>
-                        <input id="contact-input" name="contact-email" type="email" class="form-control<?php echo TUtil::showValid($errors, $values, 'contact-email') ?>" value="<?php echo TUtil::escape($values['contact-email']) ?>">
-
+                        <input id="contact-input" name="contact-email" type="email" value="<?php echo TUtil::escape($contact_email) ?>" class="form-control
+                            <?php echo isset($errors['contact-email']) ? ' is-invalid' : '' ?>
+                            <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['contact-email'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['contact-email'] ?> </div>
                         <?php } ?>
@@ -119,25 +123,25 @@ use helpers\TUtil;
                         <label class="h-6 mb-4">Définir la date de l'envoi des e-mails de rappel de la date de péremption du produit. Il est possible de cocher plusieurs options, auquel cas plusieurs e-mails seront envoyés dans les délais spécifiés</label>
 
                         <div class="form-check mb-3">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" name="delay-3" value="" id="delay-3" <?php echo in_array(3, $values['delays']) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" name="delay-3" value="" id="delay-3" <?php echo in_array(3, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-3">
                                 Envoyer un e-mail de rappel trois jours avant la péremption du produit.
                             </label>
                         </div>
                         <div class="form-check  mb-3">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-7" id="delay-7" <?php echo in_array(7, $values['delays']) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-7" id="delay-7" <?php echo in_array(7, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-7">
                                 Envoyer un e-mail de rappel une semaine avant la péremption du produit.
                             </label>
                         </div>
                         <div class="form-check mb-3">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-14" id="delay-14" <?php echo in_array(14, $values['delays']) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-14" id="delay-14" <?php echo in_array(14, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-14">
                                 Envoyer un e-mail de rappel deux semaine avant la péremption du produit.
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-30" id="delay-30" <?php echo in_array(30, $values['delays']) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-30" id="delay-30" <?php echo in_array(30, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-30">
                                 Envoyer un e-mail de rappel un mois avant la péremption du produit.
                             </label>

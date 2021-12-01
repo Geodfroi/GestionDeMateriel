@@ -42,7 +42,7 @@ class ArticlesTable extends BaseRoute
                 }
 
                 if (isset($_GET['delete'])) {
-                    if (Database::getInstance()->deleteArticleByID($_GET['delete'])) {
+                    if (Database::articles()->delete($_GET['delete'])) {
                         $this->setAlert(AlertType::SUCCESS, ARTICLE_REMOVE_SUCCESS);
                     } else {
                         $this->setAlert(AlertType::FAILURE, ARTICLE_REMOVE_FAILURE);
@@ -56,13 +56,13 @@ class ArticlesTable extends BaseRoute
         }
 
         $user_id = Authenticate::getUserId();
-        $item_count = Database::getInstance()->getUserArticlesCount($user_id);
+        $item_count = Database::articles()->queryCountByUser($user_id);
         $offset =   ($_SESSION[ART_PAGE] - 1) * TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / TABLE_DISPLAY_COUNT);
 
         $articles = [];
         if (isset($user_id)) {
-            $articles = Database::getInstance()->getUserArticles($user_id, TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
+            $articles = Database::articles()->queryAllByUser($user_id, TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
         }
 
         return $this->renderTemplate([

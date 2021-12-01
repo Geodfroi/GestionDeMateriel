@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.24 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace models;
@@ -33,6 +33,7 @@ class Article
     /**
      * Load article instance from database row.
      * 
+     * @param array $input Input from database.
      * @return Article An article instance.
      */
     public static function fromDatabaseRow(array $input): Article

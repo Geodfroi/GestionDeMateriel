@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 // import files
@@ -13,6 +13,7 @@ require_once __DIR__ . '/src/helpers/db.php';
 require_once __DIR__ . '/src/helpers/mailing.php';
 require_once __DIR__ . '/src/helpers/util.php';
 require_once __DIR__ . '/src/models/article.php';
+require_once __DIR__ . '/src/models/string_content.php';
 require_once __DIR__ . '/src/models/user.php';
 
 
@@ -23,6 +24,7 @@ require_once __DIR__ . '/src/routes/articles_table_route.php';
 require_once __DIR__ . '/src/routes/article_edit_route.php';
 require_once __DIR__ . '/src/routes/contact_route.php';
 require_once __DIR__ . '/src/routes/home_route.php';
+require_once __DIR__ . '/src/routes/local_presets_route.php';
 require_once __DIR__ . '/src/routes/login_route.php';
 require_once __DIR__ . '/src/routes/profile_route.php';
 require_once __DIR__ . '/src/routes/routes.php';

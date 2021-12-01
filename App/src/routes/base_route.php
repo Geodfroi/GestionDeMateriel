@@ -85,6 +85,11 @@ abstract class BaseRoute
         $data['alert']  = $this->alert ?? [];
         $data['errors'] = $this->errors ?? [];
 
+        if (count($this->errors)) {
+            var_dump($this->errors);
+        }
+
+
         return Util::renderTemplate($this->templateName, $data);
     }
 

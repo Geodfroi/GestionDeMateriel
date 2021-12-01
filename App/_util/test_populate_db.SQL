@@ -1,5 +1,9 @@
 USE HEdS_inv_exp;
 
+INSERT INTO locations(id, str_content) VALUES(1, 'Pharmacie 1er étage');
+INSERT INTO locations(id, str_content) VALUES(2, "Cabinet d'entretien");
+INSERT INTO locations(id, str_content) VALUES(3, 'Derrière les coussins du canapé');
+
 INSERT INTO users (id, password, email, is_admin) VALUES (1, '$2y$10$Sytf53Pfav5E0A1yTDf39uJE669PUjp/0OXYDM8lhlfNjoqrq.0a.', 'aurore.azure@gmail.com', 1);
 INSERT INTO users (id, password, email) VALUES (2, '$2y$10$yw4QX5NjU8g21i5qxnQXbOGhNjDoZ8r0eBiSSJrNTbEFtmTs8VDXC', 'flo-night@crimea.com');
 INSERT INTO users (id, password, email) VALUES (3, '$2y$10$rZGyarSuElY1WKcqRMrcVeRUoMWn0iJaitiygV66wb5N3DgHRnpva', 'h.dunant@redcross.ch');

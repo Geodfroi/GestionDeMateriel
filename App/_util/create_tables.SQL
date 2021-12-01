@@ -2,8 +2,19 @@ CREATE SCHEMA IF NOT EXISTS HEdS_inv_exp;
 
 USE HEdS_inv_exp;
 
+-- Inventory item
+CREATE TABLE IF NOT EXISTS `articles` (
+    `id`                int             UNSIGNED NOT NULL  AUTO_INCREMENT PRIMARY KEY,
+    `user_id`           int             NOT NULL,
+    `article_name`      varchar(255)    NOT NULL,
+    `location`          varchar(255)    NOT NULL,
+    `comments`          varchar(255),
+    `expiration_date`   timestamp       NOT NULL,
+    `creation_date`     timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- App Users
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `alias`         varchar(255),
     `email`         varchar(255)    NOT NULL UNIQUE,
@@ -15,13 +26,8 @@ CREATE TABLE `users` (
     `is_admin`      boolean         DEFAULT false
 );
 
--- Inventory item
-CREATE TABLE `articles` (
-    `id`                int             UNSIGNED NOT NULL  AUTO_INCREMENT PRIMARY KEY,
-    `user_id`           int             NOT NULL,
-    `article_name`      varchar(255)    NOT NULL,
-    `location`          varchar(255)    NOT NULL,
-    `comments`          varchar(255),
-    `expiration_date`   timestamp       NOT NULL,
-    `creation_date`     timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- Location Presets
+CREATE TABLE IF NOT EXISTS `locations` (
+    `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `str_content`   varchar(255)    NOT NULL
 );

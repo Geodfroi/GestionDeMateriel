@@ -74,8 +74,9 @@ use helpers\TUtil;
                     Modifier
                 <?php } ?>
             </button>
-            <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Cancel</a>
+            <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
         </form>
+
     </div>
 </div>
 

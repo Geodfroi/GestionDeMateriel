@@ -27,7 +27,7 @@ class ArticleEdit extends BaseRoute
             if (isset($_GET['update'])) {
 
                 // load input fields with existing values to update item.
-                $article = Database::getInstance()->getArticleById($_GET['update']);
+                $article = Database::articles()->queryById($_GET['update']);
                 $article_id = $article->getId();
                 $article_name = $article->getArticleName();
                 $exp_date_str = $article->getExpirationDate()->format('Y-m-d');
@@ -45,7 +45,7 @@ class ArticleEdit extends BaseRoute
 
                     $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
-                    if (Database::getInstance()->insertArticle($article)) {
+                    if (Database::articles()->insert($article)) {
                         $this->requestRedirect(ART_TABLE . '?alert=added_success');
                     } else {
                         $this->requestRedirect(ART_TABLE . '?alert=added_failure');
@@ -58,10 +58,10 @@ class ArticleEdit extends BaseRoute
                 if ($this->validateInputs($article_name, $location, $exp_date_str, $comments,)) {
                     $user_id = Authenticate::getUserId();
 
-                    $article = Database::getInstance()->getArticleById($_POST['id']);
+                    $article = Database::articles()->queryById($_POST['id']);
                     $article->updateFields($article_name, $location, $exp_date_str, $comments);
 
-                    if (Database::getInstance()->updateArticle($article)) {
+                    if (Database::articles()->update($article)) {
                         $this->requestRedirect(ART_TABLE . '?alert=updated_success');
                     } else {
                         $this->requestRedirect(ART_TABLE . '?alert=updated_failure');
