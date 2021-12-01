@@ -8,7 +8,7 @@
 require_once __DIR__ . '/const.php';
 require_once __DIR__ . '/db_settings.php';
 require_once __DIR__ . '/src/helpers/authentication.php';
-require_once __DIR__ . '/src/helpers/date_formatter.php';
+// require_once __DIR__ . '/src/helpers/date_formatter.php';
 require_once __DIR__ . '/src/helpers/db.php';
 require_once __DIR__ . '/src/helpers/mailing.php';
 require_once __DIR__ . '/src/helpers/util.php';
@@ -27,3 +27,4 @@ require_once __DIR__ . '/src/routes/login_route.php';
 require_once __DIR__ . '/src/routes/profile_route.php';
 require_once __DIR__ . '/src/routes/routes.php';
 require_once __DIR__ . '/src/routes/user_edit_route.php';
+require_once __DIR__ . '/src/routes/user_table_route.php';

@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.30 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 use helpers\ArtOrder;
@@ -15,7 +15,7 @@ $page = $_SESSION[ART_PAGE];
  */
 function disCaretArt(string $header): string
 {
-    $orderby = $_SESSION[ART_ORDER_BY];
+    $orderby = $_SESSION[ART_ORDERBY];
 
     if ($header === 'article') {
         if ($orderby === ArtOrder::NAME_ASC) {
@@ -48,8 +48,8 @@ function disCaretArt(string $header): string
 function disLinkArt(string $header): string
 {
     $root = ART_TABLE . '?orderby=';
-    $orderby = $_SESSION[ART_ORDER_BY];
-    error_log('$orderby: ' . $_SESSION[ART_ORDER_BY]);
+    $orderby = $_SESSION[ART_ORDERBY];
+    error_log('$orderby: ' . $_SESSION[ART_ORDERBY]);
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
     if ($header === 'article') {
@@ -67,22 +67,17 @@ function disLinkArt(string $header): string
 
 <div class="container mt-3">
 
+    <div class="row">
+        <div class="col-12">
+            <?php if (isset($alert['type'])) { ?>
+                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
 
-
-    <!-- <button class="btn btn-secondary" data-bs-toggle="tooltip" title="Tooltip on bottom" data-bs-placement="bottom">aaa</button> -->
     <div class="row col-12">
-        <?php if (isset($alerts['success'])) { ?>
-            <div class='alert alert-success alert-dismissible fade show' role='alert'><?php echo $alerts['success'] ?>
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-            </div>
-        <?php } ?>
-
-        <?php if (isset($alerts['failure'])) { ?>
-            <div class='alert alert-warning alert-dismissible fade show' role='alert'><?php echo $alerts['failure'] ?>
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-            </div>
-        <?php } ?>
-
         <table class="table table-striped">
 
             <thead>
@@ -164,6 +159,8 @@ function disLinkArt(string $header): string
     </div>
 </div>
 
+<div>TODO: created by column / date created</div>
+<div>articles visible by all</div>
 <div>TODO: filters</div>
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>

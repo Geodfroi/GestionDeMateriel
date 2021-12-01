@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace helpers;
+
+use routes\BaseRoute;
 
 /**
  * Utility class containing useful static functions.
@@ -72,28 +74,23 @@ class Util
      * https://www.codexworld.com/how-to/validate-password-strength-in-php/
      * 
      * @param string|null $password_candidate Proposed user password by reference.
-     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if password is properly formatted;
      */
-    public static function validate_password(&$password_candidate, array &$errors): bool
+    public static function validatePassword(BaseRoute $route, &$password_candidate): bool
     {
-        $PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
-        $PASSWORD_SHORT = 'Le mot de passe doit avoir au minimum %s caractères.';
-        $PASSWORD_WEAK = 'Le mot de passe doit comporter des chiffres et des lettres.';
-
         $password_candidate = trim($_POST['password']) ?? '';
         if ($password_candidate === '') {
-            $errors['password'] = $PASSWORD_EMPTY;
+            $route->setError('password', PASSWORD_EMPTY);
             return false;
         }
         if (strlen($password_candidate) < USER_PASSWORD_MIN_LENGTH) {
-            $errors['password'] = sprintf($PASSWORD_SHORT, USER_PASSWORD_MIN_LENGTH);
+            $route->setError('password', sprintf(PASSWORD_SHORT, USER_PASSWORD_MIN_LENGTH));
             return false;
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if (!$has_number || (!$has_letters)) {
-            $errors['password'] = $PASSWORD_WEAK;
+            $route->setError('password', PASSWORD_WEAK);
             return false;
         }
         return true;
@@ -117,21 +114,21 @@ class TUtil
         return $param ? htmlentities($param) : '';
     }
 
-    /**
-     * Set invalid class tag if the error array contains the key. Set valid tag if the key is defined in values array.
-     * 
-     * @param array $error Error array.
-     * @param string $values Values key.
-     * @param mixed $key Value key
-     * @return string Class tag or empty string.
-     */
-    public static function showValid(array $error, array $values, string $key): string
-    {
-        if (isset($error[$key]))
-            return ' is-invalid';
+    // /**
+    //  * Set invalid class tag if the error array contains the key. Set valid tag if the key is defined in values array.
+    //  * 
+    //  * @param array $error Error array.
+    //  * @param string $values Values key.
+    //  * @param mixed $key Value key
+    //  * @return string Class tag or empty string.
+    //  */
+    // public static function showValid(array $error, array $values, string $key): string
+    // {
+    //     if (isset($error[$key]))
+    //         return ' is-invalid';
 
-        if ($values[$key])
-            return ' is-valid';
-        return '';
-    }
+    //     if ($values[$key])
+    //         return ' is-valid';
+    //     return '';
+    // }
 }

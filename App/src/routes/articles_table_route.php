@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.30 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
@@ -15,18 +15,9 @@ use helpers\Database;
  */
 class ArticlesTable extends BaseRoute
 {
-    const ADD_SUCCESS = "L'article a été correctement enregistré.";
-    const ADD_FAILURE = "L'article n'a pas pu être enregistré. Veuillez réessayer.";
-    const REMOVE_SUCCESS = "L'article a été enlevé avec succès";
-    const REMOVE_FAILURE = "L'article n'a pas pu être effacé.";
-    const UPDATE_SUCCESS = "L'article a été mis à jour avec succès";
-    const UPDATE_FAILURE = "L'article n'a pas pu être mis à jour.";
-
-    const DISPLAY_COUNT = 12;
-
     public function __construct()
     {
-        parent::__construct("articles_table_template", ART_TABLE);
+        parent::__construct(ART_TABLE_TEMPLATE, ART_TABLE);
     }
 
     public function getBodyContent(): string
@@ -36,31 +27,29 @@ class ArticlesTable extends BaseRoute
         }
 
         $_SESSION[ART_PAGE] ??= 1;
-        $_SESSION[ART_ORDER_BY] ??= ArtOrder::DATE_DESC;
-
-        $alerts = [];
+        $_SESSION[ART_ORDERBY] ??= ArtOrder::DATE_DESC;
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_GET['alert'])) {
                 if ($_GET['alert'] === 'added_success') {
-                    $alerts['success'] = ArticlesTable::ADD_SUCCESS;
+                    $this->setAlert(AlertType::SUCCESS, ARTICLE_ADD_SUCCESS);
                 } else if ($_GET['alert'] === 'added_failure') {
-                    $alerts['failure'] = ArticlesTable::ADD_FAILURE;
+                    $this->setAlert(AlertType::FAILURE, ARTICLE_ADD_FAILURE);
                 } else if ($_GET['alert'] === 'updated_success') {
-                    $alerts['success'] = ArticlesTable::UPDATE_SUCCESS;
+                    $this->setAlert(AlertType::SUCCESS, ARTICLE_UPDATE_SUCCESS);
                 } else if ($_GET['alert'] === 'updated_failure') {
-                    $alerts['failure'] = ArticlesTable::UPDATE_FAILURE;
+                    $this->setAlert(AlertType::FAILURE, ARTICLE_UPDATE_FAILURE);
                 }
 
                 if (isset($_GET['delete'])) {
                     if (Database::getInstance()->deleteArticleByID($_GET['delete'])) {
-                        $alerts['success'] = ArticlesTable::REMOVE_SUCCESS;
+                        $this->setAlert(AlertType::SUCCESS, ARTICLE_REMOVE_SUCCESS);
                     } else {
-                        $alerts['failure'] = ArticlesTable::REMOVE_FAILURE;
+                        $this->setAlert(AlertType::FAILURE, ARTICLE_REMOVE_FAILURE);
                     }
                 }
             } else if (isset($_GET['orderby'])) {
-                $_SESSION[ART_ORDER_BY] = intval($_GET['orderby']);
+                $_SESSION[ART_ORDERBY] = intval($_GET['orderby']);
             } else if (isset($_GET['page'])) {
                 $_SESSION[ART_PAGE] = intval($_GET['page']);
             }
@@ -68,17 +57,16 @@ class ArticlesTable extends BaseRoute
 
         $user_id = Authenticate::getUserId();
         $item_count = Database::getInstance()->getUserArticlesCount($user_id);
-        $offset =   ($_SESSION[ART_PAGE] - 1) * ArticlesTable::DISPLAY_COUNT;
-        $page_count = ceil($item_count / ArticlesTable::DISPLAY_COUNT);
+        $offset =   ($_SESSION[ART_PAGE] - 1) * TABLE_DISPLAY_COUNT;
+        $page_count = ceil($item_count / TABLE_DISPLAY_COUNT);
 
         $articles = [];
         if (isset($user_id)) {
-            $articles = Database::getInstance()->getUserArticles($user_id, ArticlesTable::DISPLAY_COUNT, $offset, $_SESSION[ART_ORDER_BY]);
+            $articles = Database::getInstance()->getUserArticles($user_id, TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
         }
 
         return $this->renderTemplate([
             'articles' =>  $articles,
-            'alerts' => $alerts,
             'page_count' => $page_count,
         ]);
     }

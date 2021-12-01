@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
@@ -11,7 +11,6 @@ namespace routes;
  */
 class Routes
 {
-
     /**
      * Get proper route from path contained in $_SERVER['PATH_INFO']; 
      * Each route defines its own page content to be inserted into the main template
@@ -37,6 +36,8 @@ class Routes
                 return new ProfileRoute();
             case USER_EDIT:
                 return new UserEdit();
+            case USERS_TABLE:
+                return new UserTable();
             default:
                 return new class extends BaseRoute
                 {

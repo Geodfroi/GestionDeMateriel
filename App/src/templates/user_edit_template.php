@@ -1,11 +1,9 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 use helpers\TUtil;
-
-$is_admin = $values['is-admin'];
 
 ?>
 
@@ -16,8 +14,9 @@ $is_admin = $values['is-admin'];
 
             <div class="mb-2">
                 <label for="form-email" class="form-label col-12">E-mail de l'utilisateur:</label>
-                <input id="form-email" name="email" type="email" class="form-control <?php echo TUtil::showValid($errors, $values, 'email') ?>" value="<?php echo TUtil::escape($values['email']) ?>">
-
+                <input id="form-email" name="email" type="email" value="<?php echo TUtil::escape($email) ?>" class="form-control 
+                    <?php echo isset($error['email']) ? ' is-invalid' : '' ?>
+                    <?php echo $email ? ' is-valid' : '' ?>">
                 <?php if (isset($errors['email'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
                 <?php } ?>
@@ -25,8 +24,9 @@ $is_admin = $values['is-admin'];
 
             <div class="input-group mb-3">
                 <label for="form-password" class="form-label col-12">Password:</label>
-                <input id="form-password" name="password" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'password') ?>" value="<?php echo TUtil::escape($values['password']) ?>">
-
+                <input id="form-password" name="password" type="text" value="<?php echo TUtil::escape($password) ?>" class="form-control 
+                    <?php echo isset($error['password']) ? ' is-invalid' : '' ?>
+                    <?php echo $password ? ' is-valid' : '' ?>">
                 <button type="submit" name="regen-password" class="btn btn-secondary">Regénérer</button>
 
                 <?php if (isset($errors['password'])) { ?>

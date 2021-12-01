@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
@@ -13,14 +13,9 @@ use models\User;
 
 class UserEdit extends BaseRoute
 {
-    const EMAIL_EMPTY = 'Un e-mail est nécessaire pour créer un utilisateur.';
-    const EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
-    const EMAIL_USED = "Cet adresse e-mail est déjà utilisée par un autre utilisateur.";
-
-
     function __construct()
     {
-        parent::__construct('user_edit_template', USER_EDIT);
+        parent::__construct(USER_EDIT_TEMPLATE, USER_EDIT);
     }
 
     public function getBodyContent(): string
@@ -35,15 +30,13 @@ class UserEdit extends BaseRoute
             return '';
         }
 
-        $errors = [];
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $is_admin = isset($_POST['is_admin']);
 
             if (isset($_POST['new-user'])) {
-                $p_val = Util::validate_password($password, $errors);
-                $e_val = $this->validate_email($email, $errors);
+                $p_val = Util::validatePassword($this, $password);
+                $e_val = $this->validate_email($email);
 
                 if ($p_val && $e_val) {
 
@@ -58,17 +51,14 @@ class UserEdit extends BaseRoute
                 }
             } else if (isset($_POST['regen-password'])) {
                 $password = $this->getRandomPassword();
-                $this->validate_email($email, $errors);
+                $this->validate_email($email);
             }
         }
 
         return $this->renderTemplate([
-            'values' => [
-                'email' => $email ?? '',
-                'password' => $password ?? $this->getRandomPassword(),
-                'is-admin' => $is_admin  ?? false,
-            ],
-            'errors' => $errors,
+            'email' => $email ?? '',
+            'password' => $password ?? $this->getRandomPassword(),
+            'is-admin' => $is_admin  ?? false,
         ]);
     }
 
@@ -90,24 +80,23 @@ class UserEdit extends BaseRoute
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
      * @param string $email User email by reference.
-     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled-in.
      */
-    private function validate_email(&$email, &$errors): bool
+    private function validate_email(&$email): bool
     {
         $email = trim($_POST['email']) ?? '';
 
         if ($email  === '') {
-            $errors['email'] = UserEdit::EMAIL_EMPTY;
+            $this->setError('email', USER_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $errors['email'] = UserEdit::EMAIL_INVALID;
+            $this->setError('email', USER_EMAIL_INVALID);
             return false;
         }
         if (Database::getInstance()->getUserByEmail($email)) {
-            $errors['email'] = UserEdit::EMAIL_USED;
+            $this->setError('email', USER_EMAIL_USED);
             return false;
         }
 

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.30 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
@@ -14,30 +14,15 @@ use DateTime;
 
 class ArticleEdit extends BaseRoute
 {
-    const ARTICLE_ADD_EMPTY = "Il faut donner un nom à l'article à ajouter.";
-    const ARTICLE_NAME_TOO_SHORT = "Le nom de l'article doit compter au moins %s caractères.";
-    const ARTICLE_NAME_TOO_LONG = "Le nom de l'article ne doit pas dépasser %s caractères.";
-    const COMMENTS_NAME_TOO_LONG = "Les commentaires ne doivent pas dépasser %s caractèrs.";
-    const LOCATION_EMPTY = "Il est nécessaire de préciser l'emplacement.";
-    const LOCATION_NAME_TOO_SHORT = "L'emplacement doit compter au moins %s caractères.";
-    const LOCATION_NAME_TOO_LONG = "L'emplacement ne doit pas dépasser %s caractères.";
-    const DATE_EMPTY = "Il est nécessaire d'entrer la date d'expiration.";
-    const DATE_PAST = "La date fournie doit être dans le future.";
-    const DATE_INVALID = "La date fournie est invalide.";
-    const DATE_FUTURE = "La date fournie est trop loin dans le future.";
-
-
     function __construct()
     {
-        parent::__construct('article_edit_template', ART_EDIT);
+        parent::__construct(ART_EDIT_TEMPLATE, ART_EDIT);
     }
 
     public function getBodyContent(): string
     {
         // An invisible field in the form will hold the id value if the form is used to update an existing Article.
-        $errors = [];
 
-        error_log($_SERVER['REQUEST_METHOD']);
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_GET['update'])) {
 
@@ -48,15 +33,13 @@ class ArticleEdit extends BaseRoute
                 $exp_date_str = $article->getExpirationDate()->format('Y-m-d');
                 $location = $article->getLocation();
                 $comments = $article->getComments();
-            } else if (isset($_GET['loc'])) {
-                var_dump($_GET);
             }
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (isset($_POST['new-article'])) {
-                if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
+                if ($this->validateInputs($article_name, $location, $exp_date_str, $comments)) {
 
                     $user_id = Authenticate::getUserId();
 
@@ -72,7 +55,7 @@ class ArticleEdit extends BaseRoute
 
                 $article_id  = $_POST['id'];
 
-                if ($this->validate_inputs($article_name, $location, $exp_date_str, $comments, $errors)) {
+                if ($this->validateInputs($article_name, $location, $exp_date_str, $comments,)) {
                     $user_id = Authenticate::getUserId();
 
                     $article = Database::getInstance()->getArticleById($_POST['id']);
@@ -88,14 +71,11 @@ class ArticleEdit extends BaseRoute
         }
 
         return $this->renderTemplate([
-            'errors' => $errors,
-            'values' => [
-                'id' => $article_id ?? 'no-id',
-                'article-name' => $article_name ?? '',
-                'expiration-date' => $exp_date_str ?? '',
-                'location' => $location ?? '',
-                'comments' => $comments ?? '',
-            ]
+            'article_name' => $article_name ?? '',
+            'comments' => $comments ?? '',
+            'expiration_date' => $exp_date_str ?? '',
+            'id' => $article_id ?? 'no-id',
+            'location' => $location ?? '',
         ]);
     }
 
@@ -106,23 +86,22 @@ class ArticleEdit extends BaseRoute
      * @param string &$location Article's location within the school by reference.
      * @param string &$exp_date Expiration date.
      * @param string &$comments Comments to be attached to the reminder by reference.
-     * @param array &$errors Error array passed by reference to store error message.
      * @return bool True if validation is successful.
      */
-    private function validate_inputs(?string &$article_name, ?string &$location, ?string &$exp_date, ?string &$comments, array &$errors): bool
+    private function validateInputs(?string &$article_name, ?string &$location, ?string &$exp_date, ?string &$comments): bool
     {
         // Avoid && or || between conditions because all validation methods must be run without short-circuit.
         $validated   = true;
-        if (!$this->validate_article_name($article_name, $errors)) {
+        if (!$this->validateArticleName($article_name)) {
             $validated  = false;
         }
-        if (!$this->validate_location($location, $errors)) {
+        if (!$this->validateLocation($location)) {
             $validated  = false;
         }
-        if (!$this->validate_exp_date($exp_date, $errors)) {
+        if (!$this->validateExpirationDate($exp_date)) {
             $validated  = false;
         }
-        if (!$this->validate_comments($comments, $errors)) {
+        if (!$this->validateComments($comments)) {
             $validated  = false;
         }
         return $validated;
@@ -132,25 +111,24 @@ class ArticleEdit extends BaseRoute
      * Article name validation. Article name must not be empty, exceed a set length and under a set number of caracters.
      * 
      * @param array &$string $article_name Article name by reference.
-     * @param array &$errors Error array passed by reference to store error message.
      * @return bool True if validated.
      */
-    private function validate_article_name(?string &$article_name, array &$errors): bool
+    private function validateArticleName(?string &$article_name): bool
     {
         $article_name = trim($_POST['article-name']) ?? '';
 
         if ($article_name === '') {
-            $errors['article-name'] = ArticleEdit::ARTICLE_ADD_EMPTY;
+            $this->setError('article-name', ARTICLE_ADD_EMPTY);
             return false;
         }
 
         if (strlen($article_name) < ARTICLE_NAME_MIN_LENGHT) {
-            $errors['article-name'] = sprintf(ArticleEdit::ARTICLE_NAME_TOO_SHORT, ARTICLE_NAME_MIN_LENGHT);
+            $this->setError('article-name', sprintf(ARTICLE_NAME_TOO_SHORT, ARTICLE_NAME_MIN_LENGHT));
             return false;
         }
 
         if (strlen($article_name) > ARTICLE_NAME_MAX_LENGTH) {
-            $errors['article-name'] = sprintf(ArticleEdit::ARTICLE_NAME_TOO_LONG, ARTICLE_NAME_MAX_LENGTH);
+            $this->setError('article-name', sprintf(ARTICLE_NAME_TOO_LONG, ARTICLE_NAME_MAX_LENGTH));
             return false;
         }
         return true;
@@ -160,15 +138,14 @@ class ArticleEdit extends BaseRoute
      * Date validation. Date must not be empty and correspond to format yyyy-mm-dd
      * 
      * @param string &$validated_date Validated expiration date.
-     * @param array &$errors Error array passed by reference to store error message.
      * @return bool True if validated.
      */
-    private function validate_exp_date(?string &$date, array &$errors): bool
+    private function validateExpirationDate(?string &$date): bool
     {
         $date = trim($_POST['expiration-date'] ?? '');
 
         if ($date === '') {
-            $errors['expiration-date'] =  ArticleEdit::DATE_EMPTY;
+            $this->setError('expiration-date', DATE_EMPTY);
             return false;
         }
 
@@ -183,19 +160,19 @@ class ArticleEdit extends BaseRoute
         if ($validated_date) {
 
             if ($validated_date < new DateTime()) {
-                $errors['expiration-date'] =  ArticleEdit::DATE_PAST;
+                $this->setError('expiration-date', DATE_PAST);
                 return false;
             }
 
             if ($validated_date >= $future_limit) {
-                $errors['expiration-date'] =  ArticleEdit::DATE_FUTURE;
+                $this->setError('expiration-date', DATE_FUTURE);
                 return false;
             }
 
             return true;
         }
 
-        $errors['expiration-date'] =  ArticleEdit::DATE_INVALID;
+        $this->setError('expiration-date', DATE_INVALID);
         return false;
     }
 
@@ -203,25 +180,24 @@ class ArticleEdit extends BaseRoute
      * Location validation. Location must not be empty and under a set number of caracters.
      * 
      * @param string &$location Article's location within the school by reference.
-     * @param array &$errors Error array passed by reference to store error message.
      * @return bool True if validated.
      */
-    private function validate_location(?string &$location, array &$errors): bool
+    private function validateLocation(?string &$location): bool
     {
         $location = trim($_POST['location']) ?? '';
 
         if ($location === '') {
-            $errors['location'] = ArticleEdit::LOCATION_EMPTY;
+            $this->setError('location', LOCATION_EMPTY);
             return false;
         }
 
         if (strlen($location) < ARTICLE_LOCATION_MIN_LENGHT) {
-            $errors['location'] = sprintf(ArticleEdit::LOCATION_NAME_TOO_SHORT, ARTICLE_LOCATION_MIN_LENGHT);
+            $this->setError('location', sprintf(LOCATION_NAME_TOO_SHORT, ARTICLE_LOCATION_MIN_LENGHT));
             return false;
         }
 
         if (strlen($location) > ARTICLE_LOCATION_MAX_LENGHT) {
-            $errors['location'] = sprintf(ArticleEdit::LOCATION_NAME_TOO_LONG, ARTICLE_LOCATION_MAX_LENGHT);
+            $this->setError('location', sprintf(LOCATION_NAME_TOO_LONG, ARTICLE_LOCATION_MAX_LENGHT));
             return false;
         }
         return true;
@@ -231,15 +207,14 @@ class ArticleEdit extends BaseRoute
      * Comments validation. Comments can be empty string but be under a set number of caracters.
      * 
      * @param string &$comments Comments to be attached to the reminder by reference.
-     * @param array &$errors Error array passed by reference to store error message.
      * @return bool True if validated.
      */
-    private function validate_comments(?string &$comments, array &$errors): bool
+    private function validateComments(?string &$comments): bool
     {
         $comments = trim($_POST['comments']) ?? '';
 
         if (strlen($comments) > ARTICLE_COMMENTS_MAX_LENGHT) {
-            $errors['comments'] = sprintf(ArticleEdit::COMMENTS_NAME_TOO_LONG, ARTICLE_COMMENTS_MAX_LENGHT);
+            $this->setError('comments', sprintf(COMMENTS_NAME_TOO_LONG, ARTICLE_COMMENTS_MAX_LENGHT));
             return false;
         }
         return true;

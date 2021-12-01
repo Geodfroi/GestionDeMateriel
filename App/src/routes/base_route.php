@@ -1,12 +1,19 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.25 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
 
 use helpers\Util;
+
+class AlertType
+{
+    const FAILURE = 'warning';
+    const INFO = 'info';
+    const SUCCESS = 'success';
+}
 
 /**
  * Abstract class of all routes containing common utility functions.
@@ -14,6 +21,8 @@ use helpers\Util;
 abstract class BaseRoute
 {
     private string $redirectUri = "";
+    private $alert = [];
+    private $errors = [];
 
     /**
      * Link a Route with its designated template in the constructor.
@@ -27,12 +36,13 @@ abstract class BaseRoute
         $this->templateName = $templateName;
     }
 
+
     /**
      * Send a header to the browser requesting a redirection to the path provided.
      * 
      * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
      */
-    public function requestRedirect(string $uri)
+    protected function requestRedirect(string $uri)
     {
         $this->redirectUri = $uri;
 
@@ -72,6 +82,31 @@ abstract class BaseRoute
      */
     protected function renderTemplate(array $data = []): string
     {
+        $data['alert']  = $this->alert ?? [];
+        $data['errors'] = $this->errors ?? [];
+
         return Util::renderTemplate($this->templateName, $data);
+    }
+
+    /**
+     * Set an alert to be displayed. Alerts are popups messages.
+     * 
+     * @param string $type Alert type which defines alert colour; use const defined in AlertType class.
+     * @param string $msg Alert message to be displayed.
+     */
+    protected function setAlert(string $type, string $msg)
+    {
+        $this->alert = [
+            'type' => $type,
+            'msg' => $msg,
+        ];
+    }
+
+    /**
+     * Set an error to be displayed. Errors are displayed beneath invalid input in forms.
+     */
+    public function setError(string $key, string $content)
+    {
+        $this->errors[$key] = $content;
     }
 }

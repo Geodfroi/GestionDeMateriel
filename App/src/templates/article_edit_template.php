@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.11.30 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 use helpers\TUtil;
@@ -12,12 +12,13 @@ use helpers\TUtil;
         <form method="post" action="<?php echo ART_EDIT ?>">
             <label class="h4 m-4">Ajouter un article</article></label>
 
-            <input type="hidden" name="id" value="<?php echo $values['id'] ?>">
+            <input type="hidden" name="id" value="<?php echo $id ?>">
 
             <div class="mb-2">
                 <label for="form-name" class="form-label col-3">Nom de l'article:</label>
-                <input id="form-name" name="article-name" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'article-name') ?>" value="<?php echo TUtil::escape($values['article-name']) ?>">
-
+                <input id="form-name" name="article-name" type="text" value="<?php echo TUtil::escape($article_name) ?>" class="form-control
+                    <?php echo isset($error['article-name']) ? ' is-invalid' : '' ?>
+                    <?php echo $article_name ? ' is-valid' : '' ?>">
                 <?php if (isset($errors['article-name'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['article-name'] ?> </div>
                 <?php } ?>
@@ -27,7 +28,9 @@ use helpers\TUtil;
                 <label for="form-location" class="form-label col-3">Emplacement:</label>
 
                 <div class="input-group">
-                    <input id="form-location" name="location" type="text" class="form-control <?php echo TUtil::showValid($errors, $values, 'location') ?>" value="<?php echo TUtil::escape($values['location']) ?>">
+                    <input id="form-location" name="location" type="text" value="<?php echo TUtil::escape($location) ?>" class="form-control
+                        <?php echo isset($error['location']) ? ' is-invalid' : '' ?>
+                        <?php echo $location ? ' is-valid' : '' ?>">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li id="loc-preset-1"><span class="dropdown-item"><?php echo LOCATION_PRESET_1 ?></span></li>
@@ -44,8 +47,9 @@ use helpers\TUtil;
 
             <div class=" mb-2">
                 <label for="form-expiration" class="form-label col-3">Date de péremption:</label>
-                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> class="form-control <?php echo TUtil::showValid($errors, $values, 'expiration-date') ?>" value="<?php echo TUtil::escape($values['expiration-date']) ?>">
-
+                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> value="<?php echo TUtil::escape($expiration_date) ?>" class="form-control 
+                    <?php echo isset($error['expiration-date']) ? ' is-invalid' : '' ?>
+                    <?php echo $expiration_date ? ' is-valid' : '' ?>">
                 <?php if (isset($errors['expiration-date'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['expiration-date'] ?></div>
                 <?php } ?>
@@ -53,16 +57,18 @@ use helpers\TUtil;
             </div>
 
             <div class=" mb-2">
-                <textarea id="form-comments" name="comments" class="form-control <?php echo TUtil::showValid($errors, $values, 'comments') ?>" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments"><?php echo TUtil::escape($values['comments']) ?></textarea>
+                <textarea id="form-comments" name="comments" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments" class="form-control 
+                    <?php echo isset($error['comments']) ? ' is-invalid' : '' ?>
+                    <?php echo $comments ? ' is-valid' : '' ?>">
+                </textarea>
                 <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>
-
                 <?php if (isset($errors['comments'])) { ?>
                     <div class='invalid-feedback'><?php echo $errors['comments'] ?></div>
                 <?php } ?>
             </div>
 
-            <button type="submit" name="<?php echo $values['id'] === 'no-id' ? 'new-article' : 'update-article' ?>" class="btn btn-primary">
-                <?php if ($values['id'] === 'no-id') { ?>
+            <button type="submit" name="<?php echo $id === 'no-id' ? 'new-article' : 'update-article' ?>" class="btn btn-primary">
+                <?php if ($id === 'no-id') { ?>
                     Ajouter
                 <?php } else { ?>
                     Modifier

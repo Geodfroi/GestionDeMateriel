@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.30 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
@@ -15,23 +15,9 @@ use helpers\Util;
  */
 class ProfileRoute extends BaseRoute
 {
-    const REPEAT_EMPTY = "Il vous faut répéter votre mot de passe";
-    const DIFFERENT_PASSWORD = "Ce mot de passe n'est pas identique au précédent.";
-
-    const PASSWORD_UPDATE_FAILURE = "Le changement de mot de passe a échoué.";
-    const PASSWORD_UPDATE_SUCCESS = "Le mot de passe a été modifié avec succès.";
-
-    const CONTACT_SET_FAILURE = "Le changement d'adresse de contact a échoué.";
-    const CONTACT_SET_SUCCESS = "Votre nouvelle adresse de contact [%s] a été définie avec succès.";
-    const CONTACT_RESET_SUCCESS = "Vos e-mail de rappels sont désormais envoyé à [%s].";
-
-    const DELAYS_NONE = "Il est nécessaire de cocher au moins une option.";
-    const DELAY_SET_SUCCESS = "Les délais de contact avant péremption ont été modifié avec succès.";
-    const DELAY_SET_FAILURE = "Les délais de contact avant péremption n'ont pas pu être modifié.";
-
     function __construct()
     {
-        parent::__construct('profile_template', PROFILE);
+        parent::__construct(PROFILE_TEMPLATE, PROFILE);
     }
 
     public function getBodyContent(): string
@@ -41,60 +27,69 @@ class ProfileRoute extends BaseRoute
             return '';
         }
 
+        $user = Authenticate::getUser();
+        $user_id = $user->getId();
+
         // display variable identify which sub-section of the templates is displayed.
         $display = 0;
-        $errors = [];
 
         if (isset($_GET['set_alias'])) {
             $display = 1;
+            $alias = $user->getAlias();
         } else if (isset($_GET['change_password'])) {
             $display = 2;
         } else if (isset($_GET['add_email'])) {
             $display = 3;
-            $login_email = Authenticate::getUser()->getEmail();
-            $contact_email = Authenticate::getUser()->getContactEmail();
+            $login_email = $user->getEmail();
+            $contact_email = $user->getContactEmail();
             if ($contact_email === '') {
                 $contact_email = $login_email;
             }
         } else if (isset($_GET['modify_delay'])) {
             $display = 4;
-            $delays = Authenticate::getUser()->getContactDelays();
+            $delays = $user->getContactDelays();
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (isset($_POST['set-alias'])) {
                 $display = 1;
-                return 'not implemented';
+                if ($this->validateAlias($alias)) {
+                    $display = 0;
+                    if ($alias !== $user->getAlias()) {
+                        if (Database::getInstance()->updateUserAlias($user_id, $alias)) {
+
+                            if (strlen($alias) > 0) {
+                                $this->setAlert(AlertType::SUCCESS, ALIAS_UPDATE_SUCCESS);
+                            } else {
+                                $this->setAlert(AlertType::SUCCESS, ALIAS_DELETE_SUCCESS);
+                            }
+                        } else {
+                            $this->setAlert(AlertType::FAILURE, ALIAS_UPDATE_FAILURE);
+                        }
+                    }
+                }
             } else if (isset($_POST['new-password'])) {
                 $display = 2;
 
-                if (Util::validate_password($password, $errors)) {
-                    if ($this->validateRepeat($password, $errors)) {
+                if (Util::validatePassword($this, $password)) {
+                    if ($this->validateRepeat($password)) {
 
-                        $user_id = Authenticate::getUserId();
+                        $display = 0;
                         $encrypted = util::encryptPassword($password);
 
                         if (Database::getInstance()->updateUserPassword($user_id, $encrypted)) {
-                            $alert = [
-                                'type' => 'success',
-                                'msg' => ProfileRoute::PASSWORD_UPDATE_SUCCESS,
-                            ];
+                            $this->setAlert(AlertType::SUCCESS, PASSWORD_UPDATE_SUCCESS);
                         } else {
-                            $alert = [
-                                'type' => 'warning',
-                                'msg' => ProfileRoute::PASSWORD_UPDATE_FAILURE,
-                            ];
+                            $this->setAlert(AlertType::FAILURE, PASSWORD_UPDATE_FAILURE);
                         }
-                        $display = 0;
                     }
                 }
             } else if (isset($_POST['set-email'])) {
                 $display = 3;
                 $login_email = Authenticate::getUser()->getEmail();
-                error_log('c: ' .  $login_email);
 
-                if ($this->validateContactEmail($contact_email, $errors)) {
+                if ($this->validateContactEmail($contact_email)) {
 
                     $display = 0;
                     $user_id = Authenticate::getUserId();
@@ -107,21 +102,12 @@ class ProfileRoute extends BaseRoute
 
                         // if contact is null or empty, then contact is the login email.
                         if (strlen($contact_email) > 0) {
-                            $alert = [
-                                'type' => 'success',
-                                'msg' => sprintf(ProfileRoute::CONTACT_SET_SUCCESS, $contact_email),
-                            ];
+                            $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_SET_SUCCESS, $contact_email));
                         } else {
-                            $alert = [
-                                'type' => 'success',
-                                'msg' => sprintf(ProfileRoute::CONTACT_RESET_SUCCESS, $login_email),
-                            ];
+                            $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_RESET_SUCCESS, $login_email));
                         }
                     } else {
-                        $alert = [
-                            'type' => 'warning',
-                            'msg' => ProfileRoute::CONTACT_SET_FAILURE,
-                        ];
+                        $this->setAlert(AlertType::FAILURE,  CONTACT_SET_FAILURE);
                     }
                 }
             } else if (isset($_POST['set-delay'])) {
@@ -142,32 +128,23 @@ class ProfileRoute extends BaseRoute
                 }
 
                 if (count($delays) == 0) {
-                    $errors['delays']  = ProfileRoute::DELAYS_NONE;
+                    $this->setError('delays',  DELAYS_NONE);
                 } else {
 
                     $display = 0;
                     $str = implode('-', $delays);
-                    $user_id = Authenticate::getUserId();
 
                     if (Database::getInstance()->updateUserContactDelay($user_id, $str)) {
-                        $alert = [
-                            'type' => 'success',
-                            'msg' => sprintf(ProfileRoute::DELAY_SET_SUCCESS),
-                        ];
+                        $this->setAlert(AlertType::SUCCESS,  DELAY_SET_SUCCESS);
                     } else {
-                        $alert = [
-                            'type' => 'warning',
-                            'msg' => sprintf(ProfileRoute::DELAY_SET_FAILURE),
-                        ];
+                        $this->setAlert(AlertType::FAILURE,  DELAY_SET_FAILURE);
                     }
                 }
             }
         }
 
         return $this->renderTemplate([
-            'alert' => $alert ?? '',
             'display' => $display,
-            'errors' => $errors,
             'values' => [
                 'alias' => $alias ?? '',
                 'password' => $password ?? '',
@@ -180,13 +157,31 @@ class ProfileRoute extends BaseRoute
     }
 
     /**
+     * Validate user alias. Alias can be set to empty string in which cas e-mail root is used in the app.
+     * 
+     * @param string|null $alias Optional alias by reference.
+     * @return bool True if Alias is conform or empty.
+     */
+    private function validateAlias(&$alias): bool
+    {
+        $alias = trim($_POST['alias']) ?? '';
+        if ($alias === '') {
+            return true;
+        }
+        if (strlen($alias) < ALIAS_MIN_LENGHT) {
+            $this->setError('alias', sprintf(ALIAS_TOO_SHORT, ALIAS_MIN_LENGHT));
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validate contact email. Email must a valid email format or set to null.
      * 
      * @param string|null $contact_email Contact e-mail by reference.
-     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if e-mail is set to empty string or is a valid email format.
      */
-    private function validateContactEmail(&$email, array &$errors): bool
+    private function validateContactEmail(&$email): bool
     {
         $email = trim($_POST['contact-email']) ?? '';
 
@@ -195,7 +190,7 @@ class ProfileRoute extends BaseRoute
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $errors['contact-email'] = Login::EMAIL_INVALID;
+            $this->setError('contact-email', LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -205,19 +200,18 @@ class ProfileRoute extends BaseRoute
      * Validate the repeated password.
      * 
      * @param string $password_first Proposed user password entered in first field.
-     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if repeat-password corresponds to first entry.
      */
-    private function validateRepeat(string $password_first, array &$errors): bool
+    private function validateRepeat(string $password_first): bool
     {
         $password_repeat = trim($_POST['password-repeat']) ?? '';
         if (!$password_repeat) {
-            $errors['password-repeat'] = ProfileRoute::REPEAT_EMPTY;
+            $this->setError('password-repeat', PASSWORD_REPEAT_NULL);
             return false;
         }
 
         if ($password_first !== $password_repeat) {
-            $errors['password-repeat'] = ProfileRoute::DIFFERENT_PASSWORD;
+            $this->setError('password-repeat', PASSWORD_DIFFERENT);
             return false;
         }
         return true;

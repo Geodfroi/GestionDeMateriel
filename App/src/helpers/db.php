@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace helpers;
@@ -68,7 +68,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to delete article from database: ' . $error . PHP_EOL);
+        error_log(ARTICLE_DELETE . $error . PHP_EOL);
         return false;
     }
 
@@ -86,7 +86,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to delete user articles from database: ' . $error . PHP_EOL);
+        error_log(USER_ARTICLES_DELETE . $error . PHP_EOL);
         return false;
     }
 
@@ -105,7 +105,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to delete user from database: ' . $error . PHP_EOL);
+        error_log(USER_DELETE . $error . PHP_EOL);
         return false;
     }
 
@@ -139,7 +139,7 @@ class Database
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log('failure to retrieve article from database: ' . $error . PHP_EOL);
+            error_log(ARTICLE_QUERY . $error . PHP_EOL);
         }
 
         return null;
@@ -167,7 +167,7 @@ class Database
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to count articles from database: ' . $error . PHP_EOL);
+        error_log(ARTICLES_COUNT_QUERY . $error . PHP_EOL);
         return -1;
     }
 
@@ -211,7 +211,7 @@ class Database
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log('failure to retrieve article list from database: ' . $error . PHP_EOL);
+            error_log(ARTICLES_QUERY . $error . PHP_EOL);
         }
 
         return $articles;
@@ -244,7 +244,7 @@ class Database
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to retrieve User from database: ' . $error . PHP_EOL);
+        error_log(USER_QUERY . $error . PHP_EOL);
         return null;
     }
 
@@ -276,7 +276,7 @@ class Database
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to retrieve User from database: ' . $error . PHP_EOL);
+        error_log(USER_QUERY . $error . PHP_EOL);
         return null;
     }
 
@@ -321,7 +321,7 @@ class Database
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log('failure to retrieve user list from database: ' . $error . PHP_EOL);
+            error_log(USERS_QUERY  . $error . PHP_EOL);
         }
 
         return $users;
@@ -348,7 +348,7 @@ class Database
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to count users from database: ' . $error . PHP_EOL);
+        error_log(USER_COUNT_QUERY . $error . PHP_EOL);
         return -1;
     }
 
@@ -391,7 +391,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to insert article: ' . $error . PHP_EOL);
+        error_log(ARTICLE_INSERT . $error . PHP_EOL);
         return false;
     }
 
@@ -430,7 +430,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to insert user: ' . $error . PHP_EOL);
+        error_log(USER_INSERT . $error . PHP_EOL);
         return false;
     }
 
@@ -486,7 +486,29 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to update user log time' . $error . PHP_EOL);
+        error_log(USER_LOGTIME_UPDATE . $error . PHP_EOL);
+        return false;
+    }
+
+    /**
+     * Update user alias.
+     * 
+     * @param int $user_id User id.
+     * @param string $alias Updated alias for user.
+     * @return bool True is update is successful.
+     */
+    public function updateUserAlias(int $user_id, string $alias)
+    {
+        $preparedStatement = $this->pdo->prepare('UPDATE users SET alias=:alias WHERE id = :id');
+
+        $preparedStatement->bindParam(':alias', $alias, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':id', $user_id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+            return true;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log(USER_ALIAS_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -508,7 +530,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to update user contact delay' . $error . PHP_EOL);
+        error_log(USER_DELAY_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -530,7 +552,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to update user contact email' . $error . PHP_EOL);
+        error_log(USER_CONTACT_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -552,7 +574,7 @@ class Database
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to update user password' . $error . PHP_EOL);
+        error_log(USER_PASSWORD_UPDATE  . $error . PHP_EOL);
         return false;
     }
 }

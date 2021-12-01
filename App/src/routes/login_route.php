@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.12.01 ###
 ##############################
 
 namespace routes;
@@ -14,29 +14,18 @@ use helpers\Authenticate;
  */
 class Login extends BaseRoute
 {
-    const EMAIL_EMPTY = 'Un e-mail est nécessaire pour vous connecter.';
-    const PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
-    const EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
-    const USER_NOT_FOUND = "Il n'existe pas d'usager employant cette adresse e-mail.";
-    const PASSWORD_INVALID = "Le mot de passe n'est pas correct.";
-
     public function __construct()
     {
-        parent::__construct('login_template', LOGIN);
+        parent::__construct(LOGIN_TEMPLATE, LOGIN);
     }
 
     public function getBodyContent(): string
     {
-        $errors = [];
-
         if (Authenticate::isLoggedIn()) {
 
             if (isset($_GET['logout'])) {
                 Authenticate::logout();
-                $alert = [
-                    'type' => 'info',
-                    'msg' => "L'usager précédent s'est déconnecté.",
-                ];
+                $this->setAlert(AlertType::INFO, LOGIN_USER_DISC);
             } else {
                 $this->requestRedirect(HOME);
                 return '';
@@ -52,41 +41,35 @@ class Login extends BaseRoute
             if (isset($user)) {
                 // Un nouveau mot de passe a été envoyé à '<?php echo $values['email'] 
                 // $this->handleNewPasswordRequest($user->getEmail());
-                $alert = [
-                    'type' => 'warning',
-                    'msg' => "renew-password not implemented",
-                ];
+
+                $this->setAlert(AlertType::FAILURE, LOGIN_RENEW);
             }
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if ($this->validateEmailInput($email, $errors)) {
+            if ($this->validateEmailInput($email)) {
                 $user = Database::getInstance()->getUserByEmail($email);
             }
 
             if (!isset($user)) {
-                $errors['email'] = Login::USER_NOT_FOUND;
+                $this->setError('email', LOGIN_NOT_FOUND);
             } else {
-                if ($this->validatePasswordInput($password, $errors)) {
+                if ($this->validatePasswordInput($password)) {
                     if ($user->verifyPassword($password)) {
                         Authenticate::login($user);
                         $this->requestRedirect(HOME);
                         return "";
                     } else {
-                        $errors['password'] = Login::PASSWORD_INVALID;
+                        $this->setError('password', LOGIN_INVALID_PASSWORD);
                     }
                 }
             }
         }
 
         return $this->renderTemplate([
-            'errors' => $errors,
-            'values' => [
-                'email' => $email ?? '',
-                'password' => $password ?? '',
-            ],
-            'alert' => $alert ?? '',
+            'email' => $email ?? '',
+            'password' => $password ?? '',
         ]);
     }
 
@@ -94,20 +77,19 @@ class Login extends BaseRoute
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
      * @param string $email User email by reference.
-     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled-in.
      */
-    private function validateEmailInput(&$email, &$errors): bool
+    private function validateEmailInput(&$email): bool
     {
         $email = trim($_POST['email']) ?? '';
 
         if ($email  === '') {
-            $errors['email'] = Login::EMAIL_EMPTY;
+            $this->setError('email', LOGIN_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $errors['email'] = Login::EMAIL_INVALID;
+            $this->setError('email', LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -117,14 +99,13 @@ class Login extends BaseRoute
      * Validate input and fill $errors array with proper password error text to be displayed if it fails.
      * 
      * @param string $password User password by reference
-     * @param Array[string] &$errors Error array passed by reference to be modified in-function.
      * @return bool True if properly filled;
      */
-    private function validatePasswordInput(&$password, &$errors)
+    private function validatePasswordInput(&$password)
     {
         $password = trim($_POST['password']) ?? '';
         if ($password === '') {
-            $errors['password'] = Login::PASSWORD_EMPTY;
+            $this->setError('password', LOGIN_PASSWORD_EMPTY);
             return false;
         }
         return true;
