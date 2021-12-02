@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 namespace routes;
@@ -29,40 +29,49 @@ class ArticlesTable extends BaseRoute
         $_SESSION[ART_PAGE] ??= 1;
         $_SESSION[ART_ORDERBY] ??= ArtOrder::DATE_DESC;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            if (isset($_GET['alert'])) {
-                if ($_GET['alert'] === 'added_success') {
-                    $this->setAlert(AlertType::SUCCESS, ARTICLE_ADD_SUCCESS);
-                } else if ($_GET['alert'] === 'added_failure') {
-                    $this->setAlert(AlertType::FAILURE, ARTICLE_ADD_FAILURE);
-                } else if ($_GET['alert'] === 'updated_success') {
-                    $this->setAlert(AlertType::SUCCESS, ARTICLE_UPDATE_SUCCESS);
-                } else if ($_GET['alert'] === 'updated_failure') {
-                    $this->setAlert(AlertType::FAILURE, ARTICLE_UPDATE_FAILURE);
-                }
+        if (isset($_GET['alert'])) {
 
-                if (isset($_GET['delete'])) {
-                    if (Database::getInstance()->deleteArticleByID($_GET['delete'])) {
-                        $this->setAlert(AlertType::SUCCESS, ARTICLE_REMOVE_SUCCESS);
-                    } else {
-                        $this->setAlert(AlertType::FAILURE, ARTICLE_REMOVE_FAILURE);
-                    }
-                }
-            } else if (isset($_GET['orderby'])) {
-                $_SESSION[ART_ORDERBY] = intval($_GET['orderby']);
-            } else if (isset($_GET['page'])) {
-                $_SESSION[ART_PAGE] = intval($_GET['page']);
+            if ($_GET['alert'] === 'added_success') {
+                $this->setAlert(AlertType::SUCCESS, ARTICLE_ADD_SUCCESS);
+            } else if ($_GET['alert'] === 'added_failure') {
+                $this->setAlert(AlertType::FAILURE, ARTICLE_ADD_FAILURE);
+            } else if ($_GET['alert'] === 'updated_success') {
+                $this->setAlert(AlertType::SUCCESS, ARTICLE_UPDATE_SUCCESS);
+            } else if ($_GET['alert'] === 'updated_failure') {
+                $this->setAlert(AlertType::FAILURE, ARTICLE_UPDATE_FAILURE);
             }
+            goto end;
         }
 
+        if (isset($_GET['delete'])) {
+            if (Database::articles()->delete($_GET['delete'])) {
+                $this->setAlert(AlertType::SUCCESS, ARTICLE_REMOVE_SUCCESS);
+            } else {
+                $this->setAlert(AlertType::FAILURE, ARTICLE_REMOVE_FAILURE);
+            }
+            goto end;
+        }
+
+        if (isset($_GET['orderby'])) {
+            $_SESSION[ART_ORDERBY] = intval($_GET['orderby']);
+            goto end;
+        }
+
+        if (isset($_GET['page'])) {
+            $_SESSION[ART_PAGE] = intval($_GET['page']);
+            goto end;
+        }
+
+        end:
+
         $user_id = Authenticate::getUserId();
-        $item_count = Database::getInstance()->getUserArticlesCount($user_id);
+        $item_count = Database::articles()->queryCountByUser($user_id);
         $offset =   ($_SESSION[ART_PAGE] - 1) * TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / TABLE_DISPLAY_COUNT);
 
         $articles = [];
         if (isset($user_id)) {
-            $articles = Database::getInstance()->getUserArticles($user_id, TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
+            $articles = Database::articles()->queryAllByUser($user_id, TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
         }
 
         return $this->renderTemplate([

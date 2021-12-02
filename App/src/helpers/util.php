@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 namespace helpers;
@@ -70,13 +70,43 @@ class Util
     }
 
     /**
+     * Location validation. Location must not be empty and under a set number of caracters.
+     * 
+     * @param BaseRoute $route Route to forward error messages. 
+     * @param string &$location Article's location within the school by reference.
+     * @return bool True if validated.
+     */
+    public static function validateLocation(BaseRoute $route, ?string &$location): bool
+    {
+        $location = trim($_POST['location']) ?? '';
+
+        if (strlen($location) === 0) {
+            $route->setError('location', LOCATION_EMPTY);
+            return false;
+        }
+
+        $location = ucwords($location);
+        if (strlen($location) < LOCATION_MIN_LENGHT) {
+            $route->setError('location', sprintf(LOCATION_TOO_SHORT, LOCATION_MIN_LENGHT));
+            return false;
+        }
+
+        if (strlen($location) > LOCATION_MAX_LENGHT) {
+            $route->setError('location', sprintf(LOCATION_TOO_LONG, LOCATION_MAX_LENGHT));
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validate input and fill $errors array with proper password error text to be displayed if it fails.
      * https://www.codexworld.com/how-to/validate-password-strength-in-php/
      * 
+     * @param BaseRoute $route Route to forward error messages.
      * @param string|null $password_candidate Proposed user password by reference.
      * @return bool True if password is properly formatted;
      */
-    public static function validatePassword(BaseRoute $route, &$password_candidate): bool
+    public static function validatePassword(BaseRoute $route, ?string &$password_candidate): bool
     {
         $password_candidate = trim($_POST['password']) ?? '';
         if ($password_candidate === '') {

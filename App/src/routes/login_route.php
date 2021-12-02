@@ -36,20 +36,20 @@ class Login extends BaseRoute
 
             // handle demand for new password.
             $email  = $_GET['old-email'];
-            $user = Database::getInstance()->getUserByEmail($email);
+            $user = Database::users()->queryByEmail($email);
 
             if (isset($user)) {
                 // Un nouveau mot de passe a été envoyé à '<?php echo $values['email'] 
                 // $this->handleNewPasswordRequest($user->getEmail());
-
                 $this->setAlert(AlertType::FAILURE, LOGIN_RENEW);
             }
+            goto end;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($this->validateEmailInput($email)) {
-                $user = Database::getInstance()->getUserByEmail($email);
+                $user = Database::users()->queryByEmail($email);
             }
 
             if (!isset($user)) {
@@ -67,6 +67,7 @@ class Login extends BaseRoute
             }
         }
 
+        end:
         return $this->renderTemplate([
             'email' => $email ?? '',
             'password' => $password ?? '',

@@ -7,6 +7,7 @@
 namespace routes;
 
 use helpers\Authenticate;
+use helpers\Database;
 
 class AdminRoute extends BaseRoute
 {
@@ -21,6 +22,8 @@ class AdminRoute extends BaseRoute
             $this->requestRedirect(LOGIN);
         }
 
-        return $this->renderTemplate();
+        return $this->renderTemplate([
+            'locations' => $locations ?? []
+        ]);
     }
 }

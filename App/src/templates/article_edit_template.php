@@ -1,9 +1,13 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
+use helpers\Database;
 use helpers\TUtil;
+
+
+$loc_presets = Database::locations()->queryAll();
 
 ?>
 
@@ -33,9 +37,11 @@ use helpers\TUtil;
                         <?php echo $location ? ' is-valid' : '' ?>">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li id="loc-preset-1"><span class="dropdown-item"><?php echo LOCATION_PRESET_1 ?></span></li>
-                        <li id="loc-preset-2"><span class="dropdown-item"><?php echo LOCATION_PRESET_2 ?></span></li>
-                        <li id="loc-preset-3"><span class="dropdown-item"><?php echo LOCATION_PRESET_3 ?></span></li>
+
+                        <?php foreach ($loc_presets as $item) { ?>
+                            <li id="loc-preset-" <?php echo $item->getId() ?>><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
+                        <?php } ?>
+
                     </ul>
                 </div>
 
@@ -74,20 +80,20 @@ use helpers\TUtil;
                     Modifier
                 <?php } ?>
             </button>
-            <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Cancel</a>
+            <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
         </form>
+
     </div>
 </div>
 
 <script>
     let loc_input = document.getElementById('form-location');
-    document.getElementById('loc-preset-1').addEventListener('click', e => {
-        loc_input.value = "<?php echo LOCATION_PRESET_1 ?>";
-    })
-    document.getElementById('loc-preset-2').addEventListener('click', e => {
-        loc_input.value = "<?php echo LOCATION_PRESET_2 ?>";
-    })
-    document.getElementById('loc-preset-3').addEventListener('click', e => {
-        loc_input.value = "<?php echo LOCATION_PRESET_3 ?>";
-    })
+
+    let collection = document.getElementsByClassName('loc-preset');
+    for (let index = 0; index < collection.length; index++) {
+        const element = collection[index];
+        element.addEventListener('click', e => {
+            loc_input.value = element.innerText;
+        });
+    }
 </script>

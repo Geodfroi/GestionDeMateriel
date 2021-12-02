@@ -42,7 +42,7 @@ class UserEdit extends BaseRoute
 
                     $user = User::fromForm($email, $password, $is_admin);
 
-                    if (Database::getInstance()->insertUser($user)) {
+                    if (Database::users()->insert($user)) {
                         $this->requestRedirect(ADMIN . '?alert=added_success');
                     } else {
                         $this->requestRedirect(ADMIN . '?alert=added_failure');
@@ -95,7 +95,7 @@ class UserEdit extends BaseRoute
             $this->setError('email', USER_EMAIL_INVALID);
             return false;
         }
-        if (Database::getInstance()->getUserByEmail($email)) {
+        if (Database::users()->queryByEmail($email)) {
             $this->setError('email', USER_EMAIL_USED);
             return false;
         }

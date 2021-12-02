@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 namespace routes;
@@ -36,112 +36,130 @@ class ProfileRoute extends BaseRoute
         if (isset($_GET['set_alias'])) {
             $display = 1;
             $alias = $user->getAlias();
-        } else if (isset($_GET['change_password'])) {
+            goto end;
+        }
+
+        if (isset($_GET['change_password'])) {
             $display = 2;
-        } else if (isset($_GET['add_email'])) {
+            goto end;
+        }
+
+        if (isset($_GET['add_email'])) {
             $display = 3;
             $login_email = $user->getEmail();
             $contact_email = $user->getContactEmail();
             if ($contact_email === '') {
                 $contact_email = $login_email;
             }
-        } else if (isset($_GET['modify_delay'])) {
-            $display = 4;
-            $delays = $user->getContactDelays();
+            goto end;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_GET['modify_delay'])) {
+            $display = 4;
+            $delays = $user->getContactDelays();
+            goto end;
+        }
 
-            if (isset($_POST['set-alias'])) {
-                $display = 1;
-                if ($this->validateAlias($alias)) {
-                    $display = 0;
-                    if ($alias !== $user->getAlias()) {
-                        if (Database::getInstance()->updateUserAlias($user_id, $alias)) {
+        if (isset($_POST['set-alias'])) {
+            $display = 1;
+            if ($this->validateAlias($alias)) {
+                $display = 0;
+                if ($alias !== $user->getAlias()) {
+                    if (Database::users()->updateAlias($user_id, $alias)) {
 
-                            if (strlen($alias) > 0) {
-                                $this->setAlert(AlertType::SUCCESS, ALIAS_UPDATE_SUCCESS);
-                            } else {
-                                $this->setAlert(AlertType::SUCCESS, ALIAS_DELETE_SUCCESS);
-                            }
+                        if (strlen($alias) > 0) {
+                            $this->setAlert(AlertType::SUCCESS, ALIAS_UPDATE_SUCCESS);
                         } else {
-                            $this->setAlert(AlertType::FAILURE, ALIAS_UPDATE_FAILURE);
-                        }
-                    }
-                }
-            } else if (isset($_POST['new-password'])) {
-                $display = 2;
-
-                if (Util::validatePassword($this, $password)) {
-                    if ($this->validateRepeat($password)) {
-
-                        $display = 0;
-                        $encrypted = util::encryptPassword($password);
-
-                        if (Database::getInstance()->updateUserPassword($user_id, $encrypted)) {
-                            $this->setAlert(AlertType::SUCCESS, PASSWORD_UPDATE_SUCCESS);
-                        } else {
-                            $this->setAlert(AlertType::FAILURE, PASSWORD_UPDATE_FAILURE);
-                        }
-                    }
-                }
-            } else if (isset($_POST['set-email'])) {
-                $display = 3;
-                $login_email = Authenticate::getUser()->getEmail();
-
-                if ($this->validateContactEmail($contact_email)) {
-
-                    $display = 0;
-                    $user_id = Authenticate::getUserId();
-
-                    if ($contact_email === $login_email) {
-                        $contact_email  = '';
-                    }
-
-                    if (Database::getInstance()->updateUserContactEmail($user_id, $contact_email)) {
-
-                        // if contact is null or empty, then contact is the login email.
-                        if (strlen($contact_email) > 0) {
-                            $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_SET_SUCCESS, $contact_email));
-                        } else {
-                            $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_RESET_SUCCESS, $login_email));
+                            $this->setAlert(AlertType::SUCCESS, ALIAS_DELETE_SUCCESS);
                         }
                     } else {
-                        $this->setAlert(AlertType::FAILURE,  CONTACT_SET_FAILURE);
-                    }
-                }
-            } else if (isset($_POST['set-delay'])) {
-                $display = 4;
-
-                $delays = [];
-                if (isset($_POST['delay-3'])) {
-                    array_push($delays, '3');
-                }
-                if (isset($_POST['delay-7'])) {
-                    array_push($delays, '7');
-                }
-                if (isset($_POST['delay-14'])) {
-                    array_push($delays, '14');
-                }
-                if (isset($_POST['delay-30'])) {
-                    array_push($delays, '30');
-                }
-
-                if (count($delays) == 0) {
-                    $this->setError('delays',  DELAYS_NONE);
-                } else {
-
-                    $display = 0;
-                    $str = implode('-', $delays);
-
-                    if (Database::getInstance()->updateUserContactDelay($user_id, $str)) {
-                        $this->setAlert(AlertType::SUCCESS,  DELAY_SET_SUCCESS);
-                    } else {
-                        $this->setAlert(AlertType::FAILURE,  DELAY_SET_FAILURE);
+                        $this->setAlert(AlertType::FAILURE, ALIAS_UPDATE_FAILURE);
                     }
                 }
             }
+            goto end;
         }
+
+        if (isset($_POST['new-password'])) {
+            $display = 2;
+
+            if (Util::validatePassword($this, $password)) {
+                if ($this->validateRepeat($password)) {
+
+                    $display = 0;
+                    $encrypted = util::encryptPassword($password);
+
+                    if (Database::users()->updatePassword($user_id, $encrypted)) {
+                        $this->setAlert(AlertType::SUCCESS, PASSWORD_UPDATE_SUCCESS);
+                    } else {
+                        $this->setAlert(AlertType::FAILURE, PASSWORD_UPDATE_FAILURE);
+                    }
+                }
+            }
+            goto end;
+        }
+
+        if (isset($_POST['set-email'])) {
+            $display = 3;
+            $login_email = Authenticate::getUser()->getEmail();
+
+            if ($this->validateContactEmail($contact_email)) {
+
+                $display = 0;
+                $user_id = Authenticate::getUserId();
+
+                if ($contact_email === $login_email) {
+                    $contact_email  = '';
+                }
+
+                if (Database::users()->updateContactEmail($user_id, $contact_email)) {
+
+                    // if contact is null or empty, then contact is the login email.
+                    if (strlen($contact_email) > 0) {
+                        $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_SET_SUCCESS, $contact_email));
+                    } else {
+                        $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_RESET_SUCCESS, $login_email));
+                    }
+                } else {
+                    $this->setAlert(AlertType::FAILURE,  CONTACT_SET_FAILURE);
+                }
+            }
+            goto end;
+        }
+
+        if (isset($_POST['set-delay'])) {
+            $display = 4;
+
+            $delays = [];
+            if (isset($_POST['delay-3'])) {
+                array_push($delays, '3');
+            }
+            if (isset($_POST['delay-7'])) {
+                array_push($delays, '7');
+            }
+            if (isset($_POST['delay-14'])) {
+                array_push($delays, '14');
+            }
+            if (isset($_POST['delay-30'])) {
+                array_push($delays, '30');
+            }
+
+            if (count($delays) == 0) {
+                $this->setError('delays',  DELAYS_NONE);
+            } else {
+
+                $display = 0;
+                $str = implode('-', $delays);
+
+                if (Database::users()->updateContactDelay($user_id, $str)) {
+                    $this->setAlert(AlertType::SUCCESS,  DELAY_SET_SUCCESS);
+                } else {
+                    $this->setAlert(AlertType::FAILURE,  DELAY_SET_FAILURE);
+                }
+            }
+        }
+
+        end:
 
         return $this->renderTemplate([
             'display' => $display,

@@ -26,8 +26,8 @@ use helpers\TUtil;
                 <label class="h4 m-4">Formulaire d'identification</label>
                 <div class="mb-3">
                     <label for="form-email" class="form-label">Adresse e-mail</label>
-                    <input id="form-email" type="email" name='email' aria-describedby="id-descr" value=<?php echo TUtil::escape($email); ?> class="form-control 
-                        <?php echo isset($error['email-date']) ? ' is-invalid' : '' ?>
+                    <input id="form-email" type="email" name='email' aria-describedby="id-descr" value="<?php echo TUtil::escape($email); ?>" class="form-control 
+                        <?php echo isset($errors['email']) ? ' is-invalid' : '' ?>
                         <?php echo $email ? ' is-valid' : '' ?>">
                     <?php if (isset($errors['email'])) { ?>
                         <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
@@ -39,7 +39,7 @@ use helpers\TUtil;
                 <div class="mt-3 mb-3">
                     <label for="form-password" class="form-label">Mot de passe</label>
                     <input id="form-password" type="password" name='password' class="form-control 
-                        <?php echo isset($error['password']) ? ' is-invalid' : '' ?>
+                        <?php echo isset($errors['password']) ? ' is-invalid' : '' ?>
                         <?php echo $password ? ' is-valid' : '' ?>">
                     <?php if (isset($errors['password'])) { ?>
                         <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>

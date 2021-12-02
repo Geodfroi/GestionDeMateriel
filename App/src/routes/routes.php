@@ -30,6 +30,8 @@ class Routes
                 return new ContactRoute();
             case HOME:
                 return new HomeRoute();
+            case LOCAL_PRESETS:
+                return new LocationList();
             case LOGIN:
                 return new Login();
             case PROFILE:
