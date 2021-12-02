@@ -1,0 +1,18 @@
+{
+  "name": "auror/app",
+  "description": "Gestion d'inventaire",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "Auror\\App\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Service des innovations pédagogiques - HEdS",
+      "email": "aurore.azure@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {}
+}
