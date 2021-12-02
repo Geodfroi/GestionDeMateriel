@@ -12,3 +12,5 @@
     <div class="row" data-bs-toggle="tooltip" title="Modifier la liste des emplacements pouvant être sélectionnés lors de la saisie d'un nouvel article." data-bs-placement="bottom"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo LOCAL_PRESETS ?>">Gérer la liste des emplacements .</a></div>
 
 </div>
+
+<div>TODO - access user contact posts</div>

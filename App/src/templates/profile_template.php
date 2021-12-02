@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 use helpers\TUtil;
@@ -39,7 +39,7 @@ use helpers\TUtil;
             <form method="post" action=<?php echo PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="alias" type="text" id="alias" class="form-control <?php echo isset($errors['alias']) ? ' is-invalid' : '' ?>" value=<?php echo TUtil::escape($values['alias']) ?>>
+                        <input name="alias" type="text" id="alias" class="form-control <?php echo isset($errors['alias']) ? ' is-invalid' : '' ?>" value=<?php echo TUtil::escape($alias) ?>>
 
                         <?php if (isset($errors['alias'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['alias'] ?> </div>
@@ -58,7 +58,7 @@ use helpers\TUtil;
             <form method="post" action=<?php echo PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="password" type="password" id="password" value=<?php echo TUtil::escape($password) ?> class="form-control
+                        <input name="password" type="password" id="password" value="<?php echo TUtil::escape($password) ?>" class="form-control
                             <?php echo isset($errors['password']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['password'])) { ?>
@@ -70,7 +70,7 @@ use helpers\TUtil;
                 </div>
                 <div class="row mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="password-repeat" type="password" id="password-repeat" alue=<?php echo TUtil::escape($password_repeat) ?> class="form-control 
+                        <input name="password-repeat" type="password" id="password-repeat" value="<?php echo TUtil::escape($password_repeat) ?>" class="form-control 
                             <?php echo isset($errors['password-repeat']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['password-repeat'])) { ?>
@@ -159,10 +159,4 @@ use helpers\TUtil;
 
         <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo PROFILE ?>">Revenir</a></div>
     <?php }  ?>
-</div>
-
-<div>
-    <DIV>TODO: set alias</DIV>
-    <div class="div"> TODO - ajouter une adresse email privée de contact.</div>
-    <div class="div"> TODO - changer le délai avant que les mails de notification arrivent (défaut 2 semaines).</div>
 </div>

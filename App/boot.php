@@ -15,8 +15,6 @@ require_once __DIR__ . '/src/helpers/util.php';
 require_once __DIR__ . '/src/models/article.php';
 require_once __DIR__ . '/src/models/string_content.php';
 require_once __DIR__ . '/src/models/user.php';
-
-
 require_once __DIR__ . '/src/routes/base_route.php'; // must be included before other routes as it contains the route base class.
 
 require_once __DIR__ . '/src/routes/admin_route.php';

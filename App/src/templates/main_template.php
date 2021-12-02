@@ -40,7 +40,6 @@ use helpers\Authenticate;
 
                             <a class="nav-link <?php echo $_SESSION['route'] === ART_TABLE ? 'active' : '' ?>" href="<?php echo ART_TABLE ?>">Articles</a>
                             <a class="nav-link <?php echo $_SESSION['route'] === PROFILE ? 'active' : '' ?>" href="<?php echo PROFILE ?> ">Profile</a>
-                            <a class="nav-link <?php echo $_SESSION['route'] === CONTACT ? 'active' : '' ?>" href="<?php echo CONTACT ?>">Contact</a>
                             <a class="nav-link" href="<?php echo LOGOUT ?>">Déconnexion</a>
                         <?php } else { ?>
                             <a class="nav-link" href="<?php echo LOGIN ?>">Connexion</a>
@@ -66,7 +65,7 @@ use helpers\Authenticate;
                 <div class="col-3 text-end"> <a href="/contact">Contacter-nous.</a></div>
             </div>
             <div class="row">
-                <span class="text-muted h6 col-12">16 novembre 2021</span>
+                <span class="text-muted h6 col-12"><?php echo LAST_MODIFICATION ?></span>
             </div>
         </div>
     </footer>

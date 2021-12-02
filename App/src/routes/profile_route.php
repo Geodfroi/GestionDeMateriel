@@ -163,14 +163,12 @@ class ProfileRoute extends BaseRoute
 
         return $this->renderTemplate([
             'display' => $display,
-            'values' => [
-                'alias' => $alias ?? '',
-                'password' => $password ?? '',
-                'password-repeat' => $password_repeat ?? '',
-                'login-email' => $login_email ?? '',
-                'contact-email' => $contact_email ?? '',
-                'delays' => $delays ?? [],
-            ],
+            'alias' => $alias ?? '',
+            'password' => $password ?? '',
+            'password_repeat' => $password_repeat ?? '',
+            'login_email' => $login_email ?? '',
+            'contact_email' => $contact_email ?? '',
+            'delays' => $delays ?? [],
         ]);
     }
 

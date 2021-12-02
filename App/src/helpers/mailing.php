@@ -10,6 +10,7 @@ namespace helpers;
 
 /**
  * static functions connected to emails bundled together in a class
+ * https://phppot.com/php/send-email-in-php-using-gmail-smtp/
  */
 class Mailing
 {

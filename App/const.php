@@ -7,6 +7,9 @@
 // App constants
 const APP_NAME = "HEdS Gestionnaire d'inventaire";
 const ADMIN_EMAIL = "aurore.azure@gmail.com";
+
+const LAST_MODIFICATION = '02 décembre 2021';
+
 const TEMPLATES_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'templates';
 
 const ALIAS_MIN_LENGHT = 6;
@@ -23,6 +26,7 @@ const TABLE_DISPLAY_COUNT = 12;
 
 const DEFAULT_PASSWORD_LENGTH = 12;
 const USER_PASSWORD_MIN_LENGTH = 8;
+
 
 // routes
 const ADMIN = '/admin';
