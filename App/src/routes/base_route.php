@@ -89,7 +89,6 @@ abstract class BaseRoute
             var_dump($this->errors);
         }
 
-
         return Util::renderTemplate($this->templateName, $data);
     }
 

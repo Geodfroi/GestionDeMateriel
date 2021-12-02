@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 namespace helpers;
@@ -208,9 +208,9 @@ class ArticleQueries
     }
 
     /**
-     * Retrieve a single Article by it's id.
+     * Retrieve a single Article by id.
      * 
-     * @param int $id Article's id.
+     * @param int $id Article id.
      * @return Article|null
      */
     public function queryById(int $id): ?Article
@@ -233,11 +233,11 @@ class ArticleQueries
             if ($data) {
                 return Article::fromDatabaseRow($data);
             } else {
-                error_log('failure to retrieve article from database: no row with index [' . $id . '] was found.');
+                error_log(sprintf(ARTICLE_QUERY, $id));
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(ARTICLE_QUERY . $error . PHP_EOL);
+            error_log(sprintf(ARTICLE_QUERY, $id) . $error . PHP_EOL);
         }
 
         return null;
@@ -373,6 +373,37 @@ class LocationQueries
         list(,, $error) = $preparedStatement->errorInfo();
         error_log(LOCATION_INSERT . $error . PHP_EOL);
         return false;
+    }
+
+    /**
+     * Retrieve a single Location by id.
+     * 
+     * @param int $id Item id.
+     * @return StringContent|null
+     */
+    public function queryById(int $id): ?StringContent
+    {
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            str_content 
+        FROM locations WHERE id = :id');
+
+        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+
+        if ($preparedStatement->execute()) {
+
+            $data = $preparedStatement->fetch(); // retrieve only first row found; fine since id is unique.
+            if ($data) {
+                return StringContent::fromDatabaseRow($data);
+            } else {
+                error_log(sprintf(LOCATION_QUERY, $id));
+            }
+        } else {
+            list(,, $error) = $preparedStatement->errorInfo();
+            error_log(sprintf(LOCATION_QUERY, $id) . $error . PHP_EOL);
+        }
+
+        return null;
     }
 
     /**

@@ -1,13 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 namespace routes;
 
 use helpers\Authenticate;
 use helpers\Database;
+use helpers\Util;
 
 class LocationList extends BaseRoute
 {
@@ -22,52 +23,77 @@ class LocationList extends BaseRoute
             $this->requestRedirect(LOGIN);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_GET['delete'])) {
 
-            if (isset($_POST['add-new'])) {
-                if ($this->validateNew($location_field)) {;
+            if (Database::locations()->delete($_GET['delete'])) {
+                $this->setAlert(AlertType::SUCCESS, LOC_PRESET_REMOVE_SUCCESS);
+            } else {
+                $this->setAlert(AlertType::FAILURE, LOC_PRESET_REMOVE_FAILURE);
+            }
+            goto end;
+        }
+
+        if (isset($_GET['update'])) {
+            $item = Database::locations()->queryById($_GET['update']);
+            if ($item) {
+                $selected = $item->getId();
+                $location_field = $item->getContent();
+            }
+            goto end;
+        }
+
+        if (isset($_POST['add-new'])) {
+            if (Util::validateLocation($this, $location_field)) {
+
+                if (Database::locations()->contentExists($location_field)) {
+                    $this->setError('location', LOCATION_PRESET_EXISTS);
+                } else {
                     if (Database::locations()->insert($location_field)) {
+                        $location_field = '';
                     } else {
                         $this->setAlert(AlertType::FAILURE, LOCATION_PRESET_INSERT);
                     }
                 }
             }
+            goto end;
         }
 
+        if (isset($_POST['update'])) {
+            $id = intval($_POST['id']);
+
+            if (!Util::validateLocation($this, $location_field)) {
+                $selected =  $id; // $location_field will still be filled -> stay in update mode.
+                goto end;
+            }
+
+            $former = Database::locations()->queryById($id);
+            error_log('c: ' . $former->getContent() . ' - ' . $location_field);
+
+            if (strcasecmp($location_field, $former->getContent()) == 0) {
+                $location_field = '';
+                goto end;
+            }
+
+            if (Database::locations()->contentExists($location_field)) {
+                $this->setError('location', LOCATION_PRESET_EXISTS);
+                $selected =  $id; // $location_field will still be filled -> stay in update mode.
+                goto end;
+            }
+
+            if (Database::locations()->update($id, $location_field)) {
+                $this->setAlert(AlertType::SUCCESS, LOC_PRESET_UPDATE_SUCCESS);
+                $location_field = ''; // $selected = 0 -> return to normal list display.
+                goto end;
+            }
+        }
+
+        end:
         $locations = Database::locations()->queryAll();
 
         return $this->renderTemplate([
+            'selected' => $selected ?? 0,
             'location_field' => $location_field ?? '',
             'locations' => $locations ?? []
         ]);
-    }
-
-    /**
-     * New location name validation. Name must be longer than set lenght and not already exist.
-     * @return bool True if validated.
-     */
-    private function validateNew(&$new_location): bool
-    {
-        $new_location = trim($_POST['location-field']) ?? '';
-
-        if (strlen($new_location) == 0) {
-            $this->setError('location-field', LOCATION_PRESET_EMPTY);
-            return false;
-        }
-        if (strlen($new_location) < LOCATION_MIN_LENGHT) {
-            $this->setError('location-field', sprintf(LOCATION_TOO_SHORT, LOCATION_MIN_LENGHT));
-            return false;
-        }
-
-        if (strlen($new_location) > LOCATION_MAX_LENGHT) {
-            $this->setError('location-field', sprintf(LOCATION_TOO_LONG, LOCATION_MAX_LENGHT));
-            return false;
-        }
-        if (Database::locations()->contentExists($new_location)) {
-            $this->setError('location-field', LOCATION_PRESET_EXISTS);
-            return false;
-        }
-
-        return true;
     }
 }

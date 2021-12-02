@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.02 ###
 ##############################
 
 // App constants
@@ -23,10 +23,6 @@ const TABLE_DISPLAY_COUNT = 12;
 
 const DEFAULT_PASSWORD_LENGTH = 12;
 const USER_PASSWORD_MIN_LENGTH = 8;
-
-const LOCATION_PRESET_1 = "Pharmacie 1er étage";
-const LOCATION_PRESET_2 = "Cabinet d'entretien";
-const LOCATION_PRESET_3 = "Derrière les coussins du canapé";
 
 // routes
 const ADMIN = '/admin';
@@ -63,12 +59,13 @@ const USER_ID = 'user_id';
 //Database errors
 const ARTICLE_DELETE = 'failure to delete article from database: ';
 const ARTICLE_INSERT = 'failure to insert article: ';
-const ARTICLE_QUERY = 'failure to retrieve article from database: ';
+const ARTICLE_QUERY = 'failure to retrieve article [%s] from database: ';
 const ARTICLES_COUNT_QUERY = 'failure to count articles from database: ';
 const ARTICLES_QUERY = 'failure to retrieve article list from database: ';
 const LOCATIONS_CHECK_CONTENT = 'failure to check for content string: ';
 const LOCATION_DELETE = 'failure to delete location from database: ';
 const LOCATION_INSERT = 'failure to properly insert new location: ';
+const LOCATION_QUERY = 'failure to retrieve location [%s] from database: ';
 const LOCATIONS_QUERY_ALL = 'failure to retrieve locations: ';
 const LOCATION_UPDATE = 'failure to update location string correctly: ';
 const USER_ALIAS_UPDATE = 'failure to update user alias: ';
@@ -96,9 +93,7 @@ const ARTICLE_ADD_EMPTY = "Il faut donner un nom à l'article à ajouter.";
 const ARTICLE_NAME_TOO_SHORT = "Le nom de l'article doit compter au moins %s caractères.";
 const ARTICLE_NAME_TOO_LONG = "Le nom de l'article ne doit pas dépasser %s caractères.";
 const COMMENTS_NAME_TOO_LONG = "Les commentaires ne doivent pas dépasser %s caractèrs.";
-const LOCATION_EMPTY = "Il est nécessaire de préciser l'emplacement.";
-const LOCATION_TOO_LONG = "Un emplacement ne peut dépasser %s caractères.";
-const LOCATION_TOO_SHORT = "Un emplacement doit au moins comporter %s caractères";
+
 const DATE_EMPTY = "Il est nécessaire d'entrer la date d'expiration.";
 const DATE_PAST = "La date fournie doit être dans le future.";
 const DATE_INVALID = "La date fournie est invalide.";
@@ -114,11 +109,12 @@ const ARTICLE_UPDATE_SUCCESS = "L'article a été mis à jour avec succès.";
 
 // local presets alerts
 const LOCATION_PRESET_INSERT = "Il n'a pas été possible d'ajouter le nouvel emplacement à la liste.";
+const LOC_PRESET_REMOVE_FAILURE = "L'emplacement n' pas pu être enlevé.";
+const LOC_PRESET_REMOVE_SUCCESS = "L'emplacement a été enlevé avec succès.";
+const LOC_PRESET_UPDATE_SUCCESS = "L'emplacement a été modifié avec succès.";
 
 // local presets errors
-const LOCATION_PRESET_EMPTY = "Le champ de saisie est vide.";
 const LOCATION_PRESET_EXISTS = "Cet emplacement est déjà présent dans la liste.";
-
 
 //login alerts
 const LOGIN_USER_DISC = "L'usager précédent s'est déconnecté.";
@@ -155,6 +151,9 @@ const USER_EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
 const USER_EMAIL_USED = 'Cet adresse e-mail est déjà utilisée par un autre utilisateur.';
 
 // util errors
+const LOCATION_EMPTY = "Il est nécessaire de préciser l'emplacement.";
+const LOCATION_TOO_LONG = "Un emplacement ne peut dépasser %s caractères.";
+const LOCATION_TOO_SHORT = "Un emplacement doit au moins comporter %s caractères";
 const PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
 const PASSWORD_SHORT = 'Le mot de passe doit avoir au minimum %s caractères.';
 const PASSWORD_WEAK = 'Le mot de passe doit comporter des chiffres et des lettres.';
