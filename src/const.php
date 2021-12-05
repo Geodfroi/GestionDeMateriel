@@ -6,11 +6,12 @@
 
 // App constants
 const APP_NAME = "HEdS Gestionnaire d'inventaire";
-const ADMIN_EMAIL = "aurore.azure@gmail.com";
+const APP_EMAIL_SENDER = "HedS: gestion d'inventaire.";
 
-const LAST_MODIFICATION = '02 décembre 2021';
+const LAST_MODIFICATION = '05 décembre 2021';
 
-const TEMPLATES_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'templates';
+const EMAIL_TEMPLATES_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'email_templates';
+const TEMPLATES_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'page_templates';
 
 const ALIAS_MIN_LENGHT = 6;
 const ARTICLE_NAME_MIN_LENGHT = 6;
@@ -27,6 +28,8 @@ const TABLE_DISPLAY_COUNT = 12;
 const DEFAULT_PASSWORD_LENGTH = 12;
 const USER_PASSWORD_MIN_LENGTH = 8;
 
+// emails
+const EMAIL_SUBJECT_NEW_PASSWORD = "HEdS - Gestion d'inventaire: votre nouveau mot de passe";
 
 // routes
 const ADMIN = '/admin';
@@ -50,6 +53,7 @@ const LOGIN_TEMPLATE = 'login_template';
 const PROFILE_TEMPLATE = 'profile_template';
 const USER_EDIT_TEMPLATE = 'user_edit_template';
 const USER_TABLE_TEMPLATE = 'user_table_template';
+
 
 // SESSION global variables keys.
 const USERS_ORDERBY = 'admin_orderby';

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.05 ###
 ##############################
 
 namespace app\helpers;
@@ -55,14 +55,14 @@ class Util
      * 
      * @return string Rendered template as string.
      */
-    public static function renderTemplate(string $name, array $data = []): string
+    public static function renderTemplate(string $name, array $data = [], string $folder_path = TEMPLATES_PATH): string
     {
         // extract array variables into the local scope so they can be to be used in the template scripts.
         extract($data, EXTR_OVERWRITE);
         // start buffering the string;
         ob_start();
         // load file content at path and resolve php script to a string in the buffer;
-        require TEMPLATES_PATH . DIRECTORY_SEPARATOR . $name . '.php';
+        require $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
         // flush the buffer content to the variable
         $rendered = ob_get_clean();
 

@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 use app\helpers\Util;
 use app\routes\Routes;
+use app\helpers\Mailing;
 
 require_once __DIR__ . '/../src/const.php';
-require_once __DIR__ . '/../db_settings.php';
+require_once __DIR__ . '/../p_settings.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
 // initiate session allowing for data permanence in _SESSION array as long as the browser is open.
@@ -27,6 +28,10 @@ if ($route = Routes::getRoute()) {
     }
 }
 
-
 // insert dynamically generated html content into the main template.
-echo Util::renderTemplate('main_template', $templateData);
+// echo Util::renderTemplate('main_template', $templateData);
+
+
+
+
+// Mailing::passwordChangeNotification(, );

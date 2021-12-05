@@ -1,11 +1,16 @@
 <?php
 
-require_once __DIR__ . '/../boot.php';
+require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
 use app\helpers\Database;
 use app\models\User;
 use app\helpers\Authenticate;
 use app\helpers\UserOrder;
+use app\helpers\Mailing;
+
+
+
+// Mailing::passwordChangeNotification();
 
 // foreach ($array as $art) {
 // }

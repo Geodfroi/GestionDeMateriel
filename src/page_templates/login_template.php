@@ -60,3 +60,6 @@ use app\helpers\TUtil;
         </div>
     </div>
 </div>
+
+<div>TODO: add favicon</div>
+<div>TODO: mail new password function</div>
