@@ -5,12 +5,12 @@
 //private setting not to be stored in github. Fill-in and remove '_template suffix.
 
 // database
-const HOST = '****';
+const HOST = '';
 const PORT = 0000;
 const DB_NAME = 'heds_inv_exp'; # HEdS Inventory expiration
-const DB_ADMIN_ID = '********';
-const DB_ADMIN_PASSWORD = '*********';
+const DB_ADMIN_ID = '';
+const DB_ADMIN_PASSWORD = '';
 
 //email account
-const APP_EMAIL = 'app.email@example.com';
-const APP_EMAIL_PASSWORD = '**********';
+const APP_EMAIL = '';
+const APP_EMAIL_PASSWORD = '';
