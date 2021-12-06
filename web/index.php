@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh 
 
@@ -29,9 +29,7 @@ if ($route = Routes::getRoute()) {
 }
 
 // insert dynamically generated html content into the main template.
-// echo Util::renderTemplate('main_template', $templateData);
+echo Util::renderTemplate('main_template', $templateData, TEMPLATES_PATH);
 
-
-
-
-// Mailing::passwordChangeNotification(, );
+// test email body
+// echo Mailing::passwordChangeNotificationBody('Johnny', '123123');

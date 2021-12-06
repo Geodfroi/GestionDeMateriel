@@ -9,26 +9,29 @@ INSERT INTO users (id, password, email) VALUES (2, '$2y$10$yw4QX5NjU8g21i5qxnQXb
 INSERT INTO users (id, password, email) VALUES (3, '$2y$10$rZGyarSuElY1WKcqRMrcVeRUoMWn0iJaitiygV66wb5N3DgHRnpva', 'h.dunant@redcross.ch');
 INSERT INTO users (id, password, email) VALUES (4, '$2y$10$cKK0yQsz9Ywj3u/Jav4D2OUexjmW8GzWP27jgjSDFPnvlpWYaqrfG',  'clarab@civilwar.org');
 
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (2, 'Vin rouge', 'celier', '2022-08-01' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (2, 'Vin rouge', 'celier', '2021-08-01' );
 INSERT INTO articles (user_id, article_name, location) VALUES (2, 'Papier A4 x 1000', 'bureau 202');
 
-INSERT INTO articles (user_id, article_name, location, expiration_date, comments) VALUES (3, 'Produit nettoyage A1', 'Placard 3A', '2023-08-01', 'this is a comment');
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A3', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A4', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A5', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A6', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A7', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A8', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A9', 'Placard 3A', '2023-06-01' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A9', 'Placard 3A', '2023-06-01' );
+INSERT INTO articles (user_id, article_name, location, expiration_date, comments) VALUES (3, 'Produit nettoyage A1', 'Placard 3A', '2021-08-01', 'this is a comment');
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2', 'Placard 3A', '2021-12-06' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2b', 'Placard 3A', '2021-12-06' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A3', 'Placard 3A', '2021-12-07' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A3b', 'Placard 3A', '2021-12-07' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A4', 'Placard 3A', '2021-12-08' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A5', 'Placard 3A', '2021-12-08' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A5', 'Placard 3A', '2021-12-09' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A6', 'Placard 3A', '2021-12-10' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A7', 'Placard 3A', '2021-12-11' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A8', 'Placard 3A', '2021-12-12' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A9', 'Placard 3A', '2021-12-13' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A9', 'Placard 3A', '2021-12-14' );
 
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2022-08-13' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2022-07-13' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2022-08-13' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament F1I8', 'Pharmacie 1er', '2022-06-13' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament F1I8', 'Pharmacie 1er', '2022-08-13' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament ADD1', 'Pharmacie 1er', '2022-08-13' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 9JTX', 'Pharmacie 1er', '2023-04-10' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2021-12-15' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2021-12-16' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2021-12-17' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament F1I8', 'Pharmacie 1er', '2021-12-18' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament F1I8', 'Pharmacie 1er', '2021-12-19' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament ADD1', 'Pharmacie 1er', '2021-08-20' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 9JTX', 'Pharmacie 1er', '2021-04-10' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Médicament 0XG6', 'Pharmacie 1er', '2021-07-12' );
 

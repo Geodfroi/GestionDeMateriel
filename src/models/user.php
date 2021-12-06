@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\models;
@@ -90,9 +90,12 @@ class User
         return $this->creation_date;
     }
 
+    /**
+     * @return array Array of integer values
+     */
     public function getContactDelays(): array
     {
-        return explode('-', $this->contact_delay);
+        return array_map('intval', explode('-', $this->contact_delay));
     }
 
     public function getContactEmail(): string

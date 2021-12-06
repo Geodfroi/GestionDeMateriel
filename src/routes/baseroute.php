@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\routes;
@@ -89,7 +89,7 @@ abstract class BaseRoute
             var_dump($this->errors);
         }
 
-        return Util::renderTemplate($this->templateName, $data);
+        return Util::renderTemplate($this->templateName, $data, TEMPLATES_PATH);
     }
 
     /**

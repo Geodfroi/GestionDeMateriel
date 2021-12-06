@@ -55,7 +55,7 @@ class Util
      * 
      * @return string Rendered template as string.
      */
-    public static function renderTemplate(string $name, array $data = [], string $folder_path = TEMPLATES_PATH): string
+    public static function renderTemplate(string $name, array $data = [], string $folder_path): string
     {
         // extract array variables into the local scope so they can be to be used in the template scripts.
         extract($data, EXTR_OVERWRITE);

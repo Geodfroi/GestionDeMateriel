@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\routes;
@@ -132,16 +132,16 @@ class Profile extends BaseRoute
 
             $delays = [];
             if (isset($_POST['delay-3'])) {
-                array_push($delays, '3');
+                array_push($delays, 3);
             }
             if (isset($_POST['delay-7'])) {
-                array_push($delays, '7');
+                array_push($delays, 7);
             }
             if (isset($_POST['delay-14'])) {
-                array_push($delays, '14');
+                array_push($delays, 14);
             }
             if (isset($_POST['delay-30'])) {
-                array_push($delays, '30');
+                array_push($delays, 30);
             }
 
             if (count($delays) == 0) {

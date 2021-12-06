@@ -1,19 +1,16 @@
 <?php
 
+
+require_once __DIR__ . '/../src/const.php';
+require_once __DIR__ . '/../p_settings.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
 use app\helpers\Database;
 use app\models\User;
 use app\helpers\Authenticate;
-use app\helpers\UserOrder;
 use app\helpers\Mailing;
 
-
-
-// Mailing::passwordChangeNotification();
-
-// foreach ($array as $art) {
-// }
+print(Mailing::passwordChangeNotification('Johnny', ['aurore.azure@gmail.com'], '123123'));
 
 // for ($i = 0; $i < 20; $i++) {
 //     $email = 'user_' . strval($i) . '@bogus.com';

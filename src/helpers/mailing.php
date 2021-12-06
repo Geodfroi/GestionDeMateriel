@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.05 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\helpers;
@@ -27,33 +27,55 @@ class Mailing
      * @param array $params Parameters to be inserted inside html template.
      * @return string html page as string.
      */
-    private static function formatEmail(string $email_tamplate, array $params): string
+    private static function formatEmail(string $email_template, array $params): string
     {
-        $content = Util::renderTemplate('', $params, EMAIL_TEMPLATES_PATH);
+        $content = Util::renderTemplate($email_template, $params, EMAIL_TEMPLATES_PATH);
         return Util::renderTemplate('email_base', ['content' => $content], EMAIL_TEMPLATES_PATH);
     }
 
     /**
      * Send a password change notification to the user mail box.
      * 
-     * @param string $sender User alias or email address.
+     * @param string $user User alias or email address.
      * @param array $emails Message will be sent to those addresses.
      * @param string $password New password in plain text.
      * @return bool True if emails are sent correctly.
      */
-    public static function passwordChangeNotification(string $sender, array $emails, string $password): bool
+    public static function passwordChangeNotification(string $user, array $emails, string $password): bool
     {
-        $params = [
-            'username' => $sender,
-            'app_name' => APP_NAME,
-            'password' => $password
-        ];
-        $html =  Mailing::formatEmail('newpassword', $params);
-
+        $html =  Mailing::passwordChangeNotificationBody($user, $password);
         return Mailing::send($emails, EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
     }
 
+    /**
+     * Return formatted body for password change.
+     * 
+     * @param string $user User alias or email address.
+     * @param string $password New password in plain text.
+     * @return string Html body.
+     */
+    public static function passwordChangeNotificationBody(string $user, string $password): string
+    {
+        return Mailing::formatEmail('newpassword', [
+            'username' => $user,
+            'app_name' => APP_NAME,
+            'password' => $password
+        ]);
+    }
 
+    /**
+     * Send an email to user to remind them of soon to be expired items.
+     */
+    public static function peremptionNotification(): bool
+    {
+    }
+
+    /**
+     * Return formatted body for peremption notification.
+     */
+    public static function peremptionNotificationBody(): string
+    {
+    }
 
     /**
      * Send an html formatted email using a gmail address.
@@ -78,6 +100,8 @@ class Mailing
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
+            $mail->CharSet = PHPMailer::CHARSET_UTF8;
+
             $mail->Username = APP_EMAIL;
             $mail->Password = APP_EMAIL_PASSWORD;
 
@@ -96,7 +120,7 @@ class Mailing
 
             $mail->send();
             return true;
-        } catch (Exception) {
+        } catch (Exception $e) {
             error_log("Error in sending email. Mailer Error: {$mail->ErrorInfo}");
             return false;
         }

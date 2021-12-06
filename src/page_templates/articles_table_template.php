@@ -160,6 +160,7 @@ function disLinkArt(string $header): string
 </div>
 
 <div>TODO: created by column / date created</div>
+<div>TODO: color scheme for dates / peremption</div>
 <div>articles visible by all</div>
 <div>TODO: filters</div>
 <div>TODO: fixed column size</div>

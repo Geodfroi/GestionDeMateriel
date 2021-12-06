@@ -244,6 +244,38 @@ class ArticleQueries
     }
 
     /**
+     * Retrieve all articles;
+     * 
+     * @return array An array of articles.
+     */
+    public function queryAll(): array
+    {
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            user_id, 
+            article_name, 
+            location,
+            comments, 
+            expiration_date,
+            creation_date 
+        FROM articles');
+
+        $articles = [];
+
+        if ($preparedStatement->execute()) {
+            // fetch next as associative array until there are none to be fetched.
+            while ($data = $preparedStatement->fetch()) {
+                array_push($articles, Article::fromDatabaseRow($data));
+            }
+        } else {
+            list(,, $error) = $preparedStatement->errorInfo();
+            error_log(ARTICLES_QUERY . $error . PHP_EOL);
+        }
+
+        return $articles;
+    }
+
+    /**
      * Retrieve the User articles;
      * 
      * @param int $user_id User id;
