@@ -1,9 +1,7 @@
 21.11.25
 
 - option d'exporter la db vers excel sheet pour owner of db ?
-- send keys to user by way of mail to register. - pre-register emails in db ?
- 
-- accept only HEdS email ?.
+
 - contact us field.
 
 - test option : send confirmation email the first time logged in.

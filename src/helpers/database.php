@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\helpers;
@@ -94,6 +94,8 @@ class Database
  */
 class ArticleQueries
 {
+
+
     private PDO $pdo;
 
     function __construct(PDO $pdo)
@@ -136,6 +138,32 @@ class ArticleQueries
         list(,, $error) = $preparedStatement->errorInfo();
         error_log(USER_ARTICLES_DELETE . $error . PHP_EOL);
         return false;
+    }
+
+    /**
+     * Return orderby query element.
+     * 
+     * @param int $const ArtOrder const value.
+     * @return Array orderby string parameters.
+     */
+    private static function getOrderParameters(int $const): array
+    {
+        switch ($const) {
+            case DATE_ASC:
+                return ['expiration_date', 'ASC'];
+            case DATE_DESC:
+                return ['expiration_date', 'DESC'];
+            case LOCATION_ASC:
+                return ['location', 'ASC'];
+            case LOCATION_DESC:
+                return ['location', 'DESC'];
+            case NAME_ASC:
+                return ['article_name', 'ASC'];
+            case NAME_DESC:
+                return ['article_name', 'DESC'];
+            default:
+                return ['expiration_date', 'ASC'];
+        }
     }
 
     /**
@@ -284,9 +312,9 @@ class ArticleQueries
      * @param int $orderby Order parameter. Use ArtOrder constants as parameter.
      * @return array An array of articles.
      */
-    public function queryAllByUser(int $user_id, int $limit, int $offset = 0, int $orderby = ArtOrder::DATE_DESC): array
+    public function queryAllByUser(int $user_id, int $limit, int $offset = 0, int $orderby = DATE_DESC): array
     {
-        [$order_column, $order_dir] = ArtOrder::getOrderParameters($orderby);
+        [$order_column, $order_dir] = ArticleQueries::getOrderParameters($orderby);
 
         //Only data can be bound inside $preparedStatement, order-by params must be set before in the query string.
         $query_str = sprintf('SELECT 
@@ -538,6 +566,32 @@ class UserQueries
         return false;
     }
 
+    /**
+     * Return orderby query element.
+     * 
+     * @param int $const UserOrder const value.
+     * @return Array orderby string parameters.
+     */
+    private static function getOrderParameters(int $const): array
+    {
+        switch ($const) {
+            case CREATED_ASC:
+                return ['creation_date', 'ASC'];
+            case CREATED_DESC:
+                return ['creation_date', 'DESC'];
+            case EMAIL_ASC:
+                return ['email', 'ASC'];
+            case EMAIL_DESC:
+                return ['email', 'DESC'];
+            case LOGIN_ASC:
+                return ['last_login', 'ASC'];
+            case LOGIN_DESC:
+                return ['last_login', 'DESC'];
+            default:
+                return ['email', 'ASC'];
+        }
+    }
+
     /**     
      * Insert a User into the database.
      * 
@@ -674,14 +728,16 @@ class UserQueries
      * @param int $orderby Order parameter. Use UserOrder constants as parameter.
      * @return array Array of users.
      */
-    public function queryAll(int $limit, int $offset = 0, int $orderby = UserOrder::EMAIL_ASC, bool $excludeAdmins = true): array
+    public function queryAll(int $limit, int $offset = 0, int $orderby = EMAIL_ASC, bool $excludeAdmins = true): array
     {
-        [$order_column, $order_dir] = UserOrder::getOrderParameters($orderby);
+        [$order_column, $order_dir] = UserQueries::getOrderParameters($orderby);
 
         // //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.
         $query_str = 'SELECT 
              id, 
+             alias,
              contact_email,
+             contact_delay,
              email, 
              password, 
              creation_date,
@@ -819,83 +875,5 @@ class UserQueries
         list(,, $error) = $preparedStatement->errorInfo();
         error_log(USER_PASSWORD_UPDATE  . $error . PHP_EOL);
         return false;
-    }
-}
-
-/**
- * Order enum implemented as const of a class.
- */
-class ArtOrder
-{
-    const DATE_ASC = 0;
-    const DATE_DESC = 1;
-    const LOCATION_ASC = 2;
-    const LOCATION_DESC = 3;
-    const NAME_ASC = 4;
-    const NAME_DESC = 5;
-
-    /**
-     * Return orderby query element.
-     * 
-     * @param int $const ArtOrder const value.
-     * @return Array orderby string parameters.
-     */
-    public static function getOrderParameters(int $const): array
-    {
-        switch ($const) {
-            case ArtOrder::DATE_ASC:
-                return ['expiration_date', 'ASC'];
-            case ArtOrder::DATE_DESC:
-                return ['expiration_date', 'DESC'];
-            case ArtOrder::LOCATION_ASC:
-                return ['location', 'ASC'];
-            case ArtOrder::LOCATION_DESC:
-                return ['location', 'DESC'];
-            case ArtOrder::NAME_ASC:
-                return ['article_name', 'ASC'];
-            case ArtOrder::NAME_DESC:
-                return ['article_name', 'DESC'];
-            default:
-                return ['expiration_date', 'ASC'];
-        }
-    }
-}
-
-/**
- * Order enum implemented as const of a class.
- */
-class UserOrder
-{
-    const CREATED_ASC = 0;
-    const CREATED_DESC = 1;
-    const EMAIL_ASC = 2;
-    const EMAIL_DESC = 3;
-    const LOGIN_ASC = 4;
-    const LOGIN_DESC = 5;
-
-    /**
-     * Return orderby query element.
-     * 
-     * @param int $const UserOrder const value.
-     * @return Array orderby string parameters.
-     */
-    public static function getOrderParameters(int $const): array
-    {
-        switch ($const) {
-            case UserOrder::CREATED_ASC:
-                return ['creation_date', 'ASC'];
-            case UserOrder::CREATED_DESC:
-                return ['creation_date', 'DESC'];
-            case UserOrder::EMAIL_ASC:
-                return ['email', 'ASC'];
-            case UserOrder::EMAIL_DESC:
-                return ['email', 'DESC'];
-            case UserOrder::LOGIN_ASC:
-                return ['last_login', 'ASC'];
-            case UserOrder::LOGIN_DESC:
-                return ['last_login', 'DESC'];
-            default:
-                return ['email', 'ASC'];
-        }
     }
 }

@@ -11,7 +11,8 @@
     </div>
     <br>
 
-    <div>Voici votre nouveau mot de passe pour vous connecter à l'application [<?php echo $app_name ?>]: </div>
+    <div>Un compte utilisateur pour l'application [<?php echo $app_name ?>] a été créé pour votre bénéfice.</div>
+    <div>Votre mot de passe: </div>
     <br> <br>
     <div> <span style="color:blue;font-size:24px;">&emsp; <?php echo $password ?></span> </div>
     <br><br>

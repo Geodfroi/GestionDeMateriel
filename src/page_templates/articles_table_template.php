@@ -1,9 +1,7 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
-
-use app\helpers\ArtOrder;
 
 $page = $_SESSION[ART_PAGE];
 
@@ -18,21 +16,21 @@ function disCaretArt(string $header): string
     $orderby = $_SESSION[ART_ORDERBY];
 
     if ($header === 'article') {
-        if ($orderby === ArtOrder::NAME_ASC) {
+        if ($orderby === NAME_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === ArtOrder::NAME_DESC) {
+        } else if ($orderby === NAME_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'location') {
-        if ($orderby === ArtOrder::LOCATION_ASC) {
+        if ($orderby === LOCATION_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === ArtOrder::LOCATION_DESC) {
+        } else if ($orderby === LOCATION_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'per_date') {
-        if ($orderby === ArtOrder::DATE_ASC) {
+        if ($orderby === DATE_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === ArtOrder::DATE_DESC) {
+        } else if ($orderby === DATE_DESC) {
             return 'bi-caret-down';
         }
     }
@@ -54,11 +52,11 @@ function disLinkArt(string $header): string
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
     if ($header === 'article') {
 
-        return $orderby === ArtOrder::NAME_ASC ? $root . ArtOrder::NAME_DESC : $root . ArtOrder::NAME_ASC;
+        return $orderby === NAME_ASC ? $root . NAME_DESC : $root . NAME_ASC;
     } else if ($header === 'location') {
-        return $orderby === ArtOrder::LOCATION_ASC ? $root . ArtOrder::LOCATION_DESC : $root . ArtOrder::LOCATION_ASC;
+        return $orderby === LOCATION_ASC ? $root . LOCATION_DESC : $root . LOCATION_ASC;
     } else if ($header === 'per_date') {
-        return $orderby === ArtOrder::DATE_DESC ? $root . ArtOrder::DATE_ASC : $root . ArtOrder::DATE_DESC;
+        return $orderby === DATE_DESC ? $root . DATE_ASC : $root . DATE_DESC;
     }
     return '';
 }

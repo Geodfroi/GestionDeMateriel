@@ -118,6 +118,30 @@ class User
         return $this->last_login;
     }
 
+    /**
+     * @return string Recipient string to be used in email body.
+     */
+    public function getMailingAlias(): string
+    {
+        if ($this->getAlias()) {
+            return $this->getAlias();
+        }
+        return $this->getEmail();
+    }
+
+    /**
+     * Addresses where emails will be sent.
+     */
+    public function getMailingAddresses(): array
+    {
+        $emails = [];
+        array_push($emails, $this->getEmail());
+        if ($this->getContactEmail()) {
+            array_push($emails, $this->getContactEmail());
+        }
+        return $emails;
+    }
+
     public function getPassword(): string
     {
         return $this->password_hash;

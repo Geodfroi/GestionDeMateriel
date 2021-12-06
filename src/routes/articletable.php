@@ -1,12 +1,11 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\routes;
 
-use app\helpers\ArtOrder;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 
@@ -27,7 +26,7 @@ class ArticleTable extends BaseRoute
         }
 
         $_SESSION[ART_PAGE] ??= 1;
-        $_SESSION[ART_ORDERBY] ??= ArtOrder::DATE_DESC;
+        $_SESSION[ART_ORDERBY] ??= DATE_DESC;
 
         if (isset($_GET['alert'])) {
 

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.05 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\helpers;
@@ -24,6 +24,20 @@ class Util
     public static function encryptPassword(string $password_plain): string
     {
         return password_hash($password_plain, PASSWORD_BCRYPT);
+    }
+
+    /**
+     * Generate a valid random password.
+     */
+    public static function getRandomPassword()
+    {
+        $password_candidate = Util::randomString(DEFAULT_PASSWORD_LENGTH);
+        $has_number = preg_match('@[0-9]@', $password_candidate);
+        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
+        if ($has_number && $has_letters) {
+            return $password_candidate;
+        }
+        return $this->getRandomPassword();
     }
 
     /**

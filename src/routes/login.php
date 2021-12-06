@@ -1,13 +1,15 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\routes;
 
 use app\helpers\Database;
 use app\helpers\Authenticate;
+use app\helpers\Mailing;
+use app\helpers\Util;
 
 /**
  * Route class containing behavior linked to login_template
@@ -39,10 +41,23 @@ class Login extends BaseRoute
             $user = Database::users()->queryByEmail($email);
 
             if (isset($user)) {
-                // Un nouveau mot de passe a été envoyé à '<?php echo $values['email'] 
-                // $this->handleNewPasswordRequest($user->getEmail());
-                $this->setAlert(AlertType::FAILURE, LOGIN_RENEW);
+                $former_password = $user->getPassword();
+
+                $plain_password = Util::getRandomPassword();
+                $encrypted = Util::encryptPassword($plain_password);
+
+                if (Database::users()->updatePassword($user->getId(), $encrypted)) {
+
+                    if (Mailing::passwordChangeNotification($user,  $plain_password)) {
+                        $this->setAlert(AlertType::SUCCESS, LOGIN_NEW_PASSWORD_SUCCESS);
+                        goto end;
+                    } else {
+                        // attempt to roll back change.
+                        Database::users()->updatePassword($user->getId(), $former_password);
+                    }
+                }
             }
+            $this->setAlert(AlertType::FAILURE, LOGIN_NEW_PASSWORD_FAILURE);
             goto end;
         }
 
@@ -110,15 +125,5 @@ class Login extends BaseRoute
             return false;
         }
         return true;
-    }
-
-    /**
-     * Send a new password to user and register new password to database
-     * 
-     * @param string $email User email.
-     */
-    private function handleNewPasswordRequest($email)
-    {
-        echo 'login_route:: handleNewPasswordRequest not implemented';
     }
 }

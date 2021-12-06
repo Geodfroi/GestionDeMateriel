@@ -8,7 +8,6 @@ namespace app\routes;
 
 use app\helpers\Authenticate;
 use app\helpers\Database;
-use app\helpers\UserOrder;
 
 /**
  * Route class containing behavior linked to admin_template. This route handles all admin related tasks.
@@ -27,7 +26,7 @@ class UserTable extends BaseRoute
         }
 
         $_SESSION[USERS_PAGE] ??= 1;
-        $_SESSION[USERS_ORDERBY] ??= UserOrder::EMAIL_ASC;
+        $_SESSION[USERS_ORDERBY] ??= EMAIL_ASC;
 
         if (isset($_GET['alert'])) {
             if ($_GET['alert'] === 'added_success') {

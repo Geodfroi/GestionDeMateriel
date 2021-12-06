@@ -1,21 +1,20 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 // App constants
 const APP_NAME = "HEdS Gestionnaire d'inventaire";
-const APP_EMAIL_SENDER = "HedS: gestion d'inventaire.";
-
-const LAST_MODIFICATION = '05 décembre 2021';
+const APP_FULL_URL = "http://localhost:8085/";
+const LAST_MODIFICATION = '06 décembre 2021';
 
 const EMAIL_TEMPLATES_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'email_templates';
 const TEMPLATES_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'page_templates';
 
 const ALIAS_MIN_LENGHT = 6;
 const ARTICLE_NAME_MIN_LENGHT = 6;
-const ARTICLE_NAME_MAX_LENGTH = 20;
+const ARTICLE_NAME_MAX_LENGTH = 40;
 
 const ARTICLE_COMMENTS_MAX_LENGHT = 240;
 const ARTICLE_DATE_FUTURE_LIMIT = '2050-01-01';
@@ -29,7 +28,9 @@ const DEFAULT_PASSWORD_LENGTH = 12;
 const USER_PASSWORD_MIN_LENGTH = 8;
 
 // emails
+const EMAIL_SENDER = "HEdS: gestion d'inventaire.";
 const EMAIL_SUBJECT_NEW_PASSWORD = "HEdS - Gestion d'inventaire: votre nouveau mot de passe";
+const EMAIL_PEREMPTION_REMINDER = "HEdS - Gestion d'inventaire: ces articles arrivent à péremption";
 
 // routes
 const ADMIN = '/admin';
@@ -63,6 +64,21 @@ const ART_PAGE = 'articles_page';
 
 const ADMIN_ID = 'admin_id';
 const USER_ID = 'user_id';
+
+//Database queries
+const DATE_ASC = 0;
+const DATE_DESC = 1;
+const LOCATION_ASC = 2;
+const LOCATION_DESC = 3;
+const NAME_ASC = 4;
+const NAME_DESC = 5;
+
+const CREATED_ASC = 0;
+const CREATED_DESC = 1;
+const EMAIL_ASC = 2;
+const EMAIL_DESC = 3;
+const LOGIN_ASC = 4;
+const LOGIN_DESC = 5;
 
 //Database errors
 const ARTICLE_DELETE = 'failure to delete article from database: ';
@@ -126,7 +142,8 @@ const LOCATION_PRESET_EXISTS = "Cet emplacement est déjà présent dans la list
 
 //login alerts
 const LOGIN_USER_DISC = "L'usager précédent s'est déconnecté.";
-const LOGIN_RENEW = "renew-password not implemented";
+const LOGIN_NEW_PASSWORD_FAILURE = "Le changement de mot de passe a échoué.";
+const LOGIN_NEW_PASSWORD_SUCCESS = "Un nouveau mot de passe a été envoyé dans votre boîte email.";
 
 //login errors
 const LOGIN_EMAIL_EMPTY = 'Un e-mail est nécessaire pour vous connecter.';

@@ -12,13 +12,10 @@ require_once __DIR__ . '/../p_settings.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
 use app\helpers\Database;
-use app\helpers\UserOrder;
 use app\helpers\Mailing;
 
-use DateTime;
-
 $articles = Database::articles()->queryAll();
-$users = Database::users()->queryAll(9999, 0, UserOrder::CREATED_ASC, false);
+$users = Database::users()->queryAll(9999, 0, CREATED_ASC, false);
 $today = new DateTime();
 
 // iterate through users and articles to flag articles that are soon due.
@@ -26,6 +23,8 @@ foreach ($users as $user) {
     echo PHP_EOL . PHP_EOL;
 
     $delays = $user->getContactDelays();
+
+
     $reminders = [];
 
     foreach ($articles as $article) {
@@ -49,18 +48,12 @@ foreach ($users as $user) {
             } else {
             }
         }
-
-        // echo $article->getExpirationDate()->format('Y-m-d') . PHP_EOL;
-        // echo $interval->format('days: %r%a') . PHP_EOL . PHP_EOL;
     }
 
-    Mailing::peremptionNotification();
-
-    //send reminder emails
-    foreach ($reminders as $reminder) {
-        // echo 'count: ' . count($reminders) . PHP_EOL;
-        echo $reminder['article']->getArticleName() . PHP_EOL;
-        echo $reminder['delay'] .  PHP_EOL .  PHP_EOL .  PHP_EOL;
-        // var_dump($rem);
+    if (!Mailing::peremptionNotification($recipient, $emails, $reminders)) {
+        error_log('peremption notification failed');
+        return;
     }
+
+    // echo Mailing::peremptionNotificationBody($recipient, $reminders);
 }

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\routes;
@@ -50,30 +50,16 @@ class UserEdit extends BaseRoute
                     return '';
                 }
             } else if (isset($_POST['regen-password'])) {
-                $password = $this->getRandomPassword();
+                $password = Util::getRandomPassword();
                 $this->validate_email($email);
             }
         }
 
         return $this->renderTemplate([
             'email' => $email ?? '',
-            'password' => $password ?? $this->getRandomPassword(),
+            'password' => $password ?? Util::getRandomPassword(),
             'is-admin' => $is_admin  ?? false,
         ]);
-    }
-
-    /**
-     * Generate a valid random password.
-     */
-    private function getRandomPassword()
-    {
-        $password_candidate = Util::randomString(DEFAULT_PASSWORD_LENGTH);
-        $has_number = preg_match('@[0-9]@', $password_candidate);
-        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
-        if ($has_number && $has_letters) {
-            return $password_candidate;
-        }
-        return $this->getRandomPassword();
     }
 
     /**

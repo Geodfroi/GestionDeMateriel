@@ -7,9 +7,9 @@ declare(strict_types=1);
 ##############################
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh 
 
+use app\helpers\Mailing;
 use app\helpers\Util;
 use app\routes\Routes;
-use app\helpers\Mailing;
 
 require_once __DIR__ . '/../src/const.php';
 require_once __DIR__ . '/../p_settings.php';
@@ -27,9 +27,10 @@ if ($route = Routes::getRoute()) {
         $templateData['page_content'] = $route->getBodyContent();
     }
 }
-
 // insert dynamically generated html content into the main template.
 echo Util::renderTemplate('main_template', $templateData, TEMPLATES_PATH);
 
-// test email body
-// echo Mailing::passwordChangeNotificationBody('Johnny', '123123');
+//test server in browser
+// require_once __DIR__ . '/../server/server.php';
+
+// echo Mailing::passwordChangeNotificationBody('Bunny', '123123123');

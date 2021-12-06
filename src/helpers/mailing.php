@@ -13,6 +13,7 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 use app\helpers\Util;
+use app\models\User;
 
 /**
  * static functions connected to emails bundled together in a class
@@ -36,45 +37,60 @@ class Mailing
     /**
      * Send a password change notification to the user mail box.
      * 
-     * @param string $user User alias or email address.
+     * @param User $user Email recipient.
      * @param array $emails Message will be sent to those addresses.
      * @param string $password New password in plain text.
      * @return bool True if emails are sent correctly.
      */
-    public static function passwordChangeNotification(string $user, array $emails, string $password): bool
+    public static function passwordChangeNotification(User $user, string $password): bool
     {
-        $html =  Mailing::passwordChangeNotificationBody($user, $password);
-        return Mailing::send($emails, EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
+        $html =  Mailing::passwordChangeNotificationBody($user->getMailingAlias(), $password);
+        return Mailing::send($user->getMailingAddresses(), EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
     }
 
     /**
      * Return formatted body for password change.
      * 
-     * @param string $user User alias or email address.
+     * @param string $recipient User alias or email address.
      * @param string $password New password in plain text.
      * @return string Html body.
      */
-    public static function passwordChangeNotificationBody(string $user, string $password): string
+    public static function passwordChangeNotificationBody(string $recipient, string $password): string
     {
         return Mailing::formatEmail('newpassword', [
-            'username' => $user,
+            'username' => $recipient,
             'app_name' => APP_NAME,
-            'password' => $password
+            'password' => $password,
+            'url' => APP_FULL_URL,
         ]);
     }
 
     /**
      * Send an email to user to remind them of soon to be expired items.
+     * 
+     * @param User $user Email recipient.
+     * @param array $reminders Associative array containing 'article' and 'delay' keys.
+     * @return bool True if emails are sent correctly.
      */
-    public static function peremptionNotification(): bool
+    public static function peremptionNotification(User $user, array $reminders): bool
     {
+        $html =  Mailing::peremptionNotificationBody($user->getMailingAlias(), $reminders);
+        return Mailing::send($user->getMailingAddresses(), EMAIL_PEREMPTION_REMINDER,  $html, '');
     }
 
     /**
      * Return formatted body for peremption notification.
+     * 
+     * @param string $recipient User alias or email address.
+     * @param array $reminders Associative array containing 'article' and 'delay' keys.
+     * @return string Html body.
      */
-    public static function peremptionNotificationBody(): string
+    public static function peremptionNotificationBody(string $recipient, array $reminders): string
     {
+        return Mailing::formatEmail('reminder', [
+            'username' => $recipient,
+            'reminders' => $reminders
+        ]);
     }
 
     /**
@@ -106,7 +122,7 @@ class Mailing
             $mail->Password = APP_EMAIL_PASSWORD;
 
             // Sender and recipient settings
-            $mail->setFrom(APP_EMAIL, APP_EMAIL_SENDER);
+            $mail->setFrom(APP_EMAIL, EMAIL_SENDER);
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }

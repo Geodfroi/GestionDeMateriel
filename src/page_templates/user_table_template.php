@@ -1,9 +1,8 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
-use app\helpers\UserOrder;
 
 $page = $_SESSION[USERS_PAGE];
 
@@ -17,21 +16,21 @@ function disCaretAdm(string $header): string
 {
     $orderby = $_SESSION[USERS_ORDERBY];
     if ($header === 'email') {
-        if ($orderby === UserOrder::EMAIL_DESC) {
+        if ($orderby === EMAIL_DESC) {
             return 'bi-caret-down';
-        } else if ($orderby === UserOrder::EMAIL_ASC) {
+        } else if ($orderby === EMAIL_ASC) {
             return 'bi-caret-up';
         }
     } else if ($header === 'login') {
-        if ($orderby === UserOrder::LOGIN_DESC) {
+        if ($orderby === LOGIN_DESC) {
             return 'bi-caret-down';
-        } else if ($orderby === UserOrder::LOGIN_ASC) {
+        } else if ($orderby === LOGIN_ASC) {
             return 'bi-caret-up';
         }
     } else if ($header === 'creation') {
-        if ($orderby === UserOrder::CREATED_DESC) {
+        if ($orderby === CREATED_DESC) {
             return 'bi-caret-down';
-        } else if ($orderby === UserOrder::CREATED_ASC) {
+        } else if ($orderby === CREATED_ASC) {
             return 'bi-caret-up';
         }
     }
@@ -52,11 +51,11 @@ function disLinkAdm(string $header): string
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie creation is listed most recent first.
     if ($header === 'email') {
-        return $orderby === UserOrder::EMAIL_ASC ? $root . UserOrder::EMAIL_DESC : $root . UserOrder::EMAIL_ASC;
+        return $orderby === EMAIL_ASC ? $root . EMAIL_DESC : $root . EMAIL_ASC;
     } else if ($header === 'login') {
-        return $orderby === UserOrder::LOGIN_DESC ? $root . UserOrder::LOGIN_ASC : $root . UserOrder::LOGIN_DESC;
+        return $orderby === LOGIN_DESC ? $root . LOGIN_ASC : $root . LOGIN_DESC;
     } else if ($header === 'creation') {
-        return $orderby === UserOrder::CREATED_DESC ? $root . UserOrder::CREATED_ASC : $root . UserOrder::CREATED_DESC;
+        return $orderby === CREATED_DESC ? $root . CREATED_ASC : $root . CREATED_DESC;
     }
     return '';
 }
