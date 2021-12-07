@@ -72,8 +72,7 @@ use app\helpers\Authenticate;
         <div>MAIN: backup db</div>
         <div>ADMIN - access user contact posts.</div>
         <div>ADMIN - create new email to user.</div>
-        <div>ARTICLES: color scheme for dates / peremption</div>
-        <div>ARTICLES: filters</div>
+        <div>ARTICLES: filter with created by</div>
         <div>ARTICLES: fixed column size</div>
         <div>ARTICLES: better adaptive layout</div>
         <div>CONTACT: create contact page</div>

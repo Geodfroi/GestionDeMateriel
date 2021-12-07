@@ -52,10 +52,10 @@ class Filter
                 return "WHERE article_name LIKE CONCAT('%', :fil, '%')";
             case Filter::LOCATION:
                 return "WHERE location LIKE CONCAT('%', :fil, '%')";
-                // case Filter::DATE_BEFORE:
-                //     break;
-                // case Filter::DATE_AFTER:
-                //     break;
+            case Filter::DATE_BEFORE:
+                return "WHERE expiration_date < :fil";
+            case Filter::DATE_AFTER:
+                return "WHERE expiration_date > :fil";
             default:
                 break;
         }

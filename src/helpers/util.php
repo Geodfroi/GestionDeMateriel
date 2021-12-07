@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\helpers;
@@ -11,6 +11,8 @@ namespace app\helpers;
 use app\constants\Error;
 use app\constants\Settings;
 use app\routes\BaseRoute;
+
+use DateTime;
 
 /**
  * Utility class containing useful static functions.
@@ -26,6 +28,23 @@ class Util
     public static function encryptPassword(string $password_plain): string
     {
         return password_hash($password_plain, PASSWORD_BCRYPT);
+    }
+
+    /**
+     * Get number of days until date.
+     * 
+     * @param DateTime $date.
+     * @return int Return number of days>; 0 if date is already past.
+     */
+    public static function getDaysUntil(DateTime $date): int
+    {
+        $today = new DateTime();
+        $interval = $today->diff($date);
+        if ($interval->invert) {
+            // interval is negative: expiration date is already past.
+            return 0;
+        }
+        return intval($interval->format('%a'));
     }
 
     /**

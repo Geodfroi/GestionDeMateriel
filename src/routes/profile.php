@@ -9,6 +9,7 @@ namespace app\routes;
 use app\constants\Alert;
 use app\constants\Error;
 use app\constants\Route;
+use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -187,8 +188,8 @@ class Profile extends BaseRoute
         if ($alias === '') {
             return true;
         }
-        if (strlen($alias) < ALIAS_MIN_LENGHT) {
-            $this->setError('alias', sprintf(Error::ALIAS_TOO_SHORT, ALIAS_MIN_LENGHT));
+        if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
+            $this->setError('alias', sprintf(Error::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
             return false;
         }
         return true;

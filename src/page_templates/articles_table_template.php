@@ -8,6 +8,7 @@ use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Database;
+use app\helpers\Util;
 use app\models\Article;
 
 
@@ -68,7 +69,7 @@ function disLinkArt(string $header): string
     } else if ($header === 'location') {
         return $orderby === OrderBy::LOCATION_ASC ? $root . OrderBy::LOCATION_DESC : $root . OrderBy::LOCATION_ASC;
     } else if ($header === 'per_date') {
-        return $orderby === OrderBy::DATE_DESC ? $root . OrderBy::DATE_ASC : $root . OrderBy::DATE_DESC;
+        return $orderby === OrderBy::DATE_ASC ? $root . OrderBy::DATE_DESC : $root . OrderBy::DATE_ASC;
     } else if ($header === 'owner') {
         return $root . OrderBy::OWNED_BY;
     }
@@ -120,7 +121,8 @@ function getOwner(Article $article): string
                                 <?php echo Filter::getLabel(FILTER::DATE_AFTER) ?></span></li>
                     </ul>
 
-                    <input id="filter-val" name="filter-val" class="form-control" type="search" placeholder="filtre" aria-label="Filter" value="<?php echo $filter_val ?>">
+                    <input id="filter-val" name="filter-val" class="form-control" type="date" placeholder="filtre" aria-label="Filter" value="<?php echo $filter_val ?>">
+
                     <button class="btn btn-primary" type="submit" name="filter">Filtrer</button>
             </form>
         </div>
@@ -145,17 +147,44 @@ function getOwner(Article $article): string
             </thead>
             <tbody>
                 <?php for ($n = 0; $n < count($articles); $n++) {
-                    $article = $articles[$n]; ?>
+                    $article = $articles[$n];
+                    $day_until = Util::getDaysUntil($article->getExpirationDate()); ?>
+
                     <tr>
+                        <!-- <?php if ($day_until <= 3) { ?>
+                        <tr class="bg-danger">
+                        <?php } elseif ($day_until <= 7) { ?>
+                        <tr class="bg-warning">
+                        <?php } else { ?>
+                        <tr>
+                        <?php } ?> -->
+
+                        <!-- Article -->
                         <td><?php echo $article->getArticleName()  ?>
                             <?php if (strlen($article->getComments()) > 0) { ?>
                                 <span class="bi-text-left text-info" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span>
                             <?php } ?>
                         </td>
                         <td><?php echo $article->getLocation() ?></td>
-                        <td><?php echo $article->getExpirationDate()->format('d/m/Y') ?></td>
-                        <td><?php echo getOwner($article) ?></td>
 
+                        <!-- Date de péremption -->
+                        <td>
+                            <?php echo $article->getExpirationDate()->format('d/m/Y') ?>
+                            <span>&emsp;</span>
+
+                            <?php if ($day_until <= 3) { ?>
+                                <span class="bg-dark text-danger mark"><?php echo sprintf('%s jour(s)', $day_until) ?>&ensp;<i class="bi bi-exclamation-triangle-fill"></i></span>
+                            <?php } elseif ($day_until <= 7) { ?>
+                                <span class="bg-dark text-warning mark"><?php echo sprintf('%s jour(s)', $day_until) ?>&ensp;<i class="bi bi-exclamation-circle-fill"></i></span>
+                            <?php } else { ?>
+                                <span><?php echo sprintf('%s jour(s)', $day_until) ?></span>
+                            <?php } ?>
+
+                        </td>
+
+                        <!-- Créé par -->
+                        <td><?php echo getOwner($article) ?></td>
+                        <!-- Actions -->
                         <td>
                             <a class="link-secondary" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
                             <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
@@ -219,12 +248,25 @@ function getOwner(Article $article): string
     let filter_type_input = document.getElementById('filter-type');
     let filter_val_input = document.getElementById('filter-val');
 
+    //change input type depending on filter-type.
+    function changeInputFieldType() {
+        //Warning: use loose equality here -> compare str and int values.
+        if (filter_type_input.value == <?php echo Filter::ARTICLE_NAME ?> || filter_type_input.value == <?php echo Filter::LOCATION ?>) {
+            filter_val_input.type = 'search';
+        } else {
+            filter_val_input.type = 'date';
+        }
+    }
+
+    changeInputFieldType();
+
     let collection = document.getElementsByClassName('filter-item');
     for (let index = 0; index < collection.length; index++) {
         const element = collection[index];
         element.addEventListener('click', e => {
             btn.innerText = element.innerText;
             filter_type_input.value = parseInt(element.id);
+            changeInputFieldType();
             filter_val_input.value = '';
         });
     }

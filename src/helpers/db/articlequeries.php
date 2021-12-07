@@ -14,7 +14,6 @@ use app\constants\Error;
 use app\constants\Filter;
 use app\constants\OrderBy;
 use app\models\Article;
-use DateTime;
 
 /**
  * Regroup function to interact with article table.
@@ -188,6 +187,7 @@ class ArticleQueries
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DATE_DESC, int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): array
     {
         $filter_arg = trim($filter_arg);
+        error_log('arg: ' . $filter_arg);
         $filter_statement = $filter_arg ? Filter::printStatement($filter_type) : '';
         $order_q = OrderBy::getOrderParameters($orderby);
 
