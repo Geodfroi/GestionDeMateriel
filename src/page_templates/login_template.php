@@ -3,6 +3,7 @@
 ## Joël Piguet - 2021.12.01 ###
 ##############################
 
+use app\constants\Route;
 use app\helpers\TUtil;
 
 ?>
@@ -55,7 +56,7 @@ use app\helpers\TUtil;
         <div class="col-6 mx-auto">
             <!-- Display a link to propose to send a new password to email. -->
             <?php if (isset($errors['password']) && strlen($email) > 0) { ?>
-                <a href='<?php echo LOGIN . '?old-email=' . $email ?>'>Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
+                <a href='<?php echo Route::LOGIN . '?old-email=' . $email ?>'>Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
             <?php } ?>
         </div>
     </div>

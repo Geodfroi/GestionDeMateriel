@@ -6,6 +6,7 @@
 
 namespace app\routes;
 
+use app\constants\Route;
 use app\helpers\Authenticate;
 
 /**
@@ -15,19 +16,19 @@ class Home extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('', HOME);
+        parent::__construct('', Route::HOME);
     }
 
     public function getBodyContent(): string
     {
         if (Authenticate::isLoggedIn()) {
             if (Authenticate::isAdmin()) {
-                $this->requestRedirect(ADMIN);
+                $this->requestRedirect(Route::ADMIN);
             } else {
-                $this->requestRedirect(ART_TABLE);
+                $this->requestRedirect(Route::ART_TABLE);
             }
         } else {
-            $this->requestRedirect(LOGIN);
+            $this->requestRedirect(Route::LOGIN);
         }
         return '';
     }

@@ -6,6 +6,9 @@
 
 namespace app\routes;
 
+use app\constants\Alert;
+use app\constants\Error;
+use app\constants\Route;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -14,21 +17,21 @@ class LocationList extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(LOC_PRESETS_TEMPLATE, LOCAL_PRESETS);
+        parent::__construct('location_presets_template', Route::LOCAL_PRESETS);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(LOGIN);
+            $this->requestRedirect(Route::LOGIN);
         }
 
         if (isset($_GET['delete'])) {
 
             if (Database::locations()->delete($_GET['delete'])) {
-                $this->setAlert(AlertType::SUCCESS, LOC_PRESET_REMOVE_SUCCESS);
+                $this->setAlert(AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
             } else {
-                $this->setAlert(AlertType::FAILURE, LOC_PRESET_REMOVE_FAILURE);
+                $this->setAlert(AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
             }
             goto end;
         }
@@ -46,12 +49,12 @@ class LocationList extends BaseRoute
             if (Util::validateLocation($this, $location_field)) {
 
                 if (Database::locations()->contentExists($location_field)) {
-                    $this->setError('location', LOCATION_PRESET_EXISTS);
+                    $this->setError('location', Error::LOCATION_PRESET_EXISTS);
                 } else {
                     if (Database::locations()->insert($location_field)) {
                         $location_field = '';
                     } else {
-                        $this->setAlert(AlertType::FAILURE, LOCATION_PRESET_INSERT);
+                        $this->setAlert(AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
                     }
                 }
             }
@@ -75,13 +78,13 @@ class LocationList extends BaseRoute
             }
 
             if (Database::locations()->contentExists($location_field)) {
-                $this->setError('location', LOCATION_PRESET_EXISTS);
+                $this->setError('location', Error::LOCATION_PRESET_EXISTS);
                 $selected =  $id; // $location_field will still be filled -> stay in update mode.
                 goto end;
             }
 
             if (Database::locations()->update($id, $location_field)) {
-                $this->setAlert(AlertType::SUCCESS, LOC_PRESET_UPDATE_SUCCESS);
+                $this->setAlert(AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
                 $location_field = ''; // $selected = 0 -> return to normal list display.
                 goto end;
             }

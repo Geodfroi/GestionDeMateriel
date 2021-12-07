@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\helpers;
@@ -11,9 +11,14 @@ namespace app\helpers;
 use \PDO;
 use PDOException;
 
+use app\constants\Error;
+use app\constants\Filter;
+use app\constants\OrderBy;
+use app\constants\P_Settings;
 use app\models\User;
 use app\models\Article;
 use app\models\StringContent;
+
 
 /**
  * Database class accessible throughout the application by calling it'ss get_instance() method. 
@@ -31,11 +36,11 @@ class Database
     function __construct()
     {
         try {
-            $dsn = 'mysql:host=' . HOST . ';port=' . PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+            $dsn = 'mysql:host=' . P_Settings::HOST . ';port=' . P_Settings::PORT . ';dbname=' . P_Settings::DB_NAME . ';charset=utf8mb4';
             $options = [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ];
-            $pdo = new PDO($dsn, DB_ADMIN_ID, DB_ADMIN_PASSWORD, $options);
+            $pdo = new PDO($dsn, P_Settings::DB_ADMIN_ID, P_Settings::DB_ADMIN_PASSWORD, $options);
             $this->locations = new LocationQueries($pdo);
             $this->users = new UserQueries($pdo);
             $this->articles = new ArticleQueries($pdo);
@@ -117,7 +122,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(ARTICLE_DELETE . $error . PHP_EOL);
+        error_log(error::ARTICLE_DELETE . $error . PHP_EOL);
         return false;
     }
 
@@ -135,37 +140,11 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_ARTICLES_DELETE . $error . PHP_EOL);
+        error_log(Error::USER_ARTICLES_DELETE . $error . PHP_EOL);
         return false;
     }
 
-    /**
-     * Return orderby query element.
-     * 
-     * @param int $const ArtOrder const value.
-     * @return Array orderby string parameters.
-     */
-    private static function getOrderParameters(int $const): array
-    {
-        switch ($const) {
-            case DATE_ASC:
-                return ['expiration_date', 'ASC'];
-            case DATE_DESC:
-                return ['expiration_date', 'DESC'];
-            case LOCATION_ASC:
-                return ['location', 'ASC'];
-            case LOCATION_DESC:
-                return ['location', 'DESC'];
-            case NAME_ASC:
-                return ['article_name', 'ASC'];
-            case NAME_DESC:
-                return ['article_name', 'DESC'];
-            case OWNED_BY:
-                return ['user_id', 'ASC'];
-            default:
-                return ['expiration_date', 'ASC'];
-        }
-    }
+
 
     /**
      * Insert an article into the database.
@@ -206,7 +185,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(ARTICLE_INSERT . $error . PHP_EOL);
+        error_log(Error::ARTICLE_INSERT . $error . PHP_EOL);
         return false;
     }
 
@@ -225,7 +204,7 @@ class ArticleQueries
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(ARTICLES_COUNT_QUERY . $error . PHP_EOL);
+        error_log(Error::ARTICLES_COUNT_QUERY . $error . PHP_EOL);
         return -1;
     }
 
@@ -255,11 +234,11 @@ class ArticleQueries
             if ($data) {
                 return Article::fromDatabaseRow($data);
             } else {
-                error_log(sprintf(ARTICLE_QUERY, $id));
+                error_log(sprintf(Error::ARTICLE_QUERY, $id));
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(sprintf(ARTICLE_QUERY, $id) . $error . PHP_EOL);
+            error_log(sprintf(Error::ARTICLE_QUERY, $id) . $error . PHP_EOL);
         }
 
         return null;
@@ -270,12 +249,13 @@ class ArticleQueries
      * 
      * @param int $limit The maximum number of items to be returned.
      * @param int $offset The number of result items to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use ArtOrder constants as parameter.
+     * @param int $orderby Order parameter. Use OrderBy constants as parameter.
+     * @param int $filter_type Filter parameter. Use Filter constants as parameter.
      * @return array An array of articles.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = DATE_DESC): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DATE_DESC, int $filter_type = Filter::ARTICLE_NAME, string $filter_txt = ''): array
     {
-        [$order_column, $order_dir] = ArticleQueries::getOrderParameters($orderby);
+        [$order_column, $order_dir] = OrderBy::getOrderParameters($orderby);
 
         //Only data can be bound inside $preparedStatement, order-by params must be set before in the query string.
         $query_str = sprintf('SELECT 
@@ -303,7 +283,7 @@ class ArticleQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(ARTICLES_QUERY . $error . PHP_EOL);
+            error_log(Error::ARTICLES_QUERY . $error . PHP_EOL);
         }
 
         return $articles;
@@ -372,7 +352,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(LOCATION_DELETE . $error . PHP_EOL);
+        error_log(Error::LOCATION_DELETE . $error . PHP_EOL);
         return false;
     }
 
@@ -391,7 +371,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(LOCATION_INSERT . $error . PHP_EOL);
+        error_log(Error::LOCATION_INSERT . $error . PHP_EOL);
         return false;
     }
 
@@ -416,11 +396,11 @@ class LocationQueries
             if ($data) {
                 return StringContent::fromDatabaseRow($data);
             } else {
-                error_log(sprintf(LOCATION_QUERY, $id));
+                error_log(sprintf(Error::LOCATION_QUERY, $id));
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(sprintf(LOCATION_QUERY, $id) . $error . PHP_EOL);
+            error_log(sprintf(Error::LOCATION_QUERY, $id) . $error . PHP_EOL);
         }
 
         return null;
@@ -444,7 +424,7 @@ class LocationQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(LOCATIONS_QUERY_ALL  . $error . PHP_EOL);
+            error_log(Error::LOCATIONS_QUERY_ALL  . $error . PHP_EOL);
         }
 
         return $locations;
@@ -468,7 +448,7 @@ class LocationQueries
             return intval($r) === 1;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(LOCATIONS_CHECK_CONTENT . $error . PHP_EOL);
+        error_log(Error::LOCATIONS_CHECK_CONTENT . $error . PHP_EOL);
         return false;
     }
 
@@ -490,7 +470,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(LOCATION_UPDATE . $error . PHP_EOL);
+        error_log(Error::LOCATION_UPDATE . $error . PHP_EOL);
         return false;
     }
 }
@@ -522,35 +502,11 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_DELETE . $error . PHP_EOL);
+        error_log(Error::USER_DELETE . $error . PHP_EOL);
         return false;
     }
 
-    /**
-     * Return orderby query element.
-     * 
-     * @param int $const UserOrder const value.
-     * @return Array orderby string parameters.
-     */
-    private static function getOrderParameters(int $const): array
-    {
-        switch ($const) {
-            case CREATED_ASC:
-                return ['creation_date', 'ASC'];
-            case CREATED_DESC:
-                return ['creation_date', 'DESC'];
-            case EMAIL_ASC:
-                return ['email', 'ASC'];
-            case EMAIL_DESC:
-                return ['email', 'DESC'];
-            case LOGIN_ASC:
-                return ['last_login', 'ASC'];
-            case LOGIN_DESC:
-                return ['last_login', 'DESC'];
-            default:
-                return ['email', 'ASC'];
-        }
-    }
+
 
     /**     
      * Insert a User into the database.
@@ -587,7 +543,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_INSERT . $error . PHP_EOL);
+        error_log(Error::USER_INSERT . $error . PHP_EOL);
         return false;
     }
 
@@ -619,7 +575,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_QUERY . $error . PHP_EOL);
+        error_log(Error::USER_QUERY . $error . PHP_EOL);
         return null;
     }
 
@@ -650,7 +606,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_QUERY . $error . PHP_EOL);
+        error_log(Error::USER_QUERY . $error . PHP_EOL);
         return null;
     }
 
@@ -675,7 +631,7 @@ class UserQueries
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USERS_COUNT_QUERY . $error . PHP_EOL);
+        error_log(Error::USERS_COUNT_QUERY . $error . PHP_EOL);
         return -1;
     }
 
@@ -685,12 +641,12 @@ class UserQueries
      * @param bool $excludeAdmins Count only common users.
      * @param int $limit The maximum number of users to be returned.
      * @param int $offset The number of result users to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use UserOrder constants as parameter.
+     * @param int $orderby Order parameter. Use OrderBy constants as parameter.
      * @return array Array of users.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = EMAIL_ASC, bool $excludeAdmins = false): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
     {
-        [$order_column, $order_dir] = UserQueries::getOrderParameters($orderby);
+        [$order_column, $order_dir] = OrderBy::getOrderParameters($orderby);
 
         // //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.
         $query_str = 'SELECT 
@@ -722,7 +678,7 @@ class UserQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(USERS_QUERY  . $error . PHP_EOL);
+            error_log(Error::USERS_QUERY  . $error . PHP_EOL);
         }
 
         return $users;
@@ -746,7 +702,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_ALIAS_UPDATE . $error . PHP_EOL);
+        error_log(Error::USER_ALIAS_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -768,7 +724,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_DELAY_UPDATE . $error . PHP_EOL);
+        error_log(Error::USER_DELAY_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -790,7 +746,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_CONTACT_UPDATE . $error . PHP_EOL);
+        error_log(Error::USER_CONTACT_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -811,7 +767,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_LOGTIME_UPDATE . $error . PHP_EOL);
+        error_log(Error::USER_LOGTIME_UPDATE . $error . PHP_EOL);
         return false;
     }
 
@@ -833,7 +789,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(USER_PASSWORD_UPDATE  . $error . PHP_EOL);
+        error_log(Error::USER_PASSWORD_UPDATE  . $error . PHP_EOL);
         return false;
     }
 }

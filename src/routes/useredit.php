@@ -6,6 +6,9 @@
 
 namespace app\routes;
 
+use app\constants\Alert;
+use app\constants\Error;
+use app\constants\Route;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -15,18 +18,18 @@ class UserEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(USER_EDIT_TEMPLATE, USER_EDIT);
+        parent::__construct('user_edit_template', Route::USER_EDIT);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(LOGIN);
+            $this->requestRedirect(Route::LOGIN);
             return '';
         }
 
         if (!Authenticate::isAdmin()) {
-            $this->requestRedirect(HOME);
+            $this->requestRedirect(Route::HOME);
             return '';
         }
 
@@ -43,9 +46,9 @@ class UserEdit extends BaseRoute
                     $user = User::fromForm($email, $password, $is_admin);
 
                     if (Database::users()->insert($user)) {
-                        $this->requestRedirect(ADMIN . '?alert=added_success');
+                        $this->requestRedirect(Route::ADMIN . '?alert=added_success');
                     } else {
-                        $this->requestRedirect(ADMIN . '?alert=added_failure');
+                        $this->requestRedirect(Route::ADMIN . '?alert=added_failure');
                     }
                     return '';
                 }
@@ -73,16 +76,16 @@ class UserEdit extends BaseRoute
         $email = trim($_POST['email']) ?? '';
 
         if ($email  === '') {
-            $this->setError('email', USER_EMAIL_EMPTY);
+            $this->setError('email', Error::USER_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $this->setError('email', USER_EMAIL_INVALID);
+            $this->setError('email', Error::USER_EMAIL_INVALID);
             return false;
         }
         if (Database::users()->queryByEmail($email)) {
-            $this->setError('email', USER_EMAIL_USED);
+            $this->setError('email', Error::USER_EMAIL_USED);
             return false;
         }
 

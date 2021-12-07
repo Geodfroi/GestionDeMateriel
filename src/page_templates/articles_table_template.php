@@ -3,10 +3,17 @@
 ## Joël Piguet - 2021.12.07 ###
 ##############################
 
+use app\constants\Filter;
+use app\constants\OrderBy;
+use app\constants\Route;
+use app\constants\Session;
 use app\helpers\Database;
 use app\models\Article;
 
-$page = $_SESSION[ART_PAGE];
+
+$page = $_SESSION[Session::ART_PAGE];
+$filter_type = intval($_SESSION[Session::ART_FILTER_TYPE]);
+$filter_val = $_SESSION[Session::ART_FILTER_VAL];
 
 /**
  * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
@@ -16,28 +23,28 @@ $page = $_SESSION[ART_PAGE];
  */
 function disCaretArt(string $header): string
 {
-    $orderby = $_SESSION[ART_ORDERBY];
+    $orderby = $_SESSION[Session::ART_ORDERBY];
 
     if ($header === 'article') {
-        if ($orderby === NAME_ASC) {
+        if ($orderby === OrderBy::NAME_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === NAME_DESC) {
+        } else if ($orderby === OrderBy::NAME_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'location') {
-        if ($orderby === LOCATION_ASC) {
+        if ($orderby === OrderBy::LOCATION_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === LOCATION_DESC) {
+        } else if ($orderby === OrderBy::LOCATION_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'per_date') {
-        if ($orderby === DATE_ASC) {
+        if ($orderby === OrderBy::DATE_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === DATE_DESC) {
+        } else if ($orderby === OrderBy::DATE_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'owner') {
-        if ($orderby === OWNED_BY) {
+        if ($orderby === OrderBy::OWNED_BY) {
             return 'bi-caret-down';
         }
     }
@@ -52,20 +59,18 @@ function disCaretArt(string $header): string
  */
 function disLinkArt(string $header): string
 {
-    $root = ART_TABLE . '?orderby=';
-    $orderby = $_SESSION[ART_ORDERBY];
-    error_log('$orderby: ' . $_SESSION[ART_ORDERBY]);
+    $root = Route::ART_TABLE . '?orderby=';
+    $orderby = $_SESSION[Session::ART_ORDERBY];
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
     if ($header === 'article') {
-
-        return $orderby === NAME_ASC ? $root . NAME_DESC : $root . NAME_ASC;
+        return $orderby === OrderBy::NAME_ASC ? $root . OrderBy::NAME_DESC : $root . OrderBy::NAME_ASC;
     } else if ($header === 'location') {
-        return $orderby === LOCATION_ASC ? $root . LOCATION_DESC : $root . LOCATION_ASC;
+        return $orderby === OrderBy::LOCATION_ASC ? $root . OrderBy::LOCATION_DESC : $root . OrderBy::LOCATION_ASC;
     } else if ($header === 'per_date') {
-        return $orderby === DATE_DESC ? $root . DATE_ASC : $root . DATE_DESC;
+        return $orderby === OrderBy::DATE_DESC ? $root . OrderBy::DATE_ASC : $root . OrderBy::DATE_DESC;
     } else if ($header === 'owner') {
-        return $root . OWNED_BY;
+        return $root . OrderBy::OWNED_BY;
     }
     return '';
 }
@@ -97,19 +102,26 @@ function getOwner(Article $article): string
     </div>
 
     <div class="row">
-        <form method="post" action="<?php echo ART_TABLE ?>">
-            <div class="input-group">
-                <input name="filter-type" type="hidden">
-                <button id="filter-btn" class="btn btn-outline-secondary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown"></button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><span id="0" class="dropdown-item filter-item">Par nom d'article</span></li>
-                    <li><span id="1" class="dropdown-item filter-item">Par emplacement</span></li>
-                    <li><span id="2" class="dropdown-item filter-item">Par date de péremption</span></li>
-                </ul>
+        <div class="col-12 col-md-8 mx-auto">
+            <form method="post" action="<?php echo Route::ART_TABLE ?>">
+                <div class="input-group">
+                    <input id="filter-type" name="filter-type" type="hidden" value="<?php echo $filter_type ?>">
+                    <button id="filter-btn" class="btn btn-outline-secondary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown">
+                        <?php echo Filter::getLabel($filter_type); ?>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span id="<?php echo Filter::ARTICLE_NAME ?>" class="dropdown-item filter-item">
+                                <?php echo Filter::getLabel(FILTER::ARTICLE_NAME) ?></span></li>
+                        <li><span id="<?php echo Filter::LOCATION ?>" class="dropdown-item filter-item">
+                                <?php echo Filter::getLabel(FILTER::LOCATION) ?></span></li>
+                        <li><span id="<?php echo Filter::DATE ?>" class="dropdown-item filter-item">
+                                <?php echo Filter::getLabel(FILTER::DATE) ?></span></li>
+                    </ul>
 
-                <input name="filter-txt" class="form-control" type="search" placeholder="filtre" aria-label="Filter">
-                <button class="btn btn-primary" type="submit" name="filter">Filtrer</button>
-        </form>
+                    <input id="filter-val" name="filter-val" class="form-control" type="search" placeholder="filtre" aria-label="Filter" value="<?php echo $filter_val ?>">
+                    <button class="btn btn-primary" type="submit" name="filter">Filtrer</button>
+            </form>
+        </div>
     </div>
 
     <div class="row">
@@ -143,7 +155,7 @@ function getOwner(Article $article): string
                         <td><?php echo getOwner($article) ?></td>
 
                         <td>
-                            <a class="link-secondary" href=<?php echo ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
+                            <a class="link-secondary" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
                             <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
 
@@ -158,7 +170,7 @@ function getOwner(Article $article): string
                                         Voulez-vous vraiment supprimer [<?php echo $article->getArticleName() ?>] ?
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="<?php echo ART_TABLE . '?delete=' . $article->getId() ?>" class="btn btn-primary">Confirmer</a>
+                                        <a href="<?php echo Route::ART_TABLE . '?delete=' . $article->getId() ?>" class="btn btn-primary">Confirmer</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                     </div>
                                 </div>
@@ -174,7 +186,7 @@ function getOwner(Article $article): string
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo ART_TABLE . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo Route::ART_TABLE . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
@@ -182,12 +194,12 @@ function getOwner(Article $article): string
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
                 <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                    <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
             <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo ART_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo Route::ART_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>
@@ -195,20 +207,23 @@ function getOwner(Article $article): string
     </nav>
 
     <div class="row">
-        <a href="<?php echo ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
+        <a href="<?php echo Route::ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
     </div>
 </div>
 
 <script>
+    // set btn filter inner text and fill filter-type input value field.
     let btn = document.getElementById('filter-btn');
-    let hidden_input = document.getElementById('filter-type');
+    let filter_type_input = document.getElementById('filter-type');
+    let filter_val_input = document.getElementById('filter-val');
 
     let collection = document.getElementsByClassName('filter-item');
     for (let index = 0; index < collection.length; index++) {
         const element = collection[index];
         element.addEventListener('click', e => {
             btn.innerText = element.innerText;
-            hidden_input.value = parseInt(element.id);
+            filter_type_input.value = parseInt(element.id);
+            filter_val_input.value = '';
         });
     }
 </script>

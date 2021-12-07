@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use app\constants\Error;
+use app\constants\Settings;
 use app\routes\BaseRoute;
 
 /**
@@ -31,13 +33,13 @@ class Util
      */
     public static function getRandomPassword()
     {
-        $password_candidate = Util::randomString(DEFAULT_PASSWORD_LENGTH);
+        $password_candidate = Util::randomString(Settings::DEFAULT_PASSWORD_LENGTH);
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if ($has_number && $has_letters) {
             return $password_candidate;
         }
-        return $this->getRandomPassword();
+        return Util::getRandomPassword();
     }
 
     /**
@@ -76,7 +78,7 @@ class Util
         // start buffering the string;
         ob_start();
         // load file content at path and resolve php script to a string in the buffer;
-        require $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
+        require __DIR__ . "//../" .  $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
         // flush the buffer content to the variable
         $rendered = ob_get_clean();
 
@@ -95,18 +97,18 @@ class Util
         $location = trim($_POST['location']) ?? '';
 
         if (strlen($location) === 0) {
-            $route->setError('location', LOCATION_EMPTY);
+            $route->setError('location', Error::LOCATION_EMPTY);
             return false;
         }
 
         $location = ucwords($location);
-        if (strlen($location) < LOCATION_MIN_LENGHT) {
-            $route->setError('location', sprintf(LOCATION_TOO_SHORT, LOCATION_MIN_LENGHT));
+        if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
+            $route->setError('location', sprintf(Error::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
             return false;
         }
 
-        if (strlen($location) > LOCATION_MAX_LENGHT) {
-            $route->setError('location', sprintf(LOCATION_TOO_LONG, LOCATION_MAX_LENGHT));
+        if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
+            $route->setError('location', sprintf(Error::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
             return false;
         }
         return true;
@@ -124,17 +126,17 @@ class Util
     {
         $password_candidate = trim($_POST['password']) ?? '';
         if ($password_candidate === '') {
-            $route->setError('password', PASSWORD_EMPTY);
+            $route->setError('password', Error::PASSWORD_EMPTY);
             return false;
         }
-        if (strlen($password_candidate) < USER_PASSWORD_MIN_LENGTH) {
-            $route->setError('password', sprintf(PASSWORD_SHORT, USER_PASSWORD_MIN_LENGTH));
+        if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
+            $route->setError('password', sprintf(Error::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
             return false;
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if (!$has_number || (!$has_letters)) {
-            $route->setError('password', PASSWORD_WEAK);
+            $route->setError('password', Error::PASSWORD_WEAK);
             return false;
         }
         return true;

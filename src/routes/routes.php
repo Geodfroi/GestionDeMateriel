@@ -1,10 +1,13 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.06 ###
 ##############################
 
 namespace app\routes;
+
+use app\constants\Alert;
+use app\constants\Route;
 
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
@@ -19,28 +22,27 @@ class Routes
      */
     public static function getRoute(): BaseRoute
     {
-        error_log("cccccccc");
 
-        switch ($_SERVER['PATH_INFO'] ?? HOME) {
-            case ADMIN:
+        switch ($_SERVER['PATH_INFO'] ?? Route::HOME) {
+            case Route::ADMIN:
                 return new Admin();
-            case ART_EDIT:
+            case Route::ART_EDIT:
                 return new ArticleEdit();
-            case ART_TABLE:
+            case Route::ART_TABLE:
                 return new ArticleTable();
-            case CONTACT:
+            case Route::CONTACT:
                 return new Contact();
-            case HOME:
+            case Route::HOME:
                 return new Home();
-            case LOCAL_PRESETS:
+            case Route::LOCAL_PRESETS:
                 return new LocationList();
-            case LOGIN:
+            case Route::LOGIN:
                 return new Login();
-            case PROFILE:
+            case Route::PROFILE:
                 return new Profile();
-            case USER_EDIT:
+            case Route::USER_EDIT:
                 return new UserEdit();
-            case USERS_TABLE:
+            case Route::USERS_TABLE:
                 return new UserTable();
             default:
                 return new class extends BaseRoute

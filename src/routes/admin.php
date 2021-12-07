@@ -6,19 +6,21 @@
 
 namespace app\routes;
 
+use app\constants\Route;
 use app\helpers\Authenticate;
+
 
 class Admin extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(ADMIN_TEMPLATE, ADMIN);
+        parent::__construct('admin_template', Route::ADMIN);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(LOGIN);
+            $this->requestRedirect(Route::LOGIN);
         }
 
         return $this->renderTemplate([

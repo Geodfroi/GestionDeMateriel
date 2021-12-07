@@ -6,6 +6,9 @@
 
 namespace app\routes;
 
+use app\constants\Error;
+use app\constants\Route;
+use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -17,7 +20,7 @@ class ArticleEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(ART_EDIT_TEMPLATE, ART_EDIT);
+        parent::__construct('article_edit_template', Route::ART_EDIT);
     }
 
     public function getBodyContent(): string
@@ -45,9 +48,9 @@ class ArticleEdit extends BaseRoute
                 $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
                 if (Database::articles()->insert($article)) {
-                    $this->requestRedirect(ART_TABLE . '?alert=added_success');
+                    $this->requestRedirect(Route::ART_TABLE . '?alert=added_success');
                 } else {
-                    $this->requestRedirect(ART_TABLE . '?alert=added_failure');
+                    $this->requestRedirect(Route::ART_TABLE . '?alert=added_failure');
                 }
             }
             goto end;
@@ -64,9 +67,9 @@ class ArticleEdit extends BaseRoute
                 $article->updateFields($article_name, $location, $exp_date_str, $comments);
 
                 if (Database::articles()->update($article)) {
-                    $this->requestRedirect(ART_TABLE . '?alert=updated_success');
+                    $this->requestRedirect(Route::ART_TABLE . '?alert=updated_success');
                 } else {
-                    $this->requestRedirect(ART_TABLE . '?alert=updated_failure');
+                    $this->requestRedirect(Route::ART_TABLE . '?alert=updated_failure');
                 }
             }
         }
@@ -121,17 +124,17 @@ class ArticleEdit extends BaseRoute
         $article_name = trim($_POST['article-name']) ?? '';
 
         if ($article_name === '') {
-            $this->setError('article-name', ARTICLE_ADD_EMPTY);
+            $this->setError('article-name', Error::ARTICLE_ADD_EMPTY);
             return false;
         }
 
-        if (strlen($article_name) < ARTICLE_NAME_MIN_LENGHT) {
-            $this->setError('article-name', sprintf(ARTICLE_NAME_TOO_SHORT, ARTICLE_NAME_MIN_LENGHT));
+        if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
+            $this->setError('article-name', sprintf(Error::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
             return false;
         }
 
-        if (strlen($article_name) > ARTICLE_NAME_MAX_LENGTH) {
-            $this->setError('article-name', sprintf(ARTICLE_NAME_TOO_LONG, ARTICLE_NAME_MAX_LENGTH));
+        if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
+            $this->setError('article-name', sprintf(Error::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
             return false;
         }
         return true;
@@ -148,7 +151,7 @@ class ArticleEdit extends BaseRoute
         $date = trim($_POST['expiration-date'] ?? '');
 
         if ($date === '') {
-            $this->setError('expiration-date', DATE_EMPTY);
+            $this->setError('expiration-date', Error::DATE_EMPTY);
             return false;
         }
 
@@ -157,25 +160,25 @@ class ArticleEdit extends BaseRoute
 
         static $future_limit;
         if (is_null($future_limit)) {
-            $future_limit = DateTime::createFromFormat('Y-m-d', ARTICLE_DATE_FUTURE_LIMIT);
+            $future_limit = DateTime::createFromFormat('Y-m-d', Settings::ARTICLE_DATE_FUTURE_LIMIT);
         }
 
         if ($validated_date) {
 
             if ($validated_date < new DateTime()) {
-                $this->setError('expiration-date', DATE_PAST);
+                $this->setError('expiration-date', Error::DATE_PAST);
                 return false;
             }
 
             if ($validated_date >= $future_limit) {
-                $this->setError('expiration-date', DATE_FUTURE);
+                $this->setError('expiration-date', Error::DATE_FUTURE);
                 return false;
             }
 
             return true;
         }
 
-        $this->setError('expiration-date', DATE_INVALID);
+        $this->setError('expiration-date', Error::DATE_INVALID);
         return false;
     }
 
@@ -189,8 +192,8 @@ class ArticleEdit extends BaseRoute
     {
         $comments = trim($_POST['comments']) ?? '';
 
-        if (strlen($comments) > ARTICLE_COMMENTS_MAX_LENGHT) {
-            $this->setError('comments', sprintf(COMMENTS_NAME_TOO_LONG, ARTICLE_COMMENTS_MAX_LENGHT));
+        if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
+            $this->setError('comments', sprintf(Error::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
             return false;
         }
         return true;

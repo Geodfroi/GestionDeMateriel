@@ -6,7 +6,9 @@
 
 namespace app\routes;
 
+use app\constants\Settings;
 use app\helpers\Util;
+
 
 class AlertType
 {
@@ -64,7 +66,7 @@ abstract class BaseRoute
      */
     public function getHeaderTitle(): string
     {
-        return APP_NAME;
+        return Settings::APP_NAME;
     }
 
     /**
@@ -89,7 +91,7 @@ abstract class BaseRoute
             var_dump($this->errors);
         }
 
-        return Util::renderTemplate($this->templateName, $data, TEMPLATES_PATH);
+        return Util::renderTemplate($this->templateName, $data, Settings::TEMPLATES_PATH);
     }
 
     /**

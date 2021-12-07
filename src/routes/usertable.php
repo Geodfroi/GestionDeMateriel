@@ -6,6 +6,11 @@
 
 namespace app\routes;
 
+use app\constants\Alert;
+use app\constants\OrderBy;
+use app\constants\Route;
+use app\constants\Session;
+use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 
@@ -16,34 +21,34 @@ class UserTable extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(USER_TABLE_TEMPLATE, USERS_TABLE);
+        parent::__construct('user_table_template', Route::USERS_TABLE);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(LOGIN);
+            $this->requestRedirect(Route::LOGIN);
         }
 
-        $_SESSION[USERS_PAGE] ??= 1;
-        $_SESSION[USERS_ORDERBY] ??= EMAIL_ASC;
+        $_SESSION[Session::USERS_PAGE] ??= 1;
+        $_SESSION[Session::USERS_ORDERBY] ??= OrderBy::EMAIL_ASC;
 
         if (isset($_GET['alert'])) {
             if ($_GET['alert'] === 'added_success') {
-                $this->setAlert(AlertType::SUCCESS, USER_ADD_SUCCESS);
+                $this->setAlert(AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
             } else if ($_GET['alert'] === 'added_failure') {
-                $this->setAlert(AlertType::FAILURE, USER_ADD_FAILURE);
+                $this->setAlert(AlertType::FAILURE, Alert::USER_ADD_FAILURE);
             }
             goto end;
         }
 
         if (isset($_GET['orderby'])) {
-            $_SESSION[USERS_ORDERBY] = intval($_GET['orderby']);
+            $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
             goto end;
         }
 
         if (isset($_GET['page'])) {
-            $_SESSION[USERS_PAGE] = intval($_GET['page']);
+            $_SESSION[Session::USERS_PAGE] = intval($_GET['page']);
             goto end;
         }
 
@@ -53,35 +58,34 @@ class UserTable extends BaseRoute
 
             if (Database::users()->delete($user_id)) {
                 if (Database::articles()->deleteUserArticles($user_id)) {
-                    $this->setAlert(AlertType::SUCCESS, USER_REMOVE_SUCCESS);
+                    $this->setAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
                 } else {
                     Database::users()->insert($user); // insert back user if article delete was unsuccessful.
-                    $this->setAlert(AlertType::FAILURE, USER_REMOVE_FAILURE);
+                    $this->setAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
                 }
             } else {
-                $this->setAlert(AlertType::FAILURE, USER_REMOVE_FAILURE);
+                $this->setAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
             }
             goto end;
         }
 
         if (isset($_GET['connect'])) {
             Authenticate::login_as($_GET['connect']);
-            $this->requestRedirect(ART_TABLE);
+            $this->requestRedirect(Route::ART_TABLE);
             return '';
         }
 
         end:
 
         $item_count = Database::users()->queryCount(false);
-        $offset =   ($_SESSION[USERS_PAGE] - 1) * TABLE_DISPLAY_COUNT;
-        $page_count = ceil($item_count / TABLE_DISPLAY_COUNT);
-        $users = Database::users()->queryAll(TABLE_DISPLAY_COUNT, $offset, $_SESSION[USERS_ORDERBY], false);
+        $offset =   ($_SESSION[Session::USERS_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
+        $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
+        $users = Database::users()->queryAll(Settings::TABLE_DISPLAY_COUNT, $offset, $_SESSION[Session::USERS_ORDERBY], false);
 
         return $this->renderTemplate([
             'users' =>  $users,
             'page_count' => $page_count,
-            'page' => $_SESSION[USERS_PAGE],
-            'orderby' => $_SESSION[USERS_ORDERBY],
+
         ]);
     }
 }

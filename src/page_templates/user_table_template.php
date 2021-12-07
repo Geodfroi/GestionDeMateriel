@@ -3,8 +3,11 @@
 ## Joël Piguet - 2021.12.06 ###
 ##############################
 
+use app\constants\OrderBy;
+use app\constants\Route;
+use app\constants\Session;
 
-$page = $_SESSION[USERS_PAGE];
+$page = $_SESSION[Session::USERS_PAGE];
 
 /**
  * Display caret icon besides table header to display order setting depending on _SESSION[USERS_ORDERBY]
@@ -14,23 +17,23 @@ $page = $_SESSION[USERS_PAGE];
  */
 function disCaretAdm(string $header): string
 {
-    $orderby = $_SESSION[USERS_ORDERBY];
+    $orderby = $_SESSION[Session::USERS_ORDERBY];
     if ($header === 'email') {
-        if ($orderby === EMAIL_DESC) {
+        if ($orderby === OrderBy::EMAIL_DESC) {
             return 'bi-caret-down';
-        } else if ($orderby === EMAIL_ASC) {
+        } else if ($orderby === OrderBy::EMAIL_ASC) {
             return 'bi-caret-up';
         }
     } else if ($header === 'login') {
-        if ($orderby === LOGIN_DESC) {
+        if ($orderby === OrderBy::LOGIN_DESC) {
             return 'bi-caret-down';
-        } else if ($orderby === LOGIN_ASC) {
+        } else if ($orderby === OrderBy::LOGIN_ASC) {
             return 'bi-caret-up';
         }
     } else if ($header === 'creation') {
-        if ($orderby === CREATED_DESC) {
+        if ($orderby === OrderBy::CREATED_DESC) {
             return 'bi-caret-down';
-        } else if ($orderby === CREATED_ASC) {
+        } else if ($orderby === OrderBy::CREATED_ASC) {
             return 'bi-caret-up';
         }
     }
@@ -38,24 +41,23 @@ function disCaretAdm(string $header): string
 }
 
 /**
- * Compile header link depending on _SESSION[USERS_ORDERBY]
+ * Compile header link depending on Session USERS_ORDERBY
  * 
  * @param string $header Table header name
  * @return string Header link to display in href.
  */
 function disLinkAdm(string $header): string
 {
-
-    $root = USERS_TABLE . '?orderby=';
-    $orderby = $_SESSION[USERS_ORDERBY];
+    $root = Route::USERS_TABLE . '?orderby=';
+    $orderby = $_SESSION[Session::USERS_ORDERBY];
 
     // play with ASC / DESC to set default behavior the first time the column is clicked; ie creation is listed most recent first.
     if ($header === 'email') {
-        return $orderby === EMAIL_ASC ? $root . EMAIL_DESC : $root . EMAIL_ASC;
+        return $orderby === OrderBy::EMAIL_ASC ? $root . OrderBy::EMAIL_DESC : $root . OrderBy::EMAIL_ASC;
     } else if ($header === 'login') {
-        return $orderby === LOGIN_DESC ? $root . LOGIN_ASC : $root . LOGIN_DESC;
+        return $orderby === OrderBy::LOGIN_DESC ? $root . OrderBy::LOGIN_ASC : $root . OrderBy::LOGIN_DESC;
     } else if ($header === 'creation') {
-        return $orderby === CREATED_DESC ? $root . CREATED_ASC : $root . CREATED_DESC;
+        return $orderby === OrderBy::CREATED_DESC ? $root . OrderBy::CREATED_ASC : $root . OrderBy::CREATED_DESC;
     }
     return '';
 }
@@ -100,7 +102,7 @@ function disLinkAdm(string $header): string
                             <a class="link-secondary" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
 
                             <?php if (!$user->isAdmin()) { ?>
-                                <a href="<?php echo USERS_TABLE . '?connect=' . $user->getId() ?>" class="link-secondary text-info ms-2"><i class="bi bi-usb-plug" role="img" style="font-size: 1.2rem;" aria-label="connect-as" data-bs-toggle="tooltip" title="Se connecter en tant que [<?php echo $user->getEmail() ?>]" data-bs-placement="bottom"></i></a>
+                                <a href="<?php echo Route::USERS_TABLE . '?connect=' . $user->getId() ?>" class="link-secondary text-info ms-2"><i class="bi bi-usb-plug" role="img" style="font-size: 1.2rem;" aria-label="connect-as" data-bs-toggle="tooltip" title="Se connecter en tant que [<?php echo $user->getEmail() ?>]" data-bs-placement="bottom"></i></a>
                             <?php } ?>
                         </td>
                         <!-- Modal window for user delete confirmation -->
@@ -114,7 +116,7 @@ function disLinkAdm(string $header): string
                                         Voulez-vous vraiment supprimer [<?php echo $user->getEmail() ?>] ? Les articles associés à cet utilisateur seront également supprimés.
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="<?php echo USERS_TABLE . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
+                                        <a href="<?php echo Route::USERS_TABLE . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                     </div>
                                 </div>
@@ -130,7 +132,7 @@ function disLinkAdm(string $header): string
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo USERS_TABLE  . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo Route::USERS_TABLE  . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
@@ -138,12 +140,12 @@ function disLinkAdm(string $header): string
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
                 <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo USERS_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                    <a href="<?php echo Route::USERS_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
             <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo USERS_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+                <a href="<?php echo Route::USERS_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>
@@ -151,7 +153,7 @@ function disLinkAdm(string $header): string
     </nav>
 
     <div class="row">
-        <a href="<?php echo USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
+        <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
     </div>
 </div>
 

@@ -1,11 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\Alert;
+use app\constants\Error;
+use app\constants\Route;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -17,13 +20,13 @@ class Profile extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(PROFILE_TEMPLATE, PROFILE);
+        parent::__construct('profile_template', Route::PROFILE);
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(LOGIN);
+            $this->requestRedirect(Route::LOGIN);
             return '';
         }
 
@@ -68,12 +71,12 @@ class Profile extends BaseRoute
                     if (Database::users()->updateAlias($user_id, $alias)) {
 
                         if (strlen($alias) > 0) {
-                            $this->setAlert(AlertType::SUCCESS, ALIAS_UPDATE_SUCCESS);
+                            $this->setAlert(AlertType::SUCCESS, Alert::ALIAS_UPDATE_SUCCESS);
                         } else {
-                            $this->setAlert(AlertType::SUCCESS, ALIAS_DELETE_SUCCESS);
+                            $this->setAlert(AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
                         }
                     } else {
-                        $this->setAlert(AlertType::FAILURE, ALIAS_UPDATE_FAILURE);
+                        $this->setAlert(AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
                     }
                 }
             }
@@ -90,9 +93,9 @@ class Profile extends BaseRoute
                     $encrypted = util::encryptPassword($password);
 
                     if (Database::users()->updatePassword($user_id, $encrypted)) {
-                        $this->setAlert(AlertType::SUCCESS, PASSWORD_UPDATE_SUCCESS);
+                        $this->setAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
                     } else {
-                        $this->setAlert(AlertType::FAILURE, PASSWORD_UPDATE_FAILURE);
+                        $this->setAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
                     }
                 }
             }
@@ -116,12 +119,12 @@ class Profile extends BaseRoute
 
                     // if contact is null or empty, then contact is the login email.
                     if (strlen($contact_email) > 0) {
-                        $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_SET_SUCCESS, $contact_email));
+                        $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
                     } else {
-                        $this->setAlert(AlertType::SUCCESS, sprintf(CONTACT_RESET_SUCCESS, $login_email));
+                        $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_RESET_SUCCESS, $login_email));
                     }
                 } else {
-                    $this->setAlert(AlertType::FAILURE,  CONTACT_SET_FAILURE);
+                    $this->setAlert(AlertType::FAILURE,  Alert::CONTACT_SET_FAILURE);
                 }
             }
             goto end;
@@ -145,16 +148,16 @@ class Profile extends BaseRoute
             }
 
             if (count($delays) == 0) {
-                $this->setError('delays',  DELAYS_NONE);
+                $this->setError('delays',  Error::DELAYS_NONE);
             } else {
 
                 $display = 0;
                 $str = implode('-', $delays);
 
                 if (Database::users()->updateContactDelay($user_id, $str)) {
-                    $this->setAlert(AlertType::SUCCESS,  DELAY_SET_SUCCESS);
+                    $this->setAlert(AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
                 } else {
-                    $this->setAlert(AlertType::FAILURE,  DELAY_SET_FAILURE);
+                    $this->setAlert(AlertType::FAILURE, Alert::DELAY_SET_FAILURE);
                 }
             }
         }
@@ -185,7 +188,7 @@ class Profile extends BaseRoute
             return true;
         }
         if (strlen($alias) < ALIAS_MIN_LENGHT) {
-            $this->setError('alias', sprintf(ALIAS_TOO_SHORT, ALIAS_MIN_LENGHT));
+            $this->setError('alias', sprintf(Error::ALIAS_TOO_SHORT, ALIAS_MIN_LENGHT));
             return false;
         }
         return true;
@@ -206,7 +209,7 @@ class Profile extends BaseRoute
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $this->setError('contact-email', LOGIN_EMAIL_INVALID);
+            $this->setError('contact-email', Error::LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -222,12 +225,12 @@ class Profile extends BaseRoute
     {
         $password_repeat = trim($_POST['password-repeat']) ?? '';
         if (!$password_repeat) {
-            $this->setError('password-repeat', PASSWORD_REPEAT_NULL);
+            $this->setError('password-repeat', Error::PASSWORD_REPEAT_NULL);
             return false;
         }
 
         if ($password_first !== $password_repeat) {
-            $this->setError('password-repeat', PASSWORD_DIFFERENT);
+            $this->setError('password-repeat', Error::PASSWORD_DIFFERENT);
             return false;
         }
         return true;

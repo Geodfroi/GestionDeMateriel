@@ -8,10 +8,15 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+use app\constants\Mail;
+use app\constants\P_Settings;
+use app\constants\Settings;
 use app\helpers\Util;
 use app\models\User;
 
@@ -30,8 +35,8 @@ class Mailing
      */
     private static function formatEmail(string $email_template, array $params): string
     {
-        $content = Util::renderTemplate($email_template, $params, EMAIL_TEMPLATES_PATH);
-        return Util::renderTemplate('email_base', ['content' => $content], EMAIL_TEMPLATES_PATH);
+        $content = Util::renderTemplate($email_template, $params, Settings::EMAIL_TEMPLATES_PATH);
+        return Util::renderTemplate('email_base', ['content' => $content], Settings::EMAIL_TEMPLATES_PATH);
     }
 
     /**
@@ -45,7 +50,7 @@ class Mailing
     public static function passwordChangeNotification(User $user, string $password): bool
     {
         $html =  Mailing::passwordChangeNotificationBody($user->getDisplayAlias(), $password);
-        return Mailing::send($user->getMailingAddresses(), EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
+        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
     }
 
     /**
@@ -59,9 +64,9 @@ class Mailing
     {
         return Mailing::formatEmail('newpassword', [
             'username' => $recipient,
-            'app_name' => APP_NAME,
+            'app_name' => Settings::APP_NAME,
             'password' => $password,
-            'url' => APP_FULL_URL,
+            'url' => Settings::APP_FULL_URL,
         ]);
     }
 
@@ -75,7 +80,7 @@ class Mailing
     public static function peremptionNotification(User $user, array $reminders): bool
     {
         $html =  Mailing::peremptionNotificationBody($user->getDisplayAlias(), $reminders);
-        return Mailing::send($user->getMailingAddresses(), EMAIL_PEREMPTION_REMINDER,  $html, '');
+        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_PEREMPTION_REMINDER,  $html, '');
     }
 
     /**
@@ -118,11 +123,11 @@ class Mailing
 
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
 
-            $mail->Username = APP_EMAIL;
-            $mail->Password = APP_EMAIL_PASSWORD;
+            $mail->Username = P_Settings::APP_EMAIL;
+            $mail->Password = P_Settings::APP_EMAIL_PASSWORD;
 
             // Sender and recipient settings
-            $mail->setFrom(APP_EMAIL, EMAIL_SENDER);
+            $mail->setFrom(P_Settings::APP_EMAIL, Mail::EMAIL_SENDER);
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }

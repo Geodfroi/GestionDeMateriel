@@ -3,13 +3,14 @@
 ## Joël Piguet - 2021.12.01 ###
 ##############################
 
+use app\constants\Route;
 use app\helpers\TUtil;
 
 ?>
 
 <div class="container">
     <div class="row col-8">
-        <form method="post" action="<?php echo USER_EDIT ?>">
+        <form method="post" action="<?php echo Route::USER_EDIT ?>">
             <label class="h4 m-4">Ajouter un utilisateur.</article></label>
 
             <div class="mb-2">
@@ -41,7 +42,7 @@ use app\helpers\TUtil;
 
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-modal">Ajouter</button>
-            <a href="<?php echo ADMIN ?>" class="btn btn-secondary">Annuler</a>
+            <a href="<?php echo Route::ADMIN ?>" class="btn btn-secondary">Annuler</a>
 
             <!-- Modal window for user creation confirmation -->
             <div class="modal fade" id="create-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="create-modalLabel" aria-hidden="true">

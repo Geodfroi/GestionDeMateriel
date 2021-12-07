@@ -3,9 +3,9 @@
 ## Joël Piguet - 2021.12.02 ###
 ##############################
 
+use app\constants\Route;
 use app\helpers\Database;
 use app\helpers\TUtil;
-
 
 $loc_presets = Database::locations()->queryAll();
 
@@ -13,7 +13,7 @@ $loc_presets = Database::locations()->queryAll();
 
 <div class="container">
     <div class="row col-8">
-        <form method="post" action="<?php echo ART_EDIT ?>">
+        <form method="post" action="<?php echo Route::ART_EDIT ?>">
             <label class="h4 m-4">Ajouter un article</article></label>
 
             <input type="hidden" name="id" value="<?php echo $id ?>">
@@ -80,7 +80,7 @@ $loc_presets = Database::locations()->queryAll();
                     Modifier
                 <?php } ?>
             </button>
-            <a href="<?php echo ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
+            <a href="<?php echo Route::ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
         </form>
 
     </div>

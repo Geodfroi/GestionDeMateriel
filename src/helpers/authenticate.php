@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use app\constants\Session;
 use app\models\User;
 
 /**
@@ -22,8 +23,8 @@ class Authenticate
      */
     public static function getUser(): ?User
     {
-        if (isset($_SESSION[USER_ID])) {
-            return Database::users()->queryById($_SESSION[USER_ID]);
+        if (isset($_SESSION[Session::USER_ID])) {
+            return Database::users()->queryById($_SESSION[Session::USER_ID]);
         }
         return null;
     }
@@ -35,20 +36,20 @@ class Authenticate
      */
     public static function getUserId(): int
     {
-        if (isset($_SESSION[USER_ID])) {
-            return $_SESSION[USER_ID];
+        if (isset($_SESSION[Session::USER_ID])) {
+            return $_SESSION[Session::USER_ID];
         }
         return -1;
     }
 
     public static function isAdmin()
     {
-        return isset($_SESSION[ADMIN_ID]);
+        return isset($_SESSION[Session::ADMIN_ID]);
     }
 
     public static function isLoggedIn(): bool
     {
-        return isset($_SESSION[USER_ID]);
+        return isset($_SESSION[Session::USER_ID]);
     }
 
     /**
@@ -58,11 +59,11 @@ class Authenticate
      */
     public static function login(User $user)
     {
-        $_SESSION[USER_ID] = $user->getId();
+        $_SESSION[Session::USER_ID] = $user->getId();
 
         // USER_ID and ADMIN_ID are separate to allow admin to log-in as a different user and keep admin privileges.
         if ($user->isAdmin()) {
-            $_SESSION[ADMIN_ID] = $user->getId();
+            $_SESSION[Session::ADMIN_ID] = $user->getId();
         }
 
         Database::users()->updateLogTime($user->getId());
@@ -73,7 +74,7 @@ class Authenticate
      */
     public static function login_as(int $id)
     {
-        $_SESSION[USER_ID] = $id;
+        $_SESSION[Session::USER_ID] = $id;
     }
 
     /**

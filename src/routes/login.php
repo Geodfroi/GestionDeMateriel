@@ -6,6 +6,9 @@
 
 namespace app\routes;
 
+use app\constants\Alert;
+use app\constants\Error;
+use app\constants\Route;
 use app\helpers\Database;
 use app\helpers\Authenticate;
 use app\helpers\Mailing;
@@ -18,7 +21,7 @@ class Login extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct(LOGIN_TEMPLATE, LOGIN);
+        parent::__construct('login_template', Route::LOGIN);
     }
 
     public function getBodyContent(): string
@@ -27,9 +30,9 @@ class Login extends BaseRoute
 
             if (isset($_GET['logout'])) {
                 Authenticate::logout();
-                $this->setAlert(AlertType::INFO, LOGIN_USER_DISC);
+                $this->setAlert(AlertType::INFO, Alert::LOGIN_USER_DISC);
             } else {
-                $this->requestRedirect(HOME);
+                $this->requestRedirect(Route::HOME);
                 return '';
             }
         }
@@ -49,7 +52,7 @@ class Login extends BaseRoute
                 if (Database::users()->updatePassword($user->getId(), $encrypted)) {
 
                     if (Mailing::passwordChangeNotification($user,  $plain_password)) {
-                        $this->setAlert(AlertType::SUCCESS, LOGIN_NEW_PASSWORD_SUCCESS);
+                        $this->setAlert(AlertType::SUCCESS, Alert::LOGIN_NEW_PASSWORD_SUCCESS);
                         goto end;
                     } else {
                         // attempt to roll back change.
@@ -57,7 +60,7 @@ class Login extends BaseRoute
                     }
                 }
             }
-            $this->setAlert(AlertType::FAILURE, LOGIN_NEW_PASSWORD_FAILURE);
+            $this->setAlert(AlertType::FAILURE, Alert::LOGIN_NEW_PASSWORD_FAILURE);
             goto end;
         }
 
@@ -68,15 +71,15 @@ class Login extends BaseRoute
             }
 
             if (!isset($user)) {
-                $this->setError('email', LOGIN_NOT_FOUND);
+                $this->setError('email', Error::LOGIN_NOT_FOUND);
             } else {
                 if ($this->validatePasswordInput($password)) {
                     if ($user->verifyPassword($password)) {
                         Authenticate::login($user);
-                        $this->requestRedirect(HOME);
+                        $this->requestRedirect(Route::HOME);
                         return "";
                     } else {
-                        $this->setError('password', LOGIN_INVALID_PASSWORD);
+                        $this->setError('password', Error::LOGIN_INVALID_PASSWORD);
                     }
                 }
             }
@@ -100,12 +103,12 @@ class Login extends BaseRoute
         $email = trim($_POST['email']) ?? '';
 
         if ($email  === '') {
-            $this->setError('email', LOGIN_EMAIL_EMPTY);
+            $this->setError('email', Error::LOGIN_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $this->setError('email', LOGIN_EMAIL_INVALID);
+            $this->setError('email', Error::LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -121,7 +124,7 @@ class Login extends BaseRoute
     {
         $password = trim($_POST['password']) ?? '';
         if ($password === '') {
-            $this->setError('password', LOGIN_PASSWORD_EMPTY);
+            $this->setError('password', Error::LOGIN_PASSWORD_EMPTY);
             return false;
         }
         return true;

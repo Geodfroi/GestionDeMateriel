@@ -3,6 +3,7 @@
 ## Joël Piguet - 2021.12.02 ###
 ##############################
 
+use app\constants\Route;
 use app\helpers\TUtil;
 
 ?>
@@ -34,7 +35,7 @@ use app\helpers\TUtil;
 
                         <?php if ($selected === 0) { ?>
                             <td>
-                                <a class="link-secondary" href=<?php echo LOCAL_PRESETS . '?update=' . $item->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
+                                <a class="link-secondary" href=<?php echo Route::LOCAL_PRESETS . '?update=' . $item->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
                                 <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal-<?php echo $item->getId() ?>"><i class=" bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                             </td>
 
@@ -49,7 +50,7 @@ use app\helpers\TUtil;
                                             Voulez-vous vraiment supprimer [<?php echo $item->getContent() ?>] ?
                                         </div>
                                         <div class="modal-footer">
-                                            <a href="<?php echo LOCAL_PRESETS . '?delete=' . $item->getId() ?>" class="btn btn-primary">Confirmer</a>
+                                            <a href="<?php echo Route::LOCAL_PRESETS . '?delete=' . $item->getId() ?>" class="btn btn-primary">Confirmer</a>
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                         </div>
                                     </div>
@@ -62,7 +63,7 @@ use app\helpers\TUtil;
         </table>
     </ul>
 
-    <form method="post" action="<?php echo LOCAL_PRESETS ?>">
+    <form method="post" action="<?php echo Route::LOCAL_PRESETS ?>">
 
         <input type="hidden" name="id" value="<?php echo $selected ?>">
 
@@ -87,6 +88,6 @@ use app\helpers\TUtil;
             <?php } ?>
         </div>
 
-        <a href="<?php echo ADMIN ?>" class="btn btn-secondary">Retour</a>
+        <a href="<?php echo Route::ADMIN ?>" class="btn btn-secondary">Retour</a>
     </form>
 </div>

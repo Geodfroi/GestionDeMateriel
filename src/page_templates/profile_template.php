@@ -3,6 +3,7 @@
 ## Joël Piguet - 2021.12.02 ###
 ##############################
 
+use app\constants\Route;
 use app\helpers\TUtil;
 
 ?>
@@ -23,20 +24,20 @@ use app\helpers\TUtil;
     <!-- Profile change list -->
     <?php if ($display == 0) { ?>
 
-        <div class="row" data-bs-toggle="tooltip" title="Par défaut, l'email est utilisé pour identifier l'utilisateur au sein de l'application. Un nom d'usager peut être défini de façon facultative." data-bs-placement="bottom"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto mt-4" href="<?php echo PROFILE . '?set_alias=1' ?>">Définir un nom d'usager.</a></div>
+        <div class="row" data-bs-toggle="tooltip" title="Par défaut, l'email est utilisé pour identifier l'utilisateur au sein de l'application. Un nom d'usager peut être défini de façon facultative." data-bs-placement="bottom"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto mt-4" href="<?php echo Route::PROFILE . '?set_alias=1' ?>">Définir un nom d'usager.</a></div>
 
-        <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo PROFILE . '?change_password=1' ?>">Changer mon mot de passe</a></div>
+        <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?change_password=1' ?>">Changer mon mot de passe</a></div>
 
-        <div class="row" data-bs-toggle="tooltip" title="Il n'est pas possible de changer l'adresse de login, mais l'adresse e-mail par laquelle l'application vous contacte peut être modifiée." data-bs-placement="bottom"> <a class=" btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo PROFILE . '?add_email=1' ?>">Ajouter une adresse de contact</a></div>
+        <div class="row" data-bs-toggle="tooltip" title="Il n'est pas possible de changer l'adresse de login, mais l'adresse e-mail par laquelle l'application vous contacte peut être modifiée." data-bs-placement="bottom"> <a class=" btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?add_email=1' ?>">Ajouter une adresse de contact</a></div>
 
         <div class="row" data-bs-toggle="tooltip" title="Par défault, l'application vous averti une première fois 2 semaines  avant qu'un article arrive à péremption, puis une seconde fois trois jours avant." data-bs-placement="bottom">
-            <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo PROFILE . '?modify_delay=1' ?>">Modifier le délai de contact</a>
+            <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?modify_delay=1' ?>">Modifier le délai de contact</a>
         </div>
     <?php } else { ?>
 
         <?php if ($display == 1) { ?>
             <!-- Set user alias -->
-            <form method="post" action=<?php echo PROFILE ?>>
+            <form method="post" action=<?php echo Route::PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
                         <input name="alias" type="text" id="alias" class="form-control <?php echo isset($errors['alias']) ? ' is-invalid' : '' ?>" value=<?php echo TUtil::escape($alias) ?>>
@@ -55,7 +56,7 @@ use app\helpers\TUtil;
             </form>
         <?php } elseif ($display == 2) { ?>
             <!-- Modify password form -->
-            <form method="post" action=<?php echo PROFILE ?>>
+            <form method="post" action=<?php echo Route::PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
                         <input name="password" type="password" id="password" value="<?php echo TUtil::escape($password) ?>" class="form-control
@@ -96,7 +97,7 @@ use app\helpers\TUtil;
                 </div>
             </div>
 
-            <form method="post" action="<?php echo PROFILE ?>">
+            <form method="post" action="<?php echo Route::PROFILE ?>">
                 <div class="row mb-4">
                     <div class="col-12 col-md-8 mx-auto">
 
@@ -117,7 +118,7 @@ use app\helpers\TUtil;
         <?php } elseif ($display == 4) { ?>
             <!-- Set delay before contact email form -->
 
-            <form method="post" action="<?php echo PROFILE ?>">
+            <form method="post" action="<?php echo Route::PROFILE ?>">
                 <div class="row mb-4 mt-4">
                     <div class="col-12 col-md-8 mx-auto">
                         <label class="h-6 mb-4">Définir la date de l'envoi des e-mails de rappel de la date de péremption du produit. Il est possible de cocher plusieurs options, auquel cas plusieurs e-mails seront envoyés dans les délais spécifiés</label>
@@ -157,6 +158,6 @@ use app\helpers\TUtil;
             </form>
         <?php } ?>
 
-        <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo PROFILE ?>">Revenir</a></div>
+        <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE ?>">Revenir</a></div>
     <?php }  ?>
 </div>
