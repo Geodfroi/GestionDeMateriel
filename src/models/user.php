@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\models;
@@ -103,6 +103,17 @@ class User
         return $this->contact_email;
     }
 
+    /**
+     * @return string Recipient string to be used in email body.
+     */
+    public function getDisplayAlias(): string
+    {
+        if ($this->getAlias()) {
+            return $this->getAlias();
+        }
+        return $this->getEmail();
+    }
+
     public function getEmail(): string
     {
         return $this->email;
@@ -118,16 +129,6 @@ class User
         return $this->last_login;
     }
 
-    /**
-     * @return string Recipient string to be used in email body.
-     */
-    public function getMailingAlias(): string
-    {
-        if ($this->getAlias()) {
-            return $this->getAlias();
-        }
-        return $this->getEmail();
-    }
 
     /**
      * Addresses where emails will be sent.

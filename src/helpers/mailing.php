@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\helpers;
@@ -44,7 +44,7 @@ class Mailing
      */
     public static function passwordChangeNotification(User $user, string $password): bool
     {
-        $html =  Mailing::passwordChangeNotificationBody($user->getMailingAlias(), $password);
+        $html =  Mailing::passwordChangeNotificationBody($user->getDisplayAlias(), $password);
         return Mailing::send($user->getMailingAddresses(), EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
     }
 
@@ -74,7 +74,7 @@ class Mailing
      */
     public static function peremptionNotification(User $user, array $reminders): bool
     {
-        $html =  Mailing::peremptionNotificationBody($user->getMailingAlias(), $reminders);
+        $html =  Mailing::peremptionNotificationBody($user->getDisplayAlias(), $reminders);
         return Mailing::send($user->getMailingAddresses(), EMAIL_PEREMPTION_REMINDER,  $html, '');
     }
 

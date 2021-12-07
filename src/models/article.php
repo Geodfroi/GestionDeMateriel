@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\models;
@@ -71,6 +71,11 @@ class Article
         $instance->expiration_date = DateTime::createFromFormat('Y-m-d', $expiration_date);
         $instance->creation_date = new DateTime();
         return $instance;
+    }
+
+    public function getCreationDate(): DateTime
+    {
+        return $this->creation_date;
     }
 
     public function getArticleName(): string

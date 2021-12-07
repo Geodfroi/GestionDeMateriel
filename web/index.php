@@ -32,5 +32,4 @@ echo Util::renderTemplate('main_template', $templateData, TEMPLATES_PATH);
 
 //test server in browser
 // require_once __DIR__ . '/../server/server.php';
-
 // echo Mailing::passwordChangeNotificationBody('Bunny', '123123123');

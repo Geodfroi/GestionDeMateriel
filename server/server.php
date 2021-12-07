@@ -15,7 +15,7 @@ use app\helpers\Database;
 use app\helpers\Mailing;
 
 $articles = Database::articles()->queryAll();
-$users = Database::users()->queryAll(9999, 0, CREATED_ASC, false);
+$users = Database::users()->queryAll();
 $today = new DateTime();
 
 // iterate through users and articles to flag articles that are soon due.

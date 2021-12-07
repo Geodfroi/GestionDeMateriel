@@ -95,7 +95,6 @@ class Database
 class ArticleQueries
 {
 
-
     private PDO $pdo;
 
     function __construct(PDO $pdo)
@@ -161,6 +160,8 @@ class ArticleQueries
                 return ['article_name', 'ASC'];
             case NAME_DESC:
                 return ['article_name', 'DESC'];
+            case OWNED_BY:
+                return ['user_id', 'ASC'];
             default:
                 return ['expiration_date', 'ASC'];
         }
@@ -210,20 +211,13 @@ class ArticleQueries
     }
 
     /**
-     * Get number of articles owned by user.
+     * Get number of articles in db.
      * 
-     * @param int User id.
      * @return int # of articles or -1 if query fails.
      */
-    public function queryCountByUser(int $user_id): int
+    public function queryCount(): int
     {
-        $preparedStatement = $this->pdo->prepare('SELECT 
-            COUNT(*)
-            FROM articles
-            WHERE user_id = :uid
-        ');
-
-        $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
+        $preparedStatement = $this->pdo->prepare('SELECT COUNT(*) FROM articles');
 
         if ($preparedStatement->execute()) {
             $r = $preparedStatement->fetchColumn();
@@ -272,47 +266,14 @@ class ArticleQueries
     }
 
     /**
-     * Retrieve all articles;
+     * Retrieve database articles;
      * 
-     * @return array An array of articles.
-     */
-    public function queryAll(): array
-    {
-        $preparedStatement = $this->pdo->prepare('SELECT 
-            id, 
-            user_id, 
-            article_name, 
-            location,
-            comments, 
-            expiration_date,
-            creation_date 
-        FROM articles');
-
-        $articles = [];
-
-        if ($preparedStatement->execute()) {
-            // fetch next as associative array until there are none to be fetched.
-            while ($data = $preparedStatement->fetch()) {
-                array_push($articles, Article::fromDatabaseRow($data));
-            }
-        } else {
-            list(,, $error) = $preparedStatement->errorInfo();
-            error_log(ARTICLES_QUERY . $error . PHP_EOL);
-        }
-
-        return $articles;
-    }
-
-    /**
-     * Retrieve the User articles;
-     * 
-     * @param int $user_id User id;
      * @param int $limit The maximum number of items to be returned.
      * @param int $offset The number of result items to be skipped before including them to the result array.
      * @param int $orderby Order parameter. Use ArtOrder constants as parameter.
      * @return array An array of articles.
      */
-    public function queryAllByUser(int $user_id, int $limit, int $offset = 0, int $orderby = DATE_DESC): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = DATE_DESC): array
     {
         [$order_column, $order_dir] = ArticleQueries::getOrderParameters($orderby);
 
@@ -325,12 +286,11 @@ class ArticleQueries
             comments, 
             expiration_date,
             creation_date 
-        FROM articles WHERE user_id = :uid 
+        FROM articles 
         ORDER BY %s %s LIMIT :lim OFFSET :off', $order_column, $order_dir);
 
         $preparedStatement = $this->pdo->prepare($query_str);
 
-        $preparedStatement->bindParam(':uid', $user_id, PDO::PARAM_INT);
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 
@@ -728,7 +688,7 @@ class UserQueries
      * @param int $orderby Order parameter. Use UserOrder constants as parameter.
      * @return array Array of users.
      */
-    public function queryAll(int $limit, int $offset = 0, int $orderby = EMAIL_ASC, bool $excludeAdmins = true): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = EMAIL_ASC, bool $excludeAdmins = false): array
     {
         [$order_column, $order_dir] = UserQueries::getOrderParameters($orderby);
 

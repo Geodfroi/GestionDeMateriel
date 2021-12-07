@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 namespace app\routes;
@@ -61,17 +61,18 @@ class ArticleTable extends BaseRoute
             goto end;
         }
 
+        if (isset($_POST['filter'])) {
+            var_dump($_POST);
+            goto end;
+        }
+
         end:
 
-        $user_id = Authenticate::getUserId();
-        $item_count = Database::articles()->queryCountByUser($user_id);
+        $item_count = Database::articles()->queryCount();
         $offset =   ($_SESSION[ART_PAGE] - 1) * TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / TABLE_DISPLAY_COUNT);
 
-        $articles = [];
-        if (isset($user_id)) {
-            $articles = Database::articles()->queryAllByUser($user_id, TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
-        }
+        $articles = Database::articles()->queryAll(TABLE_DISPLAY_COUNT, $offset, $_SESSION[ART_ORDERBY]);
 
         return $this->renderTemplate([
             'articles' =>  $articles,

@@ -1,11 +1,10 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.11.29 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 use app\helpers\Authenticate;
-
 ?>
 
 <!DOCTYPE html>
@@ -24,41 +23,50 @@ use app\helpers\Authenticate;
 
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
             <div class="container-fluid">
-                <span class="navbar-brand me-4" href="#">Gestionnaire d'inventaire</span>
+                <span class="navbar-brand me-4" href="#">HEdS - Gestionnaire d'inventaire</span>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav">
+                    <ul class="navbar-nav">
 
                         <?php if (Authenticate::isLoggedIn()) { ?>
                             <?php if (Authenticate::isAdmin()) { ?>
-                                <a class="nav-link <?php echo $_SESSION['route'] === ADMIN ? 'active' : '' ?>" href="<?php echo ADMIN ?>">Admin</a>
+                                <li class="nav-item active">
+                                    <a class="nav-link <?php echo $_SESSION['route'] === ADMIN ? 'active' : '' ?>" href="<?php echo ADMIN ?>">Admin</a>
+                                </li>
                             <?php } ?>
-
-                            <a class="nav-link <?php echo $_SESSION['route'] === ART_TABLE ? 'active' : '' ?>" href="<?php echo ART_TABLE ?>">Articles</a>
-                            <a class="nav-link <?php echo $_SESSION['route'] === PROFILE ? 'active' : '' ?>" href="<?php echo PROFILE ?> ">Profile</a>
-                            <a class="nav-link" href="<?php echo LOGOUT ?>">Déconnexion</a>
-                        <?php } else { ?>
-                            <a class="nav-link" href="<?php echo LOGIN ?>">Connexion</a>
+                            <li class="nav-item active">
+                                <a class="nav-link <?php echo $_SESSION['route'] === ART_TABLE ? 'active' : '' ?>" href="<?php echo ART_TABLE ?>">Articles</a>
+                            </li>
+                            <li class="nav-item active">
+                                <a class="nav-link <?php echo $_SESSION['route'] === PROFILE ? 'active' : '' ?>" href="<?php echo PROFILE ?> ">Profile</a>
+                            </li>
                         <?php } ?>
-                    </div>
-                </div>
 
-                <!-- Display user log-in -->
-                <?php if (Authenticate::isLoggedIn()) { ?>
-                    <div><?php echo Authenticate::getUser()->getEmail() ?></div>
-                <?php } ?>
-            </div>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item ms-auto">
+                            <?php if (Authenticate::isLoggedIn()) { ?>
+                                <div>
+                                    <a class="nav-link" href="<?php echo LOGOUT ?>"><?php echo Authenticate::getUser()->getEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
+                                </div>
+                            <?php } else { ?>
+                                <a class="nav-link" href="<?php echo LOGIN ?>">Connexion</a>
+                            <?php } ?>
+                        </li>
+                    </ul>
+                </div>
     </header>
 
-    <main class="flex-shrink-0">
+    <main class="flex-shrink-0 mt-5">
         <?php echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page"; ?>
     </main>
 
-    <footer class="footer mt-auto py-3 bg-light w-100 border-up">
+    <div style="margin-top: 80px;">hidden by fixed footer</div>
+    <footer class="footer mt-auto py-3 bg-light w-100 border-up fixed-bottom">
         <div class="container">
             <div class="row">
                 <div class="text-muted h5 col-9 me-auto">HEdS - Service des innovations pédagogiques.</div>
@@ -79,7 +87,5 @@ use app\helpers\Authenticate;
         })
     </script>
 </body>
-
-
 
 </html>

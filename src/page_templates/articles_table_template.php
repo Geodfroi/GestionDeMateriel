@@ -1,7 +1,10 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
+
+use app\helpers\Database;
+use app\models\Article;
 
 $page = $_SESSION[ART_PAGE];
 
@@ -33,6 +36,10 @@ function disCaretArt(string $header): string
         } else if ($orderby === DATE_DESC) {
             return 'bi-caret-down';
         }
+    } else if ($header === 'owner') {
+        if ($orderby === OWNED_BY) {
+            return 'bi-caret-down';
+        }
     }
     return '';
 }
@@ -57,8 +64,22 @@ function disLinkArt(string $header): string
         return $orderby === LOCATION_ASC ? $root . LOCATION_DESC : $root . LOCATION_ASC;
     } else if ($header === 'per_date') {
         return $orderby === DATE_DESC ? $root . DATE_ASC : $root . DATE_DESC;
+    } else if ($header === 'owner') {
+        return $root . OWNED_BY;
     }
     return '';
+}
+
+/**
+ * @return string Article owner display alias.
+ */
+function getOwner(Article $article): string
+{
+    $user = Database::users()->queryById($article->getUserId());
+    if ($user) {
+        return sprintf("%s (%s)", $user->getDisplayAlias(), $article->getCreationDate()->format('d.m.Y'));
+    }
+    return "Inconnu";
 }
 
 ?>
@@ -75,7 +96,24 @@ function disLinkArt(string $header): string
         </div>
     </div>
 
-    <div class="row col-12">
+    <div class="row">
+        <form method="post" action="<?php echo ART_TABLE ?>">
+            <div class="input-group">
+                <input name="filter-type" type="hidden">
+                <button id="filter-btn" class="btn btn-outline-secondary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown"></button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><span id="0" class="dropdown-item filter-item">Par nom d'article</span></li>
+                    <li><span id="1" class="dropdown-item filter-item">Par emplacement</span></li>
+                    <li><span id="2" class="dropdown-item filter-item">Par date de péremption</span></li>
+                </ul>
+
+                <input name="filter-txt" class="form-control" type="search" placeholder="filtre" aria-label="Filter">
+                <button class="btn btn-primary" type="submit" name="filter">Filtrer</button>
+        </form>
+    </div>
+
+    <div class="row">
+
         <table class="table table-striped">
 
             <thead>
@@ -85,6 +123,8 @@ function disLinkArt(string $header): string
                     <th><a class="text-decoration-none" href="<?php echo disLinkArt('location') ?>">Location <span class="<?php echo disCaretArt('location') ?>"></span></a>
 
                     <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Date de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
+
+                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('owner') ?>">Créé par <span class="<?php echo disCaretArt('owner') ?>"></span></a>
 
                     <th>Actions</th>
                 </tr>
@@ -100,6 +140,8 @@ function disLinkArt(string $header): string
                         </td>
                         <td><?php echo $article->getLocation() ?></td>
                         <td><?php echo $article->getExpirationDate()->format('d/m/Y') ?></td>
+                        <td><?php echo getOwner($article) ?></td>
+
                         <td>
                             <a class="link-secondary" href=<?php echo ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
                             <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
@@ -128,7 +170,7 @@ function disLinkArt(string $header): string
         </table>
     </div>
 
-    <nav aria-label="list-pagination">
+    <nav>
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
@@ -157,10 +199,22 @@ function disLinkArt(string $header): string
     </div>
 </div>
 
-<div>TODO: created by column / date created</div>
+<script>
+    let btn = document.getElementById('filter-btn');
+    let hidden_input = document.getElementById('filter-type');
+
+    let collection = document.getElementsByClassName('filter-item');
+    for (let index = 0; index < collection.length; index++) {
+        const element = collection[index];
+        element.addEventListener('click', e => {
+            btn.innerText = element.innerText;
+            hidden_input.value = parseInt(element.id);
+        });
+    }
+</script>
+
+
 <div>TODO: color scheme for dates / peremption</div>
-<div>articles visible by all</div>
 <div>TODO: filters</div>
 <div>TODO: fixed column size</div>
 <div>TODO: better adaptive layout</div>
-<div>TODO: put tab logout link under email on the left</div>

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.07 ###
 ##############################
 
 // App constants
@@ -66,19 +66,19 @@ const ADMIN_ID = 'admin_id';
 const USER_ID = 'user_id';
 
 //Database queries
-const DATE_ASC = 0;
-const DATE_DESC = 1;
-const LOCATION_ASC = 2;
-const LOCATION_DESC = 3;
-const NAME_ASC = 4;
-const NAME_DESC = 5;
-
 const CREATED_ASC = 0;
 const CREATED_DESC = 1;
-const EMAIL_ASC = 2;
-const EMAIL_DESC = 3;
-const LOGIN_ASC = 4;
-const LOGIN_DESC = 5;
+const DATE_ASC = 2;
+const DATE_DESC = 3;
+const EMAIL_ASC = 4;
+const EMAIL_DESC = 5;
+const LOCATION_ASC = 6;
+const LOCATION_DESC = 7;
+const NAME_ASC = 8;
+const NAME_DESC = 9;
+const LOGIN_ASC = 10;
+const LOGIN_DESC = 11;
+const OWNED_BY = 12;
 
 //Database errors
 const ARTICLE_DELETE = 'failure to delete article from database: ';
