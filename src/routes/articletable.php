@@ -78,11 +78,21 @@ class ArticleTable extends BaseRoute
 
         end:
 
-        $item_count = Database::articles()->queryCount();
+        $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTER_TYPE], $_SESSION[Session::ART_FILTER_VAL]);
+        error_log('ic:' . $item_count);
+
         $offset =   ($_SESSION[Session::ART_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
 
-        $articles = Database::articles()->queryAll(Settings::TABLE_DISPLAY_COUNT, $offset, $_SESSION[Session::ART_ORDERBY]);
+        $articles = Database::articles()->queryAll(
+            Settings::TABLE_DISPLAY_COUNT,
+            $offset,
+            $_SESSION[Session::ART_ORDERBY],
+            $_SESSION[Session::ART_FILTER_TYPE],
+            $_SESSION[Session::ART_FILTER_VAL]
+        );
+
+        error_log('ic2:' . count($articles));
 
         return $this->renderTemplate([
             'articles' =>  $articles,

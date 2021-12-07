@@ -114,8 +114,10 @@ function getOwner(Article $article): string
                                 <?php echo Filter::getLabel(FILTER::ARTICLE_NAME) ?></span></li>
                         <li><span id="<?php echo Filter::LOCATION ?>" class="dropdown-item filter-item">
                                 <?php echo Filter::getLabel(FILTER::LOCATION) ?></span></li>
-                        <li><span id="<?php echo Filter::DATE ?>" class="dropdown-item filter-item">
-                                <?php echo Filter::getLabel(FILTER::DATE) ?></span></li>
+                        <li><span id="<?php echo Filter::DATE_BEFORE ?>" class="dropdown-item filter-item">
+                                <?php echo Filter::getLabel(FILTER::DATE_BEFORE) ?></span></li>
+                        <li><span id="<?php echo Filter::DATE_AFTER ?>" class="dropdown-item filter-item">
+                                <?php echo Filter::getLabel(FILTER::DATE_AFTER) ?></span></li>
                     </ul>
 
                     <input id="filter-val" name="filter-val" class="form-control" type="search" placeholder="filtre" aria-label="Filter" value="<?php echo $filter_val ?>">
@@ -227,9 +229,3 @@ function getOwner(Article $article): string
         });
     }
 </script>
-
-
-<div>TODO: color scheme for dates / peremption</div>
-<div>TODO: filters</div>
-<div>TODO: fixed column size</div>
-<div>TODO: better adaptive layout</div>

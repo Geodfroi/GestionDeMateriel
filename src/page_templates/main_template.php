@@ -68,6 +68,21 @@ use app\helpers\Authenticate;
         <?php echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page"; ?>
     </main>
 
+    <div>
+        <div>MAIN: backup db</div>
+        <div>ADMIN - access user contact posts.</div>
+        <div>ADMIN - create new email to user.</div>
+        <div>ARTICLES: color scheme for dates / peremption</div>
+        <div>ARTICLES: filters</div>
+        <div>ARTICLES: fixed column size</div>
+        <div>ARTICLES: better adaptive layout</div>
+        <div>CONTACT: create contact page</div>
+        <div>LOGIN: add favicon</div>
+        <div>USER_EDIT: layout for small screen.</div>
+        <div>USER_TABLE: send email to new user when account is created.</div>
+        <div>USER_TABLE: alias for column created by</div>
+    </div>
+
     <div style="margin-top: 80px;">&nbsp;</div>
     <footer class="footer mt-auto py-3 bg-light w-100 border-up fixed-bottom">
         <div class="container">

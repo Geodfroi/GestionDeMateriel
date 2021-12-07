@@ -61,6 +61,3 @@ use app\helpers\TUtil;
         </div>
     </div>
 </div>
-
-<div>TODO: add favicon</div>
-<div>TODO: backup db</div>

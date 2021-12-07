@@ -65,5 +65,3 @@ use app\helpers\TUtil;
 
     </div>
 </div>
-
-<div class="div">TODO: layout for small screen.</div>

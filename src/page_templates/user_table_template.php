@@ -156,6 +156,3 @@ function disLinkAdm(string $header): string
         <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
     </div>
 </div>
-
-<div>TODO: send email to new user when account is created.</div>
-<div>TODO: alias for column created by</div>
