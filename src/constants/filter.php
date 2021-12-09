@@ -3,12 +3,10 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\constants;
-
-use Exception;
 
 /**
  * Filters for article table queries.
@@ -40,25 +38,5 @@ class Filter
             default:
                 return "Par nom d'article:";
         }
-    }
-
-    /**
-     * Compose WHERE clause to be inserted into article database query.
-     */
-    public static function printStatement($filter_type): string
-    {
-        switch ($filter_type) {
-            case Filter::ARTICLE_NAME:
-                return "WHERE article_name LIKE CONCAT('%', :fil, '%')";
-            case Filter::LOCATION:
-                return "WHERE location LIKE CONCAT('%', :fil, '%')";
-            case Filter::DATE_BEFORE:
-                return "WHERE expiration_date < :fil";
-            case Filter::DATE_AFTER:
-                return "WHERE expiration_date > :fil";
-            default:
-                break;
-        }
-        throw new Exception('printStatement:: Invalid arguments');
     }
 }

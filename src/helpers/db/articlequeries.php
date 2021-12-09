@@ -3,17 +3,18 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\helpers\db;
-
-use \PDO;
 
 use app\constants\Error;
 use app\constants\Filter;
 use app\constants\OrderBy;
 use app\models\Article;
+
+use Exception;
+use \PDO;
 
 /**
  * Regroup function to interact with article table.
@@ -65,6 +66,75 @@ class ArticleQueries
     }
 
 
+    /**
+     * Compose WHERE clause to be inserted into article database query.
+     * 
+     * @param int $param Filter constant value.
+     * @return string Where clause.
+     */
+    public static function printFilterStatement($param): string
+    {
+        switch ($param) {
+            case Filter::ARTICLE_NAME:
+                return "WHERE article_name LIKE CONCAT('%', :fil, '%')";
+            case Filter::LOCATION:
+                return "WHERE location LIKE CONCAT('%', :fil, '%')";
+            case Filter::DATE_BEFORE:
+                return "WHERE expiration_date < :fil";
+            case Filter::DATE_AFTER:
+                return "WHERE expiration_date > :fil";
+            default:
+                break;
+        }
+        throw new Exception("printStatement:: Invalid [$param] parameter");
+    }
+
+    /**
+     * Compose ORDER BY clause.
+     * 
+     * @param int $param OrderBy constant value.
+     * @return string orderby clause.
+     */
+    public static function printOrderStatement(int $param): string
+    {
+        // CURRENT_TIMESTAMP - expiration_date <- Order old articles at the end.
+
+        switch ($param) {
+            case OrderBy::NAME_ASC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), article_name ASC';
+            case OrderBy::NAME_DESC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), article_name DESC';
+            case OrderBy::LOCATION_ASC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), location ASC';
+            case OrderBy::LOCATION_DESC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), location DESC';
+            case OrderBy::DELAY_ASC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), (CURRENT_TIMESTAMP - expiration_date) ASC';
+            case OrderBy::DELAY_DESC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), (CURRENT_TIMESTAMP - expiration_date) DESC';
+
+                // case OrderBy::CREATED_ASC:
+                //     return 'creation_date ASC';
+                // case OrderBy::CREATED_DESC:
+                //     return 'creation_date DESC';
+
+                // case OrderBy::EMAIL_ASC:
+                //     return 'email ASC';
+                // case OrderBy::EMAIL_DESC:
+                //     return 'email DESC';
+
+                // case OrderBy::LOGIN_ASC:
+                //     return 'last_login ASC';
+                // case OrderBy::LOGIN_DESC:
+                //     return 'last_login DESC';
+
+                // case OrderBy::OWNED_BY:
+                //     return 'user_id ASC';
+            default:
+                break;
+        }
+        throw new Exception("printOrderStatement: invalid [$param)] parameter");
+    }
 
     /**
      * Insert an article into the database.
@@ -119,7 +189,7 @@ class ArticleQueries
     public function queryCount(int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): int
     {
         $filter_arg = trim($filter_arg);
-        $filter_statement = $filter_arg ? Filter::printStatement($filter_type) : '';
+        $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
 
         error_log('count: ' . "SELECT COUNT(*) FROM articles $filter_statement");
         $preparedStatement = $this->pdo->prepare("SELECT COUNT(*) FROM articles $filter_statement");
@@ -184,12 +254,12 @@ class ArticleQueries
      * @param string $filter_arg Filter argument value.
      * @return array An array of articles.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DATE_DESC, int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): array
     {
         $filter_arg = trim($filter_arg);
-        error_log('arg: ' . $filter_arg);
-        $filter_statement = $filter_arg ? Filter::printStatement($filter_type) : '';
-        $order_q = OrderBy::getOrderParameters($orderby);
+
+        $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
+        $order_statement = ArticleQueries::printOrderStatement($orderby);
 
         $preparedStatement = $this->pdo->prepare("SELECT 
             id, 
@@ -201,7 +271,8 @@ class ArticleQueries
             creation_date
         FROM articles 
         $filter_statement
-        ORDER BY $order_q LIMIT :lim OFFSET :off");
+        $order_statement
+        LIMIT :lim OFFSET :off");
 
         if ($filter_arg) {
             $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);

@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 use app\constants\Filter;
@@ -39,9 +39,9 @@ function disCaretArt(string $header): string
             return 'bi-caret-down';
         }
     } else if ($header === 'per_date') {
-        if ($orderby === OrderBy::DATE_ASC) {
+        if ($orderby === OrderBy::DELAY_ASC) {
             return 'bi-caret-up';
-        } else if ($orderby === OrderBy::DATE_DESC) {
+        } else if ($orderby === OrderBy::DELAY_DESC) {
             return 'bi-caret-down';
         }
     } else if ($header === 'owner') {
@@ -69,7 +69,7 @@ function disLinkArt(string $header): string
     } else if ($header === 'location') {
         return $orderby === OrderBy::LOCATION_ASC ? $root . OrderBy::LOCATION_DESC : $root . OrderBy::LOCATION_ASC;
     } else if ($header === 'per_date') {
-        return $orderby === OrderBy::DATE_ASC ? $root . OrderBy::DATE_DESC : $root . OrderBy::DATE_ASC;
+        return $orderby === OrderBy::DELAY_ASC ? $root . OrderBy::DELAY_DESC : $root . OrderBy::DELAY_ASC;
     } else if ($header === 'owner') {
         return $root . OrderBy::OWNED_BY;
     }
@@ -138,7 +138,7 @@ function getOwner(Article $article): string
 
                     <th><a class="text-decoration-none" href="<?php echo disLinkArt('location') ?>">Location <span class="<?php echo disCaretArt('location') ?>"></span></a>
 
-                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Date de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
+                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Délai de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
 
                     <th><a class="text-decoration-none" href="<?php echo disLinkArt('owner') ?>">Créé par <span class="<?php echo disCaretArt('owner') ?>"></span></a>
 
@@ -150,14 +150,11 @@ function getOwner(Article $article): string
                     $article = $articles[$n];
                     $day_until = Util::getDaysUntil($article->getExpirationDate()); ?>
 
-                    <tr>
-                        <!-- <?php if ($day_until <= 3) { ?>
-                        <tr class="bg-danger">
-                        <?php } elseif ($day_until <= 7) { ?>
-                        <tr class="bg-warning">
+                    <?php if ($day_until <= 0) { ?>
+                        <tr class="bg-secondary">
                         <?php } else { ?>
                         <tr>
-                        <?php } ?> -->
+                        <?php } ?>
 
                         <!-- Article -->
                         <td><?php echo $article->getArticleName()  ?>
@@ -167,12 +164,13 @@ function getOwner(Article $article): string
                         </td>
                         <td><?php echo $article->getLocation() ?></td>
 
-                        <!-- Date de péremption -->
+                        <!-- Délai de péremption -->
                         <td>
                             <?php echo $article->getExpirationDate()->format('d/m/Y') ?>
                             <span>&emsp;</span>
-
-                            <?php if ($day_until <= 3) { ?>
+                            <?php if ($day_until <= 0) { ?>
+                                <span><?php echo 'échu' ?></span>
+                            <?php } elseif ($day_until <= 3) { ?>
                                 <span class="bg-dark text-danger mark"><?php echo sprintf('%s jour(s)', $day_until) ?>&ensp;<i class="bi bi-exclamation-triangle-fill"></i></span>
                             <?php } elseif ($day_until <= 7) { ?>
                                 <span class="bg-dark text-warning mark"><?php echo sprintf('%s jour(s)', $day_until) ?>&ensp;<i class="bi bi-exclamation-circle-fill"></i></span>
@@ -186,7 +184,7 @@ function getOwner(Article $article): string
                         <td><?php echo getOwner($article) ?></td>
                         <!-- Actions -->
                         <td>
-                            <a class="link-secondary" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
+                            <a class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
                             <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
 
@@ -207,8 +205,8 @@ function getOwner(Article $article): string
                                 </div>
                             </div>
                         </div>
-                    </tr>
-                <?php } ?>
+                        </tr>
+                    <?php } ?>
             </tbody>
         </table>
     </div>

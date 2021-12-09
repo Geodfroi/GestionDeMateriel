@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\helpers;
@@ -38,13 +38,17 @@ class Util
      */
     public static function getDaysUntil(DateTime $date): int
     {
-        $today = new DateTime();
+        $today = Util::stripTimeComponent(new DateTime());
+        $date = Util::stripTimeComponent($date);
+
         $interval = $today->diff($date);
+        $days = $interval->days;
         if ($interval->invert) {
-            // interval is negative: expiration date is already past.
-            return 0;
+            error_log('a');
+            $days = -$days;
         }
-        return intval($interval->format('%a'));
+        error_log(strval($days));
+        return $days;
     }
 
     /**
@@ -81,6 +85,16 @@ class Util
         return $randomString;
     }
 
+    /**
+     * Strip time component from a DateTime value. Useful for date comparaison.
+     * 
+     * @param DateTime Date value.
+     * @return DateTime Striped Date value.
+     */
+    public static function stripTimeComponent(DateTime $date): DateTime
+    {
+        return DateTime::createFromFormat('Y-m-d', $date->format('Y-m-d'));
+    }
 
     /**
      * Load a php template in memory and returns a content string.

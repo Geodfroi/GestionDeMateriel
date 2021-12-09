@@ -45,7 +45,46 @@ class UserQueries
         return false;
     }
 
+    /**
+     * Return orderby query element.
+     * 
+     * @param int $param OrderBy Const value.
+     * @return Array orderby string parameters.
+     */
+    public static function getOrderStatement(int $param): string
+    {
+        switch ($param) {
 
+                // case OrderBy::CREATED_ASC:
+                //     return 'creation_date ASC';
+                // case OrderBy::CREATED_DESC:
+                //     return 'creation_date DESC';
+                // case OrderBy::DATE_ASC:
+                //     return 'expiration_date ASC';
+                // case OrderBy::DATE_DESC:
+                //     return 'expiration_date DESC';
+                // case OrderBy::EMAIL_ASC:
+                //     return 'email ASC';
+                // case OrderBy::EMAIL_DESC:
+                //     return 'email DESC';
+                // case OrderBy::LOCATION_ASC:
+                //     return 'location ASC';
+                // case OrderBy::LOCATION_DESC:
+                //     return 'location DESC';
+                // case OrderBy::LOGIN_ASC:
+                //     return 'last_login ASC';
+                // case OrderBy::LOGIN_DESC:
+                //     return 'last_login DESC';
+                // case OrderBy::NAME_ASC:
+                //     return 'article_name ASC';
+                // case OrderBy::NAME_DESC:
+                //     return 'article_name DESC';
+                // case OrderBy::OWNED_BY:
+                //     return 'user_id ASC';
+            default:
+                return '';
+        }
+    }
 
     /**     
      * Insert a User into the database.
@@ -185,7 +224,7 @@ class UserQueries
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
     {
-        $order = OrderBy::getOrderParameters($orderby);
+        $order = UserQueries::getOrderStatement($orderby);
         $filter_admin = $excludeAdmins ? ' WHERE is_admin = False' : '';
 
         // //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\routes;
@@ -13,6 +13,8 @@ use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Util;
+use app\models\Article;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
@@ -31,7 +33,7 @@ class ArticleTable extends BaseRoute
         }
 
         $_SESSION[Session::ART_PAGE] ??= 1;
-        $_SESSION[Session::ART_ORDERBY] ??= OrderBy::DATE_DESC;
+        $_SESSION[Session::ART_ORDERBY] ??= OrderBy::DELAY_ASC;
         $_SESSION[Session::ART_FILTER_TYPE] ??= 0;
         $_SESSION[Session::ART_FILTER_VAL] ??= '';
 
@@ -71,15 +73,12 @@ class ArticleTable extends BaseRoute
         if (isset($_POST['filter'])) {
             $_SESSION[Session::ART_FILTER_TYPE]  = $_POST['filter-type'];
             $_SESSION[Session::ART_FILTER_VAL]  = $_POST['filter-val'];
-
-            error_log('type: ' . $_SESSION[Session::ART_FILTER_TYPE]);
             goto end;
         }
 
         end:
 
         $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTER_TYPE], $_SESSION[Session::ART_FILTER_VAL]);
-        error_log('ic:' . $item_count);
 
         $offset =   ($_SESSION[Session::ART_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
@@ -92,11 +91,29 @@ class ArticleTable extends BaseRoute
             $_SESSION[Session::ART_FILTER_VAL]
         );
 
-        error_log('ic2:' . count($articles));
+        // usort($articles, array($this, "_compareExpired"));
 
         return $this->renderTemplate([
             'articles' =>  $articles,
             'page_count' => $page_count,
         ]);
     }
+
+    // /**
+    //  * sort results so that articles past the expiration date are pushed at the bottom.
+    //  */
+    // function _compareExpired(Article $a, Article $b): int
+    // {
+    //     $delta_a = Util::getDaysUntil($a->getExpirationDate());
+    //     $delta_b = Util::getDaysUntil($b->getExpirationDate());
+    //     return   $delta_a >    $delta_b;
+
+    //     // if ($delta_a > 0 && $delta_b < 0) {
+    //     //     return 1;
+    //     // }
+    //     // if ($delta_a < 0 && $delta_b > 0) {
+    //     //     return -1;
+    //     // }
+    //     // return 0;
+    // }
 }
