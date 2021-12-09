@@ -100,36 +100,28 @@ class ArticleQueries
         // CURRENT_TIMESTAMP - expiration_date <- Order old articles at the end.
 
         switch ($param) {
+                // order by is already expired, then name, then delay until peremption by order of urgency.
             case OrderBy::NAME_ASC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), article_name ASC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), article_name ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
             case OrderBy::NAME_DESC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), article_name DESC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), article_name DESC, (CURRENT_TIMESTAMP - expiration_date) DESC';
+
+                // order by is already expired, then location, then delay until peremption by order of urgency.
             case OrderBy::LOCATION_ASC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), location ASC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), location ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
             case OrderBy::LOCATION_DESC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), location DESC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), location DESC, (CURRENT_TIMESTAMP - expiration_date) DESC';
+                // order by is already expired, then delay, then owner.
             case OrderBy::DELAY_ASC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), (CURRENT_TIMESTAMP - expiration_date) ASC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), (CURRENT_TIMESTAMP - expiration_date) ASC, alias ASC';
             case OrderBy::DELAY_DESC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), (CURRENT_TIMESTAMP - expiration_date) DESC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), (CURRENT_TIMESTAMP - expiration_date) DESC, alias ASC';
 
-                // case OrderBy::CREATED_ASC:
-                //     return 'creation_date ASC';
-                // case OrderBy::CREATED_DESC:
-                //     return 'creation_date DESC';
-
-                // case OrderBy::EMAIL_ASC:
-                //     return 'email ASC';
-                // case OrderBy::EMAIL_DESC:
-                //     return 'email DESC';
-
-                // case OrderBy::LOGIN_ASC:
-                //     return 'last_login ASC';
-                // case OrderBy::LOGIN_DESC:
-                //     return 'last_login DESC';
-
-                // case OrderBy::OWNED_BY:
-                //     return 'user_id ASC';
+                // order by is already expired, then owner, then creation date, then delay.
+            case OrderBy::OWNED_BY_ASC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), alias ASC, creation_date ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
+            case OrderBy::OWNED_BY_DESC:
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), alias DESC, creation_date ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
             default:
                 break;
         }
@@ -180,35 +172,6 @@ class ArticleQueries
     }
 
     /**
-     * Get number of articles in db.
-     * 
-     * @param int $filter_type Filter parameter. Use Filter constants as parameter.
-     * @param string $filter_arg Filter argument value.
-     * @return int # of articles or -1 if query fails.
-     */
-    public function queryCount(int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): int
-    {
-        $filter_arg = trim($filter_arg);
-        $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
-
-        error_log('count: ' . "SELECT COUNT(*) FROM articles $filter_statement");
-        $preparedStatement = $this->pdo->prepare("SELECT COUNT(*) FROM articles $filter_statement");
-
-        if ($filter_arg) {
-            $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
-        }
-
-        if ($preparedStatement->execute()) {
-            $r = $preparedStatement->fetchColumn();
-            return intval($r);
-        }
-
-        list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::ARTICLES_COUNT_QUERY . $error . PHP_EOL);
-        return -1;
-    }
-
-    /**
      * Retrieve a single Article by id.
      * 
      * @param int $id Article id.
@@ -245,6 +208,34 @@ class ArticleQueries
     }
 
     /**
+     * Get number of articles in db.
+     * 
+     * @param int $filter_type Filter parameter. Use Filter constants as parameter.
+     * @param string $filter_arg Filter argument value.
+     * @return int # of articles or -1 if query fails.
+     */
+    public function queryCount(int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): int
+    {
+        $filter_arg = trim($filter_arg);
+        $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
+
+        $preparedStatement = $this->pdo->prepare("SELECT COUNT(*) FROM articles $filter_statement");
+
+        if ($filter_arg) {
+            $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
+        }
+
+        if ($preparedStatement->execute()) {
+            $r = $preparedStatement->fetchColumn();
+            return intval($r);
+        }
+
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log(Error::ARTICLES_COUNT_QUERY . $error . PHP_EOL);
+        return -1;
+    }
+
+    /**
      * Retrieve database articles;
      * 
      * @param int $limit The maximum number of items to be returned.
@@ -261,15 +252,17 @@ class ArticleQueries
         $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
         $order_statement = ArticleQueries::printOrderStatement($orderby);
 
+        // join table if necessary to have user column alias available in orderby statements.
         $preparedStatement = $this->pdo->prepare("SELECT 
-            id, 
-            user_id, 
-            article_name, 
-            location,
-            comments, 
-            expiration_date,
-            creation_date
-        FROM articles 
+            articles.id, 
+            articles.user_id, 
+            articles.article_name, 
+            articles.location,
+            articles.comments, 
+            articles.expiration_date,
+            articles.creation_date,
+            users.alias
+        FROM articles INNER JOIN users ON articles.user_id = users.id
         $filter_statement
         $order_statement
         LIMIT :lim OFFSET :off");
@@ -285,6 +278,7 @@ class ArticleQueries
         if ($preparedStatement->execute()) {
             // fetch next as associative array until there are none to be fetched.
             while ($data = $preparedStatement->fetch()) {
+
                 array_push($articles, Article::fromDatabaseRow($data));
             }
         } else {

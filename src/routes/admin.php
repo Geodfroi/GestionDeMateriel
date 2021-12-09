@@ -7,8 +7,9 @@
 namespace app\routes;
 
 use app\constants\Route;
-use app\helpers\Authenticate;
+use app\constants\Session;
 
+use app\helpers\Authenticate;
 
 class Admin extends BaseRoute
 {

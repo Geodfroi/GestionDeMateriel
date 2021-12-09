@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\helpers;
@@ -44,7 +44,7 @@ class Authenticate
 
     public static function isAdmin()
     {
-        return isset($_SESSION[Session::ADMIN_ID]);
+        return isset($_SESSION[Session::IS_ADMIN]);
     }
 
     public static function isLoggedIn(): bool
@@ -63,18 +63,10 @@ class Authenticate
 
         // USER_ID and ADMIN_ID are separate to allow admin to log-in as a different user and keep admin privileges.
         if ($user->isAdmin()) {
-            $_SESSION[Session::ADMIN_ID] = $user->getId();
+            $_SESSION[Session::IS_ADMIN] = true;
         }
 
         Database::users()->updateLogTime($user->getId());
-    }
-
-    /**
-     * Log-in to a user account as an admin.
-     */
-    public static function login_as(int $id)
-    {
-        $_SESSION[Session::USER_ID] = $id;
     }
 
     /**
@@ -90,3 +82,11 @@ class Authenticate
         }
     }
 }
+
+    // /**
+    //  * Log-in to a user account as an admin.
+    //  */
+    // public static function login_as(int $id)
+    // {
+    //     $_SESSION[Session::USER_ID] = $id;
+    // }

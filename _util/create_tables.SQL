@@ -5,18 +5,18 @@ USE HEdS_inv_exp;
 -- Inventory item
 CREATE TABLE IF NOT EXISTS `articles` (
     `id`                int             UNSIGNED NOT NULL  AUTO_INCREMENT PRIMARY KEY,
-    `user_id`           int             NOT NULL,
     `article_name`      varchar(255)    NOT NULL,
-    `location`          varchar(255)    NOT NULL,
     `comments`          varchar(255),
+    `creation_date`     timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `expiration_date`   timestamp       NOT NULL,
-    `creation_date`     timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+    `location`          varchar(255)    NOT NULL,
+    `user_id`           int             NOT NULL
+ );
 
 -- App Users
 CREATE TABLE IF NOT EXISTS `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `alias`         varchar(255),
+    `alias`         varchar(255)    NOT NULL UNIQUE,
     `email`         varchar(255)    NOT NULL UNIQUE,
     `contact_email` varchar(255),
     `contact_delay` varchar(255)    NOT NULL DEFAULT '3-14',

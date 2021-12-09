@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\constants;
@@ -15,7 +15,7 @@ class Settings
 {
     const APP_NAME = "HEdS Gestionnaire d'inventaire";
     const APP_FULL_URL = "http://localhost:8085/";
-    const LAST_MODIFICATION = '07 décembre 2021';
+    const LAST_MODIFICATION = '09 décembre 2021';
 
     const EMAIL_TEMPLATES_PATH = 'email_templates';
     const TEMPLATES_PATH = 'page_templates';

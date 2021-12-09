@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\models;
@@ -72,6 +72,7 @@ class User
         $instance->contact_email = '';
         $instance->contact_delay = '3-14';
         $instance->email = $email;
+        $instance->alias = $email;
         $instance->password_hash = Util::encryptPassword($plain_password);
         $instance->creation_date = new DateTime();
         $instance->last_login = new DateTime();
@@ -103,17 +104,6 @@ class User
         return $this->contact_email;
     }
 
-    /**
-     * @return string Recipient string to be used in email body.
-     */
-    public function getDisplayAlias(): string
-    {
-        if ($this->getAlias()) {
-            return $this->getAlias();
-        }
-        return $this->getEmail();
-    }
-
     public function getEmail(): string
     {
         return $this->email;
@@ -128,7 +118,6 @@ class User
     {
         return $this->last_login;
     }
-
 
     /**
      * Addresses where emails will be sent.
@@ -146,6 +135,11 @@ class User
     public function getPassword(): string
     {
         return $this->password_hash;
+    }
+
+    public function hasAlias(): bool
+    {
+        return $this->alias !== $this->email;
     }
 
     public function isAdmin(): bool

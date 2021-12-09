@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 use app\constants\OrderBy;
@@ -91,20 +91,30 @@ function disLinkAdm(string $header): string
                 <?php for ($n = 0; $n < count($users); $n++) {
                     $user = $users[$n]; ?>
                     <tr>
-                        <td><?php echo $user->getEmail() ?>
+                        <!-- email -->
+                        <td>
+                            <?php if ($user->hasAlias()) {
+                                echo sprintf('%s (%s)', $user->getEmail(), $user->getAlias());
+                            } else {
+                                echo $user->getEmail();
+                            } ?>
+
                             <?php if ($user->isAdmin()) { ?>
                                 <i class="bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
                             <?php } ?>
                         </td>
-                        <td><?php echo $user->getCreationDate()->format('d/m/Y') ?></td>
-                        <td><?php echo $user->getLastLogin()->format('d/m/Y') ?></td>
+                        <!-- creation -->
+                        <td><?php echo $user->getCreationDate()->format('d-m-Y') ?></td>
+                        <!-- login -->
+                        <td><?php echo $user->getLastLogin()->format('d-m-Y H:i:s') ?></td>
                         <td>
                             <a class="link-secondary" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
 
                             <?php if (!$user->isAdmin()) { ?>
-                                <a href="<?php echo Route::USERS_TABLE . '?connect=' . $user->getId() ?>" class="link-secondary text-info ms-2"><i class="bi bi-usb-plug" role="img" style="font-size: 1.2rem;" aria-label="connect-as" data-bs-toggle="tooltip" title="Se connecter en tant que [<?php echo $user->getEmail() ?>]" data-bs-placement="bottom"></i></a>
+                                <a href="<?php echo Route::USER_EDIT . '?edit=' . $user->getId() ?>" class="link-secondary text-info ms-2"><i class="bi bi-usb-plug" role="img" style="font-size: 1.2rem;" aria-label="connect-as" data-bs-toggle="tooltip" title="Modifier le profil d'utilisateur." data-bs-placement="bottom"></i></a>
                             <?php } ?>
                         </td>
+
                         <!-- Modal window for user delete confirmation -->
                         <div class="modal fade" id=<?php echo "delete-modal-$n" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=<?php echo "delete-modalLabel-$n" ?> aria-hidden="true">
                             <div class="modal-dialog">
@@ -112,9 +122,7 @@ function disLinkAdm(string $header): string
                                     <div class="modal-header">
                                         <h5 class="modal-title" id=<?php echo "delete-modalLabel-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
                                     </div>
-                                    <div class="modal-body">
-                                        Voulez-vous vraiment supprimer [<?php echo $user->getEmail() ?>] ? Les articles associés à cet utilisateur seront également supprimés.
-                                    </div>
+                                    <div class="modal-body"> Voulez-vous vraiment supprimer le compte utilisateur [<?php echo $user->getEmail() ?>] ? </div>
                                     <div class="modal-footer">
                                         <a href="<?php echo Route::USERS_TABLE . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>

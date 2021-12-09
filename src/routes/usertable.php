@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\routes;
@@ -54,26 +54,21 @@ class UserTable extends BaseRoute
 
         if (isset($_GET['delete'])) {
             $user_id = $_GET['delete'];
-            $user = Database::users()->queryById($user_id);
 
             if (Database::users()->delete($user_id)) {
-                if (Database::articles()->deleteUserArticles($user_id)) {
-                    $this->setAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
-                } else {
-                    Database::users()->insert($user); // insert back user if article delete was unsuccessful.
-                    $this->setAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
-                }
+                $this->setAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
             } else {
                 $this->setAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
             }
             goto end;
         }
 
-        if (isset($_GET['connect'])) {
-            Authenticate::login_as($_GET['connect']);
-            $this->requestRedirect(Route::ART_TABLE);
-            return '';
-        }
+
+        // if (isset($_GET['edit'])) {
+        //     $_SESSION[SESSION::EDIT_ID] = $_GET['profile'];
+        //     $this->requestRedirect(Route::PROFILE);
+        //     return '';
+        // }
 
         end:
 
@@ -85,7 +80,6 @@ class UserTable extends BaseRoute
         return $this->renderTemplate([
             'users' =>  $users,
             'page_count' => $page_count,
-
         ]);
     }
 }

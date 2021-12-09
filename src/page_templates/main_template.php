@@ -69,7 +69,7 @@ use app\helpers\Authenticate;
     </main>
 
     <div>
-        <div>Filter by urgent delay</div>
+        <div>PROFILE - Renew user password from ADMIN account</div>
         <div>MAIN: backup db</div>
         <div>ADMIN - access user contact posts.</div>
         <div>ADMIN - create new email to user.</div>

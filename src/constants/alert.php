@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\constants;
@@ -41,6 +41,7 @@ class Alert
     const ALIAS_DELETE_SUCCESS = "Vous avez effacé votre alias. Votre e-mail sera utilisé pour vous identifier auprès des autres utilisateurs.";
     const ALIAS_UPDATE_FAILURE = "Votre alias n'a pas pu être modifié.";
     const ALIAS_UPDATE_SUCCESS = "Votre alias a été modifié avec succès.";
+    const ALIAS_EXISTS_FAILURE = "Un autre utilisateur utilise déjà cet alias.";
     const CONTACT_RESET_SUCCESS = "Vos e-mail de rappels sont désormais envoyé à [%s].";
     const CONTACT_SET_FAILURE = "Le changement d'adresse de contact a échoué.";
     const CONTACT_SET_SUCCESS = "Votre nouvelle adresse de contact [%s] a été définie avec succès.";
@@ -48,4 +49,5 @@ class Alert
     const DELAY_SET_SUCCESS = "Les délais de contact avant péremption ont été modifié avec succès.";
     const PASSWORD_UPDATE_FAILURE = "Le changement de mot de passe a échoué.";
     const PASSWORD_UPDATE_SUCCESS = "Le mot de passe a été modifié avec succès.";
+    const USER_NOT_FOUND = "L'utilisateur n'a pas pu être identifié.";
 }

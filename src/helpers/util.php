@@ -44,10 +44,8 @@ class Util
         $interval = $today->diff($date);
         $days = $interval->days;
         if ($interval->invert) {
-            error_log('a');
             $days = -$days;
         }
-        error_log(strval($days));
         return $days;
     }
 

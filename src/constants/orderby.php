@@ -22,5 +22,6 @@ class OrderBy
     const NAME_DESC = 9;
     const LOGIN_ASC = 10;
     const LOGIN_DESC = 11;
-    const OWNED_BY = 12;
+    const OWNED_BY_ASC = 12;
+    const OWNED_BY_DESC = 13;
 }

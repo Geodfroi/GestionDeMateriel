@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 use app\constants\Route;
@@ -24,13 +24,17 @@ use app\helpers\TUtil;
     <!-- Profile change list -->
     <?php if ($display == 0) { ?>
 
+        <div class="row">
+            <span class="text-center text-info border border-primary border-2 rounded mt-4 mb-2 py-2 col-12 col-md-6 mx-auto"> <?php echo "Compte utilisateur : $login_email" ?></span>
+        </div>
+
         <div class="row" data-bs-toggle="tooltip" title="Par défaut, l'email est utilisé pour identifier l'utilisateur au sein de l'application. Un nom d'usager peut être défini de façon facultative." data-bs-placement="bottom"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto mt-4" href="<?php echo Route::PROFILE . '?set_alias=1' ?>">Définir un nom d'usager.</a></div>
 
-        <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?change_password=1' ?>">Changer mon mot de passe</a></div>
+        <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?change_password=1' ?>">Changer de mot de passe</a></div>
 
-        <div class="row" data-bs-toggle="tooltip" title="Il n'est pas possible de changer l'adresse de login, mais l'adresse e-mail par laquelle l'application vous contacte peut être modifiée." data-bs-placement="bottom"> <a class=" btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?add_email=1' ?>">Ajouter une adresse de contact</a></div>
+        <div class="row" data-bs-toggle="tooltip" title="Il n'est pas possible de changer l'adresse de login, mais une adresse de contact supplémentaire peut être ajoutée." data-bs-placement="bottom"> <a class=" btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?add_email=1' ?>">Ajouter une adresse de contact</a></div>
 
-        <div class="row" data-bs-toggle="tooltip" title="Par défault, l'application vous averti une première fois 2 semaines  avant qu'un article arrive à péremption, puis une seconde fois trois jours avant." data-bs-placement="bottom">
+        <div class="row" data-bs-toggle="tooltip" title="Par défault, l'application envoie un e-mail de rappel une première fois 2 semaines  avant qu'un article arrive à péremption, puis une nouvelle fois trois jours avant." data-bs-placement="bottom">
             <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" href="<?php echo Route::PROFILE . '?modify_delay=1' ?>">Modifier le délai de contact</a>
         </div>
     <?php } else { ?>
@@ -45,7 +49,7 @@ use app\helpers\TUtil;
                         <?php if (isset($errors['alias'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['alias'] ?> </div>
                         <?php } else { ?>
-                            <div id="id-descr" class="form-text">Définissez votre alias au sein de l'application. Il sera plus facile pour vos collègues de vous identifier par votre nom que par votre e-mail.</div>
+                            <div id="id-descr" class="form-text">Définissez un alias au sein de l'application. Il est plus facile pour autrui d'identifier un utilisateur par un alias plutôt que par un e-mail.</div>
                         <?php } ?>
                     </div>
                 </div>
@@ -65,7 +69,7 @@ use app\helpers\TUtil;
                         <?php if (isset($errors['password'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
                         <?php } else { ?>
-                            <div class="form-text">Entrer votre nouveau mot de passe.</div>
+                            <div class="form-text">Entrer un nouveau mot de passe.</div>
                         <?php } ?>
                     </div>
                 </div>
@@ -77,7 +81,7 @@ use app\helpers\TUtil;
                         <?php if (isset($errors['password-repeat'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['password-repeat'] ?> </div>
                         <?php } else { ?>
-                            <div class="form-text">Entrer votre nouveau mot de passe une seconde fois.</div>
+                            <div class="form-text">Entrer le nouveau mot de passe une seconde fois.</div>
                         <?php } ?>
                     </div>
                 </div>
@@ -92,7 +96,7 @@ use app\helpers\TUtil;
 
             <div class="row mt-4 mb-3">
                 <div class="col-12 col-md-8 mx-auto">
-                    <label for="login-input" class="form-label">Votre e-mail d'inscription. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Votre e-mail d'inscription sert d'identifiant dans notre base de donnée et ne peut ainsi pas être modifié." data-bs-placement="right"></i></label>
+                    <label for="login-input" class="form-label">L'e-mail d'inscription. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="L'e-mail d'inscription sert d'identifiant dans la base de donnée et ne peut ainsi pas être modifié." data-bs-placement="right"></i></label>
                     <input id="login-input" class="form-control" type="text" value="<?php echo $login_email ?>" disabled readonly>
                 </div>
             </div>
@@ -101,7 +105,7 @@ use app\helpers\TUtil;
                 <div class="row mb-4">
                     <div class="col-12 col-md-8 mx-auto">
 
-                        <label for="contact-input" class="form-label">Votre e-mail de contact pour recevoir les courriers de rappels. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Prenez-garde à correctement entrer votre adresse: l'application ne vérifie pas que l'adresse fournie existe." data-bs-placement="right"></i></label>
+                        <label for="contact-input" class="form-label">L'e-mail de contact pour recevoir les courriers de rappels. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Il faut prendre garde à correctement taper l'adresse car l'application ne vérifie pas que cette dernière soit fonctionnelle." data-bs-placement="right"></i></label>
                         <input id="contact-input" name="contact-email" type="email" value="<?php echo TUtil::escape($contact_email) ?>" class="form-control
                             <?php echo isset($errors['contact-email']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">

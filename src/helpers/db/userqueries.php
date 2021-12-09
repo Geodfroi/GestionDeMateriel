@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\helpers\db;
 
 use \PDO;
+use Exception;
 
 use app\constants\Error;
 use app\constants\OrderBy;
@@ -46,44 +47,35 @@ class UserQueries
     }
 
     /**
-     * Return orderby query element.
+     * Compose ORDER BY clause.
      * 
-     * @param int $param OrderBy Const value.
-     * @return Array orderby string parameters.
+     * @param int $param OrderBy constant value.
+     * @return string orderby clause.
      */
     public static function getOrderStatement(int $param): string
     {
         switch ($param) {
+                //simply by email which are unique.
+            case OrderBy::EMAIL_ASC:
+                return 'ORDER BY email ASC';
+            case OrderBy::EMAIL_DESC:
+                return 'ORDER BY email DESC';
 
-                // case OrderBy::CREATED_ASC:
-                //     return 'creation_date ASC';
-                // case OrderBy::CREATED_DESC:
-                //     return 'creation_date DESC';
-                // case OrderBy::DATE_ASC:
-                //     return 'expiration_date ASC';
-                // case OrderBy::DATE_DESC:
-                //     return 'expiration_date DESC';
-                // case OrderBy::EMAIL_ASC:
-                //     return 'email ASC';
-                // case OrderBy::EMAIL_DESC:
-                //     return 'email DESC';
-                // case OrderBy::LOCATION_ASC:
-                //     return 'location ASC';
-                // case OrderBy::LOCATION_DESC:
-                //     return 'location DESC';
-                // case OrderBy::LOGIN_ASC:
-                //     return 'last_login ASC';
-                // case OrderBy::LOGIN_DESC:
-                //     return 'last_login DESC';
-                // case OrderBy::NAME_ASC:
-                //     return 'article_name ASC';
-                // case OrderBy::NAME_DESC:
-                //     return 'article_name DESC';
-                // case OrderBy::OWNED_BY:
-                //     return 'user_id ASC';
+                // by creation date, then email.
+            case OrderBy::CREATED_ASC:
+                return 'ORDER BY creation_date ASC, email ASC';
+            case OrderBy::CREATED_DESC:
+                return 'ORDER BY creation_date DESC, email ASC';
+
+                // by last login date.
+            case OrderBy::LOGIN_ASC:
+                return 'ORDER BY last_login ASC';
+            case OrderBy::LOGIN_DESC:
+                return 'ORDER BY last_login DESC';
             default:
-                return '';
+                break;
         }
+        throw new Exception("printOrderStatement: invalid [$param)] parameter");
     }
 
     /**     
@@ -126,6 +118,37 @@ class UserQueries
     }
 
     /**
+     * Return a single User data by alias.
+     * 
+     * @param int $id User alias.
+     * @return ?User User class instance.
+     */
+    public function queryByAlias(string $alias): ?User
+    {
+        $preparedStatement = $this->pdo->prepare('SELECT 
+            id, 
+            alias,
+            contact_email,
+            contact_delay,
+            email, 
+            password, 
+            creation_date, 
+            last_login,
+            is_admin 
+        FROM Users WHERE alias = :al');
+
+        $preparedStatement->bindParam(':al', $alias, PDO::PARAM_STR);
+
+        if ($preparedStatement->execute()) {
+            $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+            return $data ? User::fromDatabaseRow($data) : null;
+        }
+        list(,, $error) = $preparedStatement->errorInfo();
+        error_log(Error::USER_QUERY . $error . PHP_EOL);
+        return null;
+    }
+
+    /**
      * Return a single User data by id.
      * 
      * @param int $id User id.
@@ -146,7 +169,6 @@ class UserQueries
         FROM Users WHERE id = :id');
 
         $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
-
 
         if ($preparedStatement->execute()) {
             $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
@@ -224,11 +246,11 @@ class UserQueries
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
     {
-        $order = UserQueries::getOrderStatement($orderby);
-        $filter_admin = $excludeAdmins ? ' WHERE is_admin = False' : '';
+        $order_statement = UserQueries::getOrderStatement($orderby);
+        $filter_statement = $excludeAdmins ? ' WHERE is_admin = False' : '';
 
-        // //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.
-        $query_str = "SELECT 
+        //Only data can be bound inside $preparedStatement, order-by params and where clause must be set before in the query string.
+        $preparedStatement = $this->pdo->prepare("SELECT 
              id, 
              alias,
              contact_email,
@@ -239,10 +261,9 @@ class UserQueries
              last_login, 
              is_admin
          FROM users 
-         $filter_admin 
-         ORDER BY $order LIMIT :lim OFFSET :off";
+         $filter_statement 
+         $order_statement LIMIT :lim OFFSET :off");
 
-        $preparedStatement = $this->pdo->prepare($query_str);
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 

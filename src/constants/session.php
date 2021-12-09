@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.09 ###
 ##############################
 
 namespace app\constants;
@@ -20,6 +20,11 @@ class Session
     const ART_FILTER_TYPE = 'article_filter_type';
     const ART_FILTER_VAL = 'article_filter_value';
 
-    const ADMIN_ID = 'admin_id';
+    // /**
+    //  * Which profile is loaded on the user edit page.
+    //  */
+    // const USER_EDIT_ID = 'edit_id';
+
     const USER_ID = 'user_id';
+    const IS_ADMIN = 'is_admin';
 }

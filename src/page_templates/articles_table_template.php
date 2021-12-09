@@ -45,7 +45,9 @@ function disCaretArt(string $header): string
             return 'bi-caret-down';
         }
     } else if ($header === 'owner') {
-        if ($orderby === OrderBy::OWNED_BY) {
+        if ($orderby === OrderBy::OWNED_BY_ASC) {
+            return 'bi-caret-up';
+        } else if ($orderby === OrderBy::OWNED_BY_DESC) {
             return 'bi-caret-down';
         }
     }
@@ -69,9 +71,9 @@ function disLinkArt(string $header): string
     } else if ($header === 'location') {
         return $orderby === OrderBy::LOCATION_ASC ? $root . OrderBy::LOCATION_DESC : $root . OrderBy::LOCATION_ASC;
     } else if ($header === 'per_date') {
-        return $orderby === OrderBy::DELAY_ASC ? $root . OrderBy::DELAY_DESC : $root . OrderBy::DELAY_ASC;
+        return $orderby === OrderBy::DELAY_DESC ? $root . OrderBy::DELAY_ASC : $root . OrderBy::DELAY_DESC;
     } else if ($header === 'owner') {
-        return $root . OrderBy::OWNED_BY;
+        return $orderby === OrderBy::OWNED_BY_DESC ? $root . OrderBy::OWNED_BY_ASC : $root . OrderBy::OWNED_BY_DESC;
     }
     return '';
 }
@@ -83,7 +85,10 @@ function getOwner(Article $article): string
 {
     $user = Database::users()->queryById($article->getUserId());
     if ($user) {
-        return sprintf("%s (%s)", $user->getDisplayAlias(), $article->getCreationDate()->format('d.m.Y'));
+
+        //take only caracters before @ if it is an email.
+        $alias  = explode('@', $user->getAlias())[0];
+        return sprintf("%s (%s)", $alias, $article->getCreationDate()->format('d.m.Y'));
     }
     return "Inconnu";
 }
