@@ -3,12 +3,10 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\helpers;
-
-
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -49,7 +47,7 @@ class Mailing
      */
     public static function passwordChangeNotification(User $user, string $password): bool
     {
-        $html =  Mailing::passwordChangeNotificationBody($user->getDisplayAlias(), $password);
+        $html =  Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
         return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
     }
 
@@ -79,7 +77,7 @@ class Mailing
      */
     public static function peremptionNotification(User $user, array $reminders): bool
     {
-        $html =  Mailing::peremptionNotificationBody($user->getDisplayAlias(), $reminders);
+        $html =  Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
         return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_PEREMPTION_REMINDER,  $html, '');
     }
 
@@ -106,15 +104,22 @@ class Mailing
      * @param string $subject Email subject.
      * @param string $html_content HTML formatted content.
      * @param string $plain_content Plain content for client refusing html version.
+     * @param bool $show_debug_output Show detailled debug output. 
      * @return true True if email is sent properly.
      */
-    private static function send(array $recipients, string $subject, string $html_content, string $plain_content): bool
+    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, bool $show_debug_output = false): bool
     {
+        if (SETTINGS::IS_DEBUG) {
+            $recipients = [SETTINGS::DEBUG_EMAIL];
+        }
+
         $mail = new PHPMailer(true);
 
         try {
             // Server settings
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
+            if ($show_debug_output) {
+                $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
+            }
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;

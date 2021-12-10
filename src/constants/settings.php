@@ -13,6 +13,9 @@ namespace app\constants;
  */
 class Settings
 {
+    const IS_DEBUG = true;
+    const DEBUG_EMAIL = 'innov.heds@gmail.com';
+
     const APP_NAME = "HEdS Gestionnaire d'inventaire";
     const APP_FULL_URL = "http://localhost:8085/";
     const LAST_MODIFICATION = '09 décembre 2021';

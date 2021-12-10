@@ -7,6 +7,7 @@
 namespace app\routes;
 
 use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\Error;
 use app\constants\Route;
 use app\helpers\Authenticate;

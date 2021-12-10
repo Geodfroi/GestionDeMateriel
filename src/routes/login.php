@@ -1,17 +1,17 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\Error;
 use app\constants\Route;
 use app\helpers\Database;
 use app\helpers\Authenticate;
-use app\helpers\Mailing;
 use app\helpers\Util;
 
 /**
@@ -44,23 +44,9 @@ class Login extends BaseRoute
             $user = Database::users()->queryByEmail($email);
 
             if (isset($user)) {
-                $former_password = $user->getPassword();
-
-                $plain_password = Util::getRandomPassword();
-                $encrypted = Util::encryptPassword($plain_password);
-
-                if (Database::users()->updatePassword($user->getId(), $encrypted)) {
-
-                    if (Mailing::passwordChangeNotification($user,  $plain_password)) {
-                        $this->setAlert(AlertType::SUCCESS, Alert::LOGIN_NEW_PASSWORD_SUCCESS);
-                        goto end;
-                    } else {
-                        // attempt to roll back change.
-                        Database::users()->updatePassword($user->getId(), $former_password);
-                    }
-                }
+                Util::renewPassword($this, $user);
             }
-            $this->setAlert(AlertType::FAILURE, Alert::LOGIN_NEW_PASSWORD_FAILURE);
+
             goto end;
         }
 

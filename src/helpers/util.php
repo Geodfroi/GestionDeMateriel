@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\helpers;
 
+use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\Error;
 use app\constants\Settings;
+use app\models\User;
 use app\routes\BaseRoute;
 
 use DateTime;
@@ -81,6 +84,31 @@ class Util
         }
 
         return $randomString;
+    }
+
+    /**
+     * Create a new password, send a renewal email and modify database record.
+     * 
+     * @param BaseRoute Route receiving the alerts.
+     * @param User User.
+     */
+    public static function renewPassword(BaseRoute $route, User $user)
+    {
+        $former_password = $user->getPassword();
+
+        $plain_password = Util::getRandomPassword();
+        $encrypted = Util::encryptPassword($plain_password);
+
+        if (Database::users()->updatePassword($user->getId(), $encrypted)) {
+
+            if (Mailing::passwordChangeNotification($user,  $plain_password)) {
+                $route->setAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getEmail()));
+                return;
+            }
+            // attempt to roll back update.
+            Database::users()->updatePassword($user->getId(), $former_password);
+        }
+        $route->setAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
     }
 
     /**

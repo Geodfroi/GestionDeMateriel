@@ -1,12 +1,11 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\routes;
 
-use app\constants\Alert;
 use app\constants\Error;
 use app\constants\Route;
 use app\helpers\Authenticate;
@@ -33,35 +32,37 @@ class UserEdit extends BaseRoute
             return '';
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+        if (isset($_POST['new-user'])) {
+            $p_val = Util::validatePassword($this, $password);
+            $e_val = $this->validate_email($email);
             $is_admin = isset($_POST['is_admin']);
 
-            if (isset($_POST['new-user'])) {
-                $p_val = Util::validatePassword($this, $password);
-                $e_val = $this->validate_email($email);
+            if ($p_val && $e_val) {
+                $user = User::fromForm($email, $password, $is_admin);
 
-                if ($p_val && $e_val) {
-
-                    $user = User::fromForm($email, $password, $is_admin);
-
-                    if (Database::users()->insert($user)) {
-                        $this->requestRedirect(Route::ADMIN . '?alert=added_success');
-                    } else {
-                        $this->requestRedirect(Route::ADMIN . '?alert=added_failure');
-                    }
-                    return '';
+                if (Database::users()->insert($user)) {
+                    $this->requestRedirect(Route::ADMIN . '?alert=added_success');
+                } else {
+                    $this->requestRedirect(Route::ADMIN . '?alert=added_failure');
                 }
-            } else if (isset($_POST['regen-password'])) {
-                $password = Util::getRandomPassword();
-                $this->validate_email($email);
+                return '';
             }
+            goto end;
         }
+
+        if (isset($_POST['regen-password'])) {
+            $is_admin = isset($_POST['is_admin']);
+            $password = Util::getRandomPassword();
+            $this->validate_email($email);
+            goto end;
+        }
+
+        end:
 
         return $this->renderTemplate([
             'email' => $email ?? '',
             'password' => $password ?? Util::getRandomPassword(),
-            'is-admin' => $is_admin  ?? false,
+            'is_admin' => $is_admin ?? false,
         ]);
     }
 

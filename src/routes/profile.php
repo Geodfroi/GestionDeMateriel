@@ -7,9 +7,9 @@
 namespace app\routes;
 
 use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\Error;
 use app\constants\Route;
-use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;

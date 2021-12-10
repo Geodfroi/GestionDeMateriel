@@ -1,21 +1,13 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Settings;
 use app\helpers\Util;
-
-
-class AlertType
-{
-    const FAILURE = 'warning';
-    const INFO = 'info';
-    const SUCCESS = 'success';
-}
 
 /**
  * Abstract class of all routes containing common utility functions.
@@ -100,7 +92,7 @@ abstract class BaseRoute
      * @param string $type Alert type which defines alert colour; use const defined in AlertType class.
      * @param string $msg Alert message to be displayed.
      */
-    protected function setAlert(string $type, string $msg)
+    public function setAlert(string $type, string $msg)
     {
         $this->alert = [
             'type' => $type,

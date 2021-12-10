@@ -7,6 +7,7 @@
 namespace app\routes;
 
 use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
@@ -79,6 +80,7 @@ class ArticleTable extends BaseRoute
         end:
 
         $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTER_TYPE], $_SESSION[Session::ART_FILTER_VAL]);
+        error_log('$item_count :' .    $item_count);
 
         $offset =   ($_SESSION[Session::ART_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);

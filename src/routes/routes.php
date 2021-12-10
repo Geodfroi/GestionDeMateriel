@@ -1,14 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Route;
-use app\constants\Session;
-use app\helpers\Authenticate;
 
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
@@ -25,10 +23,10 @@ class Routes
     {
         $route = $_SERVER['PATH_INFO'] ?? Route::HOME;
 
-        if ($route != Route::PROFILE) {
-            //reset profile id when leaving profile page.
-            $_SESSION[SESSION::PROFILE_ID] = Authenticate::getUserId();
-        }
+        // if ($route != Route::PROFILE) {
+        //     //reset profile id when leaving profile page.
+        //     $_SESSION[SESSION::PROFILE_ID] = Authenticate::getUserId();
+        // }
 
         switch ($route) {
             case Route::ADMIN:

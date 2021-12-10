@@ -1,18 +1,20 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Util;
 
 /**
  * Route class containing behavior linked to admin_template. This route handles all admin related tasks.
@@ -42,6 +44,12 @@ class UserTable extends BaseRoute
             goto end;
         }
 
+        if (isset($_GET['renew'])) {
+            $user = Database::users()->queryById(intval($_GET['renew']));
+            Util::renewPassword($this, $user);
+            goto end;
+        }
+
         if (isset($_GET['orderby'])) {
             $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
             goto end;
@@ -62,13 +70,6 @@ class UserTable extends BaseRoute
             }
             goto end;
         }
-
-
-        // if (isset($_GET['edit'])) {
-        //     $_SESSION[SESSION::EDIT_ID] = $_GET['profile'];
-        //     $this->requestRedirect(Route::PROFILE);
-        //     return '';
-        // }
 
         end:
 

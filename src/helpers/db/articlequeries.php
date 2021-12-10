@@ -263,13 +263,12 @@ class ArticleQueries
             articles.creation_date,
             users.alias
         FROM articles INNER JOIN users ON articles.user_id = users.id
-        $filter_statement
         $order_statement
         LIMIT :lim OFFSET :off");
-
-        if ($filter_arg) {
-            $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
-        }
+        // $filter_statement
+        // if ($filter_arg) {
+        //     $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
+        // }
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 

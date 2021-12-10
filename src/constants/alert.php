@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.10 ###
 ##############################
 
 namespace app\constants;
@@ -34,8 +34,6 @@ class Alert
 
     //login alerts
     const LOGIN_USER_DISC = "L'usager précédent s'est déconnecté.";
-    const LOGIN_NEW_PASSWORD_FAILURE = "Le changement de mot de passe a échoué.";
-    const LOGIN_NEW_PASSWORD_SUCCESS = "Un nouveau mot de passe a été envoyé dans votre boîte email.";
 
     //profile alerts
     const ALIAS_DELETE_SUCCESS = "Vous avez effacé votre alias. Votre e-mail sera utilisé pour vous identifier auprès des autres utilisateurs.";
@@ -50,4 +48,8 @@ class Alert
     const PASSWORD_UPDATE_FAILURE = "Le changement de mot de passe a échoué.";
     const PASSWORD_UPDATE_SUCCESS = "Le mot de passe a été modifié avec succès.";
     const USER_NOT_FOUND = "L'utilisateur n'a pas pu être identifié.";
+
+    // util alerts
+    const NEW_PASSWORD_FAILURE = "Le changement de mot de passe a échoué.";
+    const NEW_PASSWORD_SUCCESS = "Un nouveau mot de passe a été envoyé à [%s].";
 }
