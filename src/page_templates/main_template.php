@@ -69,9 +69,9 @@ use app\helpers\Authenticate;
     </main>
 
     <div>
-        <div>BUG: when user is deleted, its created articles dont show anymore</div>
-        <div>EDIT USER</div>
-        <div>PROFILE - Renew user password from ADMIN account</div>
+        <div>ARTICLES filter crash</div>
+        <div>IMPLEMENT LOGGING for server.</div>
+        <div>CREATE EMAILS PLAIN CONTENT</div>
         <div>MAIN: backup db</div>
         <div>ADMIN - access user contact posts.</div>
         <div>ADMIN - create new email to user.</div>

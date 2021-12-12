@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\helpers\db;
 
 use \PDO;
 use Exception;
+use Monolog\Logger;
 
 use app\constants\Error;
 use app\constants\OrderBy;
@@ -21,10 +22,12 @@ use app\models\User;
 class UserQueries
 {
     private PDO $pdo;
+    private Logger $logger;
 
-    function __construct(PDO $pdo)
+    function __construct(PDO $pdo, Logger $logger)
     {
         $this->pdo = $pdo;
+        $this->logger = $logger;
     }
 
     /**
@@ -42,7 +45,8 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_DELETE . $error . PHP_EOL);
+
+        $this->logger->error(Error::USER_DELETE . $error);
         return false;
     }
 
@@ -113,7 +117,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_INSERT . $error . PHP_EOL);
+        $this->logger->error(Error::USER_INSERT . $error);
         return false;
     }
 
@@ -144,7 +148,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_QUERY . $error . PHP_EOL);
+        $this->logger->error(Error::USER_QUERY . $error);
         return null;
     }
 
@@ -175,7 +179,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_QUERY . $error . PHP_EOL);
+        $this->logger->error(Error::USER_QUERY . $error);
         return null;
     }
 
@@ -206,7 +210,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_QUERY . $error . PHP_EOL);
+        $this->logger->error(Error::USER_QUERY . $error);
         return null;
     }
 
@@ -231,7 +235,7 @@ class UserQueries
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USERS_COUNT_QUERY . $error . PHP_EOL);
+        $this->logger->error(Error::USERS_COUNT_QUERY . $error);
         return -1;
     }
 
@@ -276,7 +280,7 @@ class UserQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(Error::USERS_QUERY  . $error . PHP_EOL);
+            $this->logger->error(Error::USERS_QUERY  . $error);
         }
 
         return $users;
@@ -300,7 +304,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_ALIAS_UPDATE . $error . PHP_EOL);
+        $this->logger->error(Error::USER_ALIAS_UPDATE . $error);
         return false;
     }
 
@@ -322,7 +326,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_DELAY_UPDATE . $error . PHP_EOL);
+        $this->logger->error(Error::USER_DELAY_UPDATE . $error);
         return false;
     }
 
@@ -344,7 +348,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_CONTACT_UPDATE . $error . PHP_EOL);
+        $this->logger->error(Error::USER_CONTACT_UPDATE . $error);
         return false;
     }
 
@@ -365,7 +369,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_LOGTIME_UPDATE . $error . PHP_EOL);
+        $this->logger->error(Error::USER_LOGTIME_UPDATE . $error);
         return false;
     }
 
@@ -387,7 +391,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_PASSWORD_UPDATE  . $error . PHP_EOL);
+        $this->logger->error(Error::USER_PASSWORD_UPDATE  . $error);
         return false;
     }
 }

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\helpers;
@@ -11,6 +11,7 @@ namespace app\helpers;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+use Monolog\Logger;
 
 use app\constants\Mail;
 use app\constants\P_Settings;
@@ -48,7 +49,7 @@ class Mailing
     public static function passwordChangeNotification(User $user, string $password): bool
     {
         $html =  Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
-        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '');
+        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '', Logging::app());
     }
 
     /**
@@ -73,12 +74,14 @@ class Mailing
      * 
      * @param User $user Email recipient.
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
+     * @param Logger $logger Logger channel.
      * @return bool True if emails are sent correctly.
      */
-    public static function peremptionNotification(User $user, array $reminders): bool
+    public static function peremptionNotification(User $user, array $reminders, Logger $logger): bool
     {
+        $logger->info("Sending peremption email to {$user->getAlias()}", $reminders);
         $html =  Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
-        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_PEREMPTION_REMINDER,  $html, '');
+        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_PEREMPTION_REMINDER,  $html, '', $logger);
     }
 
     /**
@@ -104,10 +107,10 @@ class Mailing
      * @param string $subject Email subject.
      * @param string $html_content HTML formatted content.
      * @param string $plain_content Plain content for client refusing html version.
-     * @param bool $show_debug_output Show detailled debug output. 
+     * @param Logger $logger Logger channel.
      * @return true True if email is sent properly.
      */
-    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, bool $show_debug_output = false): bool
+    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, Logger $logger): bool
     {
         if (SETTINGS::IS_DEBUG) {
             $recipients = [SETTINGS::DEBUG_EMAIL];
@@ -117,9 +120,7 @@ class Mailing
 
         try {
             // Server settings
-            if ($show_debug_output) {
-                $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
-            }
+            $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
@@ -144,11 +145,13 @@ class Mailing
             $mail->Body = $html_content;
             $mail->AltBody = $plain_content;
 
-            $mail->send();
-            return true;
+            if ($mail->send()) {
+                return true;
+            }
+            $logger->error('Failure to send email.', ['error' => $mail->ErrorInfo]);
         } catch (Exception $e) {
-            error_log("Error in sending email. Mailer Error: {$mail->ErrorInfo}");
-            return false;
+            $logger->error('Error in sending email.', ['error' => $e->errorMessage()]);
         }
+        return false;
     }
 }

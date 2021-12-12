@@ -8,9 +8,9 @@ namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
-use app\constants\Error;
 use app\constants\Route;
 use app\constants\Settings;
+use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -169,7 +169,7 @@ class Profile extends BaseRoute
             }
 
             if (count($delays) == 0) {
-                $this->setError('delays',  Error::DELAYS_NONE);
+                $this->setError('delays',  Warning::DELAYS_NONE);
             } else {
 
                 $display = 0;
@@ -209,7 +209,7 @@ class Profile extends BaseRoute
             return true;
         }
         if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            $this->setError('alias', sprintf(Error::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
+            $this->setError('alias', sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
             return false;
         }
         return true;
@@ -230,7 +230,7 @@ class Profile extends BaseRoute
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $this->setError('contact-email', Error::LOGIN_EMAIL_INVALID);
+            $this->setError('contact-email', Warning::LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -246,12 +246,12 @@ class Profile extends BaseRoute
     {
         $password_repeat = trim($_POST['password-repeat']) ?? '';
         if (!$password_repeat) {
-            $this->setError('password-repeat', Error::PASSWORD_REPEAT_NULL);
+            $this->setError('password-repeat', Warning::PASSWORD_REPEAT_NULL);
             return false;
         }
 
         if ($password_first !== $password_repeat) {
-            $this->setError('password-repeat', Error::PASSWORD_DIFFERENT);
+            $this->setError('password-repeat', Warning::PASSWORD_DIFFERENT);
             return false;
         }
         return true;

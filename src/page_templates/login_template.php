@@ -27,7 +27,7 @@ use app\helpers\TUtil;
                 <label class="h4 m-4">Formulaire d'identification</label>
                 <div class="mb-3">
                     <label for="form-email" class="form-label">Adresse e-mail</label>
-                    <input id="form-email" type="email" name='email' aria-describedby="id-descr" value="<?php echo TUtil::escape($email); ?>" class="form-control 
+                    <input id="form-email" type="email" name='email' aria-describedby="id-descr" value="<?php echo htmlentities($email); ?>" class="form-control 
                         <?php echo isset($errors['email']) ? ' is-invalid' : '' ?>
                         <?php echo $email ? ' is-valid' : '' ?>">
                     <?php if (isset($errors['email'])) { ?>

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
@@ -78,10 +78,6 @@ abstract class BaseRoute
     {
         $data['alert']  = $this->alert ?? [];
         $data['errors'] = $this->errors ?? [];
-
-        if (count($this->errors)) {
-            var_dump($this->errors);
-        }
 
         return Util::renderTemplate($this->templateName, $data, Settings::TEMPLATES_PATH);
     }

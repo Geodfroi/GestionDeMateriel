@@ -20,7 +20,7 @@ $loc_presets = Database::locations()->queryAll();
 
             <div class="mb-2">
                 <label for="form-name" class="form-label col-3">Nom de l'article:</label>
-                <input id="form-name" name="article-name" type="text" value="<?php echo TUtil::escape($article_name) ?>" class="form-control
+                <input id="form-name" name="article-name" type="text" value="<?php echo htmlentities($article_name) ?>" class="form-control
                     <?php echo isset($error['article-name']) ? ' is-invalid' : '' ?>
                     <?php echo $article_name ? ' is-valid' : '' ?>">
                 <?php if (isset($errors['article-name'])) { ?>
@@ -32,7 +32,7 @@ $loc_presets = Database::locations()->queryAll();
                 <label for="form-location" class="form-label col-3">Emplacement:</label>
 
                 <div class="input-group">
-                    <input id="form-location" name="location" type="text" value="<?php echo TUtil::escape($location) ?>" class="form-control
+                    <input id="form-location" name="location" type="text" value="<?php echo htmlentities($location) ?>" class="form-control
                         <?php echo isset($error['location']) ? ' is-invalid' : '' ?>
                         <?php echo $location ? ' is-valid' : '' ?>">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
@@ -53,7 +53,7 @@ $loc_presets = Database::locations()->queryAll();
 
             <div class=" mb-2">
                 <label for="form-expiration" class="form-label col-3">Date de péremption:</label>
-                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> value="<?php echo TUtil::escape($expiration_date) ?>" class="form-control 
+                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> value="<?php echo htmlentities($expiration_date) ?>" class="form-control 
                     <?php echo isset($error['expiration-date']) ? ' is-invalid' : '' ?>
                     <?php echo $expiration_date ? ' is-valid' : '' ?>">
                 <?php if (isset($errors['expiration-date'])) { ?>

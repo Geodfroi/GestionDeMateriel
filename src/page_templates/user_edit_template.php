@@ -15,7 +15,7 @@ use app\helpers\TUtil;
 
             <div class="mb-2">
                 <label for="form-email" class="form-label col-12">E-mail de l'utilisateur:</label>
-                <input id="form-email" name="email" type="email" value="<?php echo TUtil::escape($email) ?>" class="form-control 
+                <input id="form-email" name="email" type="email" value="<?php echo htmlentities($email) ?>" class="form-control 
                     <?php echo isset($error['email']) ? ' is-invalid' : '' ?>
                     <?php echo $email ? ' is-valid' : '' ?>">
                 <?php if (isset($errors['email'])) { ?>
@@ -25,7 +25,7 @@ use app\helpers\TUtil;
 
             <div class="input-group mb-3">
                 <label for="form-password" class="form-label col-12">Password:</label>
-                <input id="form-password" name="password" type="text" value="<?php echo TUtil::escape($password) ?>" class="form-control 
+                <input id="form-password" name="password" type="text" value="<?php echo htmlentities($password) ?>" class="form-control 
                     <?php echo isset($error['password']) ? ' is-invalid' : '' ?>
                     <?php echo $password ? ' is-valid' : '' ?>">
                 <button type="submit" name="regen-password" class="btn btn-secondary">Regénérer</button>

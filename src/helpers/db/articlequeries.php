@@ -3,18 +3,20 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\helpers\db;
+
+use Exception;
+use \PDO;
+use Monolog\Logger;
 
 use app\constants\Error;
 use app\constants\Filter;
 use app\constants\OrderBy;
 use app\models\Article;
 
-use Exception;
-use \PDO;
 
 /**
  * Regroup function to interact with article table.
@@ -22,10 +24,12 @@ use \PDO;
 class ArticleQueries
 {
     private PDO $pdo;
+    private Logger $logger;
 
-    function __construct(PDO $pdo)
+    function __construct(PDO $pdo, Logger $logger)
     {
         $this->pdo = $pdo;
+        $this->logger = $logger;
     }
 
     /**
@@ -43,7 +47,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(error::ARTICLE_DELETE . $error . PHP_EOL);
+        $this->logger->error(error::ARTICLE_DELETE . $error);
         return false;
     }
 
@@ -61,7 +65,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::USER_ARTICLES_DELETE . $error . PHP_EOL);
+        $this->logger->error(Error::USER_ARTICLES_DELETE . $error);
         return false;
     }
 
@@ -167,7 +171,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::ARTICLE_INSERT . $error . PHP_EOL);
+        $this->logger->error(Error::ARTICLE_INSERT . $error);
         return false;
     }
 
@@ -197,11 +201,11 @@ class ArticleQueries
             if ($data) {
                 return Article::fromDatabaseRow($data);
             } else {
-                error_log(sprintf(Error::ARTICLE_QUERY, $id));
+                $this->logger->error(sprintf(Error::ARTICLE_QUERY, $id));
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(sprintf(Error::ARTICLE_QUERY, $id) . $error . PHP_EOL);
+            $this->logger->error(sprintf(Error::ARTICLE_QUERY, $id) . $error);
         }
 
         return null;
@@ -231,7 +235,7 @@ class ArticleQueries
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::ARTICLES_COUNT_QUERY . $error . PHP_EOL);
+        $this->logger->error(Error::ARTICLES_COUNT_QUERY . $error);
         return -1;
     }
 
@@ -253,6 +257,7 @@ class ArticleQueries
         $order_statement = ArticleQueries::printOrderStatement($orderby);
 
         // join table if necessary to have user column alias available in orderby statements.
+        // LEFT JOIN: all articles are listed even if the user who created the article is no longer be present in db.
         $preparedStatement = $this->pdo->prepare("SELECT 
             articles.id, 
             articles.user_id, 
@@ -262,13 +267,14 @@ class ArticleQueries
             articles.expiration_date,
             articles.creation_date,
             users.alias
-        FROM articles INNER JOIN users ON articles.user_id = users.id
+        FROM articles LEFT JOIN users ON articles.user_id = users.id
+        $filter_statement
         $order_statement
         LIMIT :lim OFFSET :off");
-        // $filter_statement
-        // if ($filter_arg) {
-        //     $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
-        // }
+
+        if ($filter_arg) {
+            $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
+        }
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 
@@ -282,7 +288,7 @@ class ArticleQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(Error::ARTICLES_QUERY . $error . PHP_EOL);
+            $this->logger->error(Error::ARTICLES_QUERY . $error);
         }
 
         return $articles;
@@ -319,7 +325,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log('failure to update article: ' . $error . PHP_EOL);
+        $this->logger->error('failure to update article: ' . $error);
         return false;
     }
 }

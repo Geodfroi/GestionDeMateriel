@@ -14,8 +14,6 @@ use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
-use app\helpers\Util;
-use app\models\Article;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.

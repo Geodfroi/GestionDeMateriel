@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\models;
@@ -126,6 +126,6 @@ class Article
 
     public function __toString(): string
     {
-        return sprintf('Article %04d> [%s] in [%s], expires %s; user_id: %04d; created: %s;', $this->id,  $this->article_name, $this->location, $this->expiration_date->format('Y-m-d'), $this->user_id, $this->creation_date->format('Y-m-d'));
+        return sprintf('[%s] in [%s], expires %s;', $this->id,  $this->article_name, $this->location, $this->expiration_date->format('Y-m-d'));
     }
 }

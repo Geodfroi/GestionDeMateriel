@@ -6,8 +6,8 @@
 
 namespace app\routes;
 
-use app\constants\Error;
 use app\constants\Route;
+use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -77,16 +77,16 @@ class UserEdit extends BaseRoute
         $email = trim($_POST['email']) ?? '';
 
         if ($email  === '') {
-            $this->setError('email', Error::USER_EMAIL_EMPTY);
+            $this->setError('email', Warning::USER_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $this->setError('email', Error::USER_EMAIL_INVALID);
+            $this->setError('email', Warning::USER_EMAIL_INVALID);
             return false;
         }
         if (Database::users()->queryByEmail($email)) {
-            $this->setError('email', Error::USER_EMAIL_USED);
+            $this->setError('email', Warning::USER_EMAIL_USED);
             return false;
         }
 

@@ -8,8 +8,8 @@ namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
-use app\constants\Error;
 use app\constants\Route;
+use app\constants\Warning;
 use app\helpers\Database;
 use app\helpers\Authenticate;
 use app\helpers\Util;
@@ -57,7 +57,7 @@ class Login extends BaseRoute
             }
 
             if (!isset($user)) {
-                $this->setError('email', Error::LOGIN_NOT_FOUND);
+                $this->setError('email', Warning::LOGIN_NOT_FOUND);
             } else {
                 if ($this->validatePasswordInput($password)) {
                     if ($user->verifyPassword($password)) {
@@ -65,7 +65,7 @@ class Login extends BaseRoute
                         $this->requestRedirect(Route::HOME);
                         return "";
                     } else {
-                        $this->setError('password', Error::LOGIN_INVALID_PASSWORD);
+                        $this->setError('password', Warning::LOGIN_INVALID_PASSWORD);
                     }
                 }
             }
@@ -89,12 +89,12 @@ class Login extends BaseRoute
         $email = trim($_POST['email']) ?? '';
 
         if ($email  === '') {
-            $this->setError('email', Error::LOGIN_EMAIL_EMPTY);
+            $this->setError('email', Warning::LOGIN_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $this->setError('email', Error::LOGIN_EMAIL_INVALID);
+            $this->setError('email', Warning::LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -110,7 +110,7 @@ class Login extends BaseRoute
     {
         $password = trim($_POST['password']) ?? '';
         if ($password === '') {
-            $this->setError('password', Error::LOGIN_PASSWORD_EMPTY);
+            $this->setError('password', Warning::LOGIN_PASSWORD_EMPTY);
             return false;
         }
         return true;

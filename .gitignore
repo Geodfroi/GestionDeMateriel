@@ -1,2 +1,3 @@
 p_settings.php
 vendor/
+logs/server.log

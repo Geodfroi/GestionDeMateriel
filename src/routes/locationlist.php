@@ -8,8 +8,8 @@ namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
-use app\constants\Error;
 use app\constants\Route;
+use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -50,7 +50,7 @@ class LocationList extends BaseRoute
             if (Util::validateLocation($this, $location_field)) {
 
                 if (Database::locations()->contentExists($location_field)) {
-                    $this->setError('location', Error::LOCATION_PRESET_EXISTS);
+                    $this->setError('location', Warning::LOCATION_PRESET_EXISTS);
                 } else {
                     if (Database::locations()->insert($location_field)) {
                         $location_field = '';
@@ -79,7 +79,7 @@ class LocationList extends BaseRoute
             }
 
             if (Database::locations()->contentExists($location_field)) {
-                $this->setError('location', Error::LOCATION_PRESET_EXISTS);
+                $this->setError('location', Warning::LOCATION_PRESET_EXISTS);
                 $selected =  $id; // $location_field will still be filled -> stay in update mode.
                 goto end;
             }

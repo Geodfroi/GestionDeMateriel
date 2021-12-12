@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace app\constants;
 
+/**
+ * Alert messages in html.
+ */
 class Alert
 {
     // admin alerts

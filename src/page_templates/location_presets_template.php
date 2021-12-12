@@ -73,7 +73,7 @@ use app\helpers\TUtil;
                 <label for="location" class="input-group-text"> Nouvelle saisie </label>
             <?php } ?>
 
-            <input id="location" type="text" name='location' value="<?php echo TUtil::escape($location_field); ?>" class="form-control 
+            <input id="location" type="text" name='location' value="<?php echo htmlentities($location_field); ?>" class="form-control 
                         <?php echo isset($errors['location']) ? ' is-invalid' : '' ?>
                         <?php echo $location_field ? ' is-valid' : '' ?>">
 

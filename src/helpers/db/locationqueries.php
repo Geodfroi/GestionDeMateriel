@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.07 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\helpers\db;
 
 use \PDO;
+use Monolog\Logger;
 
 use app\constants\Error;
 use app\models\StringContent;
@@ -19,10 +20,12 @@ use app\models\StringContent;
 class LocationQueries
 {
     private PDO $pdo;
+    private Logger $logger;
 
-    function __construct(PDO $pdo)
+    function __construct(PDO $pdo, Logger $logger)
     {
         $this->pdo = $pdo;
+        $this->logger = $logger;
     }
 
     /**
@@ -40,7 +43,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::LOCATION_DELETE . $error . PHP_EOL);
+        $this->logger->error(Error::LOCATION_DELETE . $error);
         return false;
     }
 
@@ -59,7 +62,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::LOCATION_INSERT . $error . PHP_EOL);
+        $this->logger->error(Error::LOCATION_INSERT . $error);
         return false;
     }
 
@@ -84,11 +87,11 @@ class LocationQueries
             if ($data) {
                 return StringContent::fromDatabaseRow($data);
             } else {
-                error_log(sprintf(Error::LOCATION_QUERY, $id));
+                $this->logger->error(sprintf(Error::LOCATION_QUERY, $id));
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(sprintf(Error::LOCATION_QUERY, $id) . $error . PHP_EOL);
+            $this->logger->error(sprintf(Error::LOCATION_QUERY, $id) . $error);
         }
 
         return null;
@@ -112,7 +115,7 @@ class LocationQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            error_log(Error::LOCATIONS_QUERY_ALL  . $error . PHP_EOL);
+            $this->logger->error(Error::LOCATIONS_QUERY_ALL  . $error);
         }
 
         return $locations;
@@ -136,7 +139,7 @@ class LocationQueries
             return intval($r) === 1;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::LOCATIONS_CHECK_CONTENT . $error . PHP_EOL);
+        $this->logger->error(Error::LOCATIONS_CHECK_CONTENT . $error);
         return false;
     }
 
@@ -158,7 +161,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        error_log(Error::LOCATION_UPDATE . $error . PHP_EOL);
+        $this->logger->error(Error::LOCATION_UPDATE . $error);
         return false;
     }
 }

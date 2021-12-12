@@ -6,9 +6,9 @@
 
 namespace app\routes;
 
-use app\constants\Error;
 use app\constants\Route;
 use app\constants\Settings;
+use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
@@ -124,17 +124,17 @@ class ArticleEdit extends BaseRoute
         $article_name = trim($_POST['article-name']) ?? '';
 
         if ($article_name === '') {
-            $this->setError('article-name', Error::ARTICLE_ADD_EMPTY);
+            $this->setError('article-name', Warning::ARTICLE_ADD_EMPTY);
             return false;
         }
 
         if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
-            $this->setError('article-name', sprintf(Error::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
+            $this->setError('article-name', sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
             return false;
         }
 
         if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
-            $this->setError('article-name', sprintf(Error::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
+            $this->setError('article-name', sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
             return false;
         }
         return true;
@@ -151,7 +151,7 @@ class ArticleEdit extends BaseRoute
         $date = trim($_POST['expiration-date'] ?? '');
 
         if ($date === '') {
-            $this->setError('expiration-date', Error::DATE_EMPTY);
+            $this->setError('expiration-date', Warning::DATE_EMPTY);
             return false;
         }
 
@@ -166,19 +166,19 @@ class ArticleEdit extends BaseRoute
         if ($validated_date) {
 
             if ($validated_date < new DateTime()) {
-                $this->setError('expiration-date', Error::DATE_PAST);
+                $this->setError('expiration-date', Warning::DATE_PAST);
                 return false;
             }
 
             if ($validated_date >= $future_limit) {
-                $this->setError('expiration-date', Error::DATE_FUTURE);
+                $this->setError('expiration-date', Warning::DATE_FUTURE);
                 return false;
             }
 
             return true;
         }
 
-        $this->setError('expiration-date', Error::DATE_INVALID);
+        $this->setError('expiration-date', Warning::DATE_INVALID);
         return false;
     }
 
@@ -193,7 +193,7 @@ class ArticleEdit extends BaseRoute
         $comments = trim($_POST['comments']) ?? '';
 
         if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
-            $this->setError('comments', sprintf(Error::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
+            $this->setError('comments', sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
             return false;
         }
         return true;

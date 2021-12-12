@@ -44,7 +44,7 @@ use app\helpers\TUtil;
             <form method="post" action=<?php echo Route::PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="alias" type="text" id="alias" class="form-control <?php echo isset($errors['alias']) ? ' is-invalid' : '' ?>" value=<?php echo TUtil::escape($alias) ?>>
+                        <input name="alias" type="text" id="alias" class="form-control <?php echo isset($errors['alias']) ? ' is-invalid' : '' ?>" value=<?php echo htmlentities($alias) ?>>
 
                         <?php if (isset($errors['alias'])) { ?>
                             <div class='invalid-feedback'><?php echo $errors['alias'] ?> </div>
@@ -63,7 +63,7 @@ use app\helpers\TUtil;
             <form method="post" action=<?php echo Route::PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="password" type="password" id="password" value="<?php echo TUtil::escape($password) ?>" class="form-control
+                        <input name="password" type="password" id="password" value="<?php echo htmlentities($password) ?>" class="form-control
                             <?php echo isset($errors['password']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['password'])) { ?>
@@ -75,7 +75,7 @@ use app\helpers\TUtil;
                 </div>
                 <div class="row mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="password-repeat" type="password" id="password-repeat" value="<?php echo TUtil::escape($password_repeat) ?>" class="form-control 
+                        <input name="password-repeat" type="password" id="password-repeat" value="<?php echo htmlentities($password_repeat) ?>" class="form-control 
                             <?php echo isset($errors['password-repeat']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['password-repeat'])) { ?>
@@ -106,7 +106,7 @@ use app\helpers\TUtil;
                     <div class="col-12 col-md-8 mx-auto">
 
                         <label for="contact-input" class="form-label">L'e-mail de contact pour recevoir les courriers de rappels. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Il faut prendre garde à correctement taper l'adresse car l'application ne vérifie pas que cette dernière soit fonctionnelle." data-bs-placement="right"></i></label>
-                        <input id="contact-input" name="contact-email" type="email" value="<?php echo TUtil::escape($contact_email) ?>" class="form-control
+                        <input id="contact-input" name="contact-email" type="email" value="<?php echo htmlentities($contact_email) ?>" class="form-control
                             <?php echo isset($errors['contact-email']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
                         <?php if (isset($errors['contact-email'])) { ?>
