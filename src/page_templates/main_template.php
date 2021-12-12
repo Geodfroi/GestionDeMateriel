@@ -69,6 +69,7 @@ use app\helpers\Authenticate;
     </main>
 
     <div>
+        <div>Expand logs; in db;</div>
         <div>ARTICLES filter crash</div>
         <div>IMPLEMENT LOGGING for server.</div>
         <div>CREATE EMAILS PLAIN CONTENT</div>

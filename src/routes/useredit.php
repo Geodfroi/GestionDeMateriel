@@ -1,15 +1,17 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\LogInfo;
 use app\constants\Route;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\User;
 
@@ -32,6 +34,8 @@ class UserEdit extends BaseRoute
             return '';
         }
 
+        $admin_id = Authenticate::getUserId();
+
         if (isset($_POST['new-user'])) {
             $p_val = Util::validatePassword($this, $password);
             $e_val = $this->validate_email($email);
@@ -41,6 +45,12 @@ class UserEdit extends BaseRoute
                 $user = User::fromForm($email, $password, $is_admin);
 
                 if (Database::users()->insert($user)) {
+
+                    Logging::info(LogInfo::USER_CREATED, [
+                        'admin-id' => $admin_id,
+                        'new-user' => $email
+                    ]);
+
                     $this->requestRedirect(Route::ADMIN . '?alert=added_success');
                 } else {
                     $this->requestRedirect(Route::ADMIN . '?alert=added_failure');

@@ -1,17 +1,19 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
+use app\constants\LogInfo;
 use app\constants\Route;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
 
 class LocationList extends BaseRoute
@@ -27,9 +29,18 @@ class LocationList extends BaseRoute
             $this->requestRedirect(Route::LOGIN);
         }
 
+        $user_id = Authenticate::getUserId();
+
         if (isset($_GET['delete'])) {
 
+            $former_location = Database::locations()->queryById($_GET['delete']);
             if (Database::locations()->delete($_GET['delete'])) {
+
+                Logging::info(LogInfo::LOCATION_DELETED, [
+                    'user-id' => $user_id,
+                    'former-value' => $former_location
+                ]);
+
                 $this->setAlert(AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
             } else {
                 $this->setAlert(AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
@@ -53,6 +64,12 @@ class LocationList extends BaseRoute
                     $this->setError('location', Warning::LOCATION_PRESET_EXISTS);
                 } else {
                     if (Database::locations()->insert($location_field)) {
+
+                        Logging::info(LogInfo::LOCATION_CREATED, [
+                            'user-id' => $user_id,
+                            'value' => $location_field
+                        ]);
+
                         $location_field = '';
                     } else {
                         $this->setAlert(AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
@@ -71,7 +88,6 @@ class LocationList extends BaseRoute
             }
 
             $former = Database::locations()->queryById($id);
-            error_log('c: ' . $former->getContent() . ' - ' . $location_field);
 
             if (strcasecmp($location_field, $former->getContent()) == 0) {
                 $location_field = '';
@@ -85,6 +101,13 @@ class LocationList extends BaseRoute
             }
 
             if (Database::locations()->update($id, $location_field)) {
+
+                Logging::info(LogInfo::LOCATION_UPDATED, [
+                    'user-id' => $user_id,
+                    'former-value' => $former->getContent(),
+                    'new-value' => $location_field
+                ]);
+
                 $this->setAlert(AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
                 $location_field = ''; // $selected = 0 -> return to normal list display.
                 goto end;

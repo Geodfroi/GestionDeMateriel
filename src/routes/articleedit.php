@@ -1,16 +1,18 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\LogInfo;
 use app\constants\Route;
 use app\constants\Settings;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\Article;
 
@@ -44,10 +46,10 @@ class ArticleEdit extends BaseRoute
             if ($this->validateInputs($article_name, $location, $exp_date_str, $comments)) {
 
                 $user_id = Authenticate::getUserId();
-
                 $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
                 if (Database::articles()->insert($article)) {
+                    Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article->getId()]);
                     $this->requestRedirect(Route::ART_TABLE . '?alert=added_success');
                 } else {
                     $this->requestRedirect(Route::ART_TABLE . '?alert=added_failure');
@@ -67,6 +69,7 @@ class ArticleEdit extends BaseRoute
                 $article->updateFields($article_name, $location, $exp_date_str, $comments);
 
                 if (Database::articles()->update($article)) {
+                    Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article->getId()]);
                     $this->requestRedirect(Route::ART_TABLE . '?alert=updated_success');
                 } else {
                     $this->requestRedirect(Route::ART_TABLE . '?alert=updated_failure');

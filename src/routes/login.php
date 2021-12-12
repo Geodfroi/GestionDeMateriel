@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
@@ -10,8 +10,8 @@ use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\Route;
 use app\constants\Warning;
-use app\helpers\Database;
 use app\helpers\Authenticate;
+use app\helpers\Database;
 use app\helpers\Util;
 
 /**

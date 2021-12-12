@@ -1,21 +1,21 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
+use app\constants\LogInfo;
 use app\constants\Route;
 use app\constants\Settings;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
-
-use Exception;
 
 /**
  * Route class containing behavior linked to profile_template. This route displays user info.
@@ -37,17 +37,17 @@ class Profile extends BaseRoute
         // display variable identify which sub-section of the templates is displayed.
         $display = 0;
 
-        $profile_user  = Authenticate::getUser();
-        $profile_user_id = Authenticate::getUserId();
+        $user  = Authenticate::getUser();
+        $user_id = Authenticate::getUserId();
 
-        if (!$profile_user) {
+        if (!$user) {
             $this->setAlert(AlertType::FAILURE, Alert::USER_NOT_FOUND);
             return "";
         }
 
         if (isset($_GET['set_alias'])) {
             $display = 1;
-            $alias = $profile_user->getAlias();
+            $alias = $user->getAlias();
             goto end;
         }
 
@@ -58,16 +58,16 @@ class Profile extends BaseRoute
 
         if (isset($_GET['add_email'])) {
             $display = 3;
-            $contact_email = $profile_user->getContactEmail();
+            $contact_email = $user->getContactEmail();
             if ($contact_email === '') {
-                $contact_email = $profile_user->getEmail();
+                $contact_email = $user->getEmail();
             }
             goto end;
         }
 
         if (isset($_GET['modify_delay'])) {
             $display = 4;
-            $delays = $profile_user->getContactDelays();
+            $delays = $user->getContactDelays();
             goto end;
         }
 
@@ -77,23 +77,29 @@ class Profile extends BaseRoute
             if ($this->validateAlias($alias)) {
                 $display = 0;
 
-                if ($alias === $profile_user->getAlias()) {
+                if ($alias === $user->getAlias()) {
                     // changed nothing
                     goto end;
                 }
 
-                $alias_arg = $alias ? $alias : $profile_user->getEmail();
+                $alias_arg = $alias ? $alias : $user->getEmail();
 
                 $existing = Database::users()->queryByAlias($alias_arg);
                 if ($existing) {
-                    if ($existing->getId() !== $profile_user_id) {
+                    if ($existing->getId() !== $user_id) {
                         // alias already exists and assigned to another user.
                         $this->setAlert(AlertType::FAILURE, Alert::ALIAS_EXISTS_FAILURE);
                         goto end;
                     }
                 }
 
-                if (Database::users()->updateAlias($profile_user_id, $alias_arg)) {
+                if (Database::users()->updateAlias($user_id, $alias_arg)) {
+
+                    Logging::info(LogInfo::USER_UPDATED, [
+                        'user-id' => $user_id,
+                        'new-alias' => $alias_arg
+                    ]);
+
                     if ($alias) {
                         $this->setAlert(AlertType::SUCCESS, Alert::ALIAS_UPDATE_SUCCESS);
                     } else {
@@ -115,7 +121,13 @@ class Profile extends BaseRoute
                     $display = 0;
                     $encrypted = util::encryptPassword($password);
 
-                    if (Database::users()->updatePassword($profile_user_id, $encrypted)) {
+                    if (Database::users()->updatePassword($user_id, $encrypted)) {
+
+                        Logging::info(LogInfo::USER_UPDATED, [
+                            'user-id' => $user_id,
+                            'new-password' => '*********'
+                        ]);
+
                         $this->setAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
                     } else {
                         $this->setAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
@@ -132,17 +144,22 @@ class Profile extends BaseRoute
 
                 $display = 0;
 
-                if ($contact_email === $profile_user->getEmail()) {
+                if ($contact_email === $user->getEmail()) {
                     $contact_email  = '';
                 }
 
-                if (Database::users()->updateContactEmail($profile_user_id, $contact_email)) {
+                if (Database::users()->updateContactEmail($user_id, $contact_email)) {
+
+                    Logging::info(LogInfo::USER_UPDATED, [
+                        'user-id' => $user_id,
+                        'new-contact-email' => $contact_email
+                    ]);
 
                     // if contact is null or empty, then contact is the login email.
                     if (strlen($contact_email) > 0) {
                         $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
                     } else {
-                        $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_RESET_SUCCESS, $profile_user->getEmail()));
+                        $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_RESET_SUCCESS, $user->getEmail()));
                     }
                 } else {
                     $this->setAlert(AlertType::FAILURE,  Alert::CONTACT_SET_FAILURE);
@@ -175,7 +192,13 @@ class Profile extends BaseRoute
                 $display = 0;
                 $str = implode('-', $delays);
 
-                if (Database::users()->updateContactDelay($profile_user_id, $str)) {
+                if (Database::users()->updateContactDelay($user_id, $str)) {
+
+                    Logging::info(LogInfo::USER_UPDATED, [
+                        'user-id' => $user_id,
+                        'new-contact-delays' => $str
+                    ]);
+
                     $this->setAlert(AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
                 } else {
                     $this->setAlert(AlertType::FAILURE, Alert::DELAY_SET_FAILURE);
@@ -190,7 +213,7 @@ class Profile extends BaseRoute
             'alias' => $alias ?? '',
             'password' => $password ?? '',
             'password_repeat' => $password_repeat ?? '',
-            'login_email' => $profile_user->getEmail(),
+            'login_email' => $user->getEmail(),
             'contact_email' => $contact_email ?? '',
             'delays' => $delays ?? [],
         ]);
@@ -257,11 +280,3 @@ class Profile extends BaseRoute
         return true;
     }
 }
-
-        // if (!isset($_SESSION[SESSION::PROFILE_ID])) {
-        //     $_SESSION[SESSION::PROFILE_ID] = Authenticate::getUserId();
-        // }
-
-        // $profile_user_id  =  $_SESSION[SESSION::PROFILE_ID];
-        // $profile_user  = Database::users()->queryById($profile_user_id);
-        // $profile_user_id  =  $_SESSION[SESSION::PROFILE_ID];

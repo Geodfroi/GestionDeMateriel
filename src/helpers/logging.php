@@ -29,7 +29,7 @@ class Logging
     /**
      * Simpleton pattern creating app log channel
      */
-    public static function app()
+    private static function app()
     {
         static $instance;
         if (is_null($instance)) {
@@ -40,9 +40,39 @@ class Logging
     }
 
     /**
+     * Wrapper for Monolog Logger error method.
+     * @param string $msg Log message.
+     * @param array $context Log context array.
+     * @param string $channel Logging channel.
+     */
+    public static function error(string $msg, array $context = [], string $channel = 'app')
+    {
+        if ($channel === 'server') {
+            Logging::server()->error($msg, $context);
+        } else {
+            Logging::app()->error($msg, $context);
+        }
+    }
+
+    /**
+     * Wrapper for Monolog Logger info method.
+     * @param string $msg Log message.
+     * @param array $context Log context array.
+     * @param string $channel Logging channel.
+     */
+    public static function info(string $msg, array $context = [], string $channel = 'app')
+    {
+        if ($channel === 'server') {
+            Logging::server()->info($msg, $context);
+        } else {
+            Logging::app()->info($msg, $context);
+        }
+    }
+
+    /**
      * Simpleton pattern creating server log channel
      */
-    public static function server()
+    private static function server()
     {
         static $instance;
         if (is_null($instance)) {

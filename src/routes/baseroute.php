@@ -30,7 +30,6 @@ abstract class BaseRoute
         $this->templateName = $templateName;
     }
 
-
     /**
      * Send a header to the browser requesting a redirection to the path provided.
      * 
@@ -97,7 +96,7 @@ abstract class BaseRoute
     }
 
     /**
-     * Set an error to be displayed. Errors are displayed beneath invalid input in forms.
+     * Set an form error to be displayed. Errors are displayed beneath invalid input in forms.
      */
     public function setError(string $key, string $content)
     {

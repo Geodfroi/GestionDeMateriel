@@ -17,7 +17,7 @@ use app\helpers\Util;
 $articles = Database::articles()->queryAll();
 $users = Database::users()->queryAll();
 
-Logging::server()->info('Starting server script');
+Logging::info('Starting server script.', [], 'server');
 
 // iterate through users and articles to flag articles that are soon due.
 foreach ($users as $user) {
@@ -44,8 +44,8 @@ foreach ($users as $user) {
         }
     }
 
-    if (!Mailing::peremptionNotification($user, $reminders, Logging::server())) {
-        Logging::server()->warning('peremption notification failed');
+    if (!Mailing::peremptionNotification($user, $reminders, 'server')) {
+        Logging::error('peremption notification failed.', [], 'server');
         return;
     }
 }

@@ -18,7 +18,7 @@ class Route
     const LOCAL_PRESETS = '/location_presets';
     const LOGIN = '/login';
     const LOGOUT = '/login?logout=true';
-    const HOME = '/';
+    const HOME = '/home';
     const PROFILE = '/profile';
     const USER_EDIT = '/userEdit';
     const USERS_TABLE = '/usersTable';

@@ -1,12 +1,15 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Route;
+use app\constants\LogInfo;
+use app\helpers\Authenticate;
+use app\helpers\Logging;
 
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
@@ -23,10 +26,10 @@ class Routes
     {
         $route = $_SERVER['PATH_INFO'] ?? Route::HOME;
 
-        // if ($route != Route::PROFILE) {
-        //     //reset profile id when leaving profile page.
-        //     $_SESSION[SESSION::PROFILE_ID] = Authenticate::getUserId();
-        // }
+        //logging route if logged-in.
+        if (Authenticate::isLoggedIn()) {
+            Logging::info(LogInfo::ROUTING, ['route' => $route, 'user-id' => Authenticate::getUserId()]);
+        }
 
         switch ($route) {
             case Route::ADMIN:
@@ -37,8 +40,6 @@ class Routes
                 return new ArticleTable();
             case Route::CONTACT:
                 return new Contact();
-            case Route::HOME:
-                return new Home();
             case Route::LOCAL_PRESETS:
                 return new LocationList();
             case Route::LOGIN:
@@ -49,20 +50,10 @@ class Routes
                 return new UserEdit();
             case Route::USERS_TABLE:
                 return new UserTable();
-            default:
-                return new class extends BaseRoute
-                {
-                    public function __construct()
-                    {
-                        parent::__construct('', '');
-                    }
 
-                    public function getBodyContent(): string
-                    {
-                        $this->requestRedirect('/');
-                        return '';
-                    }
-                };
+            case Route::HOME:
+            default:
+                return new Home();
         }
     }
 }

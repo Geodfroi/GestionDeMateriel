@@ -3,15 +3,17 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\helpers;
 
 use app\constants\Alert;
 use app\constants\AlertType;
-use app\constants\Error;
+use app\constants\LogInfo;
 use app\constants\Settings;
+use app\constants\Warning;
+use app\helpers\Logging;
 use app\models\User;
 use app\routes\BaseRoute;
 
@@ -87,7 +89,7 @@ class Util
     }
 
     /**
-     * Create a new password, send a renewal email and modify database record.
+     * Create a new password, send a renewal email and modify database record. Includes logging.
      * 
      * @param BaseRoute Route receiving the alerts.
      * @param User User.
@@ -103,6 +105,12 @@ class Util
 
             if (Mailing::passwordChangeNotification($user,  $plain_password)) {
                 $route->setAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getEmail()));
+
+                Logging::info(LogInfo::NEW_PASSWORD_ISSUED, [
+                    'user-id' => $user->getId(),
+                    'login' => $user->getEmail()
+                ]);
+
                 return;
             }
             // attempt to roll back update.
@@ -156,18 +164,18 @@ class Util
         $location = trim($_POST['location']) ?? '';
 
         if (strlen($location) === 0) {
-            $route->setError('location', Error::LOCATION_EMPTY);
+            $route->setError('location', Warning::LOCATION_EMPTY);
             return false;
         }
 
         $location = ucwords($location);
         if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
-            $route->setError('location', sprintf(Error::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
+            $route->setError('location', sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
             return false;
         }
 
         if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
-            $route->setError('location', sprintf(Error::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
+            $route->setError('location', sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
             return false;
         }
         return true;
@@ -185,17 +193,17 @@ class Util
     {
         $password_candidate = trim($_POST['password']) ?? '';
         if ($password_candidate === '') {
-            $route->setError('password', Error::PASSWORD_EMPTY);
+            $route->setError('password', Warning::PASSWORD_EMPTY);
             return false;
         }
         if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            $route->setError('password', sprintf(Error::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
+            $route->setError('password', sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
             return false;
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if (!$has_number || (!$has_letters)) {
-            $route->setError('password', Error::PASSWORD_WEAK);
+            $route->setError('password', Warning::PASSWORD_WEAK);
             return false;
         }
         return true;

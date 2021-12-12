@@ -11,11 +11,11 @@ namespace app\helpers;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
-use Monolog\Logger;
 
 use app\constants\Mail;
 use app\constants\P_Settings;
 use app\constants\Settings;
+use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\User;
 
@@ -42,14 +42,14 @@ class Mailing
      * Send a password change notification to the user mail box.
      * 
      * @param User $user Email recipient.
-     * @param array $emails Message will be sent to those addresses.
      * @param string $password New password in plain text.
+     * @param string $logger Logger channel.
      * @return bool True if emails are sent correctly.
      */
-    public static function passwordChangeNotification(User $user, string $password): bool
+    public static function passwordChangeNotification(User $user, string $password, string $logger = 'app'): bool
     {
         $html =  Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
-        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '', Logging::app());
+        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '', $logger);
     }
 
     /**
@@ -59,7 +59,7 @@ class Mailing
      * @param string $password New password in plain text.
      * @return string Html body.
      */
-    public static function passwordChangeNotificationBody(string $recipient, string $password): string
+    private static function passwordChangeNotificationBody(string $recipient, string $password): string
     {
         return Mailing::formatEmail('newpassword', [
             'username' => $recipient,
@@ -74,12 +74,12 @@ class Mailing
      * 
      * @param User $user Email recipient.
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
-     * @param Logger $logger Logger channel.
+     * @param string $logger Logger channel.
      * @return bool True if emails are sent correctly.
      */
-    public static function peremptionNotification(User $user, array $reminders, Logger $logger): bool
+    public static function peremptionNotification(User $user, array $reminders, string $logger = 'server'): bool
     {
-        $logger->info("Sending peremption email to {$user->getAlias()}", $reminders);
+        Logging::info("Sending peremption email to {$user->getAlias()}", $reminders, $logger);
         $html =  Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
         return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_PEREMPTION_REMINDER,  $html, '', $logger);
     }
@@ -91,7 +91,7 @@ class Mailing
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
      * @return string Html body.
      */
-    public static function peremptionNotificationBody(string $recipient, array $reminders): string
+    private static function peremptionNotificationBody(string $recipient, array $reminders): string
     {
         return Mailing::formatEmail('reminder', [
             'username' => $recipient,
@@ -107,10 +107,10 @@ class Mailing
      * @param string $subject Email subject.
      * @param string $html_content HTML formatted content.
      * @param string $plain_content Plain content for client refusing html version.
-     * @param Logger $logger Logger channel.
+     * @param string $logger Logger channel.
      * @return true True if email is sent properly.
      */
-    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, Logger $logger): bool
+    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, string $logger): bool
     {
         if (SETTINGS::IS_DEBUG) {
             $recipients = [SETTINGS::DEBUG_EMAIL];
@@ -148,9 +148,9 @@ class Mailing
             if ($mail->send()) {
                 return true;
             }
-            $logger->error('Failure to send email.', ['error' => $mail->ErrorInfo]);
+            Logging::error('Failure to send email.', ['error' => $mail->ErrorInfo], $logger);
         } catch (Exception $e) {
-            $logger->error('Error in sending email.', ['error' => $e->errorMessage()]);
+            Logging::error('Error in sending email.', ['error' => $e->errorMessage()], $logger);
         }
         return false;
     }

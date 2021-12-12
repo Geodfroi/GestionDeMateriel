@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\helpers;
 
+use app\constants\LogInfo;
 use app\constants\Session;
+use app\helpers\Logging;
 use app\models\User;
 
 /**
@@ -53,7 +55,7 @@ class Authenticate
     }
 
     /**
-     * Log-in user into session. The user will stay logged-in as long as the browser is open.
+     * Log-in user into session. The user will stay logged-in as long as the browser is open. Includes logging.
      * 
      * @param User $user User instance.
      */
@@ -66,14 +68,26 @@ class Authenticate
             $_SESSION[Session::IS_ADMIN] = true;
         }
 
+        Logging::info(LogInfo::USER_LOGIN, [
+            'login' => $user->getEmail(),
+            'id' => $user->getId()
+        ]);
+
         Database::users()->updateLogTime($user->getId());
     }
 
     /**
-     * Remove credentials from _SESSION and cookies.
+     * Remove credentials from _SESSION and cookies. Includes logging.
      */
     public static function logout()
     {
+        $user = Authenticate::getUser();
+
+        Logging::info(LogInfo::USER_LOGOUT, [
+            'login' => $user->getEmail(),
+            'id' => $user->getId()
+        ]);
+
         if (session_status() === PHP_SESSION_ACTIVE) {
             $_SESSION = []; // clear the stored values in current $_SESSION global variable.
             session_regenerate_id(true); // send header to browser to remove id cookie.
@@ -82,11 +96,3 @@ class Authenticate
         }
     }
 }
-
-    // /**
-    //  * Log-in to a user account as an admin.
-    //  */
-    // public static function login_as(int $id)
-    // {
-    //     $_SESSION[Session::USER_ID] = $id;
-    // }

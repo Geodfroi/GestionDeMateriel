@@ -1,19 +1,21 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.10 ###
+## Joël Piguet - 2021.12.12 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
+use app\constants\LogInfo;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
 
 /**
@@ -64,6 +66,12 @@ class UserTable extends BaseRoute
             $user_id = $_GET['delete'];
 
             if (Database::users()->delete($user_id)) {
+
+                Logging::info(LogInfo::USER_DELETED, [
+                    'admin-id' => Authenticate::getUserId(),
+                    'user-id' => $user_id
+                ]);
+
                 $this->setAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
             } else {
                 $this->setAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);

@@ -7,7 +7,6 @@
 namespace app\routes;
 
 use app\constants\Route;
-use app\constants\Session;
 
 use app\helpers\Authenticate;
 

@@ -9,9 +9,8 @@ declare(strict_types=1);
 namespace app\helpers\db;
 
 use \PDO;
-use Monolog\Logger;
-
-use app\constants\Error;
+use app\constants\LogError;
+use app\helpers\Logging;
 use app\models\StringContent;
 
 /**
@@ -20,9 +19,9 @@ use app\models\StringContent;
 class LocationQueries
 {
     private PDO $pdo;
-    private Logger $logger;
+    private string $logger;
 
-    function __construct(PDO $pdo, Logger $logger)
+    function __construct(PDO $pdo, string $logger)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
@@ -43,7 +42,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::LOCATION_DELETE . $error);
+        Logging::error(LogError::LOCATION_DELETE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -62,7 +61,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::LOCATION_INSERT . $error);
+        Logging::error(LogError::LOCATION_INSERT, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -87,11 +86,11 @@ class LocationQueries
             if ($data) {
                 return StringContent::fromDatabaseRow($data);
             } else {
-                $this->logger->error(sprintf(Error::LOCATION_QUERY, $id));
+                Logging::error(LogError::LOCATION_QUERY, ['id' => $id], $this->logger);
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            $this->logger->error(sprintf(Error::LOCATION_QUERY, $id) . $error);
+            Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $error], $this->logger);
         }
 
         return null;
@@ -115,7 +114,7 @@ class LocationQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            $this->logger->error(Error::LOCATIONS_QUERY_ALL  . $error);
+            Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $error], $this->logger);
         }
 
         return $locations;
@@ -139,7 +138,7 @@ class LocationQueries
             return intval($r) === 1;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::LOCATIONS_CHECK_CONTENT . $error);
+        Logging::error(LogError::LOCATIONS_CHECK_CONTENT, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -161,7 +160,7 @@ class LocationQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::LOCATION_UPDATE . $error);
+        Logging::error(LogError::LOCATION_UPDATE, ['error' => $error], $this->logger);
         return false;
     }
 }

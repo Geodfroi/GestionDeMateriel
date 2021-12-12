@@ -10,11 +10,11 @@ namespace app\helpers\db;
 
 use Exception;
 use \PDO;
-use Monolog\Logger;
 
-use app\constants\Error;
 use app\constants\Filter;
+use app\constants\LogError;
 use app\constants\OrderBy;
+use app\helpers\Logging;
 use app\models\Article;
 
 
@@ -24,9 +24,9 @@ use app\models\Article;
 class ArticleQueries
 {
     private PDO $pdo;
-    private Logger $logger;
+    private string $logger;
 
-    function __construct(PDO $pdo, Logger $logger)
+    function __construct(PDO $pdo, string $logger)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
@@ -47,7 +47,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(error::ARTICLE_DELETE . $error);
+        Logging::error(LogError::ARTICLE_DELETE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -65,7 +65,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_ARTICLES_DELETE . $error);
+        Logging::error(LogError::USER_ARTICLES_DELETE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -171,7 +171,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::ARTICLE_INSERT . $error);
+        Logging::error(LogError::ARTICLE_INSERT, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -201,11 +201,11 @@ class ArticleQueries
             if ($data) {
                 return Article::fromDatabaseRow($data);
             } else {
-                $this->logger->error(sprintf(Error::ARTICLE_QUERY, $id));
+                Logging::error(LogError::ARTICLE_QUERY, ['id' => $id], $this->logger);
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            $this->logger->error(sprintf(Error::ARTICLE_QUERY, $id) . $error);
+            Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $error], $this->logger);
         }
 
         return null;
@@ -235,7 +235,7 @@ class ArticleQueries
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::ARTICLES_COUNT_QUERY . $error);
+        Logging::error(LogError::ARTICLES_COUNT_QUERY, ['error' => $error], $this->logger);
         return -1;
     }
 
@@ -288,7 +288,7 @@ class ArticleQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            $this->logger->error(Error::ARTICLES_QUERY . $error);
+            Logging::error(LogError::ARTICLES_QUERY, ['error' => $error], $this->logger);
         }
 
         return $articles;
@@ -325,7 +325,7 @@ class ArticleQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error('failure to update article: ' . $error);
+        Logging::error(LogError::ARTICLE_UPDATE, ['id' => $id, 'error' => $error], $this->logger);
         return false;
     }
 }

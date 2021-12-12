@@ -10,10 +10,10 @@ namespace app\helpers\db;
 
 use \PDO;
 use Exception;
-use Monolog\Logger;
 
-use app\constants\Error;
+use app\constants\LogError;
 use app\constants\OrderBy;
+use app\helpers\Logging;
 use app\models\User;
 
 /**
@@ -22,9 +22,9 @@ use app\models\User;
 class UserQueries
 {
     private PDO $pdo;
-    private Logger $logger;
+    private string $logger;
 
-    function __construct(PDO $pdo, Logger $logger)
+    function __construct(PDO $pdo, string $logger)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
@@ -46,7 +46,7 @@ class UserQueries
         }
         list(,, $error) = $preparedStatement->errorInfo();
 
-        $this->logger->error(Error::USER_DELETE . $error);
+        Logging::error(LogError::USER_DELETE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -117,7 +117,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_INSERT . $error);
+        Logging::error(LogError::USER_INSERT, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -148,7 +148,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_QUERY . $error);
+        Logging::error(LogError::USER_QUERY, ['error' => $error], $this->logger);
         return null;
     }
 
@@ -179,7 +179,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_QUERY . $error);
+        Logging::error(LogError::USER_QUERY, ['error' => $error], $this->logger);
         return null;
     }
 
@@ -210,7 +210,7 @@ class UserQueries
             return $data ? User::fromDatabaseRow($data) : null;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_QUERY . $error);
+        Logging::error(LogError::USER_QUERY, ['error' => $error], $this->logger);
         return null;
     }
 
@@ -235,7 +235,7 @@ class UserQueries
         }
 
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USERS_COUNT_QUERY . $error);
+        Logging::error(LogError::USERS_COUNT_QUERY, ['error' => $error], $this->logger);
         return -1;
     }
 
@@ -280,7 +280,7 @@ class UserQueries
             }
         } else {
             list(,, $error) = $preparedStatement->errorInfo();
-            $this->logger->error(Error::USERS_QUERY  . $error);
+            Logging::error(LogError::USERS_QUERY, ['error' => $error], $this->logger);
         }
 
         return $users;
@@ -304,7 +304,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_ALIAS_UPDATE . $error);
+        Logging::error(LogError::USER_ALIAS_UPDATE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -326,7 +326,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_DELAY_UPDATE . $error);
+        Logging::error(LogError::USER_DELAY_UPDATE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -348,7 +348,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_CONTACT_UPDATE . $error);
+        Logging::error(LogError::USER_CONTACT_UPDATE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -369,7 +369,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_LOGTIME_UPDATE . $error);
+        Logging::error(LogError::USER_LOGTIME_UPDATE, ['error' => $error], $this->logger);
         return false;
     }
 
@@ -391,7 +391,7 @@ class UserQueries
             return true;
         }
         list(,, $error) = $preparedStatement->errorInfo();
-        $this->logger->error(Error::USER_PASSWORD_UPDATE  . $error);
+        Logging::error(LogError::USER_PASSWORD_UPDATE, ['error' => $error], $this->logger);
         return false;
     }
 }
