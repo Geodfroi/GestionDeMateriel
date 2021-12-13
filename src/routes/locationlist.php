@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
@@ -14,7 +14,7 @@ use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Logging;
-use app\helpers\Util;
+use app\helpers\Validation;
 
 class LocationList extends BaseRoute
 {
@@ -58,7 +58,7 @@ class LocationList extends BaseRoute
         }
 
         if (isset($_POST['add-new'])) {
-            if (Util::validateLocation($this, $location_field)) {
+            if (Validation::validateLocation($this, $location_field)) {
 
                 if (Database::locations()->contentExists($location_field)) {
                     $this->setError('location', Warning::LOCATION_PRESET_EXISTS);
@@ -82,7 +82,7 @@ class LocationList extends BaseRoute
         if (isset($_POST['update'])) {
             $id = intval($_POST['id']);
 
-            if (!Util::validateLocation($this, $location_field)) {
+            if (!Validation::validateLocation($this, $location_field)) {
                 $selected =  $id; // $location_field will still be filled -> stay in update mode.
                 goto end;
             }

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13###
 ##############################
 
 namespace app\helpers;
@@ -12,7 +12,6 @@ use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Settings;
-use app\constants\Warning;
 use app\helpers\Logging;
 use app\models\User;
 use app\routes\BaseRoute;
@@ -89,6 +88,28 @@ class Util
     }
 
     /**
+     * Load a php template in memory and returns a content string.
+     *
+     * @param string $name The name of the template.
+     * @param array $data The variables to be used in php templates.
+     * 
+     * @return string Rendered template as string.
+     */
+    public static function renderTemplate(string $name, array $data = [], string $folder_path): string
+    {
+        // extract array variables into the local scope so they can be to be used in the template scripts.
+        extract($data, EXTR_OVERWRITE);
+        // start buffering the string;
+        ob_start();
+        // load file content at path and resolve php script to a string in the buffer;
+        require __DIR__ . "//../" .  $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
+        // flush the buffer content to the variable
+        $rendered = ob_get_clean();
+
+        return (string)$rendered;
+    }
+
+    /**
      * Create a new password, send a renewal email and modify database record. Includes logging.
      * 
      * @param BaseRoute Route receiving the alerts.
@@ -120,6 +141,19 @@ class Util
     }
 
     /**
+     * str_contains was introduced in php8
+     * https://stackoverflow.com/questions/66519169/call-to-undefined-function-str-contains-php
+     * 
+     * @param string $haystack;
+     * @param string $needle;
+     * @return bool True if found or $needle was empty string.
+     */
+    public static function str_contains(string $haystack, string $needle): bool
+    {
+        return '' === $needle || false !== strpos($haystack, $needle);
+    }
+
+    /**
      * Strip time component from a DateTime value. Useful for date comparaison.
      * 
      * @param DateTime Date value.
@@ -128,84 +162,5 @@ class Util
     public static function stripTimeComponent(DateTime $date): DateTime
     {
         return DateTime::createFromFormat('Y-m-d', $date->format('Y-m-d'));
-    }
-
-    /**
-     * Load a php template in memory and returns a content string.
-     *
-     * @param string $name The name of the template.
-     * @param array $data The variables to be used in php templates.
-     * 
-     * @return string Rendered template as string.
-     */
-    public static function renderTemplate(string $name, array $data = [], string $folder_path): string
-    {
-        // extract array variables into the local scope so they can be to be used in the template scripts.
-        extract($data, EXTR_OVERWRITE);
-        // start buffering the string;
-        ob_start();
-        // load file content at path and resolve php script to a string in the buffer;
-        require __DIR__ . "//../" .  $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
-        // flush the buffer content to the variable
-        $rendered = ob_get_clean();
-
-        return (string)$rendered;
-    }
-
-    /**
-     * Location validation. Location must not be empty and under a set number of caracters.
-     * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param string &$location Article's location within the school by reference.
-     * @return bool True if validated.
-     */
-    public static function validateLocation(BaseRoute $route, ?string &$location): bool
-    {
-        $location = trim($_POST['location']) ?? '';
-
-        if (strlen($location) === 0) {
-            $route->setError('location', Warning::LOCATION_EMPTY);
-            return false;
-        }
-
-        $location = ucwords($location);
-        if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
-            $route->setError('location', sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
-            return false;
-        }
-
-        if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
-            $route->setError('location', sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
-     * https://www.codexworld.com/how-to/validate-password-strength-in-php/
-     * 
-     * @param BaseRoute $route Route to forward error messages.
-     * @param string|null $password_candidate Proposed user password by reference.
-     * @return bool True if password is properly formatted;
-     */
-    public static function validatePassword(BaseRoute $route, ?string &$password_candidate): bool
-    {
-        $password_candidate = trim($_POST['password']) ?? '';
-        if ($password_candidate === '') {
-            $route->setError('password', Warning::PASSWORD_EMPTY);
-            return false;
-        }
-        if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            $route->setError('password', sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
-            return false;
-        }
-        $has_number = preg_match('@[0-9]@', $password_candidate);
-        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
-        if (!$has_number || (!$has_letters)) {
-            $route->setError('password', Warning::PASSWORD_WEAK);
-            return false;
-        }
-        return true;
     }
 }

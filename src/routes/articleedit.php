@@ -1,22 +1,18 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\LogInfo;
 use app\constants\Route;
-use app\constants\Settings;
-use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Logging;
-use app\helpers\Util;
+use app\helpers\Validation;
 use app\models\Article;
-
-use DateTime;
 
 class ArticleEdit extends BaseRoute
 {
@@ -99,106 +95,20 @@ class ArticleEdit extends BaseRoute
      */
     private function validateInputs(?string &$article_name, ?string &$location, ?string &$exp_date, ?string &$comments): bool
     {
-        // Avoid && or || between conditions because all validation methods must be run without short-circuit.
-        $validated   = true;
-        if (!$this->validateArticleName($article_name)) {
+        // Avoid && or || between conditions because all validation methods must be run without short-circuit to properly display all error messages.
+        $validated  = true;
+        if (!Validation::validateArticleName($this, $article_name)) {
             $validated  = false;
         }
-        if (!Util::validateLocation($this, $location)) {
+        if (!Validation::validateLocation($this, $location)) {
             $validated  = false;
         }
-        if (!$this->validateExpirationDate($exp_date)) {
+        if (!Validation::validateExpirationDate($this, $exp_date)) {
             $validated  = false;
         }
-        if (!$this->validateComments($comments)) {
+        if (!Validation::validateComments($this, $comments)) {
             $validated  = false;
         }
         return $validated;
-    }
-
-    /**
-     * Article name validation. Article name must not be empty, exceed a set length and under a set number of caracters.
-     * 
-     * @param array &$string $article_name Article name by reference.
-     * @return bool True if validated.
-     */
-    private function validateArticleName(?string &$article_name): bool
-    {
-        $article_name = trim($_POST['article-name']) ?? '';
-
-        if ($article_name === '') {
-            $this->setError('article-name', Warning::ARTICLE_ADD_EMPTY);
-            return false;
-        }
-
-        if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
-            $this->setError('article-name', sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
-            return false;
-        }
-
-        if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
-            $this->setError('article-name', sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Date validation. Date must not be empty and correspond to format yyyy-mm-dd
-     * 
-     * @param string &$validated_date Validated expiration date.
-     * @return bool True if validated.
-     */
-    private function validateExpirationDate(?string &$date): bool
-    {
-        $date = trim($_POST['expiration-date'] ?? '');
-
-        if ($date === '') {
-            $this->setError('expiration-date', Warning::DATE_EMPTY);
-            return false;
-        }
-
-        $validated_date = DateTime::createFromFormat('Y-m-d', $date);
-        $date = $validated_date->format('Y-m-d');
-
-        static $future_limit;
-        if (is_null($future_limit)) {
-            $future_limit = DateTime::createFromFormat('Y-m-d', Settings::ARTICLE_DATE_FUTURE_LIMIT);
-        }
-
-        if ($validated_date) {
-
-            if ($validated_date < new DateTime()) {
-                $this->setError('expiration-date', Warning::DATE_PAST);
-                return false;
-            }
-
-            if ($validated_date >= $future_limit) {
-                $this->setError('expiration-date', Warning::DATE_FUTURE);
-                return false;
-            }
-
-            return true;
-        }
-
-        $this->setError('expiration-date', Warning::DATE_INVALID);
-        return false;
-    }
-
-    /**
-     * Comments validation. Comments can be empty string but be under a set number of caracters.
-     * 
-     * @param string &$comments Comments to be attached to the reminder by reference.
-     * @return bool True if validated.
-     */
-    private function validateComments(?string &$comments): bool
-    {
-        $comments = trim($_POST['comments']) ?? '';
-
-        if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
-            $this->setError('comments', sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
-            return false;
-        }
-        return true;
     }
 }

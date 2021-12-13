@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
@@ -13,6 +13,7 @@ use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Util;
+use app\helpers\Validation;
 
 /**
  * Route class containing behavior linked to login_template
@@ -52,14 +53,14 @@ class Login extends BaseRoute
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if ($this->validateEmailInput($email)) {
+            if (Validation::validateLoginEmail($this, $email)) {
                 $user = Database::users()->queryByEmail($email);
             }
 
             if (!isset($user)) {
                 $this->setError('email', Warning::LOGIN_NOT_FOUND);
             } else {
-                if ($this->validatePasswordInput($password)) {
+                if (Validation::validateLoginPassword($this, $password)) {
                     if ($user->verifyPassword($password)) {
                         Authenticate::login($user);
                         $this->requestRedirect(Route::HOME);
@@ -76,43 +77,5 @@ class Login extends BaseRoute
             'email' => $email ?? '',
             'password' => $password ?? '',
         ]);
-    }
-
-    /**
-     * Validate input and fill $errors array with proper email error text to be displayed if it fails.
-     * 
-     * @param string $email User email by reference.
-     * @return bool True if properly filled-in.
-     */
-    private function validateEmailInput(&$email): bool
-    {
-        $email = trim($_POST['email']) ?? '';
-
-        if ($email  === '') {
-            $this->setError('email', Warning::LOGIN_EMAIL_EMPTY);
-            return false;
-        }
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            $this->setError('email', Warning::LOGIN_EMAIL_INVALID);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
-     * 
-     * @param string $password User password by reference
-     * @return bool True if properly filled;
-     */
-    private function validatePasswordInput(&$password)
-    {
-        $password = trim($_POST['password']) ?? '';
-        if ($password === '') {
-            $this->setError('password', Warning::LOGIN_PASSWORD_EMPTY);
-            return false;
-        }
-        return true;
     }
 }

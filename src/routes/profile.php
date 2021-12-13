@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
@@ -10,12 +10,12 @@ use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Route;
-use app\constants\Settings;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Util;
+use app\helpers\Validation;
 
 /**
  * Route class containing behavior linked to profile_template. This route displays user info.
@@ -74,7 +74,7 @@ class Profile extends BaseRoute
         if (isset($_POST['set-alias'])) {
             $display = 1;
 
-            if ($this->validateAlias($alias)) {
+            if (Validation::validateAlias($this, $alias)) {
                 $display = 0;
 
                 if ($alias === $user->getAlias()) {
@@ -115,8 +115,8 @@ class Profile extends BaseRoute
         if (isset($_POST['new-password'])) {
             $display = 2;
 
-            if (Util::validatePassword($this, $password)) {
-                if ($this->validateRepeat($password)) {
+            if (Validation::validatePassword($this, $password)) {
+                if (Validation::validatePasswordRepeat($this, $password)) {
 
                     $display = 0;
                     $encrypted = util::encryptPassword($password);
@@ -140,7 +140,7 @@ class Profile extends BaseRoute
         if (isset($_POST['set-email'])) {
             $display = 3;
 
-            if ($this->validateContactEmail($contact_email)) {
+            if (Validation::validateContactEmail($this, $contact_email)) {
 
                 $display = 0;
 
@@ -217,66 +217,5 @@ class Profile extends BaseRoute
             'contact_email' => $contact_email ?? '',
             'delays' => $delays ?? [],
         ]);
-    }
-
-    /**
-     * Validate user alias. Alias can be set to empty string in which cas e-mail root is used in the app.
-     * 
-     * @param string|null $alias Optional alias by reference.
-     * @return bool True if Alias is conform or empty.
-     */
-    private function validateAlias(&$alias): bool
-    {
-        $alias = trim($_POST['alias']) ?? '';
-        if ($alias === '') {
-            return true;
-        }
-        if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            $this->setError('alias', sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validate contact email. Email must a valid email format or set to null.
-     * 
-     * @param string|null $contact_email Contact e-mail by reference.
-     * @return bool True if e-mail is set to empty string or is a valid email format.
-     */
-    private function validateContactEmail(&$email): bool
-    {
-        $email = trim($_POST['contact-email']) ?? '';
-
-        if ($email  === '') {
-            return true;
-        }
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            $this->setError('contact-email', Warning::LOGIN_EMAIL_INVALID);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validate the repeated password.
-     * 
-     * @param string $password_first Proposed user password entered in first field.
-     * @return bool True if repeat-password corresponds to first entry.
-     */
-    private function validateRepeat(string $password_first): bool
-    {
-        $password_repeat = trim($_POST['password-repeat']) ?? '';
-        if (!$password_repeat) {
-            $this->setError('password-repeat', Warning::PASSWORD_REPEAT_NULL);
-            return false;
-        }
-
-        if ($password_first !== $password_repeat) {
-            $this->setError('password-repeat', Warning::PASSWORD_DIFFERENT);
-            return false;
-        }
-        return true;
     }
 }

@@ -1,13 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Alert;
 use app\constants\AlertType;
+use app\constants\ArtFilter;
 use app\constants\LogInfo;
 use app\constants\OrderBy;
 use app\constants\Route;
@@ -37,8 +38,10 @@ class ArticleTable extends BaseRoute
 
         $_SESSION[Session::ART_PAGE] ??= 1;
         $_SESSION[Session::ART_ORDERBY] ??= OrderBy::DELAY_ASC;
-        $_SESSION[Session::ART_FILTER_TYPE] ??= 0;
-        $_SESSION[Session::ART_FILTER_VAL] ??= '';
+
+        if (!isset($_SESSION[Session::ART_FILTERS])) {
+            $_SESSION[Session::ART_FILTERS] = [];
+        }
 
         if (isset($_GET['alert'])) {
 
@@ -75,24 +78,53 @@ class ArticleTable extends BaseRoute
         }
 
         if (isset($_POST['filter'])) {
-            $_SESSION[Session::ART_FILTER_TYPE]  = $_POST['filter-type'];
-            $_SESSION[Session::ART_FILTER_VAL]  = $_POST['filter-val'];
+            if ($_POST['filter-name']) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::NAME] = $_POST['filter-name'];
+            } else {
+                // if null of empty unset from filter array.
+                unset($_SESSION[Session::ART_FILTERS][ArtFilter::NAME]);
+            }
+
+            if ($_POST['filter-location']) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION] = $_POST['filter-location'];
+            } else {
+                unset($_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION]);
+            }
+
+            // remove date filters from associative array
+            unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE]);
+            unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER]);
+
+            $date_val = isset($_POST['filter-date-val']) ? $_POST['filter-date-val'] : '';
+
+            // add date filter from input selection with correct type as key
+
+            if ($_POST['filter-date-type'] === ArtFilter::DATE_BEFORE) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE] = $date_val;
+            } elseif ($_POST['filter-date-type'] === ArtFilter::DATE_AFTER) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER] = $date_val;
+            }
+
+            if (isset($_POST['show-expired'])) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::SHOW_EXPIRED] = true;
+            } else {
+                unset($_SESSION[Session::ART_FILTERS][ArtFilter::SHOW_EXPIRED]);
+            }
+
             goto end;
         }
 
         end:
 
-        $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTER_TYPE], $_SESSION[Session::ART_FILTER_VAL]);
-
-        $offset =   ($_SESSION[Session::ART_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
+        $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTERS]);
+        $offset = ($_SESSION[Session::ART_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
         $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
 
         $articles = Database::articles()->queryAll(
             Settings::TABLE_DISPLAY_COUNT,
             $offset,
             $_SESSION[Session::ART_ORDERBY],
-            $_SESSION[Session::ART_FILTER_TYPE],
-            $_SESSION[Session::ART_FILTER_VAL]
+            $_SESSION[Session::ART_FILTERS]
         );
 
         return $this->renderTemplate([

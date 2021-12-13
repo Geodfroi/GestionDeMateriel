@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\helpers;
@@ -37,6 +37,21 @@ class Logging
             $instance->pushHandler(new StreamHandler(__DIR__ . '/../../logs/app.log', Logger::DEBUG));
         }
         return $instance;
+    }
+
+    /**
+     * Wrapper for Monolog Logger debug method.
+     * @param string $msg Log message.
+     * @param array $context Log context array.
+     * @param string $channel Logging channel.
+     */
+    public static function debug(string $msg, array $context = [], string $channel = 'app')
+    {
+        if ($channel === 'server') {
+            Logging::server()->debug($msg, $context);
+        } else {
+            Logging::app()->debug($msg, $context);
+        }
     }
 
     /**

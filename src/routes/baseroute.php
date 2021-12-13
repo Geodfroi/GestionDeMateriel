@@ -1,12 +1,13 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Settings;
+use app\helpers\Logging;
 use app\helpers\Util;
 
 /**
@@ -75,6 +76,16 @@ abstract class BaseRoute
      */
     protected function renderTemplate(array $data = []): string
     {
+        // log post and get request if debug is active
+        if (Settings::IS_DEBUG) {
+            if (count($_GET) > 0) {
+                Logging::debug('GET', $_GET);
+            }
+            if (count($_POST) > 0) {
+                Logging::debug('Post', $_POST);
+            }
+        }
+
         $data['alert']  = $this->alert ?? [];
         $data['errors'] = $this->errors ?? [];
 

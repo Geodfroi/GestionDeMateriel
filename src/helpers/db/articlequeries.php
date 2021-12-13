@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\helpers\db;
@@ -11,12 +11,12 @@ namespace app\helpers\db;
 use Exception;
 use \PDO;
 
-use app\constants\Filter;
+use app\constants\ArtFilter;
 use app\constants\LogError;
 use app\constants\OrderBy;
 use app\helpers\Logging;
+use app\helpers\Util;
 use app\models\Article;
-
 
 /**
  * Regroup function to interact with article table.
@@ -69,28 +69,55 @@ class ArticleQueries
         return false;
     }
 
-
     /**
-     * Compose WHERE clause to be inserted into article database query.
+     *  Compose WHERE clause to be inserted into article database query; can be composed of several filters.
      * 
-     * @param int $param Filter constant value.
+     * @param array $filters Array of ArtFilter Instances
      * @return string Where clause.
      */
-    public static function printFilterStatement($param): string
+    public static function printFilterStatement(array $filters): string
     {
-        switch ($param) {
-            case Filter::ARTICLE_NAME:
-                return "WHERE article_name LIKE CONCAT('%', :fil, '%')";
-            case Filter::LOCATION:
-                return "WHERE location LIKE CONCAT('%', :fil, '%')";
-            case Filter::DATE_BEFORE:
-                return "WHERE expiration_date < :fil";
-            case Filter::DATE_AFTER:
-                return "WHERE expiration_date > :fil";
-            default:
-                break;
+        $str = 'WHERE ';
+        $count = 0;
+
+        //is key-value set and value not null or empty
+        if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
+            $str .= "article_name LIKE CONCAT ('%', :fname, '%')";
+            $count += 1;
         }
-        throw new Exception("printStatement:: Invalid [$param] parameter");
+
+        if (isset($filters[ArtFilter::LOCATION]) && $filters[ArtFilter::LOCATION]) {
+            if ($count === 1) {
+                $str .= ' AND ';
+            }
+            $str .= "location LIKE CONCAT ('%', :floc, '%')";
+            $count += 1;
+        }
+
+        if (isset($filters[ArtFilter::DATE_BEFORE]) && $filters[ArtFilter::DATE_BEFORE]) {
+            if ($count === 1) {
+                $str .= ' AND ';
+            }
+            $str .= "expiration_date < :fbefore";
+            $count += 1;
+        } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
+            if ($count === 1) {
+                $str .= ' AND ';
+            }
+            $str .= "expiration_date > :fbefore";
+            $count += 1;
+        }
+
+        if (!isset($filters[ArtFilter::SHOW_EXPIRED])) {
+
+            if ($count === 1) {
+                $str .= ' AND ';
+            }
+            $str .= "(expiration_date > CURRENT_TIMESTAMP)";
+            $count += 1;
+        }
+
+        return $count > 0 ? $str : '';
     }
 
     /**
@@ -214,19 +241,25 @@ class ArticleQueries
     /**
      * Get number of articles in db.
      * 
-     * @param int $filter_type Filter parameter. Use Filter constants as parameter.
-     * @param string $filter_arg Filter argument value.
+     * @param array $filters Array of ArtFilter instances.
      * @return int # of articles or -1 if query fails.
      */
-    public function queryCount(int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): int
+    public function queryCount(array $filters = []): int
     {
-        $filter_arg = trim($filter_arg);
-        $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
-
+        $filter_statement = ArticleQueries::printFilterStatement($filters);
         $preparedStatement = $this->pdo->prepare("SELECT COUNT(*) FROM articles $filter_statement");
 
-        if ($filter_arg) {
-            $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
+        if (Util::str_contains($filter_statement, ':fname')) {
+            $preparedStatement->bindParam(':fname', $filters[ArtFilter::NAME], PDO::PARAM_STR);
+        }
+        if (Util::str_contains($filter_statement, ':floc')) {
+            $preparedStatement->bindParam(':floc', $filters[ArtFilter::LOCATION], PDO::PARAM_STR);
+        }
+        if (Util::str_contains($filter_statement, ':fbefore')) {
+            $preparedStatement->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], PDO::PARAM_STR);
+        }
+        if (Util::str_contains($filter_statement, ':fafter')) {
+            $preparedStatement->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], PDO::PARAM_STR);
         }
 
         if ($preparedStatement->execute()) {
@@ -245,16 +278,30 @@ class ArticleQueries
      * @param int $limit The maximum number of items to be returned.
      * @param int $offset The number of result items to be skipped before including them to the result array.
      * @param int $orderby Order parameter. Use OrderBy constants as parameter.
-     * @param int $filter_type Filter parameter. Use Filter constants as parameter.
-     * @param string $filter_arg Filter argument value.
+     * @param array $filters Array of ArtFilter instances.
      * @return array An array of articles.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, int $filter_type = Filter::ARTICLE_NAME, $filter_arg = ''): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
-        $filter_arg = trim($filter_arg);
-
-        $filter_statement = $filter_arg ? ArticleQueries::printOrderStatement($filter_type) : '';
+        $filter_statement = ArticleQueries::printFilterStatement($filters);
         $order_statement = ArticleQueries::printOrderStatement($orderby);
+
+        // Logging::debug($filter_statement);
+        // Logging::debug('filters', $filters);
+
+        // Logging::debug("SELECT 
+        //     articles.id, 
+        //     articles.user_id, 
+        //     articles.article_name, 
+        //     articles.location,
+        //     articles.comments, 
+        //     articles.expiration_date,
+        //     articles.creation_date,
+        //     users.alias
+        // FROM articles LEFT JOIN users ON articles.user_id = users.id
+        // $filter_statement
+        // $order_statement
+        // LIMIT :lim OFFSET :off");
 
         // join table if necessary to have user column alias available in orderby statements.
         // LEFT JOIN: all articles are listed even if the user who created the article is no longer be present in db.
@@ -267,14 +314,24 @@ class ArticleQueries
             articles.expiration_date,
             articles.creation_date,
             users.alias
-        FROM articles LEFT JOIN users ON articles.user_id = users.id
-        $filter_statement
+        FROM articles LEFT JOIN users ON articles.user_id = users.id 
+        $filter_statement 
         $order_statement
         LIMIT :lim OFFSET :off");
 
-        if ($filter_arg) {
-            $preparedStatement->bindParam(':fil', $filter_arg, PDO::PARAM_STR);
+        if (Util::str_contains($filter_statement, ':fname')) {
+            $preparedStatement->bindParam(':fname', $filters[ArtFilter::NAME], PDO::PARAM_STR);
         }
+        if (Util::str_contains($filter_statement, ':floc')) {
+            $preparedStatement->bindParam(':floc', $filters[ArtFilter::LOCATION], PDO::PARAM_STR);
+        }
+        if (Util::str_contains($filter_statement, ':fbefore')) {
+            $preparedStatement->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], PDO::PARAM_STR);
+        }
+        if (Util::str_contains($filter_statement, ':fafter')) {
+            $preparedStatement->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], PDO::PARAM_STR);
+        }
+
         $preparedStatement->bindParam(':lim', $limit, PDO::PARAM_INT);
         $preparedStatement->bindParam(':off', $offset, PDO::PARAM_INT);
 

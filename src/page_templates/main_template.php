@@ -69,9 +69,8 @@ use app\helpers\Authenticate;
     </main>
 
     <div>
-        <div>Expand logs; in db;</div>
-        <div>ARTICLES filter crash</div>
-        <div>IMPLEMENT LOGGING for server.</div>
+        <div>USER_TABLE: send email to new user when account is created.</div>
+        <div>implement sqlite</div>
         <div>CREATE EMAILS PLAIN CONTENT</div>
         <div>MAIN: backup db</div>
         <div>ADMIN - access user contact posts.</div>
@@ -82,8 +81,10 @@ use app\helpers\Authenticate;
         <div>CONTACT: create contact page</div>
         <div>LOGIN: add favicon</div>
         <div>USER_EDIT: layout for small screen.</div>
-        <div>USER_TABLE: send email to new user when account is created.</div>
-        <div>USER_TABLE: alias for column created by</div>
+        <div>Remove old logs ?</div>
+        <div>Varying modal content
+            https://getbootstrap.com/docs/5.1/components/modal/
+        </div>
     </div>
 
     <div style="margin-top: 80px;">&nbsp;</div>
