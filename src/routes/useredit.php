@@ -51,9 +51,9 @@ class UserEdit extends BaseRoute
                         'new-user' => $email
                     ]);
 
-                    $this->requestRedirect(Route::ADMIN . '?alert=added_success');
+                    $this->requestRedirect(Route::USERS_TABLE . '?alert=added_success');
                 } else {
-                    $this->requestRedirect(Route::ADMIN . '?alert=added_failure');
+                    $this->requestRedirect(Route::USERS_TABLE . '?alert=added_failure');
                 }
                 return '';
             }

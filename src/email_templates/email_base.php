@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 ?>
 
@@ -19,8 +19,8 @@
 
     <footer>
         <br><br>
-        <span style="vertical-align:top;font-size:14px">HEdS - Service des innovations pédagogiques </span><br>
-        <div style="font-size:14px"> P.s. Prière de ne pas répondre à cet email qui a été généré automatiquement.</div>
+        <span style="vertical-align:top;font-size:14px">&emsp;HEdS - Service des innovations pédagogiques </span><br>
+        <div style="font-size:14px">&emsp;P.s. Prière de ne pas répondre à cet email qui a été généré automatiquement.</div>
     </footer>
 </body>
 

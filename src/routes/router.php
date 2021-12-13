@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\routes;
@@ -14,7 +14,7 @@ use app\helpers\Logging;
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
  */
-class Routes
+class Router
 {
     /**
      * Get proper route from path contained in $_SERVER['PATH_INFO']; 
@@ -40,6 +40,8 @@ class Routes
                 return new ArticleTable();
             case Route::CONTACT:
                 return new Contact();
+            case Route::DEBUG_EMAILS:
+                return new DebugEmails();
             case Route::LOCAL_PRESETS:
                 return new LocationList();
             case Route::LOGIN:
@@ -50,7 +52,6 @@ class Routes
                 return new UserEdit();
             case Route::USERS_TABLE:
                 return new UserTable();
-
             case Route::HOME:
             default:
                 return new Home();

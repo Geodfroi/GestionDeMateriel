@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `articles` (
 -- App Users
 CREATE TABLE IF NOT EXISTS `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `alias`         varchar(255)    NOT NULL UNIQUE,
+    `alias`         varchar(255)    UNIQUE,
     `email`         varchar(255)    NOT NULL UNIQUE,
     `contact_email` varchar(255),
     `contact_delay` varchar(255)    NOT NULL DEFAULT '3-14',

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
+use app\constants\LogChannel;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Mailing;
@@ -17,7 +18,7 @@ use app\helpers\Util;
 $articles = Database::articles()->queryAll();
 $users = Database::users()->queryAll();
 
-Logging::info('Starting server script.', [], 'server');
+Logging::info('Starting server script.', [], LogChannel::SERVER);
 
 // iterate through users and articles to flag articles that are soon due.
 foreach ($users as $user) {
@@ -36,6 +37,7 @@ foreach ($users as $user) {
         foreach ($delays as $delay) {
             //send reminder only once when the delay exactly matches the remaining days before peremption.
             if ($delta_days === $delay) {
+
                 array_push($reminders, [
                     'article' => $article,
                     'delay' => $delay
@@ -44,8 +46,8 @@ foreach ($users as $user) {
         }
     }
 
-    if (!Mailing::peremptionNotification($user, $reminders, 'server')) {
-        Logging::error('peremption notification failed.', [], 'server');
+    if (!Mailing::peremptionNotification($user, $reminders, LogChannel::SERVER)) {
+        Logging::error('peremption notification failed.', [], LogChannel::SERVER);
         return;
     }
 }

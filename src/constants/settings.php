@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.13 ###
 ##############################
 
 namespace app\constants;
@@ -13,7 +13,8 @@ namespace app\constants;
  */
 class Settings
 {
-    const IS_DEBUG = true;
+    const DEBUG_MODE = true;
+    const SHOW_DEBUG_PAGE = true;
     const DEBUG_EMAIL = 'innov.heds@gmail.com';
 
     const APP_NAME = "HEdS Gestionnaire d'inventaire";

@@ -154,10 +154,10 @@ class Validation
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
      * @param BaseRoute $route Route to forward error messages. 
-     * @param string $email User email by reference.
+     * @param ?string $email User email by reference.
      * @return bool True if properly filled-in.
      */
-    public static function validateLoginEmail(BaseRoute $route, string &$email): bool
+    public static function validateLoginEmail(BaseRoute $route, ?string &$email): bool
     {
         $email = trim($_POST['email']) ?? '';
 
@@ -223,10 +223,10 @@ class Validation
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
      * @param BaseRoute $route Route to forward error messages. 
-     * @param string $email User email by reference.
+     * @param ?string $email User email by reference.
      * @return bool True if properly filled-in.
      */
-    public static function validateNewLogin(BaseRoute $route, string &$email): bool
+    public static function validateNewLogin(BaseRoute $route, ?string &$email): bool
     {
         if (!Validation::validateLoginEmail($route, $email)) {
             return false;

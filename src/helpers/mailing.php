@@ -12,6 +12,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+use app\constants\LogChannel;
 use app\constants\Mail;
 use app\constants\P_Settings;
 use app\constants\Settings;
@@ -43,10 +44,10 @@ class Mailing
      * 
      * @param User $user Email recipient.
      * @param string $password New password in plain text.
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return bool True if emails are sent correctly.
      */
-    public static function passwordChangeNotification(User $user, string $password, string $logger = 'app'): bool
+    public static function passwordChangeNotification(User $user, string $password, int $logger = LogChannel::APP): bool
     {
         $html =  Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
         return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '', $logger);
@@ -59,13 +60,13 @@ class Mailing
      * @param string $password New password in plain text.
      * @return string Html body.
      */
-    private static function passwordChangeNotificationBody(string $recipient, string $password): string
+    public static function passwordChangeNotificationBody(string $recipient, string $password): string
     {
         return Mailing::formatEmail('newpassword', [
-            'username' => $recipient,
             'app_name' => Settings::APP_NAME,
-            'password' => $password,
             'url' => Settings::APP_FULL_URL,
+            'username' => $recipient,
+            'password' => $password,
         ]);
     }
 
@@ -74,10 +75,10 @@ class Mailing
      * 
      * @param User $user Email recipient.
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return bool True if emails are sent correctly.
      */
-    public static function peremptionNotification(User $user, array $reminders, string $logger = 'server'): bool
+    public static function peremptionNotification(User $user, array $reminders, int $logger = LogChannel::SERVER): bool
     {
         Logging::info("Sending peremption email to {$user->getAlias()}", $reminders, $logger);
         $html =  Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
@@ -91,11 +92,32 @@ class Mailing
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
      * @return string Html body.
      */
-    private static function peremptionNotificationBody(string $recipient, array $reminders): string
+    public static function peremptionNotificationBody(string $recipient, array $reminders): string
     {
         return Mailing::formatEmail('reminder', [
             'username' => $recipient,
             'reminders' => $reminders
+        ]);
+    }
+
+    public static function userInviteNotification()
+    {
+    }
+
+    /**
+     * Return formatted body for user invite notification.
+     * 
+     * @param string $login New user email as login.
+     * @param array $password_plain Newly generated password in plain text.
+     * @return string Html body.
+     */
+    public static function userInviteNotificationBody(string $login, string $password_plain): string
+    {
+        return Mailing::formatEmail('userinvite', [
+            'app_name' => Settings::APP_NAME,
+            'url' => Settings::APP_FULL_URL,
+            'login' => $login,
+            'password' => $password_plain,
         ]);
     }
 
@@ -107,12 +129,12 @@ class Mailing
      * @param string $subject Email subject.
      * @param string $html_content HTML formatted content.
      * @param string $plain_content Plain content for client refusing html version.
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return true True if email is sent properly.
      */
-    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, string $logger): bool
+    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, int $logger): bool
     {
-        if (SETTINGS::IS_DEBUG) {
+        if (SETTINGS::DEBUG_MODE) {
             $recipients = [SETTINGS::DEBUG_EMAIL];
         }
 

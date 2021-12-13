@@ -19,16 +19,22 @@ abstract class BaseRoute
     private $alert = [];
     private $errors = [];
 
+    private $template_name;
+    private $show_header;
+    private $show_footer;
+
     /**
      * Link a Route with its designated template in the constructor.
      * 
-     * @param string $templateName Template to use in renderTemplate call.
+     * @param string $template_name Template to use in renderTemplate call.
      * @param string $route Route's name to store in SESSION global variable (used to highlight current page in nav bar).
      */
-    public function __construct(string $templateName, string $route)
+    public function __construct(string $template_name, string $route, bool $show_header = true, bool $show_footer = true)
     {
         $_SESSION['route'] = $route;
-        $this->templateName = $templateName;
+        $this->template_name = $template_name;
+        $this->show_header = $show_header;
+        $this->show_footer = $show_footer;
     }
 
     /**
@@ -77,7 +83,7 @@ abstract class BaseRoute
     protected function renderTemplate(array $data = []): string
     {
         // log post and get request if debug is active
-        if (Settings::IS_DEBUG) {
+        if (Settings::DEBUG_MODE) {
             if (count($_GET) > 0) {
                 Logging::debug('GET', $_GET);
             }
@@ -89,7 +95,7 @@ abstract class BaseRoute
         $data['alert']  = $this->alert ?? [];
         $data['errors'] = $this->errors ?? [];
 
-        return Util::renderTemplate($this->templateName, $data, Settings::TEMPLATES_PATH);
+        return Util::renderTemplate($this->template_name, $data, Settings::TEMPLATES_PATH);
     }
 
     /**
@@ -112,5 +118,20 @@ abstract class BaseRoute
     public function setError(string $key, string $content)
     {
         $this->errors[$key] = $content;
+    }
+
+    /**
+     * Display html footer.
+     */
+    public function showFooter(): bool
+    {
+        return $this->show_footer;
+    }
+    /**
+     * Display html header. 
+     */
+    public function showHeader(): bool
+    {
+        return $this->show_header;
     }
 }
