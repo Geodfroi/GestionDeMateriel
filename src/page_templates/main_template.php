@@ -24,15 +24,7 @@ use app\helpers\Authenticate;
 
 <body class="d-flex flex-column h-100">
 
-    <div class="row">
-        <div class="col-12">
-            <?php if (isset($alert['type'])) { ?>
-                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                </div>
-            <?php } ?>
-        </div>
-    </div>
+
 
     <?php if ($show_header) { ?>
         <header>
@@ -76,6 +68,17 @@ use app\helpers\Authenticate;
                                 <?php } ?>
                             </li>
                         </ul>
+                    </div>
+
+                    <!-- show alert message over navbar -->
+                    <div class="row fixed-top">
+                        <div class="col-12">
+                            <?php if (isset($alert['type'])) { ?>
+                                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
+                                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                                </div>
+                            <?php } ?>
+                        </div>
                     </div>
         </header>
     <?php } ?>

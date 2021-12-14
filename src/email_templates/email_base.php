@@ -20,7 +20,7 @@
     <footer>
         <br><br>
         <span style="vertical-align:top;font-size:14px">&emsp;HEdS - Service des innovations pédagogiques </span><br>
-        <div style="font-size:14px">&emsp;P.s. Prière de ne pas répondre à cet email qui a été généré automatiquement.</div>
+        <div style="font-size:14px">&emsp;Prière de ne pas répondre à cet email qui a été généré automatiquement.</div>
     </footer>
 </body>
 

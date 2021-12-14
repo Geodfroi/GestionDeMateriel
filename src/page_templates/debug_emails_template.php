@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 use app\constants\Route;
@@ -15,5 +15,6 @@ use app\constants\Route;
     </div>
 
     <br><br>
-    <div class="border border-1 border-dark"><?php echo $email_template ?></div>
+    <div class="border border-1 border-dark"><?php echo $html_template ?></div>
+    <div class="my-3 border border-1 border-dark"><?php echo $plaintext ?></div>
 </div>

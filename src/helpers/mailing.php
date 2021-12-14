@@ -30,13 +30,20 @@ class Mailing
      * Return html page to be inserted inside an email.
      * 
      * @param string $email_template Name of email template.
-     * @param array $params Parameters to be inserted inside html template.
-     * @return string html page as string.
+     * @param array $params Associative array of parameters to be inserted in template.
+     * @return array String array containing Html and unformatted content.
      */
-    private static function formatEmail(string $email_template, array $params): string
+    private static function formatBody(string $email_template, array $params): array
     {
-        $content = Util::renderTemplate($email_template, $params, AppPaths::EMAIL_TEMPLATES_PATH);
-        return Util::renderTemplate('email_base', ['content' => $content], AppPaths::EMAIL_TEMPLATES_PATH);
+        Logging::debug('params', $params);
+
+        $html_content = Util::renderTemplate($email_template, $params, AppPaths::EMAIL_TEMPLATES_PATH);
+        $plain_content = Util::readFile(AppPaths::EMAIL_TEMPLATES_PATH . DIRECTORY_SEPARATOR . $email_template, $params);
+
+        return [
+            Util::renderTemplate('email_base', ['content' => $html_content], AppPaths::EMAIL_TEMPLATES_PATH),
+            $plain_content,
+        ];
     }
 
     /**
@@ -49,8 +56,8 @@ class Mailing
      */
     public static function passwordChangeNotification(User $user, string $password, int $logger = LogChannel::APP): bool
     {
-        $html =  Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
-        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_NEW_PASSWORD,  $html, '', $logger);
+        [$html, $plain_text] = Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
+        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_NEW_PASSWORD,  $html, $plain_text, $logger);
     }
 
     /**
@@ -58,14 +65,14 @@ class Mailing
      * 
      * @param string $recipient User alias or email address.
      * @param string $password New password in plain text.
-     * @return string Html body.
+     * @return array String array containing Html and unformatted content.
      */
-    public static function passwordChangeNotificationBody(string $recipient, string $password): string
+    public static function passwordChangeNotificationBody(string $recipient, string $password): array
     {
-        return Mailing::formatEmail('newpassword', [
+        return Mailing::formatBody('newpassword', [
             'app_name' => Settings::APP_NAME,
             'url' => Settings::APP_FULL_URL,
-            'username' => $recipient,
+            'alias' => $recipient,
             'password' => $password,
         ]);
     }
@@ -81,8 +88,8 @@ class Mailing
     public static function peremptionNotification(User $user, array $reminders, int $logger = LogChannel::SERVER): bool
     {
         Logging::info("Sending peremption email to {$user->getAlias()}", $reminders, $logger);
-        $html =  Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
-        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_PEREMPTION_REMINDER,  $html, '', $logger);
+        [$html, $plain_text] = Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
+        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_PEREMPTION_REMINDER,  $html, $plain_text, $logger);
     }
 
     /**
@@ -90,14 +97,15 @@ class Mailing
      * 
      * @param string $recipient User alias or email address.
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
-     * @return string Html body.
+     * @return array String array containing Html and unformatted content.
      */
-    public static function peremptionNotificationBody(string $recipient, array $reminders): string
+    public static function peremptionNotificationBody(string $recipient, array $reminders): array
     {
-        return Mailing::formatEmail('reminder', [
-            'username' => $recipient,
-            'reminders' => $reminders,
+        return Mailing::formatBody('reminder', [
+            'app_name' => Settings::APP_NAME,
             'url' => Settings::APP_FULL_URL,
+            'alias' => $recipient,
+            'reminders' => $reminders,
         ]);
     }
 
@@ -111,8 +119,8 @@ class Mailing
     public static function userInviteNotification(User $user, string $password_plain, int $logger = LogChannel::APP): bool
     {
         Logging::info("Sending user invite email to {$user->getAlias()}");
-        $html = Mailing::userInviteNotificationBody($user->getLoginEmail(), $password_plain);
-        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_USER_INVITE,  $html, '', $logger);
+        [$html, $plain_text] = Mailing::userInviteNotificationBody($user->getLoginEmail(), $password_plain);
+        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_USER_INVITE,  $html, $plain_text, $logger);
     }
 
     /**
@@ -120,11 +128,11 @@ class Mailing
      * 
      * @param string $login New user email as login.
      * @param string $password_plain Newly generated password in plain text.
-     * @return string Html body.
+     * @return array String array containing Html and unformatted content.
      */
-    public static function userInviteNotificationBody(string $login, string $password_plain): string
+    public static function userInviteNotificationBody(string $login, string $password_plain): array
     {
-        return Mailing::formatEmail('userinvite', [
+        return Mailing::formatBody('userinvite', [
             'app_name' => Settings::APP_NAME,
             'url' => Settings::APP_FULL_URL,
             'login' => $login,

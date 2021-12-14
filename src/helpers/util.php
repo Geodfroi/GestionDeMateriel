@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers;
@@ -88,11 +88,31 @@ class Util
     }
 
     /**
+     * Read text file content and replace keywords with their value.
+     * 
+     * @param string $file_path File path.
+     * @param array $params Associative array of parameters to be inserted in text content.
+     * @return string File content edited with parameters.
+     */
+    public static function readFile(string $file_path, array $params): string
+    {
+        $content = file_get_contents($file_path . '.txt');
+        foreach ($params as $key => $value) {
+
+            Logging::debug('key: ' . sprintf('$%s', $key));
+            if (is_string($value)) {
+                $content = str_replace(sprintf('$%s', $key), $value, $content);
+            }
+        }
+        return $content;
+    }
+
+    /**
      * Load a php template in memory and returns a content string.
      *
      * @param string $name The name of the template.
      * @param array $data The variables to be used in php templates.
-     * 
+     * @param string $folder_path Template directory.
      * @return string Rendered template as string.
      */
     public static function renderTemplate(string $name, array $data = [], string $folder_path): string
@@ -125,11 +145,11 @@ class Util
         if (Database::users()->updatePassword($user->getId(), $encrypted)) {
 
             if (Mailing::passwordChangeNotification($user,  $plain_password)) {
-                $route->setAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getEmail()));
+                $route->showAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
 
                 Logging::info(LogInfo::NEW_PASSWORD_ISSUED, [
                     'user-id' => $user->getId(),
-                    'login' => $user->getEmail()
+                    'login' => $user->getLoginEmail()
                 ]);
 
                 return;
@@ -137,7 +157,26 @@ class Util
             // attempt to roll back update.
             Database::users()->updatePassword($user->getId(), $former_password);
         }
-        $route->setAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+        $route->showAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+    }
+
+    /**
+     * Cut string in two at last occurence of separator character.
+     * https://stackoverflow.com/questions/67025055/explode-string-on-the-last-occurrence-of-character
+     * 
+     * @param string @separator Separator character.
+     * @param string @str String to cut.
+     * @return array Array of string or empty array if separator character was not found.
+     */
+    public static function separateAtLast(string $separator, string $str): array
+    {
+        $last_pos = strrpos($str, $separator);
+        if ($last_pos) {
+            $prefix = substr($str, 0, $last_pos);
+            $suffix = substr($str, $last_pos + 1);
+            return [$prefix, $suffix];
+        }
+        return [];
     }
 
     /**

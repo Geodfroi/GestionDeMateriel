@@ -25,7 +25,7 @@ class DebugEmails extends BaseRoute
 
             switch ($_GET['show']) {
                 case 'newpassword':
-                    $email_template = Mailing::passwordChangeNotificationBody('Mathias', 'HEDS2000');
+                    [$html_template, $plaintext] = Mailing::passwordChangeNotificationBody('mathias.r@gmail.com', 'HEDS2000');
                     break;
                 case 'reminder':
                     $array = [];
@@ -42,10 +42,10 @@ class DebugEmails extends BaseRoute
                         'delay' => 7,
                     ]);
 
-                    $email_template = Mailing::peremptionNotificationBody('José', $array);
+                    [$html_template, $plaintext] = Mailing::peremptionNotificationBody('noël.biquet@gmail.com', $array);
                     break;
                 case 'userinvite':
-                    $email_template = Mailing::userInviteNotificationBody('noël.biquet@gmail.com', 'HEDS3000');
+                    [$html_template, $plaintext] = Mailing::userInviteNotificationBody('noël.biquet@gmail.com', 'HEDS3000');
                     break;
                 default:
                     throw new Exception('Invalid parameter');
@@ -53,7 +53,8 @@ class DebugEmails extends BaseRoute
         }
 
         return $this->renderTemplate([
-            'email_template' =>  $email_template ?? '',
+            'html_template' =>  $html_template ?? '',
+            'plaintext' =>  $plaintext ?? '',
         ]);
     }
 }

@@ -14,11 +14,7 @@ use app\helpers\Database;
 
 <br><br><br><br>
 <div>
-    <div>bug insert string</div>
-    <div>Check alert</div>
-    <div>USER_TABLE: send email to new user when account is created.</div>
     <div>implement sqlite</div>
-    <div>CREATE EMAILS PLAIN CONTENT</div>
     <div>MAIN: backup db</div>
     <div>ADMIN - access user contact posts.</div>
     <div>ARTICLES: filter with created by</div>

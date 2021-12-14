@@ -1,0 +1,8 @@
+Cher [$alias]; 
+
+Des articles approchent de leurs dates de péremption. Il vous faut consulter [$app_name] pour plus de détails.
+
+Vous pouvez modifier le délai de rappel dans l'onglet [Profile].
+
+HEdS - Service des innovations pédagogiques.
+Prière de ne pas répondre à cet email qui a été généré automatiquement.

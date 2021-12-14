@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\routes;
@@ -44,8 +44,9 @@ class ArticleEdit extends BaseRoute
                 $user_id = Authenticate::getUserId();
                 $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
 
-                if (Database::articles()->insert($article)) {
-                    Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article->getId()]);
+                $article_id = Database::articles()->insert($article);
+                if ($article_id) {
+                    Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article_id]);
                     $this->requestRedirect(Route::ART_TABLE . '?alert=added_success');
                 } else {
                     $this->requestRedirect(Route::ART_TABLE . '?alert=added_failure');

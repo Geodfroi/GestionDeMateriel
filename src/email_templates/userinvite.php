@@ -3,6 +3,10 @@
 ## Joël Piguet - 2021.12.14 ###
 ##############################
 
+use app\helpers\Util;
+
+//cut '.com' from email address to prevent mail box to set it as hyperlink.
+[$login_a, $login_b] = Util::separateAtLast('.', $login);
 ?>
 
 <div>
@@ -14,7 +18,7 @@
         <tr>
             <td>&emsp;&emsp;Votre login: </td>
             <td>&emsp;&emsp;&emsp;</td>
-            <td>&emsp;<span style="color:blue;font-size:16px; text-decoration:none; "><?php echo $login ?></span>
+            <td style="color:blue;font-size:16px;">&emsp;<span><?php echo $login_a ?></span>.<span><?php echo $login_b ?></span>
             </td>
         </tr>
         <tr>
