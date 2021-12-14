@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\routes;
@@ -11,6 +11,7 @@ use app\constants\Route;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Logging;
+use app\helpers\Mailing;
 use app\helpers\Util;
 use app\helpers\Validation;
 use app\models\User;
@@ -37,24 +38,28 @@ class UserEdit extends BaseRoute
         $admin_id = Authenticate::getUserId();
 
         if (isset($_POST['new-user'])) {
-            $p_val = Validation::validateNewPassword($this, $password);
-            $e_val = Validation::validateNewLogin($this, $email);
-            $is_admin = isset($_POST['is_admin']);
+            $p_val = Validation::validateNewPassword($this, $password_plain);
+            $e_val = Validation::validateNewLogin($this, $login_email);
+            $is_admin = isset($_POST['is-admin']);
 
             if ($p_val && $e_val) {
-                $user = User::fromForm($email, $password, $is_admin);
+                $user = User::fromForm($login_email, $password_plain, $is_admin);
 
-                if (Database::users()->insert($user)) {
-
-                    Logging::info(LogInfo::USER_CREATED, [
-                        'admin-id' => $admin_id,
-                        'new-user' => $email
-                    ]);
-
-                    $this->requestRedirect(Route::USERS_TABLE . '?alert=added_success');
-                } else {
-                    $this->requestRedirect(Route::USERS_TABLE . '?alert=added_failure');
+                $id = Database::users()->insert($user);
+                if ($id) {
+                    if (Mailing::userInviteNotification($user, $password_plain)) {
+                        Logging::info(LogInfo::USER_CREATED, [
+                            'admin-id' => $admin_id,
+                            'new-user' => $login_email
+                        ]);
+                        $this->requestRedirect(Route::USERS_TABLE . '?alert=added_success');
+                        return '';
+                    } else {
+                        //attempt to roll back add user to db.
+                        Database::users()->delete($id);
+                    }
                 }
+                $this->requestRedirect(Route::USERS_TABLE . '?alert=added_failure');
                 return '';
             }
             goto end;
@@ -62,16 +67,16 @@ class UserEdit extends BaseRoute
 
         if (isset($_POST['regen-password'])) {
             $is_admin = isset($_POST['is_admin']);
-            $password = Util::getRandomPassword();
-            Validation::validateNewLogin($this, $email);
+            $password_plain = Util::getRandomPassword();
+            Validation::validateNewLogin($this, $login_email);
             goto end;
         }
 
         end:
 
         return $this->renderTemplate([
-            'email' => $email ?? '',
-            'password' => $password ?? Util::getRandomPassword(),
+            'login_email' => $login_email ?? '',
+            'password' => $password_plain ?? Util::getRandomPassword(),
             'is_admin' => $is_admin ?? false,
         ]);
     }

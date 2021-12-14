@@ -4,10 +4,10 @@ INSERT INTO locations(id, str_content) VALUES(1, 'Pharmacie 1er étage');
 INSERT INTO locations(id, str_content) VALUES(2, "Cabinet d'entretien");
 INSERT INTO locations(id, str_content) VALUES(3, 'Derrière les coussins du canapé');
 
-INSERT INTO users (id, password, alias, email, is_admin) VALUES (1, '$2y$10$Sytf53Pfav5E0A1yTDf39uJE669PUjp/0OXYDM8lhlfNjoqrq.0a.', 'aurore.azure@gmail.com', 'aurore.azure@gmail.com', 1);
-INSERT INTO users (id, password, alias, email, creation_date) VALUES (2, '$2y$10$yw4QX5NjU8g21i5qxnQXbOGhNjDoZ8r0eBiSSJrNTbEFtmTs8VDXC', 'Florence', 'flo-night@crimea.com', '2020-09-06');
-INSERT INTO users (id, password, alias, email, creation_date) VALUES (3, '$2y$10$rZGyarSuElY1WKcqRMrcVeRUoMWn0iJaitiygV66wb5N3DgHRnpva', 'h.dunant@redcross.ch', 'h.dunant@redcross.ch','2020-04-12');
-INSERT INTO users (id, password, alias, email, creation_date) VALUES (4, '$2y$10$cKK0yQsz9Ywj3u/Jav4D2OUexjmW8GzWP27jgjSDFPnvlpWYaqrfG', 'clarab@civilwar.org', 'clarab@civilwar.org','2020-12-03');
+INSERT INTO users (id, password, alias, login_email, is_admin) VALUES (1, '$2y$10$Sytf53Pfav5E0A1yTDf39uJE669PUjp/0OXYDM8lhlfNjoqrq.0a.', 'aurore.azure@gmail.com', 'aurore.azure@gmail.com', 1);
+INSERT INTO users (id, password, alias, login_email, creation_date) VALUES (2, '$2y$10$yw4QX5NjU8g21i5qxnQXbOGhNjDoZ8r0eBiSSJrNTbEFtmTs8VDXC', 'Florence', 'flo-night@crimea.com', '2020-09-06');
+INSERT INTO users (id, password, alias, login_email, creation_date) VALUES (3, '$2y$10$rZGyarSuElY1WKcqRMrcVeRUoMWn0iJaitiygV66wb5N3DgHRnpva', 'h.dunant@redcross.ch', 'h.dunant@redcross.ch','2020-04-12');
+INSERT INTO users (id, password, alias, login_email, creation_date) VALUES (4, '$2y$10$cKK0yQsz9Ywj3u/Jav4D2OUexjmW8GzWP27jgjSDFPnvlpWYaqrfG', 'clarab@civilwar.org', 'clarab@civilwar.org','2020-12-03');
 
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (2, 'Vin rouge', 'celier', '2021-08-01' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (2, 'Papier A4 x 1000', 'bureau 202', '2022-06-01' );

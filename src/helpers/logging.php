@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers;
@@ -11,6 +11,7 @@ namespace app\helpers;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+use app\constants\AppPaths;
 use app\constants\LogChannel;
 
 /**
@@ -28,7 +29,8 @@ class Logging
         static $instance;
         if (is_null($instance)) {
             $instance = new Logger('app');
-            $instance->pushHandler(new StreamHandler(__DIR__ . '/../../logs/app.log', Logger::DEBUG));
+            // __DIR__ . '/../../logs/app.log'
+            $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . 'app.log', Logger::DEBUG));
         }
         return $instance;
     }
@@ -104,7 +106,7 @@ class Logging
         static $instance;
         if (is_null($instance)) {
             $instance = new Logger('server');
-            $instance->pushHandler(new StreamHandler(__DIR__ . '/../../logs/server.log', Logger::DEBUG));
+            $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR  . 'server.log', Logger::DEBUG));
         }
         return $instance;
     }
@@ -117,7 +119,7 @@ class Logging
         static $instance;
         if (is_null($instance)) {
             $instance = new Logger('test');
-            $instance->pushHandler(new StreamHandler(__DIR__ . '/../../logs/test.log', Logger::DEBUG));
+            $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR  . 'test.log', Logger::DEBUG));
         }
         return $instance;
     }

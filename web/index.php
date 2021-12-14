@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh.
 
-use app\constants\Settings;
+use app\constants\AppPaths;
 use app\helpers\Util;
 use app\routes\Router;
 
@@ -24,7 +24,8 @@ if ($route = Router::getRoute()) {
         $templateData['page_content'] = $route->getBodyContent();
         $templateData['show_header'] = $route->showHeader();
         $templateData['show_footer'] = $route->showFooter();
+        $templateData['alert'] = $route->getAlert();
     }
 }
 // insert dynamically generated html content into the main template.
-echo Util::renderTemplate('main_template', $templateData, Settings::TEMPLATES_PATH);
+echo Util::renderTemplate('main_template', $templateData, AppPaths::TEMPLATES_PATH);

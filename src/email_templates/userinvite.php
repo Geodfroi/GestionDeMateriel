@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 ?>
@@ -9,15 +9,16 @@
     <div>&emsp;Madame, Monsieur,</div>
     <br>
     <div>&emsp;Un compte utilisateur pour l'application <a href="<?php echo $url ?>"><?php echo $app_name ?></a> a été créé pour votre bénéfice.</div>
-    <br>
+    <br><br>
     <table>
         <tr>
-            <td>&emsp;Votre login: </td>
+            <td>&emsp;&emsp;Votre login: </td>
             <td>&emsp;&emsp;&emsp;</td>
-            <td><span style="color:blue;font-size:16px;">&emsp;<?php echo $login ?></span></td>
+            <td>&emsp;<span style="color:blue;font-size:16px; text-decoration:none; "><?php echo $login ?></span>
+            </td>
         </tr>
         <tr>
-            <td>&emsp;Votre mot de passe:</td>
+            <td>&emsp;&emsp;Votre mot de passe:</td>
             <td>&emsp;&emsp;&emsp;</td>
             <td><span style="color:blue;font-size:16px;">&emsp;<?php echo $password ?></span></td>
         </tr>

@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\models;
 
-use app\helpers\Util;
 use DateTime;
+
+use app\helpers\Util;
 
 class User
 {
@@ -22,9 +23,11 @@ class User
 
     private string $contact_delay;
 
+    private string $contact_email;
+
     private DateTime $creation_date;
 
-    private string $email;
+    private string $login_email;
 
     private bool $is_admin;
 
@@ -48,7 +51,7 @@ class User
         $instance->alias = (string)($input['alias'] ?? '');
         $instance->contact_delay = (string)($input['contact_delay'] ?? '3-14');
         $instance->contact_email = (string)($input['contact_email'] ?? '');
-        $instance->email = (string)($input['email'] ?? '');
+        $instance->login_email = (string)($input['login_email'] ?? '');
         $instance->password_hash = (string)($input['password'] ?? '');
 
         $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
@@ -61,18 +64,18 @@ class User
     /**
      * Create new user from input form waiting to be inserted into db.
      * 
-     * @param string $email User email.
+     * @param string $email User login_email.
      * @param string $password User password waiting to be encrypted.
      * @param bool $is_admin True if the new user has admin privileges.
      */
-    public static function fromForm(string $email, string $plain_password, bool $is_admin = false): User
+    public static function fromForm(string $login_email, string $plain_password, bool $is_admin = false): User
     {
         $instance = new self();
         $instance->id = -1;
         $instance->contact_email = '';
         $instance->contact_delay = '3-14';
-        $instance->email = $email;
-        $instance->alias = $email;
+        $instance->login_email = $login_email;
+        $instance->alias = $login_email;
         $instance->password_hash = Util::encryptPassword($plain_password);
         $instance->creation_date = new DateTime();
         $instance->last_login = new DateTime();
@@ -104,9 +107,9 @@ class User
         return $this->contact_email;
     }
 
-    public function getEmail(): string
+    public function getLoginEmail(): string
     {
-        return $this->email;
+        return $this->login_email;
     }
 
     public function getId(): int
@@ -125,7 +128,7 @@ class User
     public function getMailingAddresses(): array
     {
         $emails = [];
-        array_push($emails, $this->getEmail());
+        array_push($emails, $this->getLoginEmail());
         if ($this->getContactEmail()) {
             array_push($emails, $this->getContactEmail());
         }
@@ -135,11 +138,6 @@ class User
     public function getPassword(): string
     {
         return $this->password_hash;
-    }
-
-    public function hasAlias(): bool
-    {
-        return $this->alias !== $this->email;
     }
 
     public function isAdmin(): bool
@@ -162,6 +160,6 @@ class User
 
     public function __toString(): string
     {
-        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->email, $this->creation_date->format('Y-m-d'), $this->last_login->format('Y-m-d'), $this->is_admin ? ' (has admin privileges)' : '');
+        return sprintf('User %04d> %s, created: %s, last login: %s%s', $this->id, $this->login_email, $this->creation_date->format('Y-m-d'), $this->last_login->format('Y-m-d'), $this->is_admin ? ' (has admin privileges)' : '');
     }
 }

@@ -39,9 +39,9 @@ class UserTable extends BaseRoute
 
         if (isset($_GET['alert'])) {
             if ($_GET['alert'] === 'added_success') {
-                $this->setAlert(AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
             } else if ($_GET['alert'] === 'added_failure') {
-                $this->setAlert(AlertType::FAILURE, Alert::USER_ADD_FAILURE);
+                $this->showAlert(AlertType::FAILURE, Alert::USER_ADD_FAILURE);
             }
             goto end;
         }
@@ -72,9 +72,9 @@ class UserTable extends BaseRoute
                     'user-id' => $user_id
                 ]);
 
-                $this->setAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
             } else {
-                $this->setAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
+                $this->showAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
             }
             goto end;
         }

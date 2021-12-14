@@ -1,24 +1,21 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.06 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 ?>
 
 <div>
-    <div>Cher
-        <?php echo $username ?>,
-    </div>
-    <br>
+    <div>&emsp;Cher<span style="text-decoration:none;"><?php echo $username ?></span>,</div>
     <br>
 
-    <div>Les articles suivants approchent de leurs dates de péremption: </div>
-    <br>
+    <div>&emsp;Les articles suivants approchent de leurs dates de péremption: </div>
+    <br><br>
 
-    <table role="presentation" style="width: 100%; max-width: 800px">
-        <thead>
+    <table role=" presentation" style="width: 100%; max-width: 800px; margin-left: 12px;">
+        <thead style="border-bottom: 10px solid white;">
             <tr>
-                <th style="width: 40%; text-align: left; color:blue">Article</th>
-                <th style="width: 20%; text-align: left; color:blue">Emplacement</th>
+                <th style="width: 30%; text-align: left; color:blue">Article</th>
+                <th style="width: 30%; text-align: left; color:blue">Emplacement</th>
                 <th style="width: 20%; text-align: left; color:blue">Délai</th>
                 <th style="width: 20%; text-align: left; color:blue">Date de péremption</th>
             </tr>
@@ -58,8 +55,6 @@
     <?php $indice += 1;
         }
     } ?>
-
-    <br><br>
-    <div>Vous pouvez modifier le délai de rappel dans l'onglet <i>Profile</i> au sein de l'application.
-    </div>
+    <br>
+    <div>&emsp;Vous pouvez modifier le délai de rappel dans l'onglet <i>Profile</i> au sein de <a href="<?php echo $url ?>">l'application.</a></div>
 </div>

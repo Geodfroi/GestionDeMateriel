@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\routes;
@@ -31,7 +31,7 @@ class Login extends BaseRoute
 
             if (isset($_GET['logout'])) {
                 Authenticate::logout();
-                $this->setAlert(AlertType::INFO, Alert::LOGIN_USER_DISC);
+                $this->showAlert(AlertType::INFO, Alert::LOGIN_USER_DISC);
             } else {
                 $this->requestRedirect(Route::HOME);
                 return '';
@@ -41,8 +41,8 @@ class Login extends BaseRoute
         if (isset($_GET['old-email'])) {
 
             // handle demand for new password.
-            $email  = $_GET['old-email'];
-            $user = Database::users()->queryByEmail($email);
+            $login_email  = $_GET['old-email'];
+            $user = Database::users()->queryByEmail($login_email);
 
             if (isset($user)) {
                 Util::renewPassword($this, $user);
@@ -53,12 +53,12 @@ class Login extends BaseRoute
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if (Validation::validateLoginEmail($this, $email)) {
-                $user = Database::users()->queryByEmail($email);
+            if (Validation::validateLoginEmail($this, $login_email)) {
+                $user = Database::users()->queryByEmail($login_email);
             }
 
             if (!isset($user)) {
-                $this->setError('email', Warning::LOGIN_NOT_FOUND);
+                $this->showWarning('login-email', Warning::LOGIN_NOT_FOUND);
             } else {
                 if (Validation::validateLoginPassword($this, $password)) {
                     if ($user->verifyPassword($password)) {
@@ -66,7 +66,7 @@ class Login extends BaseRoute
                         $this->requestRedirect(Route::HOME);
                         return "";
                     } else {
-                        $this->setError('password', Warning::LOGIN_INVALID_PASSWORD);
+                        $this->showWarning('password', Warning::LOGIN_INVALID_PASSWORD);
                     }
                 }
             }
@@ -74,7 +74,7 @@ class Login extends BaseRoute
 
         end:
         return $this->renderTemplate([
-            'email' => $email ?? '',
+            'login_email' => $login_email ?? '',
             'password' => $password ?? '',
         ]);
     }

@@ -31,7 +31,7 @@ class Validation
             return true;
         }
         if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            $route->setError('alias', sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
+            $route->showWarning('alias', sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
             return false;
         }
         return true;
@@ -51,17 +51,17 @@ class Validation
         if (
             $article_name === ''
         ) {
-            $route->setError('article-name', Warning::ARTICLE_ADD_EMPTY);
+            $route->showWarning('article-name', Warning::ARTICLE_ADD_EMPTY);
             return false;
         }
 
         if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
-            $route->setError('article-name', sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
+            $route->showWarning('article-name', sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
             return false;
         }
 
         if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
-            $route->setError('article-name', sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
+            $route->showWarning('article-name', sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
             return false;
         }
         return true;
@@ -79,7 +79,7 @@ class Validation
         $comments = trim($_POST['comments']) ?? '';
 
         if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
-            $route->setError('comments', sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
+            $route->showWarning('comments', sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
             return false;
         }
         return true;
@@ -101,7 +101,7 @@ class Validation
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $route->setError('contact-email', Warning::LOGIN_EMAIL_INVALID);
+            $route->showWarning('contact-email', Warning::LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -119,7 +119,7 @@ class Validation
         $date = trim($_POST['expiration-date'] ?? '');
 
         if ($date === '') {
-            $route->setError('expiration-date', Warning::DATE_EMPTY);
+            $route->showWarning('expiration-date', Warning::DATE_EMPTY);
             return false;
         }
 
@@ -134,19 +134,19 @@ class Validation
         if ($validated_date) {
 
             if ($validated_date < new DateTime()) {
-                $route->setError('expiration-date', Warning::DATE_PAST);
+                $route->showWarning('expiration-date', Warning::DATE_PAST);
                 return false;
             }
 
             if ($validated_date >= $future_limit) {
-                $route->setError('expiration-date', Warning::DATE_FUTURE);
+                $route->showWarning('expiration-date', Warning::DATE_FUTURE);
                 return false;
             }
 
             return true;
         }
 
-        $route->setError('expiration-date', Warning::DATE_INVALID);
+        $route->showWarning('expiration-date', Warning::DATE_INVALID);
         return false;
     }
 
@@ -159,15 +159,15 @@ class Validation
      */
     public static function validateLoginEmail(BaseRoute $route, ?string &$email): bool
     {
-        $email = trim($_POST['email']) ?? '';
+        $email = trim($_POST['login-email']) ?? '';
 
         if ($email  === '') {
-            $route->setError('email', Warning::LOGIN_EMAIL_EMPTY);
+            $route->showWarning('login-email', Warning::LOGIN_EMAIL_EMPTY);
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $route->setError('email', Warning::LOGIN_EMAIL_INVALID);
+            $route->showWarning('login-email', Warning::LOGIN_EMAIL_INVALID);
             return false;
         }
         return true;
@@ -184,7 +184,7 @@ class Validation
     {
         $password = trim($_POST['password']) ?? '';
         if ($password === '') {
-            $route->setError('password', Warning::LOGIN_PASSWORD_EMPTY);
+            $route->showWarning('password', Warning::LOGIN_PASSWORD_EMPTY);
             return false;
         }
         return true;
@@ -202,18 +202,18 @@ class Validation
         $location = trim($_POST['location']) ?? '';
 
         if (strlen($location) === 0) {
-            $route->setError('location', Warning::LOCATION_EMPTY);
+            $route->showWarning('location', Warning::LOCATION_EMPTY);
             return false;
         }
 
         $location = ucwords($location);
         if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
-            $route->setError('location', sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
+            $route->showWarning('location', sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
             return false;
         }
 
         if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
-            $route->setError('location', sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
+            $route->showWarning('location', sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
             return false;
         }
         return true;
@@ -233,7 +233,7 @@ class Validation
         }
 
         if (Database::users()->queryByEmail($email)) {
-            $route->setError('email', Warning::USER_EMAIL_USED);
+            $route->showWarning('login-email', Warning::USER_EMAIL_USED);
             return false;
         }
         return true;
@@ -251,17 +251,17 @@ class Validation
     {
         $password_candidate = trim($_POST['password']) ?? '';
         if ($password_candidate === '') {
-            $route->setError('password', Warning::PASSWORD_EMPTY);
+            $route->showWarning('password', Warning::PASSWORD_EMPTY);
             return false;
         }
         if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            $route->setError('password', sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
+            $route->showWarning('password', sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
             return false;
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if (!$has_number || (!$has_letters)) {
-            $route->setError('password', Warning::PASSWORD_WEAK);
+            $route->showWarning('password', Warning::PASSWORD_WEAK);
             return false;
         }
         return true;
@@ -278,12 +278,12 @@ class Validation
     {
         $password_repeat = trim($_POST['password-repeat']) ?? '';
         if (!$password_repeat) {
-            $route->setError('password-repeat', Warning::PASSWORD_REPEAT_NULL);
+            $route->showWarning('password-repeat', Warning::PASSWORD_REPEAT_NULL);
             return false;
         }
 
         if ($password_first !== $password_repeat) {
-            $route->setError('password-repeat', Warning::PASSWORD_DIFFERENT);
+            $route->showWarning('password-repeat', Warning::PASSWORD_DIFFERENT);
             return false;
         }
         return true;

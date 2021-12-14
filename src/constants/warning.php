@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\constants;
@@ -43,7 +43,7 @@ class Warning
     // user edit warnings
     const USER_EMAIL_EMPTY = 'Un e-mail est nécessaire pour créer un utilisateur.';
     const USER_EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
-    const USER_EMAIL_USED = 'Cet adresse e-mail est déjà utilisée par un autre utilisateur.';
+    const USER_EMAIL_USED = 'Cette adresse e-mail est déjà utilisée par un autre utilisateur.';
 
     // util warnings
     const LOCATION_EMPTY = "Il est nécessaire de préciser l'emplacement.";

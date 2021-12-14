@@ -66,16 +66,6 @@ function disLinkAdm(string $header): string
 
 <div class="container mt-3">
 
-    <div class="row">
-        <div class="col-12">
-            <?php if (isset($alert['type'])) { ?>
-                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                </div>
-            <?php } ?>
-        </div>
-    </div>
-
     <div class="row col-12">
         <table class="table table-striped table-bordered align-middle">
             <thead>
@@ -93,12 +83,7 @@ function disLinkAdm(string $header): string
                     <tr>
                         <!-- email -->
                         <td>
-                            <?php if ($user->hasAlias()) {
-                                echo sprintf('%s (%s)', $user->getEmail(), $user->getAlias());
-                            } else {
-                                echo $user->getEmail();
-                            } ?>
-
+                            <?php echo $user->getAlias(); ?>
                             <?php if ($user->isAdmin()) { ?>
                                 <i class="bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
                             <?php } ?>
@@ -122,7 +107,7 @@ function disLinkAdm(string $header): string
                                     <div class="modal-header">
                                         <h5 class="modal-title" id=<?php echo "delete-modal-label-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
                                     </div>
-                                    <div class="modal-body"> Voulez-vous vraiment supprimer le compte utilisateur [<?php echo $user->getEmail() ?>] ? </div>
+                                    <div class="modal-body"> Voulez-vous vraiment supprimer le compte utilisateur [<?php echo $user->getLoginEmail() ?>] ? </div>
                                     <div class="modal-footer">
                                         <a href="<?php echo Route::USERS_TABLE . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -138,7 +123,7 @@ function disLinkAdm(string $header): string
                                     <div class="modal-header">
                                         <h5 class="modal-title" id=<?php echo "renew-modal-label-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
                                     </div>
-                                    <div class="modal-body">Envoyer un nouveau mot de passe à [<?php echo $user->getEmail() ?>] ? </div>
+                                    <div class="modal-body">Envoyer un nouveau mot de passe à [<?php echo $user->getLoginEmail() ?>] ? </div>
                                     <div class="modal-footer">
                                         <a href="<?php echo Route::USERS_TABLE . '?renew=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>

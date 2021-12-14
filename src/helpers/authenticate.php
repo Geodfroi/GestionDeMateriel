@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers;
@@ -69,7 +69,7 @@ class Authenticate
         }
 
         Logging::info(LogInfo::USER_LOGIN, [
-            'login' => $user->getEmail(),
+            'login' => $user->getLoginEmail(),
             'id' => $user->getId()
         ]);
 
@@ -84,7 +84,7 @@ class Authenticate
         $user = Authenticate::getUser();
 
         Logging::info(LogInfo::USER_LOGOUT, [
-            'login' => $user->getEmail(),
+            'login' => $user->getLoginEmail(),
             'id' => $user->getId()
         ]);
 

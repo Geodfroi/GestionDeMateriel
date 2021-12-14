@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers\db;
@@ -24,9 +24,9 @@ use app\models\Article;
 class ArticleQueries
 {
     private PDO $pdo;
-    private string $logger;
+    private int $logger;
 
-    function __construct(PDO $pdo, string $logger)
+    function __construct(PDO $pdo, int $logger)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
@@ -163,9 +163,9 @@ class ArticleQueries
      * Insert an article into the database.
      * 
      * @param Article $article Article to insert.
-     * @return bool True if the insert is successful.
+     * @return int ID of inserted row or 0 if it fails.
      */
-    public function insert(Article $article): bool
+    public function insert(Article $article): int
     {
         $preparedStatement = $this->pdo->prepare(
             'INSERT INTO articles 
@@ -195,11 +195,11 @@ class ArticleQueries
         $preparedStatement->bindParam(':date', $date, PDO::PARAM_STR);
 
         if ($preparedStatement->execute()) {
-            return true;
+            return intval($this->pdo->lastInsertId());
         }
         list(,, $error) = $preparedStatement->errorInfo();
         Logging::error(LogError::ARTICLE_INSERT, ['error' => $error], $this->logger);
-        return false;
+        return 0;
     }
 
     /**

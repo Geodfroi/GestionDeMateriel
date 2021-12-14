@@ -23,8 +23,8 @@ $loc_presets = Database::locations()->queryAll();
                 <input id="form-name" name="article-name" type="text" value="<?php echo htmlentities($article_name) ?>" class="form-control
                     <?php echo isset($error['article-name']) ? ' is-invalid' : '' ?>
                     <?php echo $article_name ? ' is-valid' : '' ?>">
-                <?php if (isset($errors['article-name'])) { ?>
-                    <div class='invalid-feedback'><?php echo $errors['article-name'] ?> </div>
+                <?php if (isset($warnings['article-name'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['article-name'] ?> </div>
                 <?php } ?>
             </div>
 
@@ -45,8 +45,8 @@ $loc_presets = Database::locations()->queryAll();
                     </ul>
                 </div>
 
-                <?php if (isset($errors['location'])) { ?>
-                    <div class='invalid-feedback'><?php echo $errors['location'] ?></div>
+                <?php if (isset($warnings['location'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['location'] ?></div>
                 <?php } ?>
 
             </div>
@@ -56,8 +56,8 @@ $loc_presets = Database::locations()->queryAll();
                 <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> value="<?php echo htmlentities($expiration_date) ?>" class="form-control 
                     <?php echo isset($error['expiration-date']) ? ' is-invalid' : '' ?>
                     <?php echo $expiration_date ? ' is-valid' : '' ?>">
-                <?php if (isset($errors['expiration-date'])) { ?>
-                    <div class='invalid-feedback'><?php echo $errors['expiration-date'] ?></div>
+                <?php if (isset($warnings['expiration-date'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['expiration-date'] ?></div>
                 <?php } ?>
 
             </div>
@@ -68,8 +68,8 @@ $loc_presets = Database::locations()->queryAll();
                     <?php echo $comments ? ' is-valid' : '' ?>">
                 </textarea>
                 <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>
-                <?php if (isset($errors['comments'])) { ?>
-                    <div class='invalid-feedback'><?php echo $errors['comments'] ?></div>
+                <?php if (isset($warnings['comments'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['comments'] ?></div>
                 <?php } ?>
             </div>
 

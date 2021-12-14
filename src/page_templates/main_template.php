@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 use app\constants\Route;
@@ -23,6 +23,16 @@ use app\helpers\Authenticate;
 </head>
 
 <body class="d-flex flex-column h-100">
+
+    <div class="row">
+        <div class="col-12">
+            <?php if (isset($alert['type'])) { ?>
+                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
 
     <?php if ($show_header) { ?>
         <header>
@@ -50,7 +60,8 @@ use app\helpers\Authenticate;
                             <?php } ?>
 
                             <?php if (Settings::DEBUG_MODE) { ?>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email temp.[debug]</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
                             <?php } ?>
 
                         </ul>
@@ -58,7 +69,7 @@ use app\helpers\Authenticate;
                             <li class="nav-item ms-auto">
                                 <?php if (Authenticate::isLoggedIn()) { ?>
                                     <div>
-                                        <a class="nav-link" href="<?php echo Route::LOGOUT ?>"><?php echo Authenticate::getUser()->getEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
+                                        <a class="nav-link" href="<?php echo Route::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
                                     </div>
                                 <?php } else { ?>
                                     <a class="nav-link" href="<?php echo Route::LOGIN ?>">Connexion</a>
@@ -72,25 +83,6 @@ use app\helpers\Authenticate;
     <main class="flex-shrink-0 mt-5">
         <?php echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page"; ?>
     </main>
-
-    <div>
-        <div>USER_TABLE: send email to new user when account is created.</div>
-        <div>implement sqlite</div>
-        <div>CREATE EMAILS PLAIN CONTENT</div>
-        <div>MAIN: backup db</div>
-        <div>ADMIN - access user contact posts.</div>
-        <div>ADMIN - create new email to user.</div>
-        <div>ARTICLES: filter with created by</div>
-        <div>ARTICLES: fixed column size</div>
-        <div>ARTICLES: better adaptive layout</div>
-        <div>CONTACT: create contact page</div>
-        <div>LOGIN: add favicon</div>
-        <div>USER_EDIT: layout for small screen.</div>
-        <div>Remove old logs ?</div>
-        <div>Varying modal content
-            https://getbootstrap.com/docs/5.1/components/modal/
-        </div>
-    </div>
 
     <?php if ($show_footer) { ?>
         <div style="margin-top: 80px;">&nbsp;</div>

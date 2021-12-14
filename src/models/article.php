@@ -24,7 +24,6 @@ class Article
 
     private DateTime $creation_date;
 
-
     /**
      * Free comments set by the user appended to the email remainder sent when the expiration date is close.
      */

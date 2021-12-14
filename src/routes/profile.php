@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\routes;
@@ -41,7 +41,7 @@ class Profile extends BaseRoute
         $user_id = Authenticate::getUserId();
 
         if (!$user) {
-            $this->setAlert(AlertType::FAILURE, Alert::USER_NOT_FOUND);
+            $this->showAlert(AlertType::FAILURE, Alert::USER_NOT_FOUND);
             return "";
         }
 
@@ -60,7 +60,7 @@ class Profile extends BaseRoute
             $display = 3;
             $contact_email = $user->getContactEmail();
             if ($contact_email === '') {
-                $contact_email = $user->getEmail();
+                $contact_email = $user->getLoginEmail();
             }
             goto end;
         }
@@ -82,13 +82,13 @@ class Profile extends BaseRoute
                     goto end;
                 }
 
-                $alias_arg = $alias ? $alias : $user->getEmail();
+                $alias_arg = $alias ? $alias : $user->getLoginEmail();
 
                 $existing = Database::users()->queryByAlias($alias_arg);
                 if ($existing) {
                     if ($existing->getId() !== $user_id) {
                         // alias already exists and assigned to another user.
-                        $this->setAlert(AlertType::FAILURE, Alert::ALIAS_EXISTS_FAILURE);
+                        $this->showAlert(AlertType::FAILURE, Alert::ALIAS_EXISTS_FAILURE);
                         goto end;
                     }
                 }
@@ -101,12 +101,12 @@ class Profile extends BaseRoute
                     ]);
 
                     if ($alias) {
-                        $this->setAlert(AlertType::SUCCESS, Alert::ALIAS_UPDATE_SUCCESS);
+                        $this->showAlert(AlertType::SUCCESS, Alert::ALIAS_UPDATE_SUCCESS);
                     } else {
-                        $this->setAlert(AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
+                        $this->showAlert(AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
                     }
                 } else {
-                    $this->setAlert(AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
+                    $this->showAlert(AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
                 }
             }
             goto end;
@@ -115,11 +115,11 @@ class Profile extends BaseRoute
         if (isset($_POST['new-password'])) {
             $display = 2;
 
-            if (Validation::validatePassword($this, $password)) {
-                if (Validation::validatePasswordRepeat($this, $password)) {
+            if (Validation::validateNewPassword($this, $password_plain)) {
+                if (Validation::validateNewPasswordRepeat($this, $password_plain)) {
 
                     $display = 0;
-                    $encrypted = util::encryptPassword($password);
+                    $encrypted = util::encryptPassword($password_plain);
 
                     if (Database::users()->updatePassword($user_id, $encrypted)) {
 
@@ -128,9 +128,9 @@ class Profile extends BaseRoute
                             'new-password' => '*********'
                         ]);
 
-                        $this->setAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
+                        $this->showAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
                     } else {
-                        $this->setAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
+                        $this->showAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
                     }
                 }
             }
@@ -144,7 +144,7 @@ class Profile extends BaseRoute
 
                 $display = 0;
 
-                if ($contact_email === $user->getEmail()) {
+                if ($contact_email === $user->getLoginEmail()) {
                     $contact_email  = '';
                 }
 
@@ -157,12 +157,12 @@ class Profile extends BaseRoute
 
                     // if contact is null or empty, then contact is the login email.
                     if (strlen($contact_email) > 0) {
-                        $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
+                        $this->showAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
                     } else {
-                        $this->setAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_RESET_SUCCESS, $user->getEmail()));
+                        $this->showAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_RESET_SUCCESS, $user->getLoginEmail()));
                     }
                 } else {
-                    $this->setAlert(AlertType::FAILURE,  Alert::CONTACT_SET_FAILURE);
+                    $this->showAlert(AlertType::FAILURE,  Alert::CONTACT_SET_FAILURE);
                 }
             }
             goto end;
@@ -186,7 +186,7 @@ class Profile extends BaseRoute
             }
 
             if (count($delays) == 0) {
-                $this->setError('delays',  Warning::DELAYS_NONE);
+                $this->showWarning('delays',  Warning::DELAYS_NONE);
             } else {
 
                 $display = 0;
@@ -199,9 +199,9 @@ class Profile extends BaseRoute
                         'new-contact-delays' => $str
                     ]);
 
-                    $this->setAlert(AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
+                    $this->showAlert(AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
                 } else {
-                    $this->setAlert(AlertType::FAILURE, Alert::DELAY_SET_FAILURE);
+                    $this->showAlert(AlertType::FAILURE, Alert::DELAY_SET_FAILURE);
                 }
             }
         }
@@ -211,9 +211,9 @@ class Profile extends BaseRoute
         return $this->renderTemplate([
             'display' => $display,
             'alias' => $alias ?? '',
-            'password' => $password ?? '',
+            'password' => $password_plain ?? '',
             'password_repeat' => $password_repeat ?? '',
-            'login_email' => $user->getEmail(),
+            'login_email' => $user->getLoginEmail(),
             'contact_email' => $contact_email ?? '',
             'delays' => $delays ?? [],
         ]);

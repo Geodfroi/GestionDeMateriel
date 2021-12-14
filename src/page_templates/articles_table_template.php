@@ -110,16 +110,6 @@ function getOwner(Article $article): string
 <div class="container mt-3">
 
     <div class="row">
-        <div class="col-12">
-            <?php if (isset($alert['type'])) { ?>
-                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                </div>
-            <?php } ?>
-        </div>
-    </div>
-
-    <div class="row">
         <a class="link-info text-decoration-none col-12 text-center fw-bold" href="" data-bs-toggle="modal" data-bs-target="#filter-modal" aria-label="filter">
             <i class="bi bi-filter" role="img" style="font-size: 1.5rem;"></i>
             <span>Filtres

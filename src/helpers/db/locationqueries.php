@@ -19,9 +19,9 @@ use app\models\StringContent;
 class LocationQueries
 {
     private PDO $pdo;
-    private string $logger;
+    private int $logger;
 
-    function __construct(PDO $pdo, string $logger)
+    function __construct(PDO $pdo, int $logger)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
@@ -50,19 +50,19 @@ class LocationQueries
      * Insert a loaction string into the database.
      * 
      * @param string $str New location string.
-     * @return bool True if the insert is successful.
+     * @return int ID of inserted row or 0 if it fails.
      */
-    public function insert(string $str): bool
+    public function insert(string $str): int
     {
         $preparedStatement = $this->pdo->prepare('INSERT INTO locations (str_content) VALUES (:str)');
         $preparedStatement->bindParam(':str', $str, PDO::PARAM_STR);
 
         if ($preparedStatement->execute()) {
-            return true;
+            return intval($this->pdo->lastInsertId());
         }
         list(,, $error) = $preparedStatement->errorInfo();
         Logging::error(LogError::LOCATION_INSERT, ['error' => $error], $this->logger);
-        return false;
+        return 0;
     }
 
     /**

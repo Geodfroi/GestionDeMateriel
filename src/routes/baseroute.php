@@ -1,11 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\AppPaths;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\helpers\Util;
@@ -17,7 +18,7 @@ abstract class BaseRoute
 {
     private string $redirectUri = "";
     private $alert = [];
-    private $errors = [];
+    private $warnings = [];
 
     private $template_name;
     private $show_header;
@@ -37,17 +38,9 @@ abstract class BaseRoute
         $this->show_footer = $show_footer;
     }
 
-    /**
-     * Send a header to the browser requesting a redirection to the path provided.
-     * 
-     * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
-     */
-    protected function requestRedirect(string $uri)
+    public function getAlert()
     {
-        $this->redirectUri = $uri;
-
-        //The header php function will send a header message to the browser, here signaling for redirection.
-        header("Location: $uri", true);
+        return $this->alert ?? [];
     }
 
     /**
@@ -92,20 +85,35 @@ abstract class BaseRoute
             }
         }
 
-        $data['alert']  = $this->alert ?? [];
-        $data['errors'] = $this->errors ?? [];
-
-        return Util::renderTemplate($this->template_name, $data, Settings::TEMPLATES_PATH);
+        $data['warnings'] = $this->warnings ?? [];
+        return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES_PATH);
     }
 
     /**
-     * Set an alert to be displayed. Alerts are popups messages.
+     * Send a header to the browser requesting a redirection to the path provided.
+     * 
+     * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
+     */
+    protected function requestRedirect(string $uri)
+    {
+        $this->redirectUri = $uri;
+
+        //The header php function will send a header message to the browser, here signaling for redirection.
+        header("Location: $uri", true);
+    }
+
+    /**
+     * Set an popup alert message to be displayed.
      * 
      * @param string $type Alert type which defines alert colour; use const defined in AlertType class.
      * @param string $msg Alert message to be displayed.
      */
-    public function setAlert(string $type, string $msg)
+    public function showAlert(string $type, string $msg)
     {
+        if (Settings::DEBUG_MODE) {
+            Logging::debug('alert', [$type => $msg]);
+        }
+
         $this->alert = [
             'type' => $type,
             'msg' => $msg,
@@ -113,11 +121,15 @@ abstract class BaseRoute
     }
 
     /**
-     * Set an form error to be displayed. Errors are displayed beneath invalid input in forms.
+     * Set a warning to be displayed beneath invalid input in forms.
      */
-    public function setError(string $key, string $content)
+    public function showWarning(string $key, string $content)
     {
-        $this->errors[$key] = $content;
+        if (Settings::DEBUG_MODE) {
+            Logging::debug('warning', [$key => $content]);
+        }
+
+        $this->warnings[$key] = $content;
     }
 
     /**

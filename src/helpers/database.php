@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers;
@@ -11,6 +11,7 @@ namespace app\helpers;
 use \PDO;
 use PDOException;
 
+use app\constants\LogChannel;
 use app\constants\LogError;
 use app\constants\P_Settings;
 use app\helpers\Logging;
@@ -31,9 +32,9 @@ class Database
      * Initialise connection to the MySQL inside the constructor dunder method.
      * !! do not put the connection parameters (including admin password to db) in a settings.php file shared on github.
      * 
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      */
-    function __construct(string $logger)
+    function __construct(int $logger)
     {
         try {
             $dsn = 'mysql:host=' . P_Settings::HOST . ';port=' . P_Settings::PORT . ';dbname=' . P_Settings::DB_NAME . ';charset=utf8mb4';
@@ -52,10 +53,10 @@ class Database
     /**
      * Get object for article queries.
      * 
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return ArticleQueries article queries object.
      */
-    public static function articles(string $logger = 'app'): ArticleQueries
+    public static function articles(int $logger = LogChannel::APP): ArticleQueries
     {
         return Database::getInstance($logger)->articles;
     }
@@ -63,10 +64,10 @@ class Database
     /**
      * Simpleton pattern insures there is only one instance of Database class in the whole application
      * 
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return Database Always return the same instance of Database class.
      */
-    private static function getInstance(string $logger = 'app')
+    private static function getInstance(int $logger = LogChannel::APP)
     {
         static $instance;
         if (is_null($instance)) {
@@ -78,10 +79,10 @@ class Database
     /**
      * Get object for location queries.
      * 
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return LocationQueries location queries object.
      */
-    public static function locations(string $logger = 'app'): LocationQueries
+    public static function locations(int $logger = LogChannel::APP): LocationQueries
     {
         return Database::getInstance($logger)->locations;
     }
@@ -89,10 +90,10 @@ class Database
     /**
      * Get object for user queries.
      * 
-     * @param string $logger Logger channel.
+     * @param int $logger Logger channel. Use LogChannel const.
      * @return UserQueries user queries object.
      */
-    public static function users(string $logger = 'app'): UserQueries
+    public static function users(int $logger = LogChannel::APP): UserQueries
     {
         return Database::getInstance($logger)->users;
     }

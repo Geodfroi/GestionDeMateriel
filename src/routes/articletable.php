@@ -46,23 +46,23 @@ class ArticleTable extends BaseRoute
         if (isset($_GET['alert'])) {
 
             if ($_GET['alert'] === 'added_success') {
-                $this->setAlert(AlertType::SUCCESS, Alert::ARTICLE_ADD_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::ARTICLE_ADD_SUCCESS);
             } else if ($_GET['alert'] === 'added_failure') {
-                $this->setAlert(AlertType::FAILURE, Alert::ARTICLE_ADD_FAILURE);
+                $this->showAlert(AlertType::FAILURE, Alert::ARTICLE_ADD_FAILURE);
             } else if ($_GET['alert'] === 'updated_success') {
-                $this->setAlert(AlertType::SUCCESS, Alert::ARTICLE_UPDATE_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::ARTICLE_UPDATE_SUCCESS);
             } else if ($_GET['alert'] === 'updated_failure') {
-                $this->setAlert(AlertType::FAILURE, Alert::ARTICLE_UPDATE_FAILURE);
+                $this->showAlert(AlertType::FAILURE, Alert::ARTICLE_UPDATE_FAILURE);
             }
             goto end;
         }
 
         if (isset($_GET['delete'])) {
             if (Database::articles()->delete($_GET['delete'])) {
-                $this->setAlert(AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
                 Logging::info(LogInfo::ARTICLE_DELETED, ['user-id' => $user_id, 'article-id' => $_GET['delete']]);
             } else {
-                $this->setAlert(AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
+                $this->showAlert(AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
             }
             goto end;
         }

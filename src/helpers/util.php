@@ -102,7 +102,7 @@ class Util
         // start buffering the string;
         ob_start();
         // load file content at path and resolve php script to a string in the buffer;
-        require __DIR__ . "//../" .  $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
+        require  $folder_path . DIRECTORY_SEPARATOR . $name . '.php';
         // flush the buffer content to the variable
         $rendered = ob_get_clean();
 

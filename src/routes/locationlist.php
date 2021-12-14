@@ -41,9 +41,9 @@ class LocationList extends BaseRoute
                     'former-value' => $former_location
                 ]);
 
-                $this->setAlert(AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
             } else {
-                $this->setAlert(AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
+                $this->showAlert(AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
             }
             goto end;
         }
@@ -61,7 +61,7 @@ class LocationList extends BaseRoute
             if (Validation::validateLocation($this, $location_field)) {
 
                 if (Database::locations()->contentExists($location_field)) {
-                    $this->setError('location', Warning::LOCATION_PRESET_EXISTS);
+                    $this->showWarning('location', Warning::LOCATION_PRESET_EXISTS);
                 } else {
                     if (Database::locations()->insert($location_field)) {
 
@@ -72,7 +72,7 @@ class LocationList extends BaseRoute
 
                         $location_field = '';
                     } else {
-                        $this->setAlert(AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
+                        $this->showAlert(AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
                     }
                 }
             }
@@ -95,7 +95,7 @@ class LocationList extends BaseRoute
             }
 
             if (Database::locations()->contentExists($location_field)) {
-                $this->setError('location', Warning::LOCATION_PRESET_EXISTS);
+                $this->showWarning('location', Warning::LOCATION_PRESET_EXISTS);
                 $selected =  $id; // $location_field will still be filled -> stay in update mode.
                 goto end;
             }
@@ -108,7 +108,7 @@ class LocationList extends BaseRoute
                     'new-value' => $location_field
                 ]);
 
-                $this->setAlert(AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
+                $this->showAlert(AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
                 $location_field = ''; // $selected = 0 -> return to normal list display.
                 goto end;
             }

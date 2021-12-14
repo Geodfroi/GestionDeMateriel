@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS `articles` (
 CREATE TABLE IF NOT EXISTS `users` (
     `id`            int             UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `alias`         varchar(255)    UNIQUE,
-    `email`         varchar(255)    NOT NULL UNIQUE,
-    `contact_email` varchar(255),
+    `login_email`   varchar(255)    NOT NULL UNIQUE,
+    `contact_email` varchar(255),   NOT NULL,
     `contact_delay` varchar(255)    NOT NULL DEFAULT '3-14',
     `password`      varchar(255)    NOT NULL,
     `creation_date` timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP,

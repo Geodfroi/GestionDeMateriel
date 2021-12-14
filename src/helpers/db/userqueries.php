@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers\db;
@@ -22,9 +22,9 @@ use app\models\User;
 class UserQueries
 {
     private PDO $pdo;
-    private string $logger;
+    private int $logger;
 
-    function __construct(PDO $pdo, string $logger)
+    function __construct(PDO $pdo, int $logger)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
@@ -61,15 +61,15 @@ class UserQueries
         switch ($param) {
                 //simply by email which are unique.
             case OrderBy::EMAIL_ASC:
-                return 'ORDER BY email ASC';
+                return 'ORDER BY login_email ASC';
             case OrderBy::EMAIL_DESC:
-                return 'ORDER BY email DESC';
+                return 'ORDER BY login_email DESC';
 
                 // by creation date, then email.
             case OrderBy::CREATED_ASC:
-                return 'ORDER BY creation_date ASC, email ASC';
+                return 'ORDER BY creation_date ASC, login_email ASC';
             case OrderBy::CREATED_DESC:
-                return 'ORDER BY creation_date DESC, email ASC';
+                return 'ORDER BY creation_date DESC, login_email ASC';
 
                 // by last login date.
             case OrderBy::LOGIN_ASC:
@@ -86,39 +86,43 @@ class UserQueries
      * Insert a User into the database.
      * 
      * @param User $user User to insert.
-     * @return bool True if the insert is successful.
+     * @return int ID of inserted row or 0 if it fails.
      */
-    public function insert(User $user): bool
+    public function insert(User $user): int
     {
         $preparedStatement = $this->pdo->prepare(
             'INSERT INTO users 
             (
-                email,
+                login_email,
+                alias,
                 password,
                 is_admin
             ) 
             VALUES 
             (
-                :em, 
+                :lmail, 
+                :alias,
                 :pass, 
                 :adm
             )'
         );
 
-        $em = $user->getEmail();
+        $em = $user->getLoginEmail();
+        $alias = $user->getAlias();
         $pass = $user->getPassword();
         $adm = $user->isAdmin();
 
-        $preparedStatement->bindParam(':em', $em, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':lmail', $em, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':alias', $alias, PDO::PARAM_STR);
         $preparedStatement->bindParam(':pass', $pass, PDO::PARAM_STR);
         $preparedStatement->bindParam(':adm', $adm, PDO::PARAM_BOOL);
 
         if ($preparedStatement->execute()) {
-            return true;
+            return intval($this->pdo->lastInsertId());
         }
         list(,, $error) = $preparedStatement->errorInfo();
         Logging::error(LogError::USER_INSERT, ['error' => $error], $this->logger);
-        return false;
+        return 0;
     }
 
     /**
@@ -134,7 +138,7 @@ class UserQueries
             alias,
             contact_email,
             contact_delay,
-            email, 
+            login_email, 
             password, 
             creation_date, 
             last_login,
@@ -165,7 +169,7 @@ class UserQueries
             alias,
             contact_email,
             contact_delay,
-            email, 
+            login_email, 
             password, 
             creation_date, 
             last_login,
@@ -184,26 +188,26 @@ class UserQueries
     }
 
     /**
-     * Return a single User data by email.
+     * Return a single user data by their login email.
      * 
-     * @param string $email User email.
+     * @param string $login_email User login email.
      * @return ?User User class instance.
      */
-    public function queryByEmail(string $email): ?User
+    public function queryByEmail(string $login_email): ?User
     {
         $preparedStatement = $this->pdo->prepare('SELECT 
             id, 
             alias,
             contact_email,
             contact_delay,
-            email, 
+            login_email, 
             password, 
             creation_date, 
             last_login,
             is_admin 
-        FROM Users WHERE email = :email');
+        FROM Users WHERE login_email = :email');
 
-        $preparedStatement->bindParam(':email', $email, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':email', $login_email, PDO::PARAM_STR);
 
         if ($preparedStatement->execute()) {
             $data = $preparedStatement->fetch(PDO::FETCH_ASSOC);
@@ -259,7 +263,7 @@ class UserQueries
              alias,
              contact_email,
              contact_delay,
-             email, 
+             login_email, 
              password, 
              creation_date,
              last_login, 
@@ -334,14 +338,14 @@ class UserQueries
      * Update user contact adress.
      * 
      * @param int $user_id User id.
-     * @param string $email Updated contact email.
+     * @param string $contact_email Updated contact email.
      * @return bool True is update is successful.
      */
-    public function updateContactEmail(int $user_id, string $email): bool
+    public function updateContactEmail(int $user_id, string $contact_email): bool
     {
         $preparedStatement = $this->pdo->prepare('UPDATE users SET contact_email=:email WHERE id = :id');
 
-        $preparedStatement->bindParam(':email', $email, PDO::PARAM_STR);
+        $preparedStatement->bindParam(':email', $contact_email, PDO::PARAM_STR);
         $preparedStatement->bindParam(':id', $user_id, PDO::PARAM_INT);
 
         if ($preparedStatement->execute()) {

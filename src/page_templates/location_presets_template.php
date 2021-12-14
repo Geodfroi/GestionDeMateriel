@@ -1,24 +1,13 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 use app\constants\Route;
-use app\helpers\TUtil;
 
 ?>
 
 <div class="container">
-
-    <div class="row">
-        <div class="col-12">
-            <?php if (isset($alert['type'])) { ?>
-                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                </div>
-            <?php } ?>
-        </div>
-    </div>
 
     <ul class="list-group mt-4">
         <table class="table table-striped table-bordered align-middle">
@@ -74,7 +63,7 @@ use app\helpers\TUtil;
             <?php } ?>
 
             <input id="location" type="text" name='location' value="<?php echo htmlentities($location_field); ?>" class="form-control 
-                        <?php echo isset($errors['location']) ? ' is-invalid' : '' ?>
+                        <?php echo isset($warnings['location']) ? ' is-invalid' : '' ?>
                         <?php echo $location_field ? ' is-valid' : '' ?>">
 
             <?php if ($selected === 0) { ?>
@@ -83,8 +72,8 @@ use app\helpers\TUtil;
                 <button type="submit" name="update" class="btn btn-primary">Mettre à jour</button>
             <?php } ?>
 
-            <?php if (isset($errors['location'])) { ?>
-                <div class='invalid-feedback'><?php echo $errors['location'] ?> </div>
+            <?php if (isset($warnings['location'])) { ?>
+                <div class='invalid-feedback'><?php echo $warnings['location'] ?> </div>
             <?php } ?>
         </div>
 

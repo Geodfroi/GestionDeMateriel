@@ -1,10 +1,9 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 use app\constants\Route;
-use app\helpers\TUtil;
 
 ?>
 
@@ -15,28 +14,28 @@ use app\helpers\TUtil;
 
             <div class="mb-2">
                 <label for="form-email" class="form-label col-12">E-mail de l'utilisateur:</label>
-                <input id="form-email" name="email" type="email" value="<?php echo htmlentities($email) ?>" class="form-control 
-                    <?php echo isset($error['email']) ? ' is-invalid' : '' ?>
+                <input id="form-email" name="login-email" type="email" value="<?php echo htmlentities($login_email) ?>" class="form-control 
+                    <?php echo isset($warnings['login-email']) ? ' is-invalid' : '' ?>
                     <?php echo $email ? ' is-valid' : '' ?>">
-                <?php if (isset($errors['email'])) { ?>
-                    <div class='invalid-feedback'><?php echo $errors['email'] ?> </div>
+                <?php if (isset($warnings['login-email'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['login-email'] ?> </div>
                 <?php } ?>
             </div>
 
             <div class="input-group mb-3">
                 <label for="form-password" class="form-label col-12">Password:</label>
                 <input id="form-password" name="password" type="text" value="<?php echo htmlentities($password) ?>" class="form-control 
-                    <?php echo isset($error['password']) ? ' is-invalid' : '' ?>
+                    <?php echo isset($warnings['password']) ? ' is-invalid' : '' ?>
                     <?php echo $password ? ' is-valid' : '' ?>">
                 <button type="submit" name="regen-password" class="btn btn-secondary">Regénérer</button>
 
-                <?php if (isset($errors['password'])) { ?>
-                    <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
+                <?php if (isset($warnings['password'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['password'] ?> </div>
                 <?php } ?>
             </div>
 
             <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" name="is_admin" id="flexSwitchCheckDefault" <?php echo $is_admin ? 'checked' : '' ?>>
+                <input class="form-check-input" type="checkbox" role="switch" name="is-admin" id="flexSwitchCheckDefault" <?php echo $is_admin ? 'checked' : '' ?>>
                 <label class="form-check-label" for="flexSwitchCheckDefault>">Accorder les privilèges administratif à cet utilisateur.</label>
             </div>
 

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\constants;
@@ -14,15 +14,15 @@ namespace app\constants;
 class Settings
 {
     const DEBUG_MODE = true;
-    const SHOW_DEBUG_PAGE = true;
+
+    /**
+     * If DEBUG_MODE is active, all emails are sent from and to this address.
+     */
     const DEBUG_EMAIL = 'innov.heds@gmail.com';
 
     const APP_NAME = "HEdS Gestionnaire d'inventaire";
     const APP_FULL_URL = "http://localhost:8085/";
     const LAST_MODIFICATION = '09 décembre 2021';
-
-    const EMAIL_TEMPLATES_PATH = 'email_templates';
-    const TEMPLATES_PATH = 'page_templates';
 
     const ALIAS_MIN_LENGHT = 6;
     const ARTICLE_NAME_MIN_LENGHT = 6;
@@ -34,7 +34,7 @@ class Settings
     const LOCATION_MIN_LENGHT = 6;
     const LOCATION_MAX_LENGHT = 30;
 
-    const TABLE_DISPLAY_COUNT = 12;
+    const TABLE_DISPLAY_COUNT = 10;
 
     const DEFAULT_PASSWORD_LENGTH = 12;
     const USER_PASSWORD_MIN_LENGTH = 8;

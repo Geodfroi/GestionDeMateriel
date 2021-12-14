@@ -9,17 +9,6 @@ use app\constants\Route;
 
 <div class="container">
 
-    <div class="row">
-        <div class="col-12">
-            <?php if (isset($alert['type'])) { ?>
-                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                </div>
-            <?php } ?>
-        </div>
-    </div>
-
-
     <!-- Profile change list -->
     <?php if ($display == 0) { ?>
 
@@ -43,10 +32,10 @@ use app\constants\Route;
             <form method="post" action=<?php echo Route::PROFILE ?>>
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
-                        <input name="alias" type="text" id="alias" class="form-control <?php echo isset($errors['alias']) ? ' is-invalid' : '' ?>" value=<?php echo htmlentities($alias) ?>>
+                        <input name="alias" type="text" id="alias" class="form-control <?php echo isset($warnings['alias']) ? ' is-invalid' : '' ?>" value=<?php echo htmlentities($alias) ?>>
 
-                        <?php if (isset($errors['alias'])) { ?>
-                            <div class='invalid-feedback'><?php echo $errors['alias'] ?> </div>
+                        <?php if (isset($warnings['alias'])) { ?>
+                            <div class='invalid-feedback'><?php echo $warnings['alias'] ?> </div>
                         <?php } else { ?>
                             <div id="id-descr" class="form-text">Définissez un alias au sein de l'application. Il est plus facile pour autrui d'identifier un utilisateur par un alias plutôt que par un e-mail.</div>
                         <?php } ?>
@@ -63,10 +52,10 @@ use app\constants\Route;
                 <div class="row mt-4 mb-3">
                     <div class="col-12 col-md-8 mx-auto">
                         <input name="password" type="password" id="password" value="<?php echo htmlentities($password) ?>" class="form-control
-                            <?php echo isset($errors['password']) ? ' is-invalid' : '' ?>
+                            <?php echo isset($warnings['password']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
-                        <?php if (isset($errors['password'])) { ?>
-                            <div class='invalid-feedback'><?php echo $errors['password'] ?> </div>
+                        <?php if (isset($warnings['password'])) { ?>
+                            <div class='invalid-feedback'><?php echo $warnings['password'] ?> </div>
                         <?php } else { ?>
                             <div class="form-text">Entrer un nouveau mot de passe.</div>
                         <?php } ?>
@@ -75,10 +64,10 @@ use app\constants\Route;
                 <div class="row mb-3">
                     <div class="col-12 col-md-8 mx-auto">
                         <input name="password-repeat" type="password" id="password-repeat" value="<?php echo htmlentities($password_repeat) ?>" class="form-control 
-                            <?php echo isset($errors['password-repeat']) ? ' is-invalid' : '' ?>
+                            <?php echo isset($warnings['password-repeat']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
-                        <?php if (isset($errors['password-repeat'])) { ?>
-                            <div class='invalid-feedback'><?php echo $errors['password-repeat'] ?> </div>
+                        <?php if (isset($warnings['password-repeat'])) { ?>
+                            <div class='invalid-feedback'><?php echo $warnings['password-repeat'] ?> </div>
                         <?php } else { ?>
                             <div class="form-text">Entrer le nouveau mot de passe une seconde fois.</div>
                         <?php } ?>
@@ -106,10 +95,10 @@ use app\constants\Route;
 
                         <label for="contact-input" class="form-label">L'e-mail de contact pour recevoir les courriers de rappels. <i class="bi bi-info-circle" role="img" style="font-size: 1.0rem;" data-bs-toggle="tooltip" title="Il faut prendre garde à correctement taper l'adresse car l'application ne vérifie pas que cette dernière soit fonctionnelle." data-bs-placement="right"></i></label>
                         <input id="contact-input" name="contact-email" type="email" value="<?php echo htmlentities($contact_email) ?>" class="form-control
-                            <?php echo isset($errors['contact-email']) ? ' is-invalid' : '' ?>
+                            <?php echo isset($warnings['contact-email']) ? ' is-invalid' : '' ?>
                             <?php echo $password ? ' is-valid' : '' ?>">
-                        <?php if (isset($errors['contact-email'])) { ?>
-                            <div class='invalid-feedback'><?php echo $errors['contact-email'] ?> </div>
+                        <?php if (isset($warnings['contact-email'])) { ?>
+                            <div class='invalid-feedback'><?php echo $warnings['contact-email'] ?> </div>
                         <?php } ?>
                     </div>
                 </div>
@@ -127,30 +116,30 @@ use app\constants\Route;
                         <label class="h-6 mb-4">Définir la date de l'envoi des e-mails de rappel de la date de péremption du produit. Il est possible de cocher plusieurs options, auquel cas plusieurs e-mails seront envoyés dans les délais spécifiés</label>
 
                         <div class="form-check mb-3">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" name="delay-3" value="" id="delay-3" <?php echo in_array(3, $delays) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($warnings['delays']) ? ' is-invalid' : '' ?>" type="checkbox" name="delay-3" value="" id="delay-3" <?php echo in_array(3, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-3">
                                 Envoyer un e-mail de rappel trois jours avant la péremption du produit.
                             </label>
                         </div>
                         <div class="form-check  mb-3">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-7" id="delay-7" <?php echo in_array(7, $delays) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($warnings['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-7" id="delay-7" <?php echo in_array(7, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-7">
                                 Envoyer un e-mail de rappel une semaine avant la péremption du produit.
                             </label>
                         </div>
                         <div class="form-check mb-3">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-14" id="delay-14" <?php echo in_array(14, $delays) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($warnings['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-14" id="delay-14" <?php echo in_array(14, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-14">
                                 Envoyer un e-mail de rappel deux semaine avant la péremption du produit.
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input  <?php echo isset($errors['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-30" id="delay-30" <?php echo in_array(30, $delays) ? 'checked' : '' ?>>
+                            <input class="form-check-input  <?php echo isset($warnings['delays']) ? ' is-invalid' : '' ?>" type="checkbox" value="" name="delay-30" id="delay-30" <?php echo in_array(30, $delays) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="delay-30">
                                 Envoyer un e-mail de rappel un mois avant la péremption du produit.
                             </label>
-                            <?php if (isset($errors['delays'])) { ?>
-                                <div class='invalid-feedback'><?php echo $errors['delays'] ?> </div>
+                            <?php if (isset($warnings['delays'])) { ?>
+                                <div class='invalid-feedback'><?php echo $warnings['delays'] ?> </div>
                             <?php } ?>
                         </div>
                     </div>

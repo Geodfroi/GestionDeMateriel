@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.14 ###
 ##############################
 
 namespace app\helpers;
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
+// use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+use app\constants\AppPaths;
 use app\constants\LogChannel;
 use app\constants\Mail;
 use app\constants\P_Settings;
@@ -22,7 +23,6 @@ use app\models\User;
 
 /**
  * static functions connected to emails bundled together in a class
- *
  */
 class Mailing
 {
@@ -35,8 +35,8 @@ class Mailing
      */
     private static function formatEmail(string $email_template, array $params): string
     {
-        $content = Util::renderTemplate($email_template, $params, Settings::EMAIL_TEMPLATES_PATH);
-        return Util::renderTemplate('email_base', ['content' => $content], Settings::EMAIL_TEMPLATES_PATH);
+        $content = Util::renderTemplate($email_template, $params, AppPaths::EMAIL_TEMPLATES_PATH);
+        return Util::renderTemplate('email_base', ['content' => $content], AppPaths::EMAIL_TEMPLATES_PATH);
     }
 
     /**
@@ -50,7 +50,7 @@ class Mailing
     public static function passwordChangeNotification(User $user, string $password, int $logger = LogChannel::APP): bool
     {
         $html =  Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
-        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_SUBJECT_NEW_PASSWORD,  $html, '', $logger);
+        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_NEW_PASSWORD,  $html, '', $logger);
     }
 
     /**
@@ -82,7 +82,7 @@ class Mailing
     {
         Logging::info("Sending peremption email to {$user->getAlias()}", $reminders, $logger);
         $html =  Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
-        return Mailing::send($user->getMailingAddresses(), Mail::EMAIL_PEREMPTION_REMINDER,  $html, '', $logger);
+        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_PEREMPTION_REMINDER,  $html, '', $logger);
     }
 
     /**
@@ -96,19 +96,30 @@ class Mailing
     {
         return Mailing::formatEmail('reminder', [
             'username' => $recipient,
-            'reminders' => $reminders
+            'reminders' => $reminders,
+            'url' => Settings::APP_FULL_URL,
         ]);
     }
 
-    public static function userInviteNotification()
+    /**
+     * Send an invite email to new user.
+     * 
+     * @param string $password_plain Newly generated password in plain text.
+     * @param int $logger Logger channel. Use LogChannel const.
+     * @return bool True if emails are sent correctly.
+     */
+    public static function userInviteNotification(User $user, string $password_plain, int $logger = LogChannel::APP): bool
     {
+        Logging::info("Sending user invite email to {$user->getAlias()}");
+        $html = Mailing::userInviteNotificationBody($user->getLoginEmail(), $password_plain);
+        return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_USER_INVITE,  $html, '', $logger);
     }
 
     /**
      * Return formatted body for user invite notification.
      * 
      * @param string $login New user email as login.
-     * @param array $password_plain Newly generated password in plain text.
+     * @param string $password_plain Newly generated password in plain text.
      * @return string Html body.
      */
     public static function userInviteNotificationBody(string $login, string $password_plain): string
@@ -142,7 +153,7 @@ class Mailing
 
         try {
             // Server settings
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
@@ -155,7 +166,7 @@ class Mailing
             $mail->Password = P_Settings::APP_EMAIL_PASSWORD;
 
             // Sender and recipient settings
-            $mail->setFrom(P_Settings::APP_EMAIL, Mail::EMAIL_SENDER);
+            $mail->setFrom(P_Settings::APP_EMAIL, Mail::SENDER);
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }
