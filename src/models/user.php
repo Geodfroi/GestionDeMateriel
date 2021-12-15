@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.15 ###
 ##############################
 
 namespace app\models;
 
 use DateTime;
-
 use app\helpers\Util;
+use app\helpers\Convert;
 
 class User
 {
@@ -54,8 +54,8 @@ class User
         $instance->login_email = (string)($input['login_email'] ?? '');
         $instance->password_hash = (string)($input['password'] ?? '');
 
-        $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
-        $instance->last_login =   DateTime::createFromFormat('Y-m-d H:i:s', $input['last_login']);
+        $instance->creation_date = Convert::toDateTime($input['creation_date']);
+        $instance->last_login = Convert::toDateTime($input['last_login']);
 
         $instance->is_admin = (bool)$input['is_admin'];
         return $instance;

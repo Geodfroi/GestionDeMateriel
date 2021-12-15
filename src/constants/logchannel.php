@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2021.12.15 ###
 ##############################
 
 namespace app\constants;
@@ -13,7 +13,7 @@ namespace app\constants;
  */
 class LogChannel
 {
-    const APP = 0;
-    const SERVER = 1;
-    const TEST = 2;
+    const APP = 'app';
+    const SERVER = 'server';
+    const TEST = 'test';
 }

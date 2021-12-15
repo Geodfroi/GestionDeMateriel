@@ -5,7 +5,6 @@
 
 use app\constants\Route;
 use app\helpers\Database;
-use app\helpers\TUtil;
 
 $loc_presets = Database::locations()->queryAll();
 

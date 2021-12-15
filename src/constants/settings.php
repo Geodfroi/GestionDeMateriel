@@ -13,16 +13,26 @@ namespace app\constants;
  */
 class Settings
 {
+    /**
+     * Display debug options.
+     */
     const DEBUG_MODE = true;
-
+    /**
+     * Use internal sqlite db instead of mySQL for testing.
+     */
+    const USE_SQLITE = false;
     /**
      * If DEBUG_MODE is active, all emails are sent from and to this address.
      */
     const DEBUG_EMAIL = 'innov.heds@gmail.com';
 
     const APP_NAME = "HEdS Gestionnaire d'inventaire";
-    const APP_FULL_URL = "http://localhost:8085/";
-    const LAST_MODIFICATION = '09 décembre 2021';
+
+    /**
+     * Used as hyperlink in emails; must be set to proper url once the project is online. 
+     */
+    const APP_FULL_URL = Settings::DEBUG_MODE ? "http://localhost:8085/" : '';
+    const LAST_MODIFICATION = '15 décembre 2021';
 
     const ALIAS_MIN_LENGHT = 6;
     const ARTICLE_NAME_MIN_LENGHT = 6;

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.15 ###
 ##############################
 
 namespace app\helpers;
@@ -21,106 +21,77 @@ use app\constants\LogChannel;
  */
 class Logging
 {
-    /**
-     * Simpleton pattern creating app log channel
-     */
-    private static function app()
+    private static array $channels = [];
+
+
+    private static function getChannel(string $channel)
     {
-        static $instance;
-        if (is_null($instance)) {
-            $instance = new Logger('app');
-            // __DIR__ . '/../../logs/app.log'
-            $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . 'app.log', Logger::DEBUG));
+        if (!array_key_exists($channel, Logging::$channels)) {
+            $channels[$channel] = new Logger($channel);
+            $channels[$channel]->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . "$channel.log", Logger::DEBUG));
         }
-        return $instance;
+        return  $channels[$channel];
     }
 
     /**
      * Wrapper for Monolog Logger debug method.
+     * 
      * @param string $msg Log message.
      * @param array $context Log context array.
-     * @param int $channel Logging channel. Use LogChannel const.
+     * @param string $channel Logging channel. Use LogChannel const.
      */
-    public static function debug(string $msg, array $context = [], int $channel = LogChannel::APP)
+    public static function debug(string $msg, array $context = [], string $channel = LogChannel::APP)
     {
-        switch ($channel) {
-            case LogChannel::SERVER:
-                Logging::server()->debug($msg, $context);
-                break;
-            case LogChannel::TEST:
-                Logging::test()->debug($msg, $context);
-                break;
-            default:
-                break;
-        }
-        Logging::app()->debug($msg, $context);
+        Logging::getChannel($channel)->debug($msg, $context);
     }
 
     /**
      * Wrapper for Monolog Logger error method.
+     * 
      * @param string $msg Log message.
      * @param array $context Log context array.
-     * @param int $channel Logging channel. Use LogChannel const.
+     * @param string $channel Logging channel. Use LogChannel const.
      */
-    public static function error(string $msg, array $context = [], int $channel = LogChannel::APP)
+    public static function error(string $msg, array $context = [], string $channel = LogChannel::APP)
     {
-        switch ($channel) {
-            case LogChannel::SERVER:
-                Logging::server()->error($msg, $context);
-                break;
-            case LogChannel::TEST:
-                Logging::test()->error($msg, $context);
-                break;
-            default:
-                break;
-        }
-        Logging::app()->error($msg, $context);
+        Logging::getChannel($channel)->error($msg, $context);
     }
 
     /**
      * Wrapper for Monolog Logger info method.
+     * 
      * @param string $msg Log message.
      * @param array $context Log context array.
-     * @param int $channel Logging channel. Use LogChannel const.
+     * @param string $channel Logging channel. Use LogChannel const.
      */
-    public static function info(string $msg, array $context = [], int $channel = LogChannel::APP)
+    public static function info(string $msg, array $context = [], string $channel = LogChannel::APP)
     {
-        switch ($channel) {
-            case LogChannel::SERVER:
-                Logging::server()->info($msg, $context);
-                break;
-            case LogChannel::TEST:
-                Logging::test()->info($msg, $context);
-                break;
-            default:
-                break;
-        }
-        Logging::app()->info($msg, $context);
-    }
+        Logging::getChannel($channel)->info($msg, $context);
 
-    /**
-     * Simpleton pattern creating server log channel
-     */
-    private static function server()
-    {
-        static $instance;
-        if (is_null($instance)) {
-            $instance = new Logger('server');
-            $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR  . 'server.log', Logger::DEBUG));
-        }
-        return $instance;
-    }
-
-    /**
-     * Simpleton pattern creating server log channel
-     */
-    private static function test()
-    {
-        static $instance;
-        if (is_null($instance)) {
-            $instance = new Logger('test');
-            $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR  . 'test.log', Logger::DEBUG));
-        }
-        return $instance;
+        // switch ($channel) {
+        //     case LogChannel::SERVER:
+        //         Logging::server()->info($msg, $context);
+        //         break;
+        //     case LogChannel::TEST:
+        //         Logging::test()->info($msg, $context);
+        //         break;
+        //     default:
+        //         break;
+        // }
+        // Logging::app()->info($msg, $context);
     }
 }
+
+    // /**
+    //  * Simpleton pattern creating app log channel
+    //  */
+    // private static function app()
+    // {
+    //     static $instance;
+    //     if (is_null($instance)) {
+    //         $instance = new Logger('app');
+    //         // __DIR__ . '/../../logs/app.log'
+    //         $instance->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . 'app.log', Logger::DEBUG));
+    //     }
+    //     return $instance;
+    // }

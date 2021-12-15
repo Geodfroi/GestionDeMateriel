@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2021.12.15 ###
 ##############################
 
 namespace app\constants;
@@ -13,10 +13,11 @@ namespace app\constants;
  */
 class LogError
 {
-    //Database errors
+    // Database errors
     const ARTICLE_DELETE = 'failure to delete article from database.';
     const ARTICLE_INSERT = 'failure to insert article.';
     const ARTICLE_QUERY = 'failure to retrieve article from database.';
+    const ARTICLES_BACKUP = 'failure to backup article table';
     const ARTICLES_COUNT_QUERY = 'failure to count articles from database.';
     const ARTICLES_QUERY = 'failure to retrieve article list from database.';
     const ARTICLE_UPDATE = 'failure to update article.';
@@ -25,6 +26,7 @@ class LogError
     const LOCATION_DELETE = 'failure to delete location from database.';
     const LOCATION_INSERT = 'failure to properly insert new location.';
     const LOCATION_QUERY = 'failure to retrieve location from database.';
+    const LOCATIONS_BACKUP = 'failure to backup location table';
     const LOCATIONS_QUERY_ALL = 'failure to retrieve locations.';
     const LOCATION_UPDATE = 'failure to update location string correctly.';
     const USER_ALIAS_UPDATE = 'failure to update user alias.';
@@ -36,6 +38,7 @@ class LogError
     const USER_LOGTIME_UPDATE = 'failure to update user log time.';
     const USER_PASSWORD_UPDATE = 'failure to update user password.';
     const USER_QUERY = 'failure to retrieve user from database.';
+    const USERS_BACKUP = 'failure to backup user table';
     const USERS_COUNT_QUERY = 'failure to count users from database.';
     const USERS_QUERY = 'failure to retrieve user list from database.';
 }

@@ -9,7 +9,6 @@ use app\helpers\Database;
 ?>
 
 <div class="container">
-
 </div>
 
 <br><br><br><br>
@@ -17,10 +16,10 @@ use app\helpers\Database;
     <div>implement sqlite</div>
     <div>MAIN: backup db</div>
     <div>ADMIN - access user contact posts.</div>
+    <div>CONTACT: create contact page</div>
     <div>ARTICLES: filter with created by</div>
     <div>ARTICLES: fixed column size</div>
     <div>ARTICLES: better adaptive layout</div>
-    <div>CONTACT: create contact page</div>
     <div>LOGIN: add favicon</div>
     <div>USER_EDIT: layout for small screen.</div>
     <div>Remove old logs ?</div>

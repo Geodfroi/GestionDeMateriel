@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.15 ###
 ##############################
 
 namespace app\models;
+
+use app\helpers\Convert;
 
 use DateTime;
 
@@ -44,8 +46,8 @@ class Article
         $instance->location = (string)($input['location'] ?? '');
         $instance->comments = (string)($input['comments'] ?? '');
 
-        $instance->expiration_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['expiration_date']);
-        $instance->creation_date = DateTime::createFromFormat('Y-m-d H:i:s', $input['creation_date']);
+        $instance->expiration_date = Convert::toDateTime($input['expiration_date']);
+        $instance->creation_date = Convert::toDateTime($input['creation_date']);
 
         return $instance;
     }
@@ -67,7 +69,7 @@ class Article
         $instance->article_name = $article_name;
         $instance->location = $location;
         $instance->comments = $comments;
-        $instance->expiration_date = DateTime::createFromFormat('Y-m-d', $expiration_date);
+        $instance->expiration_date = Convert::toDateTime($expiration_date);
         $instance->creation_date = new DateTime();
         return $instance;
     }
@@ -120,7 +122,7 @@ class Article
         $this->article_name = $article_name;
         $this->location = $location;
         $this->comments = $comments;
-        $this->expiration_date = DateTime::createFromFormat('Y-m-d', $expiration_date);
+        $this->expiration_date = Convert::toDateTime($expiration_date);
     }
 
     public function __toString(): string

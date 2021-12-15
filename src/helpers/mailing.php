@@ -51,10 +51,10 @@ class Mailing
      * 
      * @param User $user Email recipient.
      * @param string $password New password in plain text.
-     * @param int $logger Logger channel. Use LogChannel const.
+     * @param string $logger Logger channel. Use LogChannel const.
      * @return bool True if emails are sent correctly.
      */
-    public static function passwordChangeNotification(User $user, string $password, int $logger = LogChannel::APP): bool
+    public static function passwordChangeNotification(User $user, string $password, string $logger = LogChannel::APP): bool
     {
         [$html, $plain_text] = Mailing::passwordChangeNotificationBody($user->getAlias(), $password);
         return Mailing::send($user->getMailingAddresses(), Mail::SUBJECT_NEW_PASSWORD,  $html, $plain_text, $logger);
@@ -82,10 +82,10 @@ class Mailing
      * 
      * @param User $user Email recipient.
      * @param array $reminders Associative array containing 'article' and 'delay' keys.
-     * @param int $logger Logger channel. Use LogChannel const.
+     * @param string $logger Logger channel. Use LogChannel const.
      * @return bool True if emails are sent correctly.
      */
-    public static function peremptionNotification(User $user, array $reminders, int $logger = LogChannel::SERVER): bool
+    public static function peremptionNotification(User $user, array $reminders, string $logger = LogChannel::SERVER): bool
     {
         Logging::info("Sending peremption email to {$user->getAlias()}", $reminders, $logger);
         [$html, $plain_text] = Mailing::peremptionNotificationBody($user->getAlias(), $reminders);
@@ -113,10 +113,10 @@ class Mailing
      * Send an invite email to new user.
      * 
      * @param string $password_plain Newly generated password in plain text.
-     * @param int $logger Logger channel. Use LogChannel const.
+     * @param string $logger Logger channel. Use LogChannel const.
      * @return bool True if emails are sent correctly.
      */
-    public static function userInviteNotification(User $user, string $password_plain, int $logger = LogChannel::APP): bool
+    public static function userInviteNotification(User $user, string $password_plain, string $logger = LogChannel::APP): bool
     {
         Logging::info("Sending user invite email to {$user->getAlias()}");
         [$html, $plain_text] = Mailing::userInviteNotificationBody($user->getLoginEmail(), $password_plain);
@@ -148,10 +148,10 @@ class Mailing
      * @param string $subject Email subject.
      * @param string $html_content HTML formatted content.
      * @param string $plain_content Plain content for client refusing html version.
-     * @param int $logger Logger channel. Use LogChannel const.
+     * @param string $logger Logger channel. Use LogChannel const.
      * @return true True if email is sent properly.
      */
-    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, int $logger): bool
+    private static function send(array $recipients, string $subject, string $html_content, string $plain_content, string $logger): bool
     {
         if (SETTINGS::DEBUG_MODE) {
             $recipients = [SETTINGS::DEBUG_EMAIL];
