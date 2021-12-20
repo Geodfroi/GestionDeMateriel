@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.20 ###
 ##############################
 
 namespace app\constants;
@@ -17,10 +17,7 @@ class Settings
      * Display debug options.
      */
     const DEBUG_MODE = true;
-    /**
-     * Use internal sqlite db instead of mySQL for testing.
-     */
-    const USE_SQLITE = false;
+
     /**
      * If DEBUG_MODE is active, all emails are sent from and to this address.
      */
@@ -32,7 +29,7 @@ class Settings
      * Used as hyperlink in emails; must be set to proper url once the project is online. 
      */
     const APP_FULL_URL = Settings::DEBUG_MODE ? "http://localhost:8085/" : '';
-    const LAST_MODIFICATION = '15 décembre 2021';
+    const LAST_MODIFICATION = '20 décembre 2021';
 
     const ALIAS_MIN_LENGHT = 6;
     const ARTICLE_NAME_MIN_LENGHT = 6;

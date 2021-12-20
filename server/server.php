@@ -3,23 +3,26 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2021.12.20 ###
 ##############################
 // periodically iterate through articles and send reminder emails when they are close to peremption
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
 use app\constants\LogChannel;
+use app\constants\Globals;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Mailing;
 use app\helpers\Util;
 
+$GLOBALS[Globals::LOG_CHANNEL] = LogChannel::SERVER;
+
 // iterate through users and articles to flag articles that are soon due.
 $articles = Database::articles()->queryAll();
 $users = Database::users()->queryAll();
 
-Logging::info('Starting server script.', [], LogChannel::SERVER);
+Logging::info('Starting server script.');
 
 foreach ($users as $user) {
     echo PHP_EOL . PHP_EOL;
@@ -46,8 +49,8 @@ foreach ($users as $user) {
         }
     }
 
-    if (!Mailing::peremptionNotification($user, $reminders, LogChannel::SERVER)) {
-        Logging::error('peremption notification failed.', [], LogChannel::SERVER);
+    if (!Mailing::peremptionNotification($user, $reminders)) {
+        Logging::error('peremption notification failed.');
         return;
     }
 }

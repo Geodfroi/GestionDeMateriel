@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2021.12.20 ###
 ##############################
 
 namespace app\helpers\db;
@@ -18,14 +18,17 @@ use app\models\StringContent;
  */
 class LocationQueries
 {
+    private $conn;
+    private bool $use_sqlite;
+
     /**
      * @param PDO|SQlite3 $conn Db connection.
-     * @param int $logger Logger channel.
+     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
      */
-    function __construct($conn, string $logger)
+    function __construct($conn, bool $use_sqlite)
     {
         $this->conn = $conn;
-        $this->logger = $logger;
+        $this->use_sqlite = $use_sqlite;
     }
 
     public function backup()
@@ -41,14 +44,14 @@ class LocationQueries
      */
     public function delete(int $id): bool
     {
-        $preparedStatement = $this->conn->prepare('DELETE FROM locations WHERE id = :id');
-        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt = $this->conn->prepare('DELETE FROM locations WHERE id = :id');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
-        if ($preparedStatement->execute()) {
+        if ($stmt->execute()) {
             return true;
         }
-        //list(,, $error) = $preparedStatement->errorInfo();
-        Logging::error(LogError::LOCATION_DELETE, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+        //list(,, $error) = $stmt->errorInfo();
+        Logging::error(LogError::LOCATION_DELETE, ['error' => $this->conn->lastErrorMsg()]);
         return false;
     }
 
@@ -60,13 +63,15 @@ class LocationQueries
      */
     public function insert(string $str): int
     {
-        $preparedStatement = $this->conn->prepare('INSERT INTO locations (str_content) VALUES (:str)');
-        $preparedStatement->bindParam(':str', $str, PDO::PARAM_STR);
+        $stmt = $this->conn->prepare('INSERT INTO locations (str_content) VALUES (:str)');
+        $stmt->bindParam(':str', $str, PDO::PARAM_STR);
 
-        if ($preparedStatement->execute()) {
-            return intval($this->conn->lastInsertId());
+        $r = $stmt->execute();
+        if ($r) {
+            return $this->use_sqlite ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
         }
-        Logging::error(LogError::LOCATION_INSERT, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+
+        Logging::error(LogError::LOCATION_INSERT, ['error' => $this->conn->lastErrorMsg()]);
         return 0;
     }
 
@@ -78,23 +83,23 @@ class LocationQueries
      */
     public function queryById(int $id): ?StringContent
     {
-        $preparedStatement = $this->conn->prepare('SELECT 
+        $stmt = $this->conn->prepare('SELECT 
             id, 
             str_content 
         FROM locations WHERE id = :id');
 
-        $preparedStatement->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
-        if ($preparedStatement->execute()) {
+        if ($stmt->execute()) {
 
-            $data = $preparedStatement->fetch(); // retrieve only first row found; fine since id is unique.
+            $data = $stmt->fetch(); // retrieve only first row found; fine since id is unique.
             if ($data) {
                 return StringContent::fromDatabaseRow($data);
             } else {
-                Logging::error(LogError::LOCATION_QUERY, ['id' => $id], $this->logger);
+                Logging::error(LogError::LOCATION_QUERY, ['id' => $id]);
             }
         } else {
-            Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $this->conn->lastErrorMsg()], $this->logger);
+            Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $this->conn->lastErrorMsg()]);
         }
 
         return null;
@@ -107,17 +112,17 @@ class LocationQueries
      */
     public function queryAll(): array
     {
-        $preparedStatement = $this->conn->prepare('SELECT id, str_content FROM locations ORDER BY str_content ASC');
+        $stmt = $this->conn->prepare('SELECT id, str_content FROM locations ORDER BY str_content ASC');
 
         $locations = [];
 
-        if ($preparedStatement->execute()) {
+        if ($stmt->execute()) {
             // fetch next as associative array until there are none to be fetched.
-            while ($data = $preparedStatement->fetch()) {
+            while ($data = $stmt->fetch()) {
                 array_push($locations, StringContent::fromDatabaseRow($data));
             }
         } else {
-            Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+            Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $this->conn->lastErrorMsg()]);
         }
 
         return $locations;
@@ -130,18 +135,18 @@ class LocationQueries
      */
     public function contentExists(string $content): bool
     {
-        $preparedStatement = $this->conn->prepare('SELECT 
+        $stmt = $this->conn->prepare('SELECT 
             COUNT(*)
             FROM locations
             WHERE str_content = :str');
 
-        $preparedStatement->bindParam(':str', $content, PDO::PARAM_STR);
-        if ($preparedStatement->execute()) {
-            $r = $preparedStatement->fetchColumn();
+        $stmt->bindParam(':str', $content, PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            $r = $stmt->fetchColumn();
             return intval($r) === 1;
         }
 
-        Logging::error(LogError::LOCATIONS_CHECK_CONTENT, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+        Logging::error(LogError::LOCATIONS_CHECK_CONTENT, ['error' => $this->conn->lastErrorMsg()]);
         return false;
     }
 
@@ -154,15 +159,15 @@ class LocationQueries
      */
     public function update(int $location_id, string $str)
     {
-        $preparedStatement = $this->conn->prepare('UPDATE locations SET str_content=:str WHERE id = :id');
+        $stmt = $this->conn->prepare('UPDATE locations SET str_content=:str WHERE id = :id');
 
-        $preparedStatement->bindParam(':id', $location_id, PDO::PARAM_INT);
-        $preparedStatement->bindParam(':str', $str, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $location_id, PDO::PARAM_INT);
+        $stmt->bindParam(':str', $str, PDO::PARAM_STR);
 
-        if ($preparedStatement->execute()) {
+        if ($stmt->execute()) {
             return true;
         }
-        Logging::error(LogError::LOCATION_UPDATE, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+        Logging::error(LogError::LOCATION_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
         return false;
     }
 }

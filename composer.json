@@ -10,12 +10,15 @@
   "authors": [
     {
       "name": "Service des innovations pédagogiques - HEdS",
-      "email": "aurore.azure@gmail.com"
+      "email": "innov.heds@gmail.com"
     }
   ],
   "minimum-stability": "stable",
   "require": {
     "phpmailer/phpmailer": "^6.5",
     "monolog/monolog": "^2.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
   }
 }

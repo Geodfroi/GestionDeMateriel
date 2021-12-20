@@ -94,7 +94,7 @@ class Util
      * @param array $params Associative array of parameters to be inserted in text content.
      * @return string File content edited with parameters.
      */
-    public static function readFile(string $file_path, array $params): string
+    public static function readFile(string $file_path, array $params = []): string
     {
         $content = file_get_contents($file_path . '.txt');
         foreach ($params as $key => $value) {

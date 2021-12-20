@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2021.12.20 ###
 ##############################
 
 namespace app\helpers\db;
@@ -13,14 +13,12 @@ use \PDO;
 use SQLite3;
 
 use app\constants\ArtFilter;
-use app\constants\LogChannel;
 use app\constants\LogError;
 use app\constants\OrderBy;
-use app\constants\Settings;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\Article;
-use app\routes\Login;
+use app\helpers\Database;
 
 /**
  * Regroup function to interact with article table.
@@ -28,21 +26,23 @@ use app\routes\Login;
 class ArticleQueries
 {
     private $conn;
-    private string $logger;
+    private bool $use_sqlite;
+    private array $data_types;
 
     /**
      * @param PDO|SQlite3 $conn Db connection.
-     * @param int $logger Logger channel.
+     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
      */
-    function __construct($conn, string $logger)
+    function __construct(Database $db)
     {
-        $this->conn = $conn;
-        $this->logger = $logger;
+        $this->conn = $db->getConn();
+        $this->use_sqlite = $db->useSQLite();
+        $this->data_types = $db->getDataTypes();
     }
 
     public function backup()
     {
-        Logging::debug('article backup not implemented', [], $this->logger);
+        Logging::debug('article backup not implemented');
 
         // $table_name = "employee";
         // $backup_file  = "/tmp/employee.sql";
@@ -54,7 +54,7 @@ class ArticleQueries
         //     return true;
         // }
         // list(,, $error) = $stmt->errorInfo();
-        // Logging::error(LogError::ARTICLES_BACKUP, ['error' => $error], $this->logger);
+        // Logging::error(LogError::ARTICLES_BACKUP, ['error' => $error]);
         // return false;
     }
 
@@ -67,29 +67,12 @@ class ArticleQueries
     public function delete(int $id): bool
     {
         $stmt = $this->conn->prepare('DELETE FROM articles WHERE id = :id');
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
         }
-        Logging::error(LogError::ARTICLE_DELETE, ['error' => $this->conn->lastErrorMsg()], $this->logger);
-        return false;
-    }
-
-    /**
-     * Delete all articles belonging to user.
-     * 
-     * @param int $user_id The user id.
-     * @return bool True if the delete is successful.
-     */
-    public function deleteUserArticles($user_id): bool
-    {
-        $stmt = $this->conn->prepare('DELETE FROM articles WHERE user_id = :uid');
-        $stmt->bindParam(':uid', $user_id, PDO::PARAM_INT);
-        if ($stmt->execute()) {
-            return true;
-        }
-        Logging::error(LogError::USER_ARTICLES_DELETE, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+        Logging::error(LogError::ARTICLE_DELETE, ['error' => $this->conn->lastErrorMsg()]);
         return false;
     }
 
@@ -99,15 +82,17 @@ class ArticleQueries
      * @param array $filters Array of ArtFilter Instances
      * @return string Where clause.
      */
-    public static function printFilterStatement(array $filters): string
+    public  function printFilterStatement(array $filters): string
     {
         $str = 'WHERE ';
         $count = 0;
 
+        Logging::debug('filters', $filters);
+
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
 
-            $str .= Settings::USE_SQLITE ? "article_name LIKE '%{$filters[ArtFilter::NAME]}%'" : "article_name LIKE CONCAT ('%', :fname, '%')";
+            $str .= $this->use_sqlite ? "article_name LIKE '%{$filters[ArtFilter::NAME]}%'" : "article_name LIKE CONCAT ('%', :fname, '%')";
             $count += 1;
         }
 
@@ -115,7 +100,7 @@ class ArticleQueries
             if ($count === 1) {
                 $str .= ' AND ';
             }
-            $str .= Settings::USE_SQLITE ? "location LIKE '%{$filters[ArtFilter::LOCATION]}%'" : "location LIKE CONCAT ('%', :floc, '%')";
+            $str .= $this->use_sqlite ? "location LIKE '%{$filters[ArtFilter::LOCATION]}%'" : "location LIKE CONCAT ('%', :floc, '%')";
             $count += 1;
         }
 
@@ -123,18 +108,19 @@ class ArticleQueries
             if ($count === 1) {
                 $str .= ' AND ';
             }
-            $str .= Settings::USE_SQLITE ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
+            $str .= $this->use_sqlite ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
             $count += 1;
         } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
             if ($count === 1) {
                 $str .= ' AND ';
             }
-            $str .= Settings::USE_SQLITE ? "expiration_date > {$filters[ArtFilter::DATE_AFTER]}" : "expiration_date > :fafter";
+            $str .= $this->use_sqlite ? "expiration_date > {$filters[ArtFilter::DATE_AFTER]}" : "expiration_date > :fafter";
             $count += 1;
         }
 
         if (!isset($filters[ArtFilter::SHOW_EXPIRED])) {
 
+            Logging::debug('printFilterStatement');
             if ($count === 1) {
                 $str .= ' AND ';
             }
@@ -214,15 +200,36 @@ class ArticleQueries
         $location = $article->getLocation();
         $date = $article->getExpirationDate()->format('Y-m-d H:i:s');
 
-        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-        $stmt->bindParam(':art', $name, PDO::PARAM_STR);
-        $stmt->bindParam(':loc', $location, PDO::PARAM_STR);
-        $stmt->bindParam(':date', $date, PDO::PARAM_STR);
+        Logging::debug(
+            'l',
+            [
+                'uid' => $uid,
+                'name' =>  $name,
+                'location' =>  $location,
+                'date' => $date
+            ]
+        );
 
-        if ($stmt->execute()) {
-            return intval($this->conn->lastInsertId());
+        $stmt->bindParam(':uid', $uid, $this->data_types['int']);
+        $stmt->bindParam(':art', $name, $this->data_types['str']);
+        $stmt->bindParam(':loc', $location, $this->data_types['str']);
+        $stmt->bindParam(':date', $date, $this->data_types['str']);
+
+        // $stmt->reset();
+
+        $r = $stmt->execute();
+        if ($r) {
+            Logging::debug('execute');
         }
-        Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+        // if ($r) {
+        //     if ($this->use_sqlite) {
+        //         $r->finalize(); //necessary to avoid double execution bug.
+        //         // return $this->conn->lastInsertRowID();
+        //     }
+        //     // return intval($this->conn->lastInsertId());
+        // }
+        return 1;
+        Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->conn->lastErrorMsg()]);
         return 0;
     }
 
@@ -244,18 +251,19 @@ class ArticleQueries
             creation_date 
         FROM articles WHERE id = :id');
 
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
-        if ($stmt->execute()) {
-
-            $data = $stmt->fetch(); // retrieve only first row found; fine since id is unique.
-            if ($data) {
-                return Article::fromDatabaseRow($data);
+        $r = $stmt->execute();
+        if ($r) {
+            // retrieve only first row found; fine since id is unique.
+            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
+            if ($row) {
+                return Article::fromDatabaseRow($row);
             } else {
-                Logging::error(LogError::ARTICLE_QUERY, ['id' => $id], $this->logger);
+                Logging::error(LogError::ARTICLE_QUERY, ['id' => $id]);
             }
         } else {
-            Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $this->conn->lastErrorMsg()], $this->logger);
+            Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $this->conn->lastErrorMsg()]);
         }
 
         return null;
@@ -269,27 +277,28 @@ class ArticleQueries
      */
     public function queryCount(array $filters = []): int
     {
-        $filter_statement = ArticleQueries::printFilterStatement($filters);
+        $filter_statement = $this->printFilterStatement($filters);
         $query = "SELECT COUNT(*) FROM articles $filter_statement";
 
+        Logging::debug('queryCount stmt: ' . $query);
         $stmt = $this->conn->prepare($query);
 
         if (Util::str_contains($filter_statement, ':fname')) {
-            $stmt->bindParam(':fname', $filters[ArtFilter::NAME], PDO::PARAM_STR);
+            $stmt->bindParam(':fname', $filters[ArtFilter::NAME], $this->data_types['str']);
         }
         if (Util::str_contains($filter_statement, ':floc')) {
-            $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], PDO::PARAM_STR);
+            $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], $this->data_types['str']);
         }
         if (Util::str_contains($filter_statement, ':fbefore')) {
-            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], PDO::PARAM_STR);
+            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], $this->data_types['str']);
         }
         if (Util::str_contains($filter_statement, ':fafter')) {
-            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], PDO::PARAM_STR);
+            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], $this->data_types['str']);
         }
 
         $r = $stmt->execute();
         if ($r) {
-            if (Settings::USE_SQLITE) {
+            if ($this->use_sqlite) {
                 $array = $r->fetchArray();
                 return $array['COUNT(*)'];
             }
@@ -298,7 +307,7 @@ class ArticleQueries
         }
 
         // list(,, $this->conn->lastErrorMsg()) = $stmt->errorInfo();
-        Logging::error(LogError::ARTICLES_COUNT_QUERY, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+        Logging::error(LogError::ARTICLES_COUNT_QUERY, ['error' => $this->conn->lastErrorMsg()]);
         return -1;
     }
 
@@ -313,12 +322,8 @@ class ArticleQueries
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
-        Logging::debug('filters', $filters);
-
-        $filter_statement = ArticleQueries::printFilterStatement($filters);
+        $filter_statement = $this->printFilterStatement($filters);
         $order_statement = ArticleQueries::printOrderStatement($orderby);
-
-        Logging::debug($filter_statement);
 
         $query = "SELECT 
             articles.id, 
@@ -339,28 +344,28 @@ class ArticleQueries
         $stmt = $this->conn->prepare($query);
 
         if (Util::str_contains($filter_statement, ':fname')) {
-            $stmt->bindParam(':fname', $filters[ArtFilter::NAME], PDO::PARAM_STR);
+            $stmt->bindParam(':fname', $filters[ArtFilter::NAME], $this->data_types['str']);
         }
         if (Util::str_contains($filter_statement, ':floc')) {
-            $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], PDO::PARAM_STR);
+            $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], $this->data_types['str']);
         }
         if (Util::str_contains($filter_statement, ':fbefore')) {
-            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], PDO::PARAM_STR);
+            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], $this->data_types['str']);
         }
         if (Util::str_contains($filter_statement, ':fafter')) {
             Logging::debug(':fafter');
-            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], PDO::PARAM_STR);
+            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], $this->data_types['str']);
         }
 
-        $stmt->bindParam(':lim', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':off', $offset, PDO::PARAM_INT);
+        $stmt->bindParam(':lim', $limit, $this->data_types['int']);
+        $stmt->bindParam(':off', $offset, $this->data_types['int']);
 
         $articles = [];
 
         $r = $stmt->execute();
         if ($r) {
             // fetch next as associative array until there are none to be fetched.
-            if (Settings::USE_SQLITE) {
+            if ($this->use_sqlite) {
                 while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
                     array_push($articles, Article::fromDatabaseRow($row));
                 }
@@ -370,7 +375,7 @@ class ArticleQueries
                 }
             }
         } else {
-            Logging::error(LogError::ARTICLES_QUERY, ['error' => $this->conn->lastErrorMsg()], $this->logger);
+            Logging::error(LogError::ARTICLES_QUERY, ['error' => $this->conn->lastErrorMsg()]);
         }
 
         return $articles;
@@ -397,16 +402,33 @@ class ArticleQueries
         $comments = $article->getComments();
         $id = $article->getId();
 
-        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-        $stmt->bindParam(':loc', $location, PDO::PARAM_STR);
-        $stmt->bindParam(':date', $date, PDO::PARAM_STR);
-        $stmt->bindParam(':com', $comments, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':name', $name, $this->data_types['str']);
+        $stmt->bindParam(':loc', $location, $this->data_types['str']);
+        $stmt->bindParam(':date', $date, $this->data_types['str']);
+        $stmt->bindParam(':com', $comments, $this->data_types['str']);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
         }
-        Logging::error(LogError::ARTICLE_UPDATE, ['id' => $id, 'error' => $this->conn->lastErrorMsg()], $this->logger);
+        Logging::error(LogError::ARTICLE_UPDATE, ['id' => $id, 'error' => $this->conn->lastErrorMsg()]);
         return false;
     }
 }
+
+    // /**
+    //  * Delete all articles belonging to user.
+    //  * 
+    //  * @param int $user_id The user id.
+    //  * @return bool True if the delete is successful.
+    //  */
+    // public function deleteUserArticles($user_id): bool
+    // {
+    //     $stmt = $this->conn->prepare('DELETE FROM articles WHERE user_id = :uid');
+    //     $stmt->bindParam(':uid', $user_id, $this->data_types['int']);
+    //     if ($stmt->execute()) {
+    //         return true;
+    //     }
+    //     Logging::error(LogError::USER_ARTICLES_DELETE, ['error' => $this->conn->lastErrorMsg()]);
+    //     return false;
+    // }

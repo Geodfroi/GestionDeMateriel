@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.20 ###
 ##############################
 
 use app\constants\Route;
@@ -13,6 +13,7 @@ use app\helpers\Database;
 
 <br><br><br><br>
 <div>
+    <div>Display limit as option.</div>
     <div>implement sqlite</div>
     <div>MAIN: backup db</div>
     <div>ADMIN - access user contact posts.</div>
