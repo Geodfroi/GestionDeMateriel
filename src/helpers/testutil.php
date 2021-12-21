@@ -44,12 +44,12 @@ class TestUtil
     /**
      * Set up temporary sqlite db for tests.
      * 
-     * @param string $db_name Local db name without extension.
+     * @param string $local_path Path to local db.
      * @return Database Database instance or null in case of error.
      */
-    public static function setupTestDB(string $db_name): Database
+    public static function localDBSetup(string $local_path): Database
     {
-        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
+        // $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
         if (file_exists($local_path)) {
             unlink($local_path); // erase existing
         }

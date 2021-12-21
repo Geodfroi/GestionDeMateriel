@@ -7,9 +7,8 @@ declare(strict_types=1);
 ##############################
 
 use app\constants\AppPaths;
-use app\constants\Globals;
 use app\constants\LogChannel;
-use app\helpers\Database;
+use app\helpers\App;
 use app\helpers\db\LocationQueries;
 use app\helpers\Logging;
 use app\helpers\TestUtil;
@@ -30,7 +29,8 @@ final class LocationQueriesTest extends TestCase
     {
         static $instance;
         if (is_null($instance)) {
-            $db = TestUtil::setupTestDB('testLocations');
+            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocations.db';
+            $db = TestUtil::localDBSetup($local_path);;
             $instance = new LocationQueries($db);
         }
         return $instance;
@@ -38,7 +38,7 @@ final class LocationQueriesTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $GLOBALS[Globals::LOG_CHANNEL] = LogChannel::TEST;
+        App::setConfig(LogChannel::TEST, true, true);
     }
 
     public static function tearDownAfterClass(): void

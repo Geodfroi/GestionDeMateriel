@@ -15,8 +15,8 @@ use SQLite3;
 
 use app\constants\AppPaths;
 use app\constants\LogError;
-use app\constants\Globals;
-use app\constants\P_Settings;
+use app\constants\PrivateSettings;
+use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\db\ArticleQueries;
 use app\helpers\db\LocationQueries;
@@ -33,8 +33,6 @@ class Database
     private UserQueries $users;
     private ArticleQueries $articles;
 
-    private array $data_types;
-    private bool $use_sqlite;
     private $conn;
 
     /**
@@ -42,18 +40,10 @@ class Database
      * !! do not put the connection parameters (including admin password to db) in a settings.php file shared on github.
      * 
      * @param PDO|SQlite3 $conn Db connection.
-     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
      */
-    function __construct($conn, bool $use_sqlite)
+    function __construct($conn)
     {
-        $this->use_sqlite = $use_sqlite;
         $this->conn = $conn;
-        $this->data_types = [
-            'int' => $use_sqlite ? SQLITE3_INTEGER : PDO::PARAM_INT,
-            'str' => $use_sqlite ? SQLITE3_TEXT : PDO::PARAM_STR,
-            'bool' => $use_sqlite ? SQLITE3_INTEGER : PDO::PARAM_BOOL,
-        ];
-
         $this->locations = new LocationQueries($this);
         $this->users = new UserQueries($this);
         $this->articles = new ArticleQueries($this);
@@ -68,11 +58,6 @@ class Database
         // Database::getInstance()->articles()->backup();
         // Database::getInstance()->locations()->backup();
         // Database::getInstance()->users()->backup();
-    }
-
-    public static function close()
-    {
-        Database::getInstance()->getConn()->close();
     }
 
     /**
@@ -94,14 +79,13 @@ class Database
     {
         static $instance;
         if (is_null($instance)) {
-            $use_sqlite = $GLOBALS[Globals::DATABASE] !== Globals::USE_MYSQL;
             try {
                 $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
-                $conn = $use_sqlite ? Database::getSQLiteConn($local_path) : Database::getMySQLConn();
+                $conn = APP::useSQLite() ? Database::getSQLiteConn($local_path) : Database::getMySQLConn();
             } catch (PDOException $e) {
                 Logging::error(LogError::CONN_FAILURE, ['error' =>  $e->getMessage()]);
             }
-            $instance = new static($conn, $use_sqlite);
+            $instance = new static($conn);
         }
         return $instance;
     }
@@ -111,14 +95,13 @@ class Database
         return $this->conn;
     }
 
-    public function getDataTypes()
+    public static function getDataTypes()
     {
-        return $this->data_types;
-    }
-
-    public function useSQLite()
-    {
-        return $this->use_sqlite;
+        return [
+            'int' => APP::useSQLite() ? SQLITE3_INTEGER : PDO::PARAM_INT,
+            'str' => APP::useSQLite() ? SQLITE3_TEXT : PDO::PARAM_STR,
+            'bool' => APP::useSQLite() ? SQLITE3_INTEGER : PDO::PARAM_BOOL,
+        ];
     }
 
     /**
@@ -146,12 +129,12 @@ class Database
      */
     private static function getMySQLConn(): PDO
     {
-        $dsn = 'mysql:host=' . P_Settings::MYSQL_HOST . ';port=' . P_Settings::MYSQL_PORT . ';dbname=' . P_Settings::MYSQL_SCHEMA . ';charset=utf8mb4';
+        $dsn = 'mysql:host=' . PrivateSettings::MYSQL_HOST . ';port=' . PrivateSettings::MYSQL_PORT . ';dbname=' . PrivateSettings::MYSQL_SCHEMA . ';charset=utf8mb4';
         $options = [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ];
 
-        return new PDO($dsn, P_Settings::MYSQL_ADMIN_ID, P_Settings::MYSQL_ADMIN_PASSWORD, $options);
+        return new PDO($dsn, PrivateSettings::MYSQL_ADMIN_ID, PrivateSettings::MYSQL_ADMIN_PASSWORD, $options);
     }
 
     /**

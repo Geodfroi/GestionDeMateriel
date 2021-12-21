@@ -13,7 +13,7 @@ use Exception;
 
 use app\constants\LogError;
 use app\constants\OrderBy;
-use app\constants\Settings;
+use app\helpers\App;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\models\User;
@@ -24,7 +24,6 @@ use app\models\User;
 class UserQueries
 {
     private $conn;
-    private bool $use_sqlite;
     private array $data_types;
 
     /**
@@ -34,8 +33,7 @@ class UserQueries
     function __construct(Database $db)
     {
         $this->conn = $db->getConn();
-        $this->use_sqlite = $db->useSQLite();
-        $this->data_types = $db->getDataTypes();
+        $this->data_types = Database::getDataTypes();
     }
 
     public function backup()
@@ -134,7 +132,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            return $this->use_sqlite ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+            return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
         }
 
         Logging::error(LogError::USER_INSERT, ['error' => $this->conn->lastErrorMsg()]);
@@ -165,7 +163,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
@@ -204,7 +202,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
@@ -244,7 +242,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
@@ -276,7 +274,7 @@ class UserQueries
         $stmt = $this->conn->prepare($query);
         $r = $stmt->execute();
         if ($r) {
-            if ($this->use_sqlite) {
+            if (App::useSQLite()) {
                 $array = $r->fetchArray();
                 return $array['COUNT(*)'];
             }
@@ -294,10 +292,10 @@ class UserQueries
     /**
      * Retrieve user array from database.
      * 
-     * @param bool $excludeAdmins Count only common users.
      * @param int $limit The maximum number of users to be returned.
      * @param int $offset The number of result users to be skipped before including them to the result array.
      * @param int $orderby Order parameter. Use OrderBy constants as parameter.
+     * @param bool $excludeAdmins Count only common users.
      * @return array Array of users.
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
@@ -306,7 +304,7 @@ class UserQueries
         $filter_statement = $excludeAdmins ? ' WHERE is_admin = False' : '';
 
         //Only data can be bound inside $stmt, order-by params and where clause must be set before in the query string.
-        $stmt = $this->conn->prepare("SELECT 
+        $query = "SELECT 
              id, 
              alias,
              contact_email,
@@ -318,7 +316,9 @@ class UserQueries
              is_admin
          FROM users 
          $filter_statement 
-         $order_statement LIMIT :lim OFFSET :off");
+         $order_statement LIMIT :lim OFFSET :off";
+
+        $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':lim', $limit, $this->data_types['int']);
         $stmt->bindParam(':off', $offset, $this->data_types['int']);
@@ -326,18 +326,19 @@ class UserQueries
         $r = $stmt->execute();
         if ($r) {
             $users = [];
-            if (Settings::USE_SQLITE) {
+            if (App::useSQLite()) {
                 while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
                     array_push($users, USER::fromDatabaseRow($row));
                 }
             } else {
                 // fetch next as associative array until there are none to be fetched.
-                while ($data = $stmt->fetch()) {
-                    array_push($users, User::fromDatabaseRow($data));
+                while ($row = $stmt->fetch()) {
+                    array_push($users, User::fromDatabaseRow($row));
                 }
             }
             return $users;
         }
+
         Logging::error(LogError::USERS_QUERY, ['error' => $this->conn->lastErrorMsg()]);
         return [];
     }
@@ -349,8 +350,12 @@ class UserQueries
      * @param string $alias Updated alias for user.
      * @return bool True is update is successful.
      */
-    public function updateAlias(int $user_id, string $alias)
+    public function updateAlias(int $user_id, string $alias): bool
     {
+        if (!$alias) {
+            return false;
+        }
+
         $stmt = $this->conn->prepare('UPDATE users SET alias=:alias WHERE id = :id');
 
         $stmt->bindParam(':alias', $alias, $this->data_types['str']);
@@ -416,7 +421,7 @@ class UserQueries
     public function updateLogTime(int $user_id): bool
     {
         $stmt = $this->conn->prepare('UPDATE users SET last_login=:last_login WHERE id = :id');
-        $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
+        $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y-m-d H:i:s');
 
         $stmt->bindParam(':last_login', $now, $this->data_types['str']);
         $stmt->bindParam(':id', $user_id, $this->data_types['int']);

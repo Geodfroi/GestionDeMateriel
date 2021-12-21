@@ -1,11 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 use app\constants\Route;
 use app\constants\Settings;
+use app\helpers\App;
 use app\helpers\Authenticate;
 
 ?>
@@ -23,8 +24,6 @@ use app\helpers\Authenticate;
 </head>
 
 <body class="d-flex flex-column h-100">
-
-
 
     <?php if ($show_header) { ?>
         <header>
@@ -51,7 +50,7 @@ use app\helpers\Authenticate;
                                 </li>
                             <?php } ?>
 
-                            <?php if (Settings::DEBUG_MODE) { ?>
+                            <?php if (App::isDebugMode()) { ?>
                                 <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
                                 <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
                             <?php } ?>

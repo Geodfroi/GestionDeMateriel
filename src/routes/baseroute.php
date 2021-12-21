@@ -1,13 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\AppPaths;
 use app\constants\Settings;
+use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
 
@@ -76,7 +77,7 @@ abstract class BaseRoute
     protected function renderTemplate(array $data = []): string
     {
         // log post and get request if debug is active
-        if (Settings::DEBUG_MODE) {
+        if (App::isDebugMode()) {
             if (count($_GET) > 0) {
                 Logging::debug('GET', $_GET);
             }
@@ -86,7 +87,7 @@ abstract class BaseRoute
         }
 
         $data['warnings'] = $this->warnings ?? [];
-        return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES_PATH);
+        return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES);
     }
 
     /**
@@ -110,7 +111,7 @@ abstract class BaseRoute
      */
     public function showAlert(string $type, string $msg)
     {
-        if (Settings::DEBUG_MODE) {
+        if (App::isDebugMode()) {
             Logging::debug('alert', [$type => $msg]);
         }
 
@@ -125,7 +126,7 @@ abstract class BaseRoute
      */
     public function showWarning(string $key, string $content)
     {
-        if (Settings::DEBUG_MODE) {
+        if (App::isDebugMode()) {
             Logging::debug('warning', [$key => $content]);
         }
 

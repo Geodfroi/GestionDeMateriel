@@ -8,7 +8,7 @@ namespace app\routes;
 
 use app\constants\Route;
 use app\constants\LogInfo;
-use app\constants\Settings;
+use app\helpers\App;
 use app\helpers\Authenticate;
 use app\helpers\Logging;
 
@@ -28,7 +28,7 @@ class Router
         $route = $_SERVER['PATH_INFO'] ?? Route::HOME;
 
         //logging route if logged-in and in debug mode.
-        if (Settings::DEBUG_MODE && Authenticate::isLoggedIn()) {
+        if (App::isDebugMode() && Authenticate::isLoggedIn()) {
             Logging::debug(LogInfo::ROUTING, ['route' => $route, 'user-id' => Authenticate::getUserId()]);
         }
 

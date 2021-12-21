@@ -15,6 +15,7 @@ use SQLite3;
 use app\constants\ArtFilter;
 use app\constants\LogError;
 use app\constants\OrderBy;
+use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\Article;
@@ -26,7 +27,6 @@ use app\helpers\Database;
 class ArticleQueries
 {
     private $conn;
-    private bool $use_sqlite;
     private array $data_types;
 
     /**
@@ -36,8 +36,7 @@ class ArticleQueries
     function __construct(Database $db)
     {
         $this->conn = $db->getConn();
-        $this->use_sqlite = $db->useSQLite();
-        $this->data_types = $db->getDataTypes();
+        $this->data_types = Database::getDataTypes();
     }
 
     /**
@@ -99,7 +98,7 @@ class ArticleQueries
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
 
-            $str .= $this->use_sqlite ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
+            $str .= App::useSQLite() ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
             $count += 1;
         }
 
@@ -107,7 +106,7 @@ class ArticleQueries
             if ($count === 1) {
                 $str .= ' AND ';
             }
-            $str .= $this->use_sqlite ? "location LIKE '%{$filters[ArtFilter::LOCATION]}%'" : "location LIKE CONCAT ('%', :floc, '%')";
+            $str .= App::useSQLite() ? "location LIKE '%{$filters[ArtFilter::LOCATION]}%'" : "location LIKE CONCAT ('%', :floc, '%')";
             $count += 1;
         }
 
@@ -115,13 +114,13 @@ class ArticleQueries
             if ($count === 1) {
                 $str .= ' AND ';
             }
-            $str .= $this->use_sqlite ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
+            $str .= App::useSQLite() ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
             $count += 1;
         } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
             if ($count > 0) {
                 $str .= ' AND ';
             }
-            $str .= $this->use_sqlite ? "(expiration_date > {$filters[ArtFilter::DATE_AFTER]})" : "expiration_date > :fafter";
+            $str .= App::useSQLite() ? "(expiration_date > {$filters[ArtFilter::DATE_AFTER]})" : "expiration_date > :fafter";
             $count += 1;
         }
 
@@ -214,7 +213,7 @@ class ArticleQueries
 
         $r = $stmt->execute();
         if ($r) {
-            return $this->use_sqlite ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+            return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
         }
         Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->conn->lastErrorMsg()]);
         return 0;
@@ -243,7 +242,7 @@ class ArticleQueries
         $r = $stmt->execute();
         if ($r) {
             // retrieve only first row found; fine since id is unique.
-            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
+            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
             if ($row) {
                 return Article::fromDatabaseRow($row);
             }
@@ -283,7 +282,7 @@ class ArticleQueries
 
         $r = $stmt->execute();
         if ($r) {
-            if ($this->use_sqlite) {
+            if (App::useSQLite()) {
                 $array = $r->fetchArray();
                 return $array['COUNT(*)'];
             }
@@ -353,7 +352,7 @@ class ArticleQueries
         if ($r) {
             $articles = [];
             // fetch next as associative array until there are none to be fetched.
-            if ($this->use_sqlite) {
+            if (App::useSQLite()) {
                 while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
                     array_push($articles, Article::fromDatabaseRow($row));
                 }
@@ -399,7 +398,11 @@ class ArticleQueries
         if ($stmt->execute()) {
             return true;
         }
-        Logging::error(LogError::ARTICLE_UPDATE, ['id' => $id, 'error' => $this->conn->lastErrorMsg()]);
+
+        Logging::error(LogError::ARTICLE_UPDATE, [
+            'id' => $id,
+            'error' => $this->conn->lastErrorMsg()
+        ]);
         return false;
     }
 }

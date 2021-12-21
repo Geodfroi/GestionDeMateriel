@@ -10,11 +10,10 @@ namespace app\helpers\db;
 
 use \PDO;
 use app\constants\LogError;
+use app\helpers\App;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\models\StringContent;
-
-use function PHPUnit\Framework\isNull;
 
 /**
  * Regroup function to interact with locations table.
@@ -22,7 +21,6 @@ use function PHPUnit\Framework\isNull;
 class LocationQueries
 {
     private $conn;
-    private bool $use_sqlite;
     private array $data_types;
 
     /**
@@ -32,8 +30,7 @@ class LocationQueries
     function __construct(Database $db)
     {
         $this->conn = $db->getConn();
-        $this->use_sqlite = $db->useSQLite();
-        $this->data_types = $db->getDataTypes();
+        $this->data_types = Database::getDataTypes();
     }
 
     public function backup()
@@ -69,7 +66,6 @@ class LocationQueries
     public function insert(?string $str): int
     {
         if (!$str) {
-            Logging::debug('insert shortened');
             return 0;
         }
 
@@ -78,7 +74,7 @@ class LocationQueries
 
         $r = $stmt->execute();
         if ($r) {
-            return $this->use_sqlite ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+            return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
         }
 
         Logging::error(LogError::LOCATION_INSERT, ['error' => $this->conn->lastErrorMsg()]);
@@ -103,7 +99,7 @@ class LocationQueries
         $r = $stmt->execute();
         if ($r) {
             // retrieve only first row found; fine since id is unique.
-            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
+            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
             if ($row) {
                 return StringContent::fromDatabaseRow($row);
             }
@@ -127,7 +123,7 @@ class LocationQueries
         if ($r) {
             $locations = [];
 
-            if ($this->use_sqlite) {
+            if (App::useSQLite()) {
                 while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
                     array_push($locations, StringContent::fromDatabaseRow($row));
                 }
@@ -159,7 +155,7 @@ class LocationQueries
         $stmt->bindParam(':str', $content, $this->data_types['str']);
         $r = $stmt->execute();
         if ($r) {
-            if ($this->use_sqlite) {
+            if (App::useSQLite()) {
                 return $r->numColumns() === 1;
             }
             $c = $stmt->fetchColumn();

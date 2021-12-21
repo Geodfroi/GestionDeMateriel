@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 use app\constants\Route;
@@ -13,6 +13,13 @@ use app\helpers\Database;
 
 <br><br><br><br>
 <div>
+    <div>TODO::</div>
+    <br>
+    <div>Bug with filter before</div>
+    <div>Bug with orderby created by</div>
+    <div>Enable tests with mySQL</div>
+    <div>Enable backup to local db</div>
+    <div>Btn to clear after before date</div>
     <div>Display limit as option.</div>
     <div>implement sqlite</div>
     <div>MAIN: backup db</div>

@@ -6,10 +6,13 @@ declare(strict_types=1);
 ## Joël Piguet - 2021.12.21 ###
 ##############################
 
-use app\constants\Globals;
+use app\constants\AppPaths;
 use app\constants\LogChannel;
-use app\helpers\db\UserQueries;
+use app\constants\OrderBy;
+use app\helpers\App;
+use app\helpers\Logging;
 use app\helpers\TestUtil;
+use app\helpers\db\UserQueries;
 use app\models\User;
 
 use PHPUnit\Framework\TestCase;
@@ -30,7 +33,8 @@ final class UserQueriesTest extends TestCase
     {
         static $instance;
         if (is_null($instance)) {
-            $db = TestUtil::setupTestDB('testUsers');
+            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsers.db';
+            $db = TestUtil::localDBSetup($local_path);;
             $instance = new UserQueries($db);
         }
         return $instance;
@@ -38,7 +42,7 @@ final class UserQueriesTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $GLOBALS[Globals::LOG_CHANNEL] = LogChannel::TEST;
+        App::setConfig(LogChannel::TEST, true, true);
     }
 
     public static function tearDownAfterClass(): void
@@ -64,7 +68,7 @@ final class UserQueriesTest extends TestCase
     }
 
     /**
-     * @dataProvider aliasProvider
+     * @dataProvider queryByAliasProvider
      */
     public function testQueryByAlias(string $alias, bool $is_present): void
     {
@@ -76,7 +80,7 @@ final class UserQueriesTest extends TestCase
         }
     }
 
-    public function aliasProvider(): array
+    public function queryByAliasProvider(): array
     {
         return [
             ['noel.biquet@gmail.com', true], // present
@@ -86,7 +90,7 @@ final class UserQueriesTest extends TestCase
     }
 
     /**
-     * @dataProvider emailProvider
+     * @dataProvider queryByEmailProvider
      */
     public function testQueryByEmail(string $email, bool $is_present): void
     {
@@ -98,7 +102,7 @@ final class UserQueriesTest extends TestCase
         }
     }
 
-    public function emailProvider(): array
+    public function queryByEmailProvider(): array
     {
         return [
             ['noel.biquet@gmail.com', true], // present
@@ -108,7 +112,7 @@ final class UserQueriesTest extends TestCase
     }
 
     /**
-     * @dataProvider idProvider
+     * @dataProvider queryByIdProvider
      */
     public function testQueryById(int $id, bool $is_present): void
     {
@@ -120,9 +124,7 @@ final class UserQueriesTest extends TestCase
         }
     }
 
-    // public function testQueryCount(bool $excludeAdmins = true)
-
-    public function idProvider(): array
+    public function queryByIdProvider(): array
     {
         return [
             [24, false], //not present
@@ -133,7 +135,12 @@ final class UserQueriesTest extends TestCase
 
     public function testQueryAll()
     {
-        throw new Exception();
+        $array = UserQueriesTest::queries()->queryAll(PHP_INT_MAX, 0, OrderBy::EMAIL_DESC, false);
+        // foreach ($array as $user) {
+        //     Logging::debug($user->__tostring());
+        // }
+        // Logging::debug('testQueryAll', ['count' => strval(count($array))]);
+        $this->assertNotTrue(count($array) === 0);
     }
 
     public function testQueryCount()
@@ -144,11 +151,46 @@ final class UserQueriesTest extends TestCase
         $this->assertTrue($count2 > 0);
         $this->assertNotEquals($count,  $count2);
     }
-}
 
-//    public function testqueryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
-//    public function testupdateAlias(int $user_id, string $alias)
-//    public function testupdateContactDelay(int $user_id, string $delay): bool
-//    public function testupdateContactEmail(int $user_id, string $contact_email): bool
-//    public function testupdateLogTime(int $user_id): bool
-//    public function testupdatePassword(int $user_id, string $new_password): bool
+    /**
+     * @dataProvider updateAliasProvider
+     */
+    public function testUpdateAlias(int $user_id, string $alias, bool $expect_success): void
+    {
+        $r = UserQueriesTest::queries()->updateAlias($user_id, $alias);
+        if ($expect_success) {
+            assertTrue($r);
+        } else {
+            assertFalse($r);
+        }
+    }
+
+    public function updateAliasProvider(): array
+    {
+        return [
+            [2, 'Bertrand', true],
+            [22, 'Geneveve', true], //not found id.
+            [3, '', false], //invalid alias
+        ];
+    }
+
+    public function testUpdateContactDelay(): void
+    {
+        assertTrue(UserQueriesTest::queries()->updateContactDelay(2, '3-7-14'));
+    }
+
+    public function testUpdateContactEmail(): void
+    {
+        assertTrue(UserQueriesTest::queries()->updateContactEmail(2, 'contact.me@gmail.com'));
+    }
+
+    public function testUpdateLogTime(): void
+    {
+        assertTrue(UserQueriesTest::queries()->updateLogTime(3));
+    }
+
+    public function testupdatePassword(): void
+    {
+        assertTrue(UserQueriesTest::queries()->updateLogTime(3, '12345678'));
+    }
+}

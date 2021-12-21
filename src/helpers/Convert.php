@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers;
@@ -24,6 +24,7 @@ class Convert
      */
     public static function toDateTime(string $str): DateTime
     {
+        // Logging::debug('toDateTime', ['str' => $str]);
         $res = DateTime::createFromFormat('Y-m-d H:i:s', $str);
         if ($res) {
             return $res;

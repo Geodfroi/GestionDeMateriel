@@ -3,20 +3,20 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 // periodically iterate through articles and send reminder emails when they are close to peremption
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
 use app\constants\LogChannel;
-use app\constants\Globals;
+use app\helpers\App;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Mailing;
 use app\helpers\Util;
 
-$GLOBALS[Globals::LOG_CHANNEL] = LogChannel::SERVER;
+App::setConfig(LogChannel::SERVER, false, true);
 
 // iterate through users and articles to flag articles that are soon due.
 $articles = Database::articles()->queryAll();

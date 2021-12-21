@@ -14,8 +14,9 @@ use PHPMailer\PHPMailer\Exception;
 
 use app\constants\AppPaths;
 use app\constants\Mail;
-use app\constants\P_Settings;
+use app\constants\PrivateSettings;
 use app\constants\Settings;
+use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\User;
@@ -25,6 +26,11 @@ use app\models\User;
  */
 class Mailing
 {
+    private static function appUrl(): string
+    {
+        return App::isDebugMode() ? Settings::APP_URL_DEBUG : Settings::APP_URL;
+    }
+
     /**
      * Return html page to be inserted inside an email.
      * 
@@ -36,11 +42,11 @@ class Mailing
     {
         Logging::debug('params', $params);
 
-        $html_content = Util::renderTemplate($email_template, $params, AppPaths::EMAIL_TEMPLATES_PATH);
-        $plain_content = Util::readFile(AppPaths::EMAIL_TEMPLATES_PATH . DIRECTORY_SEPARATOR . $email_template, $params);
+        $html_content = Util::renderTemplate($email_template, $params, AppPaths::EMAIL_TEMPLATES);
+        $plain_content = Util::readFile(AppPaths::EMAIL_TEMPLATES . DIRECTORY_SEPARATOR . $email_template, $params);
 
         return [
-            Util::renderTemplate('email_base', ['content' => $html_content], AppPaths::EMAIL_TEMPLATES_PATH),
+            Util::renderTemplate('email_base', ['content' => $html_content], AppPaths::EMAIL_TEMPLATES),
             $plain_content,
         ];
     }
@@ -69,7 +75,7 @@ class Mailing
     {
         return Mailing::formatBody('newpassword', [
             'app_name' => Settings::APP_NAME,
-            'url' => Settings::APP_FULL_URL,
+            'url' => Mailing::appUrl(),
             'alias' => $recipient,
             'password' => $password,
         ]);
@@ -100,7 +106,7 @@ class Mailing
     {
         return Mailing::formatBody('reminder', [
             'app_name' => Settings::APP_NAME,
-            'url' => Settings::APP_FULL_URL,
+            'url' => Mailing::appUrl(),
             'alias' => $recipient,
             'reminders' => $reminders,
         ]);
@@ -130,7 +136,7 @@ class Mailing
     {
         return Mailing::formatBody('userinvite', [
             'app_name' => Settings::APP_NAME,
-            'url' => Settings::APP_FULL_URL,
+            'url' => Mailing::appUrl(),
             'login' => $login,
             'password' => $password_plain,
         ]);
@@ -148,7 +154,7 @@ class Mailing
      */
     private static function send(array $recipients, string $subject, string $html_content, string $plain_content): bool
     {
-        if (SETTINGS::DEBUG_MODE) {
+        if (App::isDebugMode()) {
             $recipients = [SETTINGS::DEBUG_EMAIL];
         }
 
@@ -165,11 +171,11 @@ class Mailing
 
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
 
-            $mail->Username = P_Settings::APP_EMAIL;
-            $mail->Password = P_Settings::APP_EMAIL_PASSWORD;
+            $mail->Username = PrivateSettings::APP_EMAIL;
+            $mail->Password = PrivateSettings::APP_EMAIL_PASSWORD;
 
             // Sender and recipient settings
-            $mail->setFrom(P_Settings::APP_EMAIL, Mail::SENDER);
+            $mail->setFrom(PrivateSettings::APP_EMAIL, Mail::SENDER);
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }

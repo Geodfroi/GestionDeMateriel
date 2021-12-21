@@ -11,7 +11,7 @@ namespace app\constants;
 /**
  * Private setting not to be stored in github. Fill-in and remove '_template suffix.
  */
-class P_Settings
+class PrivateSettings
 {
     // database
     const MYSQL_HOST = '';

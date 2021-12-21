@@ -13,23 +13,20 @@ namespace app\constants;
  */
 class Settings
 {
-    /**
-     * Display debug options.
-     */
-    const DEBUG_MODE = true;
+
 
     /**
      * If DEBUG_MODE is active, all emails are sent from and to this address.
      */
     const DEBUG_EMAIL = 'innov.heds@gmail.com';
-
     const APP_NAME = "HEdS Gestionnaire d'inventaire";
 
+    const APP_URL_DEBUG = "http://localhost:8085/";
     /**
      * Used as hyperlink in emails; must be set to proper url once the project is online. 
      */
-    const APP_FULL_URL = Settings::DEBUG_MODE ? "http://localhost:8085/" : '';
-    const LAST_MODIFICATION = '20 décembre 2021';
+    const APP_URL = '';
+    const LAST_MODIFICATION = '21 décembre 2021';
 
     const ALIAS_MIN_LENGHT = 6;
     const ARTICLE_NAME_MIN_LENGHT = 6;

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers;
@@ -11,7 +11,7 @@ namespace app\helpers;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use app\constants\AppPaths;
-use app\constants\Globals;
+use app\helpers\App;
 
 /**
  * Wrapper for Monolog php framework; used to log to file.
@@ -24,7 +24,7 @@ class Logging
 
     private static function getChannel(?string $channel)
     {
-        $channel = is_null($channel) ? $GLOBALS[Globals::LOG_CHANNEL] : $channel;
+        $channel = is_null($channel) ? App::logChannel() : $channel;
 
         if (!array_key_exists($channel, Logging::$channels)) {
             $channels[$channel] = new Logger($channel);
