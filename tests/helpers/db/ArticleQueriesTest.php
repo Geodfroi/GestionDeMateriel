@@ -3,19 +3,21 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
+use app\constants\AppPaths;
 use app\constants\ArtFilter;
-use app\constants\LogChannel;
 use app\constants\Globals;
+use app\constants\LogChannel;
+use app\constants\OrderBy;
+use app\helpers\Database;
+use app\helpers\db\ArticleQueries;
 use app\helpers\Logging;
 use app\helpers\TestClass;
-use app\helpers\Database;
 use app\helpers\TestUtil;
 use app\models\Article;
 
-use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
@@ -28,72 +30,99 @@ use function PHPUnit\Framework\assertTrue;
 final class ArticleQueriesTest extends TestClass
 {
     /**
-     * @beforeClass
+     * Set up and access local test db.
      */
-    public static function beforeAll(): void
+    private static function queries()
+    {
+        static $instance;
+        if (is_null($instance)) {
+            $db = TestUtil::setupTestDB('testArticles');
+            $instance = new ArticleQueries($db);
+        }
+        return $instance;
+    }
+
+    public static function setUpBeforeClass(): void
     {
         // Logging::error('beforeall');
         $GLOBALS[Globals::LOG_CHANNEL] = LogChannel::TEST;
-        $GLOBALS[Globals::DATABASE] = Globals::USE_UNIT_TEST;
-
-        TestUtil::populateSQLiteDB();
+        // $GLOBALS[Globals::DATABASE] = Globals::USE_UNIT_TEST;
     }
 
-    public function testT(): void
+    public static function tearDownAfterClass(): void
     {
-        assertTrue(True);
+        // Database::close();
+        // unlink(AppPaths::TEST_UNIT_DB);
     }
 
-    // public function testDelete()
-    // {
-    //     assertTrue(Database::articles()->delete(2));
-    // }
+    public function testDelete()
+    {
+        $count = ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
+        // Logging::info('testDelete', ['queryCount' => strval($count)]);
+        assertTrue(ArticleQueriesTest::queries()->delete(2));
 
-    /**
-     * @depends testQueryCount
-     */
+        assertSame($count - 1, ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]));
+    }
+
     public function testInsert()
     {
-        $count = Database::articles()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
-        Logging::info('testInsert', ['queryCount' => strval($count)]);
+        $count = ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
+        // Logging::info('testInsert', ['queryCount' => strval($count)]);
 
         $article = Article::fromForm(0, 'Pneu', 'Garage', '2021-12-19');
-        $id = Database::articles()->insert($article);
+        $id = ArticleQueriesTest::queries()->insert($article);
         assertNotSame($id, 0);
 
-        $count2 = Database::articles()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
-
-        assertSame($count2, $count + 1);
+        assertSame($count + 1, ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]));
     }
 
-    // public function testQueryById(): Article
-    // {
-    //     $article = Database::articles()->queryById(1);
-    //     assertNotNull($article);
-    //     return $article;
-    //     // Logging::debug($article->__toString());
-    // }
+    public function testQueryById(): Article
+    {
+        $article = ArticleQueriesTest::queries()->queryById(1);
+        assertNotNull($article);
+        return $article;
+        // Logging::debug($article->__toString());
+    }
 
     public function testQueryCount(): void
     {
-        $count = Database::articles()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
+        $count = ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
         $this->assertTrue($count > 0);
-        Logging::info('testQueryCount', ['count' => strval($count)]);
+        // Logging::info('testQueryCount', ['count' => strval($count)]);
     }
 
-    // public function testQueryAll(): void
-    // {
-    //     $array = Database::articles()->queryAll();
-    //     // Logging::debug('testQueryAll', $array);
-    //     $this->assertNotTrue(count($array) === 0);
-    // }
+    /**
+     * @dataProvider filtersProvider
+     */
+    public function testQueryAll(array $filters): void
+    {
+        $array = ArticleQueriesTest::queries()->queryAll(PHP_INT_MAX, 0, OrderBy::DELAY_ASC, $filters);
+        // foreach ($array as $art) {
+        //     Logging::debug($art->__tostring());
+        // }
+        // Logging::debug('testQueryAll', ['count' => strval(count($array))]);
+        $this->assertNotTrue(count($array) === 0);
+    }
 
-    // /**
-    //  * @depends testQueryById
-    //  */
-    // public function testUpdate(): void
-    // {
-    //     $article = $this->testQueryById();
-    //     $this->assertTrue(Database::articles()->update($article));
-    // }
+    public function filtersProvider(): array
+    {
+        return [
+            // [[ArtFilter::SHOW_EXPIRED => true]],
+            // [[ArtFilter::NAME => 'Pro']],
+            [[ArtFilter::DATE_AFTER => '2021-12-30']],
+            // [[ArtFilter::DATE_BEFORE => '2021-12-30']],
+            // [[
+            //     ArtFilter::DATE_AFTER => '2021-12-30',
+            //     ArtFilter::NAME => 'Pro'
+            // ]],
+        ];
+    }
+
+    /**
+     * @depends testQueryById
+     */
+    public function testUpdate($article): void
+    {
+        $this->assertTrue(ArticleQueriesTest::queries()->update($article));
+    }
 }

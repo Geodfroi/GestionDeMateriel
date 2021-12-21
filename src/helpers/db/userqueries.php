@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers\db;
@@ -14,6 +14,7 @@ use Exception;
 use app\constants\LogError;
 use app\constants\OrderBy;
 use app\constants\Settings;
+use app\helpers\Database;
 use app\helpers\Logging;
 use app\models\User;
 
@@ -24,15 +25,17 @@ class UserQueries
 {
     private $conn;
     private bool $use_sqlite;
+    private array $data_types;
 
     /**
      * @param PDO|SQlite3 $conn Db connection.
      * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
      */
-    function __construct($conn, bool $use_sqlite)
+    function __construct(Database $db)
     {
-        $this->conn = $conn;
-        $this->use_sqlite = $use_sqlite;
+        $this->conn = $db->getConn();
+        $this->use_sqlite = $db->useSQLite();
+        $this->data_types = $db->getDataTypes();
     }
 
     public function backup()
@@ -49,14 +52,16 @@ class UserQueries
     public function delete($id): bool
     {
         $stmt = $this->conn->prepare('DELETE FROM users WHERE id = :id');
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
         }
 
-        //list(,, $error) = $stmt->errorInfo();
-        Logging::error(LogError::USER_DELETE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_DELETE, [
+            'id' => $id,
+            'error' => $this->conn->lastErrorMsg()
+        ]);
         return false;
     }
 
@@ -122,10 +127,10 @@ class UserQueries
         $pass = $user->getPassword();
         $adm = $user->isAdmin();
 
-        $stmt->bindParam(':lmail', $em, PDO::PARAM_STR);
-        $stmt->bindParam(':alias', $alias, PDO::PARAM_STR);
-        $stmt->bindParam(':pass', $pass, PDO::PARAM_STR);
-        $stmt->bindParam(':adm', $adm, PDO::PARAM_BOOL);
+        $stmt->bindParam(':lmail', $em, $this->data_types['str']);
+        $stmt->bindParam(':alias', $alias, $this->data_types['str']);
+        $stmt->bindParam(':pass', $pass, $this->data_types['str']);
+        $stmt->bindParam(':adm', $adm, $this->data_types['bool']);
 
         $r = $stmt->execute();
         if ($r) {
@@ -156,14 +161,22 @@ class UserQueries
             is_admin 
         FROM users WHERE alias = :al');
 
-        $stmt->bindParam(':al', $alias, PDO::PARAM_STR);
+        $stmt->bindParam(':al', $alias, $this->data_types['str']);
 
-        if ($stmt->execute()) {
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $data ? User::fromDatabaseRow($data) : null;
+        $r = $stmt->execute();
+        if ($r) {
+            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return User::fromDatabaseRow($row);
+            }
+            Logging::error(LogError::USER_QUERY, ['alias' => $alias]);
+            return null;
         }
 
-        Logging::error(LogError::USER_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_QUERY, [
+            'alias' => $alias,
+            'error' => $this->conn->lastErrorMsg()
+        ]);
         return null;
     }
 
@@ -187,21 +200,22 @@ class UserQueries
             is_admin 
         FROM users WHERE id = :id');
 
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
         $r = $stmt->execute();
         if ($r) {
-            if (Settings::USE_SQLITE) {
-                while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
-                    return User::fromDatabaseRow($row);
-                }
-                return null;
+            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return User::fromDatabaseRow($row);
             }
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $row ? User::fromDatabaseRow($row) : null;
+            Logging::error(LogError::USER_QUERY, ['id' => $id]);
+            return null;
         }
 
-        Logging::error(LogError::USER_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_QUERY, [
+            'id' => $id,
+            'error' => $this->conn->lastErrorMsg()
+        ]);
         return null;
     }
 
@@ -226,33 +240,22 @@ class UserQueries
         FROM users WHERE login_email = :email';
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $login_email, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $login_email, $this->data_types['str']);
 
         $r = $stmt->execute();
         if ($r) {
-            if (SETTINGS::USE_SQLITE) {
-                $row = $r->fetchArray(SQLITE3_ASSOC);
-                if ($row) {
-                    return User::fromDatabaseRow($row);
-                }
-                Logging::error('no row');
-
-                Logging::error('numColumns: ' . $r->numColumns(), []);
-                Logging::error('numColumns: ' . $r->columnName(0), []);
-                Logging::error('numColumns: ' . $r->columnName(1), []);
-                Logging::error('numColumns: ' . $r->columnName(2), []);
-                Logging::error('numColumns: ' . $r->columnName(3), []);
-                // while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
-                //     return User::fromDatabaseRow($row);
-                // }
-                return null;
-            } else {
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                return $row ? User::fromDatabaseRow($row) : null;
+            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return User::fromDatabaseRow($row);
             }
+            Logging::error(LogError::USER_QUERY, ['login_email' => $login_email,]);
+            return null;
         }
 
-        Logging::error(LogError::USER_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_QUERY, [
+            'login_email' => $login_email,
+            'error' => $this->conn->lastErrorMsg()
+        ]);
         return null;
     }
 
@@ -271,12 +274,20 @@ class UserQueries
         }
 
         $stmt = $this->conn->prepare($query);
-        if ($stmt->execute()) {
+        $r = $stmt->execute();
+        if ($r) {
+            if ($this->use_sqlite) {
+                $array = $r->fetchArray();
+                return $array['COUNT(*)'];
+            }
             $r = $stmt->fetchColumn();
             return intval($r);
         }
 
-        Logging::error(LogError::USERS_COUNT_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USERS_COUNT_QUERY, [
+            'exclude_admin' => $excludeAdmins,
+            'error' => $this->conn->lastErrorMsg()
+        ]);
         return -1;
     }
 
@@ -309,8 +320,8 @@ class UserQueries
          $filter_statement 
          $order_statement LIMIT :lim OFFSET :off");
 
-        $stmt->bindParam(':lim', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':off', $offset, PDO::PARAM_INT);
+        $stmt->bindParam(':lim', $limit, $this->data_types['int']);
+        $stmt->bindParam(':off', $offset, $this->data_types['int']);
 
         $r = $stmt->execute();
         if ($r) {
@@ -342,8 +353,8 @@ class UserQueries
     {
         $stmt = $this->conn->prepare('UPDATE users SET alias=:alias WHERE id = :id');
 
-        $stmt->bindParam(':alias', $alias, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':alias', $alias, $this->data_types['str']);
+        $stmt->bindParam(':id', $user_id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
@@ -364,8 +375,8 @@ class UserQueries
     {
         $stmt = $this->conn->prepare('UPDATE users SET contact_delay=:delay WHERE id = :id');
 
-        $stmt->bindParam(':delay', $delay, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':delay', $delay, $this->data_types['str']);
+        $stmt->bindParam(':id', $user_id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
@@ -386,8 +397,8 @@ class UserQueries
     {
         $stmt = $this->conn->prepare('UPDATE users SET contact_email=:email WHERE id = :id');
 
-        $stmt->bindParam(':email', $contact_email, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':email', $contact_email, $this->data_types['str']);
+        $stmt->bindParam(':id', $user_id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
@@ -407,8 +418,8 @@ class UserQueries
         $stmt = $this->conn->prepare('UPDATE users SET last_login=:last_login WHERE id = :id');
         $now = (new \DateTime("now", new \DateTimeZone("UTC")))->format('Y.m.d H:i:s');
 
-        $stmt->bindParam(':last_login', $now, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':last_login', $now, $this->data_types['str']);
+        $stmt->bindParam(':id', $user_id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
@@ -429,8 +440,8 @@ class UserQueries
     {
         $stmt = $this->conn->prepare('UPDATE users SET password=:pass WHERE id = :id');
 
-        $stmt->bindParam(':pass', $new_password, PDO::PARAM_STR);
-        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':pass', $new_password, $this->data_types['str']);
+        $stmt->bindParam(':id', $user_id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;

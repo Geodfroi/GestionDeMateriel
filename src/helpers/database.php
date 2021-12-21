@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers;
 
+use Exception;
 use \PDO;
 use PDOException;
 use SQLite3;
@@ -39,24 +40,23 @@ class Database
     /**
      * Initialise connection to the MySQL inside the constructor dunder method.
      * !! do not put the connection parameters (including admin password to db) in a settings.php file shared on github.
+     * 
+     * @param PDO|SQlite3 $conn Db connection.
+     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
      */
-    function __construct()
+    function __construct($conn, bool $use_sqlite)
     {
-        try {
-            $this->use_sqlite = $GLOBALS[Globals::DATABASE] !== Globals::USE_MYSQL;
-            $this->conn = $this->use_sqlite ? Database::getSQLiteConn() : Database::getMySQLConn();
+        $this->use_sqlite = $use_sqlite;
+        $this->conn = $conn;
+        $this->data_types = [
+            'int' => $use_sqlite ? SQLITE3_INTEGER : PDO::PARAM_INT,
+            'str' => $use_sqlite ? SQLITE3_TEXT : PDO::PARAM_STR,
+            'bool' => $use_sqlite ? SQLITE3_INTEGER : PDO::PARAM_BOOL,
+        ];
 
-            $this->data_types = [
-                'int' => $this->use_sqlite ? SQLITE3_INTEGER : PDO::PARAM_INT,
-                'str' => $this->use_sqlite ? SQLITE3_TEXT : PDO::PARAM_STR
-            ];
-
-            // $this->locations = new LocationQueries($conn, $use_sqlite);
-            // $this->users = new UserQueries($conn, $use_sqlite);
-            $this->articles = new ArticleQueries($this);
-        } catch (PDOException $e) {
-            Logging::error(LogError::CONN_FAILURE, ['error' =>  $e->getMessage()]);
-        }
+        $this->locations = new LocationQueries($this);
+        $this->users = new UserQueries($this);
+        $this->articles = new ArticleQueries($this);
     }
 
     /**
@@ -64,16 +64,15 @@ class Database
      */
     public static function backup()
     {
-        Database::getInstance()->articles()->backup();
-        Database::getInstance()->locations()->backup();
-        Database::getInstance()->users()->backup();
+        throw new Exception('backup not implemented');
+        // Database::getInstance()->articles()->backup();
+        // Database::getInstance()->locations()->backup();
+        // Database::getInstance()->users()->backup();
     }
 
-    /**
-     * Create and populate dummy database. Replace existing db at specified path.
-     */
-    public static function createDummy()
+    public static function close()
     {
+        Database::getInstance()->getConn()->close();
     }
 
     /**
@@ -95,7 +94,14 @@ class Database
     {
         static $instance;
         if (is_null($instance)) {
-            $instance = new static();
+            $use_sqlite = $GLOBALS[Globals::DATABASE] !== Globals::USE_MYSQL;
+            try {
+                $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
+                $conn = $use_sqlite ? Database::getSQLiteConn($local_path) : Database::getMySQLConn();
+            } catch (PDOException $e) {
+                Logging::error(LogError::CONN_FAILURE, ['error' =>  $e->getMessage()]);
+            }
+            $instance = new static($conn, $use_sqlite);
         }
         return $instance;
     }
@@ -151,10 +157,14 @@ class Database
     /**
      * Get connection to local database using SQLite3.
      * https://www.tutorialspoint.com/sqlite/sqlite_php.htm
+     * 
+     * @param string $local_path Path to local sqlite db.
+     * @return SQLite3 SQLite3 conn.
      */
-    private static function getSQLiteConn(): SQLite3
+    public static function getSQLiteConn(string $local_path): SQLite3
     {
-        $local_path = $GLOBALS[Globals::DATABASE] === Globals::USE_DEBUG_LOCAL ? AppPaths::DEBUG_LOCAL_DB : AppPaths::TEST_UNIT_DB;
+        // $db_name = is_null($db_name) ? 'localDB' : $db_name;
+        // $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
         $conn = new SQLite3($local_path);
 
         Logging::info('Connection to SQLITE DB', ['path' => $local_path]);

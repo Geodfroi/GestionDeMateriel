@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use app\helpers\Logging;
+
 ################################
 ## Joël Piguet - 2021.12.20 ###
 ##############################

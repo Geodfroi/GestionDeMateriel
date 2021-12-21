@@ -3,15 +3,18 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers\db;
 
 use \PDO;
 use app\constants\LogError;
+use app\helpers\Database;
 use app\helpers\Logging;
 use app\models\StringContent;
+
+use function PHPUnit\Framework\isNull;
 
 /**
  * Regroup function to interact with locations table.
@@ -20,15 +23,17 @@ class LocationQueries
 {
     private $conn;
     private bool $use_sqlite;
+    private array $data_types;
 
     /**
      * @param PDO|SQlite3 $conn Db connection.
      * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
      */
-    function __construct($conn, bool $use_sqlite)
+    function __construct(Database $db)
     {
-        $this->conn = $conn;
-        $this->use_sqlite = $use_sqlite;
+        $this->conn = $db->getConn();
+        $this->use_sqlite = $db->useSQLite();
+        $this->data_types = $db->getDataTypes();
     }
 
     public function backup()
@@ -45,7 +50,7 @@ class LocationQueries
     public function delete(int $id): bool
     {
         $stmt = $this->conn->prepare('DELETE FROM locations WHERE id = :id');
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
         if ($stmt->execute()) {
             return true;
@@ -61,10 +66,15 @@ class LocationQueries
      * @param string $str New location string.
      * @return int ID of inserted row or 0 if it fails.
      */
-    public function insert(string $str): int
+    public function insert(?string $str): int
     {
+        if (!$str) {
+            Logging::debug('insert shortened');
+            return 0;
+        }
+
         $stmt = $this->conn->prepare('INSERT INTO locations (str_content) VALUES (:str)');
-        $stmt->bindParam(':str', $str, PDO::PARAM_STR);
+        $stmt->bindParam(':str', $str, $this->data_types['str']);
 
         $r = $stmt->execute();
         if ($r) {
@@ -88,20 +98,19 @@ class LocationQueries
             str_content 
         FROM locations WHERE id = :id');
 
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, $this->data_types['int']);
 
-        if ($stmt->execute()) {
-
-            $data = $stmt->fetch(); // retrieve only first row found; fine since id is unique.
-            if ($data) {
-                return StringContent::fromDatabaseRow($data);
-            } else {
-                Logging::error(LogError::LOCATION_QUERY, ['id' => $id]);
+        $r = $stmt->execute();
+        if ($r) {
+            // retrieve only first row found; fine since id is unique.
+            $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
+            if ($row) {
+                return StringContent::fromDatabaseRow($row);
             }
-        } else {
-            Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $this->conn->lastErrorMsg()]);
+            Logging::error(LogError::LOCATION_QUERY, ['id' => $id]);
+            return null;
         }
-
+        Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $this->conn->lastErrorMsg()]);
         return null;
     }
 
@@ -114,18 +123,25 @@ class LocationQueries
     {
         $stmt = $this->conn->prepare('SELECT id, str_content FROM locations ORDER BY str_content ASC');
 
-        $locations = [];
+        $r = $stmt->execute();
+        if ($r) {
+            $locations = [];
 
-        if ($stmt->execute()) {
-            // fetch next as associative array until there are none to be fetched.
-            while ($data = $stmt->fetch()) {
-                array_push($locations, StringContent::fromDatabaseRow($data));
+            if ($this->use_sqlite) {
+                while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
+                    array_push($locations, StringContent::fromDatabaseRow($row));
+                }
+            } else {
+                // fetch next as associative array until there are none to be fetched.
+                while ($row = $stmt->fetch()) {
+                    array_push($locations, StringContent::fromDatabaseRow($row));
+                }
             }
-        } else {
-            Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $this->conn->lastErrorMsg()]);
+            return $locations;
         }
 
-        return $locations;
+        Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $this->conn->lastErrorMsg()]);
+        return [];
     }
 
     /**
@@ -140,10 +156,14 @@ class LocationQueries
             FROM locations
             WHERE str_content = :str');
 
-        $stmt->bindParam(':str', $content, PDO::PARAM_STR);
-        if ($stmt->execute()) {
-            $r = $stmt->fetchColumn();
-            return intval($r) === 1;
+        $stmt->bindParam(':str', $content, $this->data_types['str']);
+        $r = $stmt->execute();
+        if ($r) {
+            if ($this->use_sqlite) {
+                return $r->numColumns() === 1;
+            }
+            $c = $stmt->fetchColumn();
+            return intval($c) === 1;
         }
 
         Logging::error(LogError::LOCATIONS_CHECK_CONTENT, ['error' => $this->conn->lastErrorMsg()]);
@@ -161,8 +181,8 @@ class LocationQueries
     {
         $stmt = $this->conn->prepare('UPDATE locations SET str_content=:str WHERE id = :id');
 
-        $stmt->bindParam(':id', $location_id, PDO::PARAM_INT);
-        $stmt->bindParam(':str', $str, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $location_id, $this->data_types['int']);
+        $stmt->bindParam(':str', $str, $this->data_types['str']);
 
         if ($stmt->execute()) {
             return true;

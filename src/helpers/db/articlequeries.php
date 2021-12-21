@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers\db;
@@ -40,9 +40,18 @@ class ArticleQueries
         $this->data_types = $db->getDataTypes();
     }
 
-    public function backup()
+    /**
+     * @param PDO|SQlite3 $backup_conn Db backup connection.
+     */
+    public function backup($backup_conn)
     {
         Logging::debug('article backup not implemented');
+
+        //query all articles from current db.
+        $q = $this->queryAll();
+
+        //insert all back to backup db.
+
 
         // $table_name = "employee";
         // $backup_file  = "/tmp/employee.sql";
@@ -82,17 +91,15 @@ class ArticleQueries
      * @param array $filters Array of ArtFilter Instances
      * @return string Where clause.
      */
-    public  function printFilterStatement(array $filters): string
+    public function printFilterStatement(array $filters): string
     {
         $str = 'WHERE ';
         $count = 0;
 
-        Logging::debug('filters', $filters);
-
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
 
-            $str .= $this->use_sqlite ? "article_name LIKE '%{$filters[ArtFilter::NAME]}%'" : "article_name LIKE CONCAT ('%', :fname, '%')";
+            $str .= $this->use_sqlite ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
             $count += 1;
         }
 
@@ -111,17 +118,17 @@ class ArticleQueries
             $str .= $this->use_sqlite ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
             $count += 1;
         } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
-            if ($count === 1) {
+            if ($count > 0) {
                 $str .= ' AND ';
             }
-            $str .= $this->use_sqlite ? "expiration_date > {$filters[ArtFilter::DATE_AFTER]}" : "expiration_date > :fafter";
+            $str .= $this->use_sqlite ? "(expiration_date > {$filters[ArtFilter::DATE_AFTER]})" : "expiration_date > :fafter";
             $count += 1;
         }
 
         if (!isset($filters[ArtFilter::SHOW_EXPIRED])) {
 
-            Logging::debug('printFilterStatement');
-            if ($count === 1) {
+            // Logging::debug('printFilterStatement');
+            if ($count > 0) {
                 $str .= ' AND ';
             }
             $str .= "(expiration_date > CURRENT_TIMESTAMP)";
@@ -200,35 +207,15 @@ class ArticleQueries
         $location = $article->getLocation();
         $date = $article->getExpirationDate()->format('Y-m-d H:i:s');
 
-        Logging::debug(
-            'l',
-            [
-                'uid' => $uid,
-                'name' =>  $name,
-                'location' =>  $location,
-                'date' => $date
-            ]
-        );
-
         $stmt->bindParam(':uid', $uid, $this->data_types['int']);
         $stmt->bindParam(':art', $name, $this->data_types['str']);
         $stmt->bindParam(':loc', $location, $this->data_types['str']);
         $stmt->bindParam(':date', $date, $this->data_types['str']);
 
-        // $stmt->reset();
-
         $r = $stmt->execute();
         if ($r) {
-            Logging::debug('execute');
+            return $this->use_sqlite ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
         }
-        // if ($r) {
-        //     if ($this->use_sqlite) {
-        //         $r->finalize(); //necessary to avoid double execution bug.
-        //         // return $this->conn->lastInsertRowID();
-        //     }
-        //     // return intval($this->conn->lastInsertId());
-        // }
-        return 1;
         Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->conn->lastErrorMsg()]);
         return 0;
     }
@@ -259,13 +246,11 @@ class ArticleQueries
             $row = $this->use_sqlite ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
             if ($row) {
                 return Article::fromDatabaseRow($row);
-            } else {
-                Logging::error(LogError::ARTICLE_QUERY, ['id' => $id]);
             }
-        } else {
-            Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $this->conn->lastErrorMsg()]);
+            Logging::error(LogError::ARTICLE_QUERY, ['id' => $id]);
+            return null;
         }
-
+        Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $this->conn->lastErrorMsg()]);
         return null;
     }
 
@@ -280,7 +265,7 @@ class ArticleQueries
         $filter_statement = $this->printFilterStatement($filters);
         $query = "SELECT COUNT(*) FROM articles $filter_statement";
 
-        Logging::debug('queryCount stmt: ' . $query);
+        // Logging::debug('queryCount stmt: ' . $query);
         $stmt = $this->conn->prepare($query);
 
         if (Util::str_contains($filter_statement, ':fname')) {
@@ -322,6 +307,8 @@ class ArticleQueries
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
+        Logging::debug('filters', $filters);
+
         $filter_statement = $this->printFilterStatement($filters);
         $order_statement = ArticleQueries::printOrderStatement($orderby);
 
@@ -338,6 +325,8 @@ class ArticleQueries
         $filter_statement 
         $order_statement
         LIMIT :lim OFFSET :off";
+
+        Logging::debug('queryAll', ['query' => $query]);
 
         // join table if necessary to have user column alias available in orderby statements.
         // LEFT JOIN: all articles are listed even if the user who created the article is no longer be present in db.
@@ -360,10 +349,9 @@ class ArticleQueries
         $stmt->bindParam(':lim', $limit, $this->data_types['int']);
         $stmt->bindParam(':off', $offset, $this->data_types['int']);
 
-        $articles = [];
-
         $r = $stmt->execute();
         if ($r) {
+            $articles = [];
             // fetch next as associative array until there are none to be fetched.
             if ($this->use_sqlite) {
                 while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
@@ -374,11 +362,11 @@ class ArticleQueries
                     array_push($articles, Article::fromDatabaseRow($data));
                 }
             }
-        } else {
-            Logging::error(LogError::ARTICLES_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+            return $articles;
         }
 
-        return $articles;
+        Logging::error(LogError::ARTICLES_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        return [];
     }
 
     /**

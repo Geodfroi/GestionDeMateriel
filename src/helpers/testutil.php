@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 namespace app\helpers;
@@ -15,34 +15,49 @@ use app\constants\AppPaths;
 class TestUtil
 {
     /**
-     * Create fresh sqlite database at specified path. Replace existing.
+     * Create classes sqlite database at specified path. 
      * 
-     * @param string $local_path Path to db.
-     * @return SQLite3 Opened db connection.
+     * @param SQlite3 $conn Local db connection.
+     * @return bool True if successful.
      */
-    public static function createSQLiteDB(string $local_path)
+    public static function createClasses(SQLite3 $conn): bool
     {
-        //remove existing former db.
-        unlink($local_path);
-
-        $conn = new SQLite3($local_path);
-
-        // create app tables.
         $q = file_get_contents(AppPaths::SQLITE_TABLES);
-        $conn->exec($q);
-
-        return $conn;
+        return $conn->exec($q);
     }
 
     /**
      * Create and populate TestDB.
+     * 
+     * @param SQlite3 $conn Local db connection.
+     * @return bool True if successful.
      */
-    public static function populateSQLiteDB()
+    public static function populate(SQLite3 $conn): bool
     {
-        $conn =  TestUtil::CreateSQLiteDB(AppPaths::TEST_UNIT_DB);
-        $q = file_get_contents(AppPaths::SQLITE_ENTRIES);
+        if (TestUtil::createClasses($conn)) {
+            $q = file_get_contents(AppPaths::SQLITE_ENTRIES);
+            return $conn->exec($q);
+        }
+        return false;
+    }
 
-        $conn->exec($q);
-        $conn->close();
+    /**
+     * Set up temporary sqlite db for tests.
+     * 
+     * @param string $db_name Local db name without extension.
+     * @return Database Database instance or null in case of error.
+     */
+    public static function setupTestDB(string $db_name): Database
+    {
+        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
+        if (file_exists($local_path)) {
+            unlink($local_path); // erase existing
+        }
+
+        $conn = Database::getSQLiteConn($local_path);
+        if (TestUtil::populate($conn)) {
+            return new Database($conn, true);
+        }
+        return null;
     }
 }

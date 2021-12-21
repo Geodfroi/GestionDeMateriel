@@ -1,5 +1,5 @@
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2021.12.21 ###
 ##############################
 
 Folders:
@@ -22,5 +22,6 @@ Folders:
         phpunit tests
         https://phpunit.readthedocs.io/en/9.5/index.html
         http://nlslack.com/getting-started-with-phpunit-7-using-composer/
+        run in terminal: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --testdox tests 
 
 Modify const APP_FULL_URL to proper url once the app is online.
