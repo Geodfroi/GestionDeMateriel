@@ -1,3 +1,6 @@
 vendor/
-local/
 privatesettings.php
+local/logs/
+local/database/testArticles.db
+local/database/testLocations.db
+local/database/testUsers.db

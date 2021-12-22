@@ -15,6 +15,7 @@ use app\helpers\Database;
 <div>
     <div>TODO::</div>
     <br>
+    <div>Bug create new article warning not shown</div>
     <div>Bug with filter before</div>
     <div>Bug with orderby created by</div>
     <div>Enable tests with mySQL</div>
