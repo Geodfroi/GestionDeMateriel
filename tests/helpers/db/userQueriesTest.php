@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 use app\constants\AppPaths;
@@ -35,7 +35,7 @@ final class UserQueriesTest extends TestCase
 
         if (APP::useSQLite()) {
             $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsers.db';
-            $conn = TestUtil::localDBSetup($local_path);;
+            $conn = TestUtil::localDBSetup($local_path, true);;
         } else {
             $conn = Database::getMySQLConn();
         }
@@ -45,6 +45,15 @@ final class UserQueriesTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
+    }
+
+    public static function testBackup()
+    {
+        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsersBackup.db';
+        $backup_conn = TestUtil::localDBSetup($local_path, false);
+        assertNotNull($backup_conn);
+
+        assertTrue(UserQueriesTest::$queries->backup($backup_conn));
     }
 
     public function testDelete()

@@ -1,8 +1,13 @@
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 Folders:
+    config.json: variables controlant le comportement de l'application, serveur our tests.
+
+    __launcher:
+        bat files pour lancer l'application web, le serveur ou les tests.
+
     _util:
         create_mysql_tables.SQL : créer schémas dans la base de donnée.
         debug_populate.SQL : nouvelles entrées user et article pour tester MySQL.

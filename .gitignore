@@ -4,3 +4,4 @@ local/logs/
 local/database/testArticles.db
 local/database/testLocations.db
 local/database/testUsers.db
+local/database/testArticlesBackup.db

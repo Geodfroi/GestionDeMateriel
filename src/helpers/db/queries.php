@@ -15,7 +15,7 @@ use app\helpers\App;
 use app\helpers\Logging;
 
 /**
- * Base class for db queries; handle differences between MySQL and SQLite
+ * Base class for db queries; handle differences between MySQL and SQLite queries
  */
 class Queries
 {

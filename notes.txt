@@ -4,7 +4,6 @@
 
 - contact us field.
 
-- test option : send confirmation email the first time logged in.
 - publich to hiroku ?.
 - publich to microsoft azure.
 - backup of database.

@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace app\helpers\db;
 
 use Exception;
-use \PDO;
 use SQLite3;
 
 use app\constants\ArtFilter;
@@ -19,7 +18,6 @@ use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\Article;
-use app\helpers\Database;
 
 /**
  * Regroup function to interact with article table.
@@ -27,30 +25,55 @@ use app\helpers\Database;
 class ArticleQueries extends Queries
 {
     /**
-     * @param PDO|SQlite3 $backup_conn Db backup connection.
+     * @param SQlite3 $backup_conn Db backup connection.
+     * @return True if backup is successful.
      */
-    public function backup($backup_conn)
+    public function backup(SQlite3 $backup_conn): bool
     {
         Logging::debug('article backup not implemented');
 
-        //query all articles from current db.
-        $q = $this->queryAll();
+        $stmt = $this->conn->prepare("SELECT * FROM articles");
+        $r = $stmt->execute();
 
-        //insert all back to backup db.
+        while ($row = $this->fetchRow($r, $stmt)) {
+            $id  = (int)($row['id'] ?? 0);
+            $user_id = (int)($row['user_id'] ?? 0);
+            $article_name = (string)($row['article_name'] ?? '');
+            $location = (string)($row['location'] ?? '');
+            $comments = (string)($row['comments'] ?? '');
+            $expiration_date = (string)$row['expiration_date'];
+            $creation_date = (string)$row['creation_date'];
 
+            $query = <<<TEXT
+            INSERT INTO articles 
+            (   id,
+                user_id, 
+                article_name, 
+                location, 
+                comments,
+                expiration_date,
+                creation_date
+            ) 
+            VALUES 
+            (
+                $id,
+                $user_id,  
+                '$article_name',  
+                '$location', 
+                '$comments',
+                '$expiration_date',
+                '$creation_date'
+            )
+            TEXT;
+            Logging::debug('articles backup', ['query' => $query]);
 
-        // $table_name = "employee";
-        // $backup_file  = "/tmp/employee.sql";
-        // $sql = "SELECT * INTO OUTFILE '$backup_file' FROM $table_name";
-
-        // $stmt = $this->conn->prepare("SELECT * INTO OUTFILE 'articles.sql' FROM articles");
-
-        // if ($stmt->execute()) {
-        //     return true;
-        // }
-        // list(,, $error) = $stmt->errorInfo();
-        // Logging::error(LogError::ARTICLES_BACKUP, ['error' => $error]);
-        // return false;
+            //insert in backup db;
+            if (!$backup_conn->exec($query)) {
+                Logging::error('failure to insert article in backup db', ['article' => $article_name->_toString()]);
+                return false;
+            };
+        }
+        return true;
     }
 
     /**
@@ -92,7 +115,7 @@ class ArticleQueries extends Queries
             if ($count > 1) {
                 $str .= ' AND ';
             }
-            $str .= App::useSQLite() ? "location LIKE '%{$filters[ArtFilter::LOCATION]}%'" : "location LIKE CONCAT ('%', :floc, '%')";
+            $str .= App::useSQLite() ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
             $count += 1;
         }
 
@@ -100,13 +123,13 @@ class ArticleQueries extends Queries
             if ($count > 1) {
                 $str .= ' AND ';
             }
-            $str .= App::useSQLite() ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
+            $str .= App::useSQLite() ? "(expiration_date < '{$filters[ArtFilter::DATE_BEFORE]}')" : "expiration_date < :fbefore";
             $count += 1;
         } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
             if ($count > 0) {
                 $str .= ' AND ';
             }
-            $str .= App::useSQLite() ? "(expiration_date > {$filters[ArtFilter::DATE_AFTER]})" : "expiration_date > :fafter";
+            $str .= App::useSQLite() ? "(expiration_date > '{$filters[ArtFilter::DATE_AFTER]}')" : "expiration_date > :fafter";
             $count += 1;
         }
 
@@ -286,7 +309,7 @@ class ArticleQueries extends Queries
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
-        // Logging::debug('filters', $filters);
+        // Logging::debug('queryAll', $filters);
 
         $filter_statement = $this->printFilterStatement($filters);
         $order_statement = ArticleQueries::printOrderStatement($orderby);
@@ -301,12 +324,13 @@ class ArticleQueries extends Queries
             articles.creation_date,
             users.alias
         FROM articles LEFT JOIN users ON articles.user_id = users.id 
-        $filter_statement 
+        $filter_statement
         $order_statement
         LIMIT :lim OFFSET :off";
 
         // Logging::debug('queryAll', ['order_statement' => $order_statement]);
-        Logging::debug('queryAll', ['filter_statement' => $filter_statement]);
+        // Logging::debug('queryAll', ['filter_statement' => $filter_statement]);
+        // Logging::debug('queryAll', ['query' => $query]);
 
         // join table if necessary to have user column alias available in orderby statements.
         // LEFT JOIN: all articles are listed even if the user who created the article is no longer be present in db.

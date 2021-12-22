@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.02 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 use app\constants\Route;
@@ -20,7 +20,7 @@ $loc_presets = Database::locations()->queryAll();
             <div class="mb-2">
                 <label for="form-name" class="form-label col-3">Nom de l'article:</label>
                 <input id="form-name" name="article-name" type="text" value="<?php echo htmlentities($article_name) ?>" class="form-control
-                    <?php echo isset($error['article-name']) ? ' is-invalid' : '' ?>
+                    <?php echo isset($warnings['article-name']) ? ' is-invalid' : '' ?>
                     <?php echo $article_name ? ' is-valid' : '' ?>">
                 <?php if (isset($warnings['article-name'])) { ?>
                     <div class='invalid-feedback'><?php echo $warnings['article-name'] ?> </div>
@@ -32,7 +32,7 @@ $loc_presets = Database::locations()->queryAll();
 
                 <div class="input-group">
                     <input id="form-location" name="location" type="text" value="<?php echo htmlentities($location) ?>" class="form-control
-                        <?php echo isset($error['location']) ? ' is-invalid' : '' ?>
+                        <?php echo isset($warnings['location']) ? ' is-invalid' : '' ?>
                         <?php echo $location ? ' is-valid' : '' ?>">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -42,18 +42,16 @@ $loc_presets = Database::locations()->queryAll();
                         <?php } ?>
 
                     </ul>
+                    <?php if (isset($warnings['location'])) { ?>
+                        <div class='invalid-feedback'><?php echo $warnings['location'] ?></div>
+                    <?php } ?>
                 </div>
-
-                <?php if (isset($warnings['location'])) { ?>
-                    <div class='invalid-feedback'><?php echo $warnings['location'] ?></div>
-                <?php } ?>
-
             </div>
 
             <div class=" mb-2">
                 <label for="form-expiration" class="form-label col-3">Date de péremption:</label>
                 <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> value="<?php echo htmlentities($expiration_date) ?>" class="form-control 
-                    <?php echo isset($error['expiration-date']) ? ' is-invalid' : '' ?>
+                    <?php echo isset($warnings['expiration-date']) ? ' is-invalid' : '' ?>
                     <?php echo $expiration_date ? ' is-valid' : '' ?>">
                 <?php if (isset($warnings['expiration-date'])) { ?>
                     <div class='invalid-feedback'><?php echo $warnings['expiration-date'] ?></div>
@@ -63,7 +61,7 @@ $loc_presets = Database::locations()->queryAll();
 
             <div class=" mb-2">
                 <textarea id="form-comments" name="comments" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments" class="form-control 
-                    <?php echo isset($error['comments']) ? ' is-invalid' : '' ?>
+                    <?php echo isset($warnings['comments']) ? ' is-invalid' : '' ?>
                     <?php echo $comments ? ' is-valid' : '' ?>">
                 </textarea>
                 <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>

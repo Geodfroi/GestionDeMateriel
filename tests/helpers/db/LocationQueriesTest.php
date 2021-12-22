@@ -31,7 +31,7 @@ final class LocationQueriesTest extends TestCase
 
         if (APP::useSQLite()) {
             $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocations.db';
-            $conn = TestUtil::localDBSetup($local_path);;
+            $conn = TestUtil::localDBSetup($local_path, true);;
         } else {
             $conn = Database::getMySQLConn();
         }
@@ -40,6 +40,15 @@ final class LocationQueriesTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
+    }
+
+    public static function testBackup()
+    {
+        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocationsBackup.db';
+        $backup_conn = TestUtil::localDBSetup($local_path, false);
+        assertNotNull($backup_conn);
+
+        assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
     }
 
     public function testDelete(): void

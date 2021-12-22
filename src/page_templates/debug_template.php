@@ -15,15 +15,10 @@ use app\helpers\Database;
 <div>
     <div>TODO::</div>
     <br>
-    <div>Bug create new article warning not shown</div>
-    <div>Bug with filter before</div>
-    <div>Bug with orderby created by</div>
-    <div>Enable tests with mySQL</div>
+    <div>Bug with expiration date before filter in sqlite</div>
     <div>Enable backup to local db</div>
     <div>Btn to clear after before date</div>
     <div>Display limit as option.</div>
-    <div>implement sqlite</div>
-    <div>MAIN: backup db</div>
     <div>ADMIN - access user contact posts.</div>
     <div>CONTACT: create contact page</div>
     <div>ARTICLES: filter with created by</div>

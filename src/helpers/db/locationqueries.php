@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 namespace app\helpers\db;
+
+use Exception;
+use SQLite3;
 
 use app\constants\LogError;
 use app\helpers\App;
@@ -18,9 +21,14 @@ use app\models\StringContent;
  */
 class LocationQueries extends Queries
 {
-    public function backup()
+    /**
+     * @param SQlite3 $backup_conn Db backup connection.
+     * @return True if backup is successful.
+     */
+    public function backup(SQlite3 $backup_conn): bool
     {
         Logging::debug('location debug not implemented');
+        return false;
     }
 
     /**
