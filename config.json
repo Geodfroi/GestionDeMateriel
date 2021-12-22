@@ -1,0 +1,20 @@
+{
+  "app": {
+    "clear_log": true,
+    "debug_mode": true,
+    "log_channel": "app",
+    "use_sqlite": false
+  },
+  "server": {
+    "clear_log": true,
+    "debug_mode": true,
+    "log_channel": "server",
+    "use_sqlite": true
+  },
+  "tests": {
+    "clear_log": true,
+    "debug_mode": true,
+    "log_channel": "test",
+    "use_sqlite": true
+  }
+}

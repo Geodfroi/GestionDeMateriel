@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 use app\constants\AppPaths;
-use app\constants\LogChannel;
+use app\constants\Mode;
 use app\helpers\App;
+use app\helpers\Database;
 use app\helpers\db\LocationQueries;
 use app\helpers\Logging;
 use app\helpers\TestUtil;
@@ -22,23 +23,19 @@ use function PHPUnit\Framework\assertTrue;
 
 final class LocationQueriesTest extends TestCase
 {
-    /**
-     * Set up and access local test db.
-     */
-    private static function queries()
-    {
-        static $instance;
-        if (is_null($instance)) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocations.db';
-            $db = TestUtil::localDBSetup($local_path);;
-            $instance = new LocationQueries($db);
-        }
-        return $instance;
-    }
+    private static LocationQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setConfig(LogChannel::TEST, true, true);
+        App::setMode(Mode::TESTS_SUITE);
+
+        if (APP::useSQLite()) {
+            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocations.db';
+            $conn = TestUtil::localDBSetup($local_path);;
+        } else {
+            $conn = Database::getMySQLConn();
+        }
+        LocationQueriesTest::$queries = new LocationQueries($conn);
     }
 
     public static function tearDownAfterClass(): void
@@ -47,7 +44,7 @@ final class LocationQueriesTest extends TestCase
 
     public function testDelete(): void
     {
-        assertTrue(LocationQueriesTest::queries()->delete(2));
+        assertTrue(LocationQueriesTest::$queries->delete(2));
     }
 
     /**
@@ -55,7 +52,7 @@ final class LocationQueriesTest extends TestCase
      */
     public function testInsert(?string $str, bool $isZero): void
     {
-        $id =  LocationQueriesTest::queries()->insert($str);
+        $id =  LocationQueriesTest::$queries->insert($str);
 
         if ($isZero) {
             assertSame($id, 0);
@@ -75,7 +72,7 @@ final class LocationQueriesTest extends TestCase
 
     public function testQueryById(): StringContent
     {
-        $loc = LocationQueriesTest::queries()->queryById(1);
+        $loc = LocationQueriesTest::$queries->queryById(1);
         assertNotNull($loc);
         // Logging::debug($loc->__toString());
         return $loc;
@@ -84,7 +81,7 @@ final class LocationQueriesTest extends TestCase
 
     public function testQueryAll(): void
     {
-        $array = LocationQueriesTest::queries()->queryAll();
+        $array = LocationQueriesTest::$queries->queryAll();
         // foreach ($array as $loc) {
         //     Logging::debug($loc->__toString());
         // }
@@ -94,8 +91,8 @@ final class LocationQueriesTest extends TestCase
 
     public function testContentExists(): void
     {
-        $content = LocationQueriesTest::queries()->queryById(1)->getContent();
-        assertTrue(LocationQueriesTest::queries()->contentExists($content));
+        $content = LocationQueriesTest::$queries->queryById(1)->getContent();
+        assertTrue(LocationQueriesTest::$queries->contentExists($content));
     }
 
     /**
@@ -103,8 +100,8 @@ final class LocationQueriesTest extends TestCase
      */
     public function testUpdate(StringContent $content): void
     {
-        assertTrue(LocationQueriesTest::queries()->update($content->getId(), "On top of the chimney"));
-        $q = LocationQueriesTest::queries()->queryById($content->getId());
+        assertTrue(LocationQueriesTest::$queries->update($content->getId(), "On top of the chimney"));
+        $q = LocationQueriesTest::$queries->queryById($content->getId());
         assertSame($q->getContent(), "On top of the chimney");
     }
 }

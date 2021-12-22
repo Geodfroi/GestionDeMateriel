@@ -3,17 +3,17 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 use app\constants\AppPaths;
 use app\constants\ArtFilter;
-use app\constants\LogChannel;
+use app\constants\Mode;
 use app\constants\OrderBy;
 use app\helpers\App;
 use app\helpers\db\ArticleQueries;
+use app\helpers\Database;
 use app\helpers\Logging;
-use app\helpers\TestClass;
 use app\helpers\TestUtil;
 use app\models\Article;
 
@@ -29,55 +29,49 @@ use PHPUnit\Framework\TestCase;
  */
 final class ArticleQueriesTest extends TestCase
 {
-    /**
-     * Set up and access local test db.
-     */
-    private static function queries()
-    {
-        static $instance;
-        if (is_null($instance)) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testArticles.db';
-            $db = TestUtil::localDBSetup($local_path);
-            $instance = new ArticleQueries($db);
-        }
-        return $instance;
-    }
+    private static ArticleQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setConfig(LogChannel::TEST, true, true);
+        App::setMode(Mode::TESTS_SUITE);
+
+        if (APP::useSQLite()) {
+            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testArticles.db';
+            $conn = TestUtil::localDBSetup($local_path);;
+        } else {
+            $conn = Database::getMySQLConn();
+        }
+        ArticleQueriesTest::$queries = new ArticleQueries($conn);
     }
 
     public static function tearDownAfterClass(): void
     {
-        // Database::close();
-        // unlink(AppPaths::TEST_UNIT_DB);
     }
 
     public function testDelete()
     {
-        $count = ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
+        $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
         // Logging::info('testDelete', ['queryCount' => strval($count)]);
-        assertTrue(ArticleQueriesTest::queries()->delete(2));
+        assertTrue(ArticleQueriesTest::$queries->delete(2));
 
-        assertSame($count - 1, ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]));
+        assertSame($count - 1, ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]));
     }
 
     public function testInsert()
     {
-        $count = ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
+        $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
         // Logging::info('testInsert', ['queryCount' => strval($count)]);
 
         $article = Article::fromForm(0, 'Pneu', 'Garage', '2021-12-19');
-        $id = ArticleQueriesTest::queries()->insert($article);
+        $id = ArticleQueriesTest::$queries->insert($article);
         assertNotSame($id, 0);
 
-        assertSame($count + 1, ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]));
+        assertSame($count + 1, ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]));
     }
 
     public function testQueryById(): Article
     {
-        $article = ArticleQueriesTest::queries()->queryById(1);
+        $article = ArticleQueriesTest::$queries->queryById(1);
         assertNotNull($article);
         return $article;
         // Logging::debug($article->__toString());
@@ -85,7 +79,7 @@ final class ArticleQueriesTest extends TestCase
 
     public function testQueryCount(): void
     {
-        $count = ArticleQueriesTest::queries()->queryCount([ArtFilter::SHOW_EXPIRED => true]);
+        $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
         $this->assertTrue($count > 0);
         // Logging::info('testQueryCount', ['count' => strval($count)]);
     }
@@ -93,9 +87,9 @@ final class ArticleQueriesTest extends TestCase
     /**
      * @dataProvider queryAllProvider
      */
-    public function testQueryAll(array $filters): void
+    public function testQueryAll(array $filters, int $order_by): void
     {
-        $array = ArticleQueriesTest::queries()->queryAll(PHP_INT_MAX, 0, OrderBy::DELAY_ASC, $filters);
+        $array = ArticleQueriesTest::$queries->queryAll(PHP_INT_MAX, 0, $order_by, $filters);
         foreach ($array as $art) {
             Logging::debug($art->__tostring());
         }
@@ -106,10 +100,12 @@ final class ArticleQueriesTest extends TestCase
     public function queryAllProvider(): array
     {
         return [
-            // [[ArtFilter::SHOW_EXPIRED => true]],
-            // [[ArtFilter::NAME => 'Pro']],
-            [[ArtFilter::DATE_AFTER => '2022-01-01']],
-            // [[ArtFilter::DATE_BEFORE => '2021-12-30']],
+            // [[], OrderBy::DELAY_ASC],
+            // [[], OrderBy::OWNED_BY_DESC],
+            // [[ArtFilter::SHOW_EXPIRED => true], OrderBy::DELAY_ASC],
+            // [[ArtFilter::NAME => 'Pro'], OrderBy::DELAY_ASC],
+            // [[ArtFilter::DATE_AFTER => '2022-01-01'], OrderBy::DELAY_ASC],
+            [[ArtFilter::DATE_BEFORE => '2022-01-06'], OrderBy::DELAY_ASC],
             // [[
             //     ArtFilter::DATE_AFTER => '2021-12-30',
             //     ArtFilter::NAME => 'Pro'
@@ -122,6 +118,6 @@ final class ArticleQueriesTest extends TestCase
      */
     public function testUpdate($article): void
     {
-        $this->assertTrue(ArticleQueriesTest::queries()->update($article));
+        $this->assertTrue(ArticleQueriesTest::$queries->update($article));
     }
 }

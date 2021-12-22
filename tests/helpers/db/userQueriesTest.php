@@ -7,9 +7,10 @@ declare(strict_types=1);
 ##############################
 
 use app\constants\AppPaths;
-use app\constants\LogChannel;
+use app\constants\Mode;
 use app\constants\OrderBy;
 use app\helpers\App;
+use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\TestUtil;
 use app\helpers\db\UserQueries;
@@ -26,23 +27,20 @@ use function PHPUnit\Framework\assertTrue;
 
 final class UserQueriesTest extends TestCase
 {
-    /**
-     * Set up and access local test db.
-     */
-    private static function queries()
-    {
-        static $instance;
-        if (is_null($instance)) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsers.db';
-            $db = TestUtil::localDBSetup($local_path);;
-            $instance = new UserQueries($db);
-        }
-        return $instance;
-    }
+    private static UserQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setConfig(LogChannel::TEST, true, true);
+        App::setMode(Mode::TESTS_SUITE);
+
+        if (APP::useSQLite()) {
+            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsers.db';
+            $conn = TestUtil::localDBSetup($local_path);;
+        } else {
+            $conn = Database::getMySQLConn();
+        }
+
+        UserQueriesTest::$queries = new UserQueries($conn);
     }
 
     public static function tearDownAfterClass(): void
@@ -51,7 +49,7 @@ final class UserQueriesTest extends TestCase
 
     public function testDelete()
     {
-        assertTrue(UserQueriesTest::queries()->delete(3));
+        assertTrue(UserQueriesTest::$queries->delete(3));
     }
 
 
@@ -59,11 +57,11 @@ final class UserQueriesTest extends TestCase
     {
         $user = User::fromForm('my.email@gmail.com', '0123456789', true);
 
-        $count = UserQueriesTest::queries()->queryCount(false);
-        $id = UserQueriesTest::queries()->insert($user);
+        $count = UserQueriesTest::$queries->queryCount(false);
+        $id = UserQueriesTest::$queries->insert($user);
 
         assertNotSame($id, 0);
-        assertSame($count + 1, UserQueriesTest::queries()->queryCount(false));
+        assertSame($count + 1, UserQueriesTest::$queries->queryCount(false));
         // Logging::info('testInsert', ['queryCount' => strval($count)]);
     }
 
@@ -72,7 +70,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testQueryByAlias(string $alias, bool $is_present): void
     {
-        $user = UserQueriesTest::queries()->queryByAlias($alias);
+        $user = UserQueriesTest::$queries->queryByAlias($alias);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -94,7 +92,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testQueryByEmail(string $email, bool $is_present): void
     {
-        $user = UserQueriesTest::queries()->queryByEmail($email);
+        $user = UserQueriesTest::$queries->queryByEmail($email);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -116,7 +114,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testQueryById(int $id, bool $is_present): void
     {
-        $user = UserQueriesTest::queries()->queryById($id);
+        $user = UserQueriesTest::$queries->queryById($id);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -135,7 +133,7 @@ final class UserQueriesTest extends TestCase
 
     public function testQueryAll()
     {
-        $array = UserQueriesTest::queries()->queryAll(PHP_INT_MAX, 0, OrderBy::EMAIL_DESC, false);
+        $array = UserQueriesTest::$queries->queryAll(PHP_INT_MAX, 0, OrderBy::EMAIL_DESC, false);
         // foreach ($array as $user) {
         //     Logging::debug($user->__tostring());
         // }
@@ -145,9 +143,9 @@ final class UserQueriesTest extends TestCase
 
     public function testQueryCount()
     {
-        $count = UserQueriesTest::queries()->queryCount(false);
+        $count = UserQueriesTest::$queries->queryCount(false);
         $this->assertTrue($count > 0);
-        $count2 = UserQueriesTest::queries()->queryCount(true);
+        $count2 = UserQueriesTest::$queries->queryCount(true);
         $this->assertTrue($count2 > 0);
         $this->assertNotEquals($count,  $count2);
     }
@@ -157,7 +155,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testUpdateAlias(int $user_id, string $alias, bool $expect_success): void
     {
-        $r = UserQueriesTest::queries()->updateAlias($user_id, $alias);
+        $r = UserQueriesTest::$queries->updateAlias($user_id, $alias);
         if ($expect_success) {
             assertTrue($r);
         } else {
@@ -176,21 +174,21 @@ final class UserQueriesTest extends TestCase
 
     public function testUpdateContactDelay(): void
     {
-        assertTrue(UserQueriesTest::queries()->updateContactDelay(2, '3-7-14'));
+        assertTrue(UserQueriesTest::$queries->updateContactDelay(2, '3-7-14'));
     }
 
     public function testUpdateContactEmail(): void
     {
-        assertTrue(UserQueriesTest::queries()->updateContactEmail(2, 'contact.me@gmail.com'));
+        assertTrue(UserQueriesTest::$queries->updateContactEmail(2, 'contact.me@gmail.com'));
     }
 
     public function testUpdateLogTime(): void
     {
-        assertTrue(UserQueriesTest::queries()->updateLogTime(3));
+        assertTrue(UserQueriesTest::$queries->updateLogTime(3));
     }
 
     public function testupdatePassword(): void
     {
-        assertTrue(UserQueriesTest::queries()->updateLogTime(3, '12345678'));
+        assertTrue(UserQueriesTest::$queries->updateLogTime(3, '12345678'));
     }
 }

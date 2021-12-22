@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 namespace app\helpers;
 
+use app\constants\AppPaths;
 use Exception;
 
 /**
@@ -15,47 +16,99 @@ use Exception;
  */
 class App
 {
-    private bool $use_sqlite;
-    private string $log_channel;
-    private bool $debug_mode;
+    private static App $instance;
 
-    private static function getInstance(bool $must_be_initialised)
+    /**
+     * Associative array extracted from json file, with mode as key.
+     */
+    private array $content;
+    private string $mode;
+
+    /**
+     * @param string $mode Mode constants
+     */
+    function __construct(string $mode)
     {
-        static $instance;
-        if (is_null($instance)) {
-            if ($must_be_initialised) {
-                throw new Exception('App config was not initialised before access.');
-            }
-            $instance = new static();
-        }
-        return $instance;
+        $json = file_get_contents(AppPaths::CONFIG_FILE);
+        $this->content =  json_decode($json, true);
+        $this->mode = $mode;
+    }
+
+    private function clearLog()
+    {
+        // $clear_log = $this->getData('clear_log');
+        // if ($clear_log) {
+        //     $channel = $this->getData("log_channel");
+        //     $path = AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $channel . '.log';
+        //     if (file_exists($path)) {
+        //         file_put_contents($path, "");
+        //     }
+        // }
     }
 
     /**
-     * @param string Global Logging channel. Use LogChannel const.
-     * @param bool $use_sqlite Use local sqlite db instead of MySQL for testing purposes.
-     * @param bool $debug_mode Set debug mode to true enabling debug page display in html and logging.
+     * @param string $key Data key.
      */
-    public static function setConfig(string $log_channel, bool $use_sqlite, bool $debug_mode)
+    private function getData(string $key)
     {
-        $app = App::getInstance(false);
-        $app->use_sqlite = $use_sqlite;
-        $app->log_channel = $log_channel;
-        $app->debug_mode = $debug_mode;
+        if (!isset($this->content[$this->mode])) {
+            throw new Exception("Mode [$this->mode] is not properly defined in [config.json]");
+        }
+        $mode_array = $this->content[$this->mode];
+        if (!isset($mode_array[$key])) {
+            throw new Exception("Entry [$key] is not properly defined in mode [$this->mode] in [config.json]");
+        }
+        return $mode_array[$key];
+    }
+
+    /**
+     * Set current app mode at entry point of application.
+     * 
+     * @param $modeUse Mode constants
+     */
+    public static function setMode(string $mode)
+    {
+        App::$instance = new static($mode);
+        App::$instance->clearLog();
     }
 
     public static function useSQLite(): bool
     {
-        return App::getInstance(true)->use_sqlite;
+        return App::$instance->getData("use_sqlite");
     }
 
     public static function logChannel(): string
     {
-        return App::getInstance(true)->log_channel;
+        return App::$instance->getData("log_channel");
     }
 
     public static function isDebugMode(): bool
     {
-        return App::getInstance(true)->debug_mode;
+        return App::$instance->getData("debug_mode");
     }
 }
+
+    // /**
+    //  * @param string Global Logging channel. Use LogChannel const.
+    //  * @param bool $use_sqlite Use local sqlite db instead of MySQL for testing purposes.
+    //  * @param bool $debug_mode Set debug mode to true enabling debug page display in html and logging.
+    //  */
+    // public static function setConfig(string $log_channel, bool $use_sqlite, bool $debug_mode)
+    // {
+    //     $app = App::getInstance(false);
+    //     $app->use_sqlite = $use_sqlite;
+    //     $app->log_channel = $log_channel;
+    //     $app->debug_mode = $debug_mode;
+    // }
+
+        // /**
+    //  * @param $mode Current mode; Use Mode constants
+    //  */
+    // private static function getInstance(int $mode)
+    // {
+    //     static $instance;
+    //     if (is_null($instance)) {
+    //         $instance = new static();
+    //     }
+    //     return $instance;
+    // }

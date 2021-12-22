@@ -30,7 +30,7 @@ class Logging
             $channels[$channel] = new Logger($channel);
             $channels[$channel]->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . "$channel.log", Logger::DEBUG));
         }
-        return  $channels[$channel];
+        return $channels[$channel];
     }
 
     /**

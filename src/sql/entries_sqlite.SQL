@@ -1,3 +1,4 @@
+
 INSERT INTO locations(id, str_content) VALUES(1, 'Pharmacie 1er étage');
 INSERT INTO locations(id, str_content) VALUES(2, "Cabinet d'entretien");
 INSERT INTO locations(id, str_content) VALUES(3, 'Derrière les coussins du canapé');

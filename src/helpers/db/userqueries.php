@@ -8,34 +8,18 @@ declare(strict_types=1);
 
 namespace app\helpers\db;
 
-use \PDO;
 use Exception;
 
 use app\constants\LogError;
 use app\constants\OrderBy;
-use app\helpers\App;
-use app\helpers\Database;
 use app\helpers\Logging;
 use app\models\User;
 
 /**
  * Regroup functions to interact with users table.
  */
-class UserQueries
+class UserQueries extends Queries
 {
-    private $conn;
-    private array $data_types;
-
-    /**
-     * @param PDO|SQlite3 $conn Db connection.
-     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
-     */
-    function __construct(Database $db)
-    {
-        $this->conn = $db->getConn();
-        $this->data_types = Database::getDataTypes();
-    }
-
     public function backup()
     {
         Logging::debug('user debug not implemented');
@@ -58,7 +42,7 @@ class UserQueries
 
         Logging::error(LogError::USER_DELETE, [
             'id' => $id,
-            'error' => $this->conn->lastErrorMsg()
+            'error' => $this->error($stmt)
         ]);
         return false;
     }
@@ -132,10 +116,10 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+            return $this->rowId();
         }
 
-        Logging::error(LogError::USER_INSERT, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_INSERT, ['error' => $this->error($stmt)]);
         return 0;
     }
 
@@ -163,7 +147,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = $this->fetchRow($r, $stmt);
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
@@ -173,7 +157,7 @@ class UserQueries
 
         Logging::error(LogError::USER_QUERY, [
             'alias' => $alias,
-            'error' => $this->conn->lastErrorMsg()
+            'error' => $this->error($stmt)
         ]);
         return null;
     }
@@ -202,7 +186,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = $this->fetchRow($r, $stmt);
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
@@ -212,7 +196,7 @@ class UserQueries
 
         Logging::error(LogError::USER_QUERY, [
             'id' => $id,
-            'error' => $this->conn->lastErrorMsg()
+            'error' => $this->error($stmt)
         ]);
         return null;
     }
@@ -242,7 +226,7 @@ class UserQueries
 
         $r = $stmt->execute();
         if ($r) {
-            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+            $row = $this->fetchRow($r, $stmt);
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
@@ -252,7 +236,7 @@ class UserQueries
 
         Logging::error(LogError::USER_QUERY, [
             'login_email' => $login_email,
-            'error' => $this->conn->lastErrorMsg()
+            'error' => $this->error($stmt)
         ]);
         return null;
     }
@@ -274,17 +258,12 @@ class UserQueries
         $stmt = $this->conn->prepare($query);
         $r = $stmt->execute();
         if ($r) {
-            if (App::useSQLite()) {
-                $array = $r->fetchArray();
-                return $array['COUNT(*)'];
-            }
-            $r = $stmt->fetchColumn();
-            return intval($r);
+            return $this->count($r, $stmt);
         }
 
         Logging::error(LogError::USERS_COUNT_QUERY, [
             'exclude_admin' => $excludeAdmins,
-            'error' => $this->conn->lastErrorMsg()
+            'error' => $this->error($stmt)
         ]);
         return -1;
     }
@@ -326,20 +305,14 @@ class UserQueries
         $r = $stmt->execute();
         if ($r) {
             $users = [];
-            if (App::useSQLite()) {
-                while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
-                    array_push($users, USER::fromDatabaseRow($row));
-                }
-            } else {
-                // fetch next as associative array until there are none to be fetched.
-                while ($row = $stmt->fetch()) {
-                    array_push($users, User::fromDatabaseRow($row));
-                }
+            // fetch next as associative array until there are none to be fetched.
+            while ($row = $this->fetchRow($r, $stmt)) {
+                array_push($users, USER::fromDatabaseRow($row));
             }
             return $users;
         }
 
-        Logging::error(LogError::USERS_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USERS_QUERY, ['error' => $this->error($stmt)]);
         return [];
     }
 
@@ -365,7 +338,7 @@ class UserQueries
             return true;
         }
 
-        Logging::error(LogError::USER_ALIAS_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_ALIAS_UPDATE, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -387,7 +360,7 @@ class UserQueries
             return true;
         }
 
-        Logging::error(LogError::USER_DELAY_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_DELAY_UPDATE, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -409,7 +382,7 @@ class UserQueries
             return true;
         }
 
-        Logging::error(LogError::USER_CONTACT_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_CONTACT_UPDATE, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -430,7 +403,7 @@ class UserQueries
             return true;
         }
 
-        Logging::error(LogError::USER_LOGTIME_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_LOGTIME_UPDATE, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -452,7 +425,7 @@ class UserQueries
             return true;
         }
 
-        Logging::error(LogError::USER_PASSWORD_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::USER_PASSWORD_UPDATE, ['error' => $this->error($stmt)]);
         return false;
     }
 }

@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 
-use app\constants\LogChannel;
+use app\constants\Mode;
 use app\helpers\App;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Mailing;
 use app\helpers\Util;
 
-App::setConfig(LogChannel::SERVER, false, true);
+App::setMode(Mode::SERVER);
 
 // iterate through users and articles to flag articles that are soon due.
 $articles = Database::articles()->queryAll();

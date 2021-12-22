@@ -45,9 +45,9 @@ class TestUtil
      * Set up temporary sqlite db for tests.
      * 
      * @param string $local_path Path to local db.
-     * @return Database Database instance or null in case of error.
+     * @return SQLite3 SQLite3 db connection or null in case of error.
      */
-    public static function localDBSetup(string $local_path): Database
+    public static function localDBSetup(string $local_path): SQLite3
     {
         // $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
         if (file_exists($local_path)) {
@@ -56,7 +56,7 @@ class TestUtil
 
         $conn = Database::getSQLiteConn($local_path);
         if (TestUtil::populate($conn)) {
-            return new Database($conn, true);
+            return $conn;
         }
         return null;
     }

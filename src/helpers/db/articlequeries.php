@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 namespace app\helpers\db;
@@ -24,21 +24,8 @@ use app\helpers\Database;
 /**
  * Regroup function to interact with article table.
  */
-class ArticleQueries
+class ArticleQueries extends Queries
 {
-    private $conn;
-    private array $data_types;
-
-    /**
-     * @param PDO|SQlite3 $conn Db connection.
-     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
-     */
-    function __construct(Database $db)
-    {
-        $this->conn = $db->getConn();
-        $this->data_types = Database::getDataTypes();
-    }
-
     /**
      * @param PDO|SQlite3 $backup_conn Db backup connection.
      */
@@ -80,7 +67,7 @@ class ArticleQueries
         if ($stmt->execute()) {
             return true;
         }
-        Logging::error(LogError::ARTICLE_DELETE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::ARTICLE_DELETE, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -97,13 +84,12 @@ class ArticleQueries
 
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
-
             $str .= App::useSQLite() ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
             $count += 1;
         }
 
         if (isset($filters[ArtFilter::LOCATION]) && $filters[ArtFilter::LOCATION]) {
-            if ($count === 1) {
+            if ($count > 1) {
                 $str .= ' AND ';
             }
             $str .= App::useSQLite() ? "location LIKE '%{$filters[ArtFilter::LOCATION]}%'" : "location LIKE CONCAT ('%', :floc, '%')";
@@ -111,7 +97,7 @@ class ArticleQueries
         }
 
         if (isset($filters[ArtFilter::DATE_BEFORE]) && $filters[ArtFilter::DATE_BEFORE]) {
-            if ($count === 1) {
+            if ($count > 1) {
                 $str .= ' AND ';
             }
             $str .= App::useSQLite() ? "expiration_date < {$filters[ArtFilter::DATE_BEFORE]}" : "expiration_date < :fbefore";
@@ -167,9 +153,9 @@ class ArticleQueries
 
                 // order by is already expired, then owner, then creation date, then delay.
             case OrderBy::OWNED_BY_ASC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), alias ASC, creation_date ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), alias ASC, users.creation_date ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
             case OrderBy::OWNED_BY_DESC:
-                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), alias DESC, creation_date ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
+                return 'ORDER BY (CURRENT_TIMESTAMP > expiration_date), alias DESC, users.creation_date ASC, (CURRENT_TIMESTAMP - expiration_date) DESC';
             default:
                 break;
         }
@@ -213,9 +199,9 @@ class ArticleQueries
 
         $r = $stmt->execute();
         if ($r) {
-            return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+            return $this->rowId();
         }
-        Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->error($stmt)]);
         return 0;
     }
 
@@ -242,14 +228,14 @@ class ArticleQueries
         $r = $stmt->execute();
         if ($r) {
             // retrieve only first row found; fine since id is unique.
-            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
+            $row = $this->fetchRow($r, $stmt);
             if ($row) {
                 return Article::fromDatabaseRow($row);
             }
             Logging::error(LogError::ARTICLE_QUERY, ['id' => $id]);
             return null;
         }
-        Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::ARTICLE_QUERY, ['id' => $id, 'error' => $this->error($stmt)]);
         return null;
     }
 
@@ -282,16 +268,10 @@ class ArticleQueries
 
         $r = $stmt->execute();
         if ($r) {
-            if (App::useSQLite()) {
-                $array = $r->fetchArray();
-                return $array['COUNT(*)'];
-            }
-            $r = $stmt->fetchColumn();
-            return intval($r);
+            return $this->count($r, $stmt);
         }
 
-        // list(,, $this->conn->lastErrorMsg()) = $stmt->errorInfo();
-        Logging::error(LogError::ARTICLES_COUNT_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::ARTICLES_COUNT_QUERY, ['error' => $this->error($stmt)]);
         return -1;
     }
 
@@ -306,7 +286,7 @@ class ArticleQueries
      */
     public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
-        Logging::debug('filters', $filters);
+        // Logging::debug('filters', $filters);
 
         $filter_statement = $this->printFilterStatement($filters);
         $order_statement = ArticleQueries::printOrderStatement($orderby);
@@ -325,7 +305,8 @@ class ArticleQueries
         $order_statement
         LIMIT :lim OFFSET :off";
 
-        Logging::debug('queryAll', ['query' => $query]);
+        // Logging::debug('queryAll', ['order_statement' => $order_statement]);
+        Logging::debug('queryAll', ['filter_statement' => $filter_statement]);
 
         // join table if necessary to have user column alias available in orderby statements.
         // LEFT JOIN: all articles are listed even if the user who created the article is no longer be present in db.
@@ -352,19 +333,13 @@ class ArticleQueries
         if ($r) {
             $articles = [];
             // fetch next as associative array until there are none to be fetched.
-            if (App::useSQLite()) {
-                while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
-                    array_push($articles, Article::fromDatabaseRow($row));
-                }
-            } else {
-                while ($data = $stmt->fetch()) {
-                    array_push($articles, Article::fromDatabaseRow($data));
-                }
+            while ($row = $this->fetchRow($r, $stmt)) {
+                array_push($articles, Article::fromDatabaseRow($row));
             }
             return $articles;
         }
 
-        Logging::error(LogError::ARTICLES_QUERY, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::ARTICLES_QUERY, ['error' => $this->error($stmt)]);
         return [];
     }
 
@@ -401,25 +376,8 @@ class ArticleQueries
 
         Logging::error(LogError::ARTICLE_UPDATE, [
             'id' => $id,
-            'error' => $this->conn->lastErrorMsg()
+            'error' => $this->error($stmt)
         ]);
         return false;
     }
 }
-
-    // /**
-    //  * Delete all articles belonging to user.
-    //  * 
-    //  * @param int $user_id The user id.
-    //  * @return bool True if the delete is successful.
-    //  */
-    // public function deleteUserArticles($user_id): bool
-    // {
-    //     $stmt = $this->conn->prepare('DELETE FROM articles WHERE user_id = :uid');
-    //     $stmt->bindParam(':uid', $user_id, $this->data_types['int']);
-    //     if ($stmt->execute()) {
-    //         return true;
-    //     }
-    //     Logging::error(LogError::USER_ARTICLES_DELETE, ['error' => $this->conn->lastErrorMsg()]);
-    //     return false;
-    // }

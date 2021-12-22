@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 namespace app\constants;
@@ -20,4 +20,7 @@ class AppPaths
     //SQL queries
     const SQLITE_TABLES = __DIR__ . '/../sql/tables_sqlite.sql';
     const SQLITE_ENTRIES = __DIR__ . '/../sql/entries_sqlite.sql';
+
+    // config
+    const CONFIG_FILE = __DIR__ . '/../../config.json';
 }

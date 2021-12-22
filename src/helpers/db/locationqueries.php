@@ -8,31 +8,16 @@ declare(strict_types=1);
 
 namespace app\helpers\db;
 
-use \PDO;
 use app\constants\LogError;
 use app\helpers\App;
-use app\helpers\Database;
 use app\helpers\Logging;
 use app\models\StringContent;
 
 /**
  * Regroup function to interact with locations table.
  */
-class LocationQueries
+class LocationQueries extends Queries
 {
-    private $conn;
-    private array $data_types;
-
-    /**
-     * @param PDO|SQlite3 $conn Db connection.
-     * @param bool $use_sqlite Set for sqlite queries instead of MySQL.
-     */
-    function __construct(Database $db)
-    {
-        $this->conn = $db->getConn();
-        $this->data_types = Database::getDataTypes();
-    }
-
     public function backup()
     {
         Logging::debug('location debug not implemented');
@@ -53,7 +38,7 @@ class LocationQueries
             return true;
         }
         //list(,, $error) = $stmt->errorInfo();
-        Logging::error(LogError::LOCATION_DELETE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::LOCATION_DELETE, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -74,10 +59,10 @@ class LocationQueries
 
         $r = $stmt->execute();
         if ($r) {
-            return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+            return $this->rowId();
         }
 
-        Logging::error(LogError::LOCATION_INSERT, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::LOCATION_INSERT, ['error' => $this->error($stmt)]);
         return 0;
     }
 
@@ -99,14 +84,14 @@ class LocationQueries
         $r = $stmt->execute();
         if ($r) {
             // retrieve only first row found; fine since id is unique.
-            $row = App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch();
+            $row = $this->fetchRow($r, $stmt);
             if ($row) {
                 return StringContent::fromDatabaseRow($row);
             }
             Logging::error(LogError::LOCATION_QUERY, ['id' => $id]);
             return null;
         }
-        Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::LOCATION_QUERY, ['id' => $id, 'error' =>  $this->error($stmt)]);
         return null;
     }
 
@@ -122,21 +107,14 @@ class LocationQueries
         $r = $stmt->execute();
         if ($r) {
             $locations = [];
-
-            if (App::useSQLite()) {
-                while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
-                    array_push($locations, StringContent::fromDatabaseRow($row));
-                }
-            } else {
-                // fetch next as associative array until there are none to be fetched.
-                while ($row = $stmt->fetch()) {
-                    array_push($locations, StringContent::fromDatabaseRow($row));
-                }
+            // fetch next as associative array until there are none to be fetched.
+            while ($row = $this->fetchRow($r, $stmt)) {
+                array_push($locations, StringContent::fromDatabaseRow($row));
             }
             return $locations;
         }
 
-        Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::LOCATIONS_QUERY_ALL, ['error' => $this->error($stmt)]);
         return [];
     }
 
@@ -162,7 +140,7 @@ class LocationQueries
             return intval($c) === 1;
         }
 
-        Logging::error(LogError::LOCATIONS_CHECK_CONTENT, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::LOCATIONS_CHECK_CONTENT, ['error' => $this->error($stmt)]);
         return false;
     }
 
@@ -183,7 +161,7 @@ class LocationQueries
         if ($stmt->execute()) {
             return true;
         }
-        Logging::error(LogError::LOCATION_UPDATE, ['error' => $this->conn->lastErrorMsg()]);
+        Logging::error(LogError::LOCATION_UPDATE, ['error' => $this->error($stmt)]);
         return false;
     }
 }

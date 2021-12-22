@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2021.12.22 ###
 ##############################
 
 namespace app\helpers;
@@ -33,8 +33,6 @@ class Database
     private UserQueries $users;
     private ArticleQueries $articles;
 
-    private $conn;
-
     /**
      * Initialise connection to the MySQL inside the constructor dunder method.
      * !! do not put the connection parameters (including admin password to db) in a settings.php file shared on github.
@@ -43,10 +41,9 @@ class Database
      */
     function __construct($conn)
     {
-        $this->conn = $conn;
-        $this->locations = new LocationQueries($this);
-        $this->users = new UserQueries($this);
-        $this->articles = new ArticleQueries($this);
+        $this->locations = new LocationQueries($conn);
+        $this->users = new UserQueries($conn);
+        $this->articles = new ArticleQueries($conn);
     }
 
     /**
@@ -90,20 +87,6 @@ class Database
         return $instance;
     }
 
-    public function getConn()
-    {
-        return $this->conn;
-    }
-
-    public static function getDataTypes()
-    {
-        return [
-            'int' => APP::useSQLite() ? SQLITE3_INTEGER : PDO::PARAM_INT,
-            'str' => APP::useSQLite() ? SQLITE3_TEXT : PDO::PARAM_STR,
-            'bool' => APP::useSQLite() ? SQLITE3_INTEGER : PDO::PARAM_BOOL,
-        ];
-    }
-
     /**
      * Get object for location queries.
      * 
@@ -125,32 +108,39 @@ class Database
     }
 
     /**
-     * Get connection to MySQL database using PDO.
+     * Get connection to MySQL database using PDO. Only one connection can ever exist.
      */
-    private static function getMySQLConn(): PDO
+    public static function getMySQLConn(): PDO
     {
-        $dsn = 'mysql:host=' . PrivateSettings::MYSQL_HOST . ';port=' . PrivateSettings::MYSQL_PORT . ';dbname=' . PrivateSettings::MYSQL_SCHEMA . ';charset=utf8mb4';
-        $options = [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ];
+        static $instance;
+        if (is_null($instance)) {
+            $dsn = 'mysql:host=' . PrivateSettings::MYSQL_HOST . ';port=' . PrivateSettings::MYSQL_PORT . ';dbname=' . PrivateSettings::MYSQL_SCHEMA . ';charset=utf8mb4';
+            $options = [
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ];
+            $instance = new PDO($dsn, PrivateSettings::MYSQL_ADMIN_ID, PrivateSettings::MYSQL_ADMIN_PASSWORD, $options);
 
-        return new PDO($dsn, PrivateSettings::MYSQL_ADMIN_ID, PrivateSettings::MYSQL_ADMIN_PASSWORD, $options);
+            if (App::isDebugMode()) {
+                Logging::info('Connection to mysql', ['schema' => PrivateSettings::MYSQL_SCHEMA]);
+            }
+        }
+        return $instance;
     }
 
     /**
      * Get connection to local database using SQLite3.
      * https://www.tutorialspoint.com/sqlite/sqlite_php.htm
      * 
-     * @param string $local_path Path to local sqlite db.
+     * @param string $local_path Path to local sqlite db. Several connections can exist to different local db.
      * @return SQLite3 SQLite3 conn.
      */
     public static function getSQLiteConn(string $local_path): SQLite3
     {
-        // $db_name = is_null($db_name) ? 'localDB' : $db_name;
-        // $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
         $conn = new SQLite3($local_path);
 
-        Logging::info('Connection to SQLITE DB', ['path' => $local_path]);
+        if (App::isDebugMode()) {
+            Logging::info('Connection to SQLITE DB', ['path' => $local_path]);
+        }
         return $conn;
     }
 }
