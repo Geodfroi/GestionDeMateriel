@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 use app\constants\AppPaths;
@@ -34,8 +34,7 @@ final class UserQueriesTest extends TestCase
         App::setMode(Mode::TESTS_SUITE);
 
         if (APP::useSQLite()) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsers.db';
-            $conn = TestUtil::localDBSetup($local_path, true);;
+            $conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'users', true);
         } else {
             $conn = Database::getMySQLConn();
         }
@@ -49,29 +48,35 @@ final class UserQueriesTest extends TestCase
 
     public static function testBackup()
     {
-        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsersBackup.db';
-        $backup_conn = TestUtil::localDBSetup($local_path, false);
+        $folder = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . 'backup';
+        $backup_conn = TestUtil::localDBSetup($folder, 'users', false);
         assertNotNull($backup_conn);
-
         assertTrue(UserQueriesTest::$queries->backup($backup_conn));
-    }
-
-    public function testDelete()
-    {
-        assertTrue(UserQueriesTest::$queries->delete(3));
     }
 
 
     public function testInsert()
     {
         $user = User::fromForm('my.email@gmail.com', '0123456789', true);
-
-        $count = UserQueriesTest::$queries->queryCount(false);
         $id = UserQueriesTest::$queries->insert($user);
-
         assertNotSame($id, 0);
-        assertSame($count + 1, UserQueriesTest::$queries->queryCount(false));
-        // Logging::info('testInsert', ['queryCount' => strval($count)]);
+        assertSame(UserQueriesTest::$queries->queryById($id)->getLoginEmail(), 'my.email@gmail.com');
+    }
+
+    public function testDelete()
+    {
+        $user = User::fromForm('my.email@camamail.com', 'abcd', false);
+        $id = UserQueriesTest::$queries->insert($user);
+        assertTrue(UserQueriesTest::$queries->delete($id));
+    }
+
+    public function queryByAliasProvider(): array
+    {
+        return [
+            ['noel.biquet@gmail.com', true], // present
+            ['Henry', false], //not present
+            ['Florence', true], //not present
+        ];
     }
 
     /**
@@ -87,27 +92,6 @@ final class UserQueriesTest extends TestCase
         }
     }
 
-    public function queryByAliasProvider(): array
-    {
-        return [
-            ['noel.biquet@gmail.com', true], // present
-            ['Henry', false], //not present
-            ['Florence', true], //not present
-        ];
-    }
-
-    /**
-     * @dataProvider queryByEmailProvider
-     */
-    public function testQueryByEmail(string $email, bool $is_present): void
-    {
-        $user = UserQueriesTest::$queries->queryByEmail($email);
-        if ($is_present) {
-            assertNotNull($user);
-        } else {
-            assertNull($user);
-        }
-    }
 
     public function queryByEmailProvider(): array
     {
@@ -117,13 +101,12 @@ final class UserQueriesTest extends TestCase
             ['', false], //not present
         ];
     }
-
     /**
-     * @dataProvider queryByIdProvider
+     * @dataProvider queryByEmailProvider
      */
-    public function testQueryById(int $id, bool $is_present): void
+    public function testQueryByEmail(string $email, bool $is_present): void
     {
-        $user = UserQueriesTest::$queries->queryById($id);
+        $user = UserQueriesTest::$queries->queryByEmail($email);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -139,6 +122,19 @@ final class UserQueriesTest extends TestCase
             [0, false], //not present
         ];
     }
+    /**
+     * @dataProvider queryByIdProvider
+     */
+    public function testQueryById(int $id, bool $is_present): void
+    {
+        $user = UserQueriesTest::$queries->queryById($id);
+        if ($is_present) {
+            assertNotNull($user);
+        } else {
+            assertNull($user);
+        }
+    }
+
 
     public function testQueryAll()
     {

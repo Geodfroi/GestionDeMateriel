@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\helpers\db;
@@ -27,8 +27,24 @@ class LocationQueries extends Queries
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        Logging::debug('location debug not implemented');
-        return false;
+        $stmt = $this->conn->prepare("SELECT * FROM locations");
+        $r = $stmt->execute();
+        while ($row = $this->fetchRow($r, $stmt)) {
+            $id  = (int)($row['id'] ?? 0);
+            $str_content = (string)($row['str_content'] ?? '');
+
+            $stmt = $backup_conn->prepare('INSERT INTO locations (id, str_content) VALUES (:id, :str)');
+
+            $stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $stmt->bindParam(':str', $str_content, SQLITE3_TEXT);
+
+            if (!$stmt->execute()) {
+                Logging::error('failure to insert location in backup db', ['location' => $str_content]);
+                return false;
+            };
+        }
+
+        return true;
     }
 
     /**

@@ -3,32 +3,40 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\helpers;
 
 use SQLite3;
-
+// use app\helpers\Logging;
 use app\constants\AppPaths;
 
 class TestUtil
 {
     /**
-     * Set up temporary sqlite db for tests.
+     * Set up temporary sqlite db for tests and populate it with dummy data.
      * 
-     * @param string $local_path Path to local db.
-     * @param bool $populate Populate database with dummy entries.
+     * @param string $folder_path
+     * @param string $file_name File name without ext.
+     * @param bool populate Populate with dummy data.
      * @return SQLite3|false SQLite3 db connection or false in case of error.
      */
-    public static function localDBSetup(string $local_path, bool $populate): SQLite3
+    public static function localDBSetup(string $folder_path, string $file_name, bool $populate): SQLite3
     {
-        // $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . $db_name . '.db';
-        if (file_exists($local_path)) {
-            unlink($local_path); // erase existing
+        // create folder if it doesn't exists
+        if (!is_dir($folder_path)) {
+            mkdir($folder_path, 0777, true);
         }
 
-        $conn = Database::getSQLiteConn($local_path);
+        $file_path = $folder_path . DIRECTORY_SEPARATOR . $file_name . '.db';
+        if (file_exists($file_path)) {
+            unlink($file_path);
+            //create new file under new name as bugs occurs when recreating a file which has just been unset.
+            // $file_path = $folder_path . DIRECTORY_SEPARATOR . $file_name . '2.db';
+        }
+
+        $conn = Database::getSQLiteConn($file_path);
 
         // create classes
         $content = file_get_contents(AppPaths::SQLITE_TABLES);
@@ -36,36 +44,13 @@ class TestUtil
             return null;
         }
 
-        if (!$populate) {
-            return $conn;
-        }
-
         // populate with dummy content;
-        $content = file_get_contents(AppPaths::SQLITE_ENTRIES);
-        if ($conn->exec($content)) {
-            return $conn;
+        if ($populate) {
+            $content = file_get_contents(AppPaths::SQLITE_ENTRIES);
+            if (!$conn->exec($content)) {
+                return null;
+            }
         }
-
-        return null;
+        return $conn;
     }
 }
-
-    // /**
-    //  * Create classes sqlite database at specified path. 
-    //  * 
-    //  * @param SQlite3 $conn Local db connection.
-    //  * @return bool True if successful.
-    //  */
-    // private static function createClasses(SQLite3 $conn): bool
-    // {
-    // }
-
-    // /**
-    //  * Create and populate TestDB.
-    //  * 
-    //  * @param SQlite3 $conn Local db connection.
-    //  * @return bool True if successful.
-    //  */
-    // public static function populate(SQLite3 $conn): bool
-    // {
-    // }

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\models;
@@ -107,6 +107,11 @@ class Article
     public function getUserId(): int
     {
         return $this->user_id;
+    }
+
+    public function setId($value)
+    {
+        $this->id = $value;
     }
 
     /**

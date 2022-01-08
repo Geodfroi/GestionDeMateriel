@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\models;
@@ -143,6 +143,11 @@ class User
     public function isAdmin(): bool
     {
         return $this->is_admin;
+    }
+
+    public function setId(int $value)
+    {
+        $this->id = $value;
     }
 
     /**

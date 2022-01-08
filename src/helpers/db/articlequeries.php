@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\helpers\db;
@@ -25,13 +25,13 @@ use app\models\Article;
 class ArticleQueries extends Queries
 {
     /**
+     * Transfer article rows to local sqlite db.
+     * 
      * @param SQlite3 $backup_conn Db backup connection.
      * @return True if backup is successful.
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        Logging::debug('article backup not implemented');
-
         $stmt = $this->conn->prepare("SELECT * FROM articles");
         $r = $stmt->execute();
 
@@ -44,9 +44,9 @@ class ArticleQueries extends Queries
             $expiration_date = (string)$row['expiration_date'];
             $creation_date = (string)$row['creation_date'];
 
-            $query = <<<TEXT
-            INSERT INTO articles 
-            (   id,
+            $stmt = $backup_conn->prepare('INSERT INTO articles 
+            (   
+                id,
                 user_id, 
                 article_name, 
                 location, 
@@ -56,20 +56,25 @@ class ArticleQueries extends Queries
             ) 
             VALUES 
             (
-                $id,
-                $user_id,  
-                '$article_name',  
-                '$location', 
-                '$comments',
-                '$expiration_date',
-                '$creation_date'
-            )
-            TEXT;
-            Logging::debug('articles backup', ['query' => $query]);
+                :id,
+                :user_id,  
+                :article_name,  
+                :location, 
+                :comments,
+                :expiration_date,
+                :creation_date
+            )');
 
-            //insert in backup db;
-            if (!$backup_conn->exec($query)) {
-                Logging::error('failure to insert article in backup db', ['article' => $article_name->_toString()]);
+            $stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $stmt->bindParam(':user_id', $user_id, SQLITE3_INTEGER);
+            $stmt->bindParam(':article_name', $article_name, SQLITE3_TEXT);
+            $stmt->bindParam(':location', $location, SQLITE3_TEXT);
+            $stmt->bindParam(':comments', $comments, SQLITE3_TEXT);
+            $stmt->bindParam(':expiration_date', $expiration_date, SQLITE3_TEXT);
+            $stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
+
+            if (!$stmt->execute()) {
+                Logging::error('failure to insert article in backup db', ['article' => $article_name]);
                 return false;
             };
         }
@@ -222,7 +227,9 @@ class ArticleQueries extends Queries
 
         $r = $stmt->execute();
         if ($r) {
-            return $this->rowId();
+            $id = $this->rowId();
+            $article->setId($id);
+            return $id;
         }
         Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->error($stmt)]);
         return 0;

@@ -15,7 +15,7 @@ class AppPaths
     const TEMPLATES = __DIR__ . '/../page_templates';
     const LOG_FOLDER = __DIR__ . '/../../local/logs';
     const BACKUPS_FOLDER = __DIR__ . '/../../local/backups';
-    const TEST_DB_FOLDER = __DIR__ . '/../../local/database';
+    const TEST_DB_FOLDER = __DIR__ . '/../../tests/helpers/db/output';
 
     //SQL queries
     const SQLITE_TABLES = __DIR__ . '/../sql/tables_sqlite.sql';

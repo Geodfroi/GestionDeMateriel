@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\helpers;
@@ -126,6 +126,7 @@ class Database
         }
         return $instance;
     }
+
 
     /**
      * Get connection to local database using SQLite3.
