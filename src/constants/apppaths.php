@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.08 ###
 ##############################
 
 namespace app\constants;
@@ -14,8 +14,10 @@ class AppPaths
     const EMAIL_TEMPLATES = __DIR__ . '/../email_templates';
     const TEMPLATES = __DIR__ . '/../page_templates';
     const LOG_FOLDER = __DIR__ . '/../../local/logs';
-    const BACKUPS_FOLDER = __DIR__ . '/../../local/backups';
-    const TEST_DB_FOLDER = __DIR__ . '/../../tests/helpers/db/output';
+
+    // const BACKUPS_FOLDER =
+    const TEST_DB_FOLDER = __DIR__ . '/../../tests/output';
+    const LOCAL_DB_FOLDER = __DIR__ . '/../../local';
 
     //SQL queries
     const SQLITE_TABLES = __DIR__ . '/../sql/tables_sqlite.sql';

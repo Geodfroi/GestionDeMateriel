@@ -46,16 +46,6 @@ class Database
         $this->articles = new ArticleQueries($conn);
     }
 
-    /**
-     * Backup whole database to file.
-     */
-    public static function backup()
-    {
-        throw new Exception('backup not implemented');
-        // Database::getInstance()->articles()->backup();
-        // Database::getInstance()->locations()->backup();
-        // Database::getInstance()->users()->backup();
-    }
 
     /**
      * Get object for article queries.
@@ -77,12 +67,15 @@ class Database
         static $instance;
         if (is_null($instance)) {
             try {
-                $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
-                $conn = APP::useSQLite() ? Database::getSQLiteConn($local_path) : Database::getMySQLConn();
+                if (APP::useSQLite()) {
+                    $local_path = AppPaths::LOCAL_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
+                    $instance = new static(Database::getSQLiteConn($local_path));
+                } else {
+                    $instance = new static(Database::getMySQLConn());
+                }
             } catch (PDOException $e) {
                 Logging::error(LogError::CONN_FAILURE, ['error' =>  $e->getMessage()]);
             }
-            $instance = new static($conn);
         }
         return $instance;
     }

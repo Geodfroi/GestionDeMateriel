@@ -43,8 +43,7 @@ final class LocationQueriesTest extends TestCase
 
     public static function testBackup()
     {
-        $folder = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . 'backup';
-        $backup_conn = TestUtil::localDBSetup($folder, 'locations', false);
+        $backup_conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'locations_backup', false);
         assertNotNull($backup_conn);
         assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
     }

@@ -188,9 +188,10 @@ class UserQueries extends Queries
      * Return a single User data by alias.
      * 
      * @param int $id User alias.
+     * @param bool suppress error logging
      * @return ?User User class instance.
      */
-    public function queryByAlias(string $alias): ?User
+    public function queryByAlias(string $alias, $suppress_error = false): ?User
     {
         $stmt = $this->conn->prepare('SELECT 
             id, 
@@ -212,14 +213,17 @@ class UserQueries extends Queries
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
-            Logging::error(LogError::USER_QUERY, ['alias' => $alias]);
+            if (!$suppress_error) {
+                Logging::error(LogError::USER_QUERY, ['alias' => $alias]);
+            }
             return null;
         }
-
-        Logging::error(LogError::USER_QUERY, [
-            'alias' => $alias,
-            'error' => $this->error($stmt)
-        ]);
+        if (!$suppress_error) {
+            Logging::error(LogError::USER_QUERY, [
+                'alias' => $alias,
+                'error' => $this->error($stmt)
+            ]);
+        }
         return null;
     }
 
@@ -227,9 +231,10 @@ class UserQueries extends Queries
      * Return a single User data by id.
      * 
      * @param int $id User id.
+     * @param bool suppress error logging
      * @return ?User User class instance.
      */
-    public function queryById(int $id): ?User
+    public function queryById(int $id, $suppress_error = false): ?User
     {
         $stmt = $this->conn->prepare('SELECT 
             id, 
@@ -251,14 +256,19 @@ class UserQueries extends Queries
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
-            Logging::error(LogError::USER_QUERY, ['id' => $id]);
+            if (!$suppress_error) {
+                Logging::error(LogError::USER_QUERY, ['id' => $id]);
+            }
+
             return null;
         }
+        if (!$suppress_error) {
+            Logging::error(LogError::USER_QUERY, [
+                'id' => $id,
+                'error' => $this->error($stmt)
+            ]);
+        }
 
-        Logging::error(LogError::USER_QUERY, [
-            'id' => $id,
-            'error' => $this->error($stmt)
-        ]);
         return null;
     }
 
@@ -266,9 +276,10 @@ class UserQueries extends Queries
      * Return a single user data by their login email.
      * 
      * @param string $login_email User login email.
+     *     * @param bool suppress error logging
      * @return ?User User class instance or null.
      */
-    public function queryByEmail(string $login_email): ?User
+    public function queryByEmail(string $login_email, $suppress_error = false): ?User
     {
         $query = 'SELECT 
             id, 
@@ -291,14 +302,18 @@ class UserQueries extends Queries
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
-            Logging::error(LogError::USER_QUERY, ['login_email' => $login_email,]);
+            if (!$suppress_error) {
+                Logging::error(LogError::USER_QUERY, ['login_email' => $login_email,]);
+            }
             return null;
         }
+        if (!$suppress_error) {
+            Logging::error(LogError::USER_QUERY, [
+                'login_email' => $login_email,
+                'error' => $this->error($stmt)
+            ]);
+        }
 
-        Logging::error(LogError::USER_QUERY, [
-            'login_email' => $login_email,
-            'error' => $this->error($stmt)
-        ]);
         return null;
     }
 

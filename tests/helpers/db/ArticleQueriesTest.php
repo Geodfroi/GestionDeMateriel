@@ -54,8 +54,7 @@ final class ArticleQueriesTest extends TestCase
 
     public static function testBackup()
     {
-        $folder = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . 'backup';
-        $backup_conn = TestUtil::localDBSetup($folder, 'articles', false);
+        $backup_conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'articles_backup', false);
         assertNotNull($backup_conn);
         assertTrue(ArticleQueriesTest::$queries->backup($backup_conn));
     }
@@ -94,7 +93,6 @@ final class ArticleQueriesTest extends TestCase
 
         $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
         $this->assertTrue($count > 2);
-        Logging::info('testQueryCount', ['count' => strval($count)]);
     }
 
     /**

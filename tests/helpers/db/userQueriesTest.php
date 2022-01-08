@@ -48,8 +48,7 @@ final class UserQueriesTest extends TestCase
 
     public static function testBackup()
     {
-        $folder = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR . 'backup';
-        $backup_conn = TestUtil::localDBSetup($folder, 'users', false);
+        $backup_conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'users_backup', false);
         assertNotNull($backup_conn);
         assertTrue(UserQueriesTest::$queries->backup($backup_conn));
     }
@@ -84,7 +83,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testQueryByAlias(string $alias, bool $is_present): void
     {
-        $user = UserQueriesTest::$queries->queryByAlias($alias);
+        $user = UserQueriesTest::$queries->queryByAlias($alias, !$is_present);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -106,7 +105,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testQueryByEmail(string $email, bool $is_present): void
     {
-        $user = UserQueriesTest::$queries->queryByEmail($email);
+        $user = UserQueriesTest::$queries->queryByEmail($email, !$is_present);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -127,7 +126,7 @@ final class UserQueriesTest extends TestCase
      */
     public function testQueryById(int $id, bool $is_present): void
     {
-        $user = UserQueriesTest::$queries->queryById($id);
+        $user = UserQueriesTest::$queries->queryById($id, !$is_present);
         if ($is_present) {
             assertNotNull($user);
         } else {

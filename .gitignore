@@ -1,4 +1,4 @@
 vendor/
 privatesettings.php
 local/logs/
-tests/helpers/db/output/
+tests/output/
