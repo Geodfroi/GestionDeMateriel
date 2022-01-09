@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 use app\constants\AppPaths;
@@ -12,35 +12,28 @@ use app\constants\Mode;
 use app\constants\OrderBy;
 use app\helpers\App;
 use app\helpers\db\ArticleQueries;
-use app\helpers\Database;
+use app\helpers\DBUtil;
 use app\helpers\Logging;
-use app\helpers\TestUtil;
+use app\helpers\TestClass;
 use app\models\Article;
+
 
 use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
-use PHPUnit\Framework\TestCase;
 
 /**
  * https://phpunit.readthedocs.io/en/9.5/writing-tests-for-phpunit.html
  * cmd: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --testdox tests
  */
-final class ArticleQueriesTest extends TestCase
+final class ArticleQueriesTest extends TestClass
 {
     private static ArticleQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setMode(Mode::TESTS_SUITE);
-
-        if (APP::useSQLite()) {
-            $conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'articles', true);
-        } else {
-            $conn = Database::getMySQLConn();
-        }
-        ArticleQueriesTest::$queries = new ArticleQueries($conn);
+        ArticleQueriesTest::$queries = new ArticleQueries(ArticleQueriesTest::getConn());
     }
 
     public static function tearDownAfterClass(): void
@@ -52,12 +45,12 @@ final class ArticleQueriesTest extends TestCase
         assertTrue(true);
     }
 
-    public static function testBackup()
-    {
-        $backup_conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'articles_backup', false);
-        assertNotNull($backup_conn);
-        assertTrue(ArticleQueriesTest::$queries->backup($backup_conn));
-    }
+    // public static function testBackup()
+    // {
+    //     $backup_conn = DBUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'articles_backup', false);
+    //     assertNotNull($backup_conn);
+    //     assertTrue(ArticleQueriesTest::$queries->backup($backup_conn));
+    // }
 
     public function testInsert()
     {

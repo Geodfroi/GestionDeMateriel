@@ -3,12 +3,11 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\helpers\db;
 
-use Exception;
 use SQLite3;
 
 use app\constants\LogError;
@@ -22,23 +21,24 @@ use app\models\StringContent;
 class LocationQueries extends Queries
 {
     /**
-     * @param SQlite3 $backup_conn Db backup connection.
+     * @param SQlite3| $backup_conn Db backup connection.
      * @return True if backup is successful.
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        $stmt = $this->conn->prepare("SELECT * FROM locations");
-        $r = $stmt->execute();
-        while ($row = $this->fetchRow($r, $stmt)) {
+        $query_stmt = $this->conn->prepare("SELECT * FROM locations");
+        $r = $query_stmt->execute();
+
+        while ($row = $this->fetchRow($r, $query_stmt)) {
             $id  = (int)($row['id'] ?? 0);
             $str_content = (string)($row['str_content'] ?? '');
 
-            $stmt = $backup_conn->prepare('INSERT INTO locations (id, str_content) VALUES (:id, :str)');
+            $insert_stmt = $backup_conn->prepare('INSERT INTO locations (id, str_content) VALUES (:id, :str)');
 
-            $stmt->bindParam(':id', $id, SQLITE3_INTEGER);
-            $stmt->bindParam(':str', $str_content, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':str', $str_content, SQLITE3_TEXT);
 
-            if (!$stmt->execute()) {
+            if (!$insert_stmt->execute()) {
                 Logging::error('failure to insert location in backup db', ['location' => $str_content]);
                 return false;
             };

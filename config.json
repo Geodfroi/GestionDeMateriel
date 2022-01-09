@@ -1,4 +1,10 @@
 {
+  "comments": {
+    "clear_log": "clear logs each time the process is launched.",
+    "debug_mode": "Verbose logging to help debugging.",
+    "log_channel": "Name log file in log folder.",
+    "use_sqlite": "Use local sqlite db instead of mySql for testing the application."
+  },
   "app": {
     "clear_log": true,
     "debug_mode": true,
@@ -9,12 +15,12 @@
     "clear_log": true,
     "debug_mode": true,
     "log_channel": "server",
-    "use_sqlite": true
+    "use_sqlite": false
   },
   "tests": {
     "clear_log": true,
     "debug_mode": true,
     "log_channel": "test",
-    "use_sqlite": true
+    "use_sqlite": false
   }
 }

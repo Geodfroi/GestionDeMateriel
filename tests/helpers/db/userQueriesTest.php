@@ -3,20 +3,18 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 use app\constants\AppPaths;
 use app\constants\Mode;
 use app\constants\OrderBy;
 use app\helpers\App;
-use app\helpers\Database;
 use app\helpers\Logging;
-use app\helpers\TestUtil;
+use app\helpers\DBUtil;
+use app\helpers\TestClass;
 use app\helpers\db\UserQueries;
 use app\models\User;
-
-use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertNotNull;
@@ -25,34 +23,25 @@ use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class UserQueriesTest extends TestCase
+final class UserQueriesTest extends TestClass
 {
     private static UserQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setMode(Mode::TESTS_SUITE);
-
-        if (APP::useSQLite()) {
-            $conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'users', true);
-        } else {
-            $conn = Database::getMySQLConn();
-        }
-
-        UserQueriesTest::$queries = new UserQueries($conn);
+        UserQueriesTest::$queries = new UserQueries(TestClass::getConn());
     }
 
     public static function tearDownAfterClass(): void
     {
     }
 
-    public static function testBackup()
-    {
-        $backup_conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'users_backup', false);
-        assertNotNull($backup_conn);
-        assertTrue(UserQueriesTest::$queries->backup($backup_conn));
-    }
-
+    // public static function testBackup()
+    // {
+    //     $backup_conn = DBUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'users_backup', false);
+    //     assertNotNull($backup_conn);
+    //     assertTrue(UserQueriesTest::$queries->backup($backup_conn));
+    // }
 
     public function testInsert()
     {

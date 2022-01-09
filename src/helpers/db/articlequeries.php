@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\helpers\db;
@@ -32,10 +32,10 @@ class ArticleQueries extends Queries
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        $stmt = $this->conn->prepare("SELECT * FROM articles");
-        $r = $stmt->execute();
+        $query_stmt = $this->conn->prepare("SELECT * FROM articles");
+        $r = $query_stmt->execute();
 
-        while ($row = $this->fetchRow($r, $stmt)) {
+        while ($row = $this->fetchRow($r, $query_stmt)) {
             $id  = (int)($row['id'] ?? 0);
             $user_id = (int)($row['user_id'] ?? 0);
             $article_name = (string)($row['article_name'] ?? '');
@@ -44,7 +44,7 @@ class ArticleQueries extends Queries
             $expiration_date = (string)$row['expiration_date'];
             $creation_date = (string)$row['creation_date'];
 
-            $stmt = $backup_conn->prepare('INSERT INTO articles 
+            $insert_stmt = $backup_conn->prepare('INSERT INTO articles 
             (   
                 id,
                 user_id, 
@@ -65,15 +65,15 @@ class ArticleQueries extends Queries
                 :creation_date
             )');
 
-            $stmt->bindParam(':id', $id, SQLITE3_INTEGER);
-            $stmt->bindParam(':user_id', $user_id, SQLITE3_INTEGER);
-            $stmt->bindParam(':article_name', $article_name, SQLITE3_TEXT);
-            $stmt->bindParam(':location', $location, SQLITE3_TEXT);
-            $stmt->bindParam(':comments', $comments, SQLITE3_TEXT);
-            $stmt->bindParam(':expiration_date', $expiration_date, SQLITE3_TEXT);
-            $stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':user_id', $user_id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':article_name', $article_name, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':location', $location, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':comments', $comments, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':expiration_date', $expiration_date, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
 
-            if (!$stmt->execute()) {
+            if (!$insert_stmt->execute()) {
                 Logging::error('failure to insert article in backup db', ['article' => $article_name]);
                 return false;
             };

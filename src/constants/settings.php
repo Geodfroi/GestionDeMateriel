@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\constants;
@@ -42,4 +42,6 @@ class Settings
 
     const DEFAULT_PASSWORD_LENGTH = 12;
     const USER_PASSWORD_MIN_LENGTH = 8;
+
+    const BACKUP_FILES_MAX = 14;
 }

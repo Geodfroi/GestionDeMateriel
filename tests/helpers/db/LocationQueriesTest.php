@@ -3,17 +3,16 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 use app\constants\AppPaths;
 use app\constants\Mode;
 use app\helpers\App;
-use app\helpers\Database;
 use app\helpers\db\LocationQueries;
 use app\helpers\Logging;
-use app\helpers\TestUtil;
-use app\models\StringContent;
+use app\helpers\DBUtil;
+use app\helpers\TestClass;
 
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertNotNull;
@@ -21,32 +20,25 @@ use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class LocationQueriesTest extends TestCase
+final class LocationQueriesTest extends TestClass
 {
     private static LocationQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setMode(Mode::TESTS_SUITE);
-
-        if (APP::useSQLite()) {
-            $conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'locations', true);
-        } else {
-            $conn = Database::getMySQLConn();
-        }
-        LocationQueriesTest::$queries = new LocationQueries($conn);
+        LocationQueriesTest::$queries = new LocationQueries(LocationQueriesTest::getConn());
     }
 
     public static function tearDownAfterClass(): void
     {
     }
 
-    public static function testBackup()
-    {
-        $backup_conn = TestUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'locations_backup', false);
-        assertNotNull($backup_conn);
-        assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
-    }
+    // public static function testBackup()
+    // {
+    //     $backup_conn = DBUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'locations_backup', false);
+    //     assertNotNull($backup_conn);
+    //     assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
+    // }
 
 
     public function insertProvider(): array

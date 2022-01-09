@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\helpers;
@@ -31,19 +31,15 @@ class App
     {
         $json = file_get_contents(AppPaths::CONFIG_FILE);
         $this->content =  json_decode($json, true);
+
         $this->mode = $mode;
     }
 
     private function clearLog()
     {
-        // $clear_log = $this->getData('clear_log');
-        // if ($clear_log) {
-        //     $channel = $this->getData("log_channel");
-        //     $path = AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $channel . '.log';
-        //     if (file_exists($path)) {
-        //         file_put_contents($path, "");
-        //     }
-        // }
+        $channel = $this->getData('log_channel');
+        $path = AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $channel . '.log';
+        unlink($path);
     }
 
     /**
@@ -68,8 +64,19 @@ class App
      */
     public static function setMode(string $mode)
     {
-        App::$instance = new static($mode);
-        App::$instance->clearLog();
+        if (!isset(App::$instance)) {
+            App::$instance = new static($mode);
+            if (App::$instance->getData('clear_log')) {
+                App::$instance->clearLog();
+            }
+
+            if (App::$instance->isDebugMode()) {
+                Logging::info('mode set', [
+                    'channel' => App::$instance->logChannel(),
+                    'sqlite' => App::$instance->useSQLite(),
+                ]);
+            }
+        }
     }
 
     public static function useSQLite(): bool

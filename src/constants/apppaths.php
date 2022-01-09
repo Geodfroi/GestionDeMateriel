@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\constants;
@@ -15,7 +15,6 @@ class AppPaths
     const TEMPLATES = __DIR__ . '/../page_templates';
     const LOG_FOLDER = __DIR__ . '/../../local/logs';
 
-    // const BACKUPS_FOLDER =
     const TEST_DB_FOLDER = __DIR__ . '/../../tests/output';
     const LOCAL_DB_FOLDER = __DIR__ . '/../../local';
 
@@ -25,4 +24,7 @@ class AppPaths
 
     // config
     const CONFIG_FILE = __DIR__ . '/../../config.json';
+
+    // sqlite backup
+    const BACKUP_FOLDER = __DIR__ . '/../../_backups';
 }

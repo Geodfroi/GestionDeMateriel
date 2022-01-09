@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\helpers\db;
@@ -27,10 +27,10 @@ class UserQueries extends Queries
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        $stmt = $this->conn->prepare("SELECT * FROM users");
-        $r = $stmt->execute();
+        $query_stmt = $this->conn->prepare("SELECT * FROM users");
+        $r = $query_stmt->execute();
 
-        while ($row = $this->fetchRow($r, $stmt)) {
+        while ($row = $this->fetchRow($r, $query_stmt)) {
             $id  = (int)($row['id'] ?? 0);
             $alias = (string)($row['alias'] ?? '');
             $contact_delay = (string)($row['contact_delay'] ?? '');
@@ -41,7 +41,7 @@ class UserQueries extends Queries
             $last_login = (string)($row['last_login'] ?? '');
             $password = (string)($row['password'] ?? '');
 
-            $stmt = $backup_conn->prepare('INSERT INTO users 
+            $insert_stmt = $backup_conn->prepare('INSERT INTO users 
             (   
                 id,
                 alias, 
@@ -66,17 +66,17 @@ class UserQueries extends Queries
                 :password
             )');
 
-            $stmt->bindParam(':id', $id, SQLITE3_INTEGER);
-            $stmt->bindParam(':alias', $alias, SQLITE3_TEXT);
-            $stmt->bindParam(':contact_delay', $contact_delay, SQLITE3_TEXT);
-            $stmt->bindParam(':contact_email', $contact_email, SQLITE3_TEXT);
-            $stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
-            $stmt->bindParam(':login_email', $login_email, SQLITE3_TEXT);
-            $stmt->bindParam(':is_admin', $is_admin, SQLITE3_INTEGER);
-            $stmt->bindParam(':last_login', $last_login, SQLITE3_TEXT);
-            $stmt->bindParam(':password', $password, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':alias', $alias, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':contact_delay', $contact_delay, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':contact_email', $contact_email, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':login_email', $login_email, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':is_admin', $is_admin, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':last_login', $last_login, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':password', $password, SQLITE3_TEXT);
 
-            if (!$stmt->execute()) {
+            if (!$insert_stmt->execute()) {
                 Logging::error('failure to insert user in backup db', ['user' => $login_email]);
                 return false;
             };
