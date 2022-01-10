@@ -20,7 +20,7 @@ class LocationList extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('location_presets_template', Route::LOCAL_PRESETS);
+        parent::__construct(Route::LOCAL_PRESETS, 'location_presets_template');
     }
 
     public function getBodyContent(): string

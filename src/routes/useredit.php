@@ -20,7 +20,7 @@ class UserEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('user_edit_template', Route::USER_EDIT);
+        parent::__construct(Route::USER_EDIT, 'user_edit_template');
     }
 
     public function getBodyContent(): string

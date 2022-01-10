@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 use app\constants\ArtFilter;
@@ -172,7 +172,8 @@ function getOwner(Article $article): string
                                             <li><span id="filter-date-before" class="dropdown-item filter-date-select">Péremption avant le</span></li>
                                             <li><span id="filter-date-after" class="dropdown-item filter-date-select">Péremption après le</span></li>
                                         </ul>
-                                        <input name="filter-date-val" class="form-control" type="date" value="<?php echo $filter_date_val; ?>">
+                                        <input id="filter-date-val" name="filter-date-val" class="form-control" type="date" value="<?php echo $filter_date_val; ?>">
+                                        <button id="filter-date-clear" class="btn btn-outline-primary">Effacer</button>
                                     </div>
 
                                     <div class="form-check form-switch mb-1">
@@ -193,9 +194,9 @@ function getOwner(Article $article): string
         </div>
     </div>
 
-    <!-- Script for date filter combobox -->
-    <!-- set date filter btn inner text and fill date type input value. -->
+    <!-- script for date filter -->
     <script>
+        // set date filter btn inner text and fill date type input value.
         let btn = document.getElementById('filter-date-btn');
         let date_input = document.getElementById('filter-date-type');
 
@@ -213,6 +214,13 @@ function getOwner(Article $article): string
                 }
             });
         }
+
+        // Clear date filter btn
+        document.getElementById('filter-date-clear').addEventListener('click', e => {
+            e.preventDefault()
+            document.getElementById('filter-date-val').value = "";
+
+        })
     </script>
 
     <div class="row">

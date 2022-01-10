@@ -14,7 +14,6 @@ namespace app\constants;
 class Settings
 {
 
-
     /**
      * If DEBUG_MODE is active, all emails are sent from and to this address.
      */
@@ -26,7 +25,7 @@ class Settings
      * Used as hyperlink in emails; must be set to proper url once the project is online. 
      */
     const APP_URL = '';
-    const LAST_MODIFICATION = '21 décembre 2021';
+    const LAST_MODIFICATION = '09 janvier 2022';
 
     const ALIAS_MIN_LENGHT = 6;
     const ARTICLE_NAME_MIN_LENGHT = 6;

@@ -6,19 +6,14 @@ declare(strict_types=1);
 ## Joël Piguet - 2022.01.09 ###
 ##############################
 
-use app\constants\AppPaths;
 use app\constants\ArtFilter;
-use app\constants\Mode;
 use app\constants\OrderBy;
-use app\helpers\App;
 use app\helpers\db\ArticleQueries;
-use app\helpers\DBUtil;
-use app\helpers\Logging;
+// use app\helpers\Logging;
 use app\helpers\TestClass;
 use app\models\Article;
 
 
-use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;

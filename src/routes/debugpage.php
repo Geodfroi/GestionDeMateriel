@@ -18,7 +18,7 @@ class DebugPage extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('debug_template', Route::CONTACT);
+        parent::__construct(Route::CONTACT, 'debug_template');
     }
 
     public function getBodyContent(): string

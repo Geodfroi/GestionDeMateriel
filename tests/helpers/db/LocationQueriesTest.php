@@ -6,15 +6,10 @@ declare(strict_types=1);
 ## Joël Piguet - 2022.01.09 ###
 ##############################
 
-use app\constants\AppPaths;
-use app\constants\Mode;
-use app\helpers\App;
 use app\helpers\db\LocationQueries;
-use app\helpers\Logging;
-use app\helpers\DBUtil;
+// use app\helpers\Logging;
 use app\helpers\TestClass;
 
-use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
@@ -39,7 +34,6 @@ final class LocationQueriesTest extends TestClass
     //     assertNotNull($backup_conn);
     //     assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
     // }
-
 
     public function insertProvider(): array
     {

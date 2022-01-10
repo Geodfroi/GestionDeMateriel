@@ -18,7 +18,7 @@ class ArticleEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('article_edit_template', Route::ART_EDIT);
+        parent::__construct(Route::ART_EDIT, 'article_edit_template');
     }
 
     public function getBodyContent(): string

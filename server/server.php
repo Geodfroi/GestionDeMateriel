@@ -50,6 +50,10 @@ function sendPeremptionWarnings()
                 }
             }
         }
+        if (count($reminders) == 0) {
+            Logging::info('No peremption notice sent to users today.');
+            return;
+        }
 
         if (!Mailing::peremptionNotification($user, $reminders)) {
             Logging::error('peremption notification failed.');

@@ -2,3 +2,4 @@ vendor/
 privatesettings.php
 local/logs/
 tests/output/
+_backups/

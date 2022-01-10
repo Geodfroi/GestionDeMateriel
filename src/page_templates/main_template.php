@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 use app\constants\Route;
@@ -111,6 +111,7 @@ use app\helpers\Authenticate;
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     </script>
+    <?php echo isset($page_script) ? $page_script : ""; ?>
 </body>
 
 </html>

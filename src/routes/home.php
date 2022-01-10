@@ -16,7 +16,7 @@ class Home extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('', Route::HOME);
+        parent::__construct(Route::HOME, '');
     }
 
     public function getBodyContent(): string

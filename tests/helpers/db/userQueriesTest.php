@@ -6,12 +6,8 @@ declare(strict_types=1);
 ## Joël Piguet - 2022.01.09 ###
 ##############################
 
-use app\constants\AppPaths;
-use app\constants\Mode;
 use app\constants\OrderBy;
-use app\helpers\App;
-use app\helpers\Logging;
-use app\helpers\DBUtil;
+// use app\helpers\Logging;
 use app\helpers\TestClass;
 use app\helpers\db\UserQueries;
 use app\models\User;

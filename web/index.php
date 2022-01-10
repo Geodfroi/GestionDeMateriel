@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh.
@@ -25,6 +25,7 @@ if ($route = Router::getRoute()) {
     if (!$route->isRedirecting()) {
         $templateData['page_title'] = $route->getHeaderTitle();
         $templateData['page_content'] = $route->getBodyContent();
+        $templateData['page_script'] = $route->getScript();
         $templateData['show_header'] = $route->showHeader();
         $templateData['show_footer'] = $route->showFooter();
         $templateData['alert'] = $route->getAlert();

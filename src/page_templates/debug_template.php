@@ -1,10 +1,7 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
-
-use app\constants\Route;
-use app\helpers\Database;
 
 ?>
 
@@ -16,7 +13,6 @@ use app\helpers\Database;
     <div>TODO::</div>
     <br>
     <div>Bug with expiration date before filter in sqlite</div>
-    <div>Enable backup to local db</div>
     <div>Btn to clear after before date</div>
     <div>Display limit as option.</div>
     <div>ADMIN - access user contact posts.</div>

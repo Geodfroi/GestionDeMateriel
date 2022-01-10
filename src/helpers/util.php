@@ -140,7 +140,9 @@ class Util
         $former_password = $user->getPassword();
 
         $plain_password = Util::getRandomPassword();
+        Logging::debug('plain_password: ' .   $plain_password);
         $encrypted = Util::encryptPassword($plain_password);
+        Logging::debug('encrypted: ' .   $encrypted);
 
         if (Database::users()->updatePassword($user->getId(), $encrypted)) {
 
