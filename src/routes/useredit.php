@@ -1,11 +1,13 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\AlertType;
+use app\constants\Alert;
 use app\constants\LogInfo;
 use app\constants\Route;
 use app\helpers\Authenticate;
@@ -52,15 +54,13 @@ class UserEdit extends BaseRoute
                             'admin-id' => $admin_id,
                             'new-user' => $login_email
                         ]);
-                        $this->requestRedirect(Route::USERS_TABLE . '?alert=added_success');
-                        return '';
+                        return $this->requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
                     } else {
                         //attempt to roll back add user to db.
                         Database::users()->delete($id);
                     }
                 }
-                $this->requestRedirect(Route::USERS_TABLE . '?alert=added_failure');
-                return '';
+                return $this->requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
             }
             goto end;
         }

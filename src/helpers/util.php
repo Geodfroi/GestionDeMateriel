@@ -11,7 +11,6 @@ namespace app\helpers;
 use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
-use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
@@ -133,34 +132,31 @@ class Util
     /**
      * Create a new password, send a renewal email and modify database record. Includes logging.
      * 
-     * @param BaseRoute Route receiving the alerts.
      * @param User User.
+     * @return bool True if successful.
      */
-    public static function renewPassword(BaseRoute $route, User $user)
+    public static function renewPassword(User $user): bool
     {
         $former_password = $user->getPassword();
 
         $plain_password = Util::getRandomPassword();
-        Logging::debug('plain_password: ' .   $plain_password);
         $encrypted = Util::encryptPassword($plain_password);
-        Logging::debug('encrypted: ' .   $encrypted);
 
         if (Database::users()->updatePassword($user->getId(), $encrypted)) {
 
             if (Mailing::passwordChangeNotification($user,  $plain_password)) {
-                $route->storeAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
 
                 Logging::info(LogInfo::NEW_PASSWORD_ISSUED, [
                     'user-id' => $user->getId(),
                     'login' => $user->getLoginEmail()
                 ]);
 
-                return;
+                return true;
             }
             // attempt to roll back update.
             Database::users()->updatePassword($user->getId(), $former_password);
         }
-        $route->storeAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+        return false;
     }
 
     /**

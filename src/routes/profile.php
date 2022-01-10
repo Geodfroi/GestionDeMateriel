@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\routes;
@@ -24,7 +24,7 @@ class Profile extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::PROFILE, 'profile_template');
+        parent::__construct(Route::PROFILE, 'profile_template', 'profile');
     }
 
     public function getBodyContent(): string
@@ -40,10 +40,10 @@ class Profile extends BaseRoute
         $user  = Authenticate::getUser();
         $user_id = Authenticate::getUserId();
 
-        if (!$user) {
-            $this->showAlert(AlertType::FAILURE, Alert::USER_NOT_FOUND);
-            return "";
-        }
+        // if (!$user) {
+        //     $this->showAlert(AlertType::FAILURE, Alert::USER_NOT_FOUND);
+        //     return "";
+        // }
 
         if (isset($_GET['set_alias'])) {
             $display = 1;

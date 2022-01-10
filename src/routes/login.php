@@ -6,13 +6,13 @@
 
 namespace app\routes;
 
-// use app\constants\Alert;
-// use app\constants\AlertType;
+use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\Route;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
-use app\helpers\Logging;
+// use app\helpers\Logging;
 use app\helpers\Util;
 use app\helpers\Validation;
 
@@ -46,7 +46,10 @@ class Login extends BaseRoute
             $user = Database::users()->queryByEmail($login_email);
 
             if (isset($user)) {
-                Util::renewPassword($this, $user);
+                if (Util::renewPassword($user)) {
+                    return $this->requestRedirect(Route::LOGIN, AlertType::SUCCESS, printf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
+                }
+                return $this->requestRedirect(Route::LOGIN, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
             }
 
             goto end;

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\routes;
@@ -25,41 +25,13 @@ class UserTable extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::USERS_TABLE, 'user_table', 'user_table');
+        parent::__construct(Route::USERS_TABLE, 'user_table_template', 'user_table');
     }
 
     public function getBodyContent(): string
     {
         if (!Authenticate::isLoggedIn()) {
             $this->requestRedirect(Route::LOGIN);
-        }
-
-        $_SESSION[Session::USERS_PAGE] ??= 1;
-        $_SESSION[Session::USERS_ORDERBY] ??= OrderBy::EMAIL_ASC;
-
-        if (isset($_GET['alert'])) {
-            if ($_GET['alert'] === 'added_success') {
-                $this->showAlert(AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
-            } else if ($_GET['alert'] === 'added_failure') {
-                $this->showAlert(AlertType::FAILURE, Alert::USER_ADD_FAILURE);
-            }
-            goto end;
-        }
-
-        if (isset($_GET['renew'])) {
-            $user = Database::users()->queryById(intval($_GET['renew']));
-            Util::renewPassword($this, $user);
-            goto end;
-        }
-
-        if (isset($_GET['orderby'])) {
-            $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
-            goto end;
-        }
-
-        if (isset($_GET['page'])) {
-            $_SESSION[Session::USERS_PAGE] = intval($_GET['page']);
-            goto end;
         }
 
         if (isset($_GET['delete'])) {
@@ -71,12 +43,29 @@ class UserTable extends BaseRoute
                     'admin-id' => Authenticate::getUserId(),
                     'user-id' => $user_id
                 ]);
-
-                $this->showAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
-            } else {
-                $this->showAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
+                return $this->requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
             }
+            return $this->requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
+        }
+
+        if (isset($_GET['renew'])) {
+            $user = Database::users()->queryById(intval($_GET['renew']));
+            if (Util::renewPassword($user)) {
+                return $this->requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, printf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
+            }
+            return $this->requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+        }
+
+        $_SESSION[Session::USERS_PAGE] ??= 1;
+        $_SESSION[Session::USERS_ORDERBY] ??= OrderBy::EMAIL_ASC;
+
+        if (isset($_GET['orderby'])) {
+            $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
             goto end;
+        }
+
+        if (isset($_GET['page'])) {
+            $_SESSION[Session::USERS_PAGE] = intval($_GET['page']);
         }
 
         end:
