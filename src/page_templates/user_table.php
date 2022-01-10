@@ -93,45 +93,12 @@ function disLinkAdm(string $header): string
                         <!-- login -->
                         <td><?php echo $user->getLastLogin()->format('d-m-Y H:i:s') ?></td>
                         <td>
-                            <a class="link-secondary" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                            <a class="link-secondary" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
 
                             <?php if (!$user->isAdmin()) { ?>
-                                <a class="link-secondary text-info ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#renew-modal-$n" ?>><i class="bi bi-key" role="img" style="font-size: 1.2rem;" aria-label="renew-password" data-bs-toggle="tooltip" title="Renouveler le mot de passe." data-bs-placement="bottom"></i></a>
+                                <a class="link-secondary text-info ms-2" data-bs-toggle="modal" data-bs-target="#renew-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-key" role="img" style="font-size: 1.2rem;" aria-label="renew-password" data-bs-toggle="tooltip" title="Renouveler le mot de passe." data-bs-placement="bottom"></i></a>
                             <?php } ?>
                         </td>
-
-                        <!-- Modal window for user delete confirmation -->
-                        <div class="modal fade" id=<?php echo "delete-modal-$n" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=<?php echo "delete-modal-label-$n" ?> aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id=<?php echo "delete-modal-label-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
-                                    </div>
-                                    <div class="modal-body"> Voulez-vous vraiment supprimer le compte utilisateur [<?php echo $user->getLoginEmail() ?>] ? </div>
-                                    <div class="modal-footer">
-                                        <a href="<?php echo Route::USERS_TABLE . '?delete=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal window for renew password confirmation -->
-                        <div class="modal fade" id=<?php echo "renew-modal-$n" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=<?php echo "renew-modal-label-$n" ?> aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id=<?php echo "renew-modal-label-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
-                                    </div>
-                                    <div class="modal-body">Envoyer un nouveau mot de passe à [<?php echo $user->getLoginEmail() ?>] ? </div>
-                                    <div class="modal-footer">
-                                        <a href="<?php echo Route::USERS_TABLE . '?renew=' . $user->getId() ?>" class="btn btn-primary">Confirmer</a>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </tr>
                 <?php } ?>
             </tbody>
@@ -164,5 +131,38 @@ function disLinkAdm(string $header): string
 
     <div class="row">
         <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
+    </div>
+</div>
+
+
+<!-- Modal window for user delete confirmation -->
+<div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+            </div>
+            <div class="modal-body"> Voulez-vous vraiment supprimer le compte utilisateur [] ? </div>
+            <div class="modal-footer">
+                <a href="" class="btn btn-primary">Confirmer</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal window for renew password confirmation -->
+<div class="modal fade" id="renew-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="renew-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renew-modal-label"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+            </div>
+            <div class="modal-body">Envoyer un nouveau mot de passe à [] ? </div>
+            <div class="modal-footer">
+                <a href="" class="btn btn-primary">Confirmer</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
     </div>
 </div>

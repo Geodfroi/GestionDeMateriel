@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 use app\constants\Route;
@@ -82,15 +82,3 @@ $loc_presets = Database::locations()->queryAll();
 
     </div>
 </div>
-
-<script>
-    let loc_input = document.getElementById('form-location');
-
-    let collection = document.getElementsByClassName('loc-preset');
-    for (let index = 0; index < collection.length; index++) {
-        const element = collection[index];
-        element.addEventListener('click', e => {
-            loc_input.value = element.innerText;
-        });
-    }
-</script>

@@ -40,7 +40,7 @@ abstract class BaseRoute
     {
         $_SESSION['route'] = $route;
         $this->template_name = $template_name;
-        $this->$javascript_name = $javascript_name;
+        $this->javascript_name = $javascript_name;
         $this->show_header = $show_header;
         $this->show_footer = $show_footer;
     }
@@ -74,6 +74,9 @@ abstract class BaseRoute
      */
     public function getScript()
     {
+        if (strlen($this->javascript_name) == 0)
+            return "";
+
         $script_path = AppPaths::SCRIPTS . DIRECTORY_SEPARATOR . $this->javascript_name . '.js';
         return file_get_contents($script_path);
     }

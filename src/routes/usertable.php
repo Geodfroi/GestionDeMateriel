@@ -25,7 +25,7 @@ class UserTable extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::USERS_TABLE, 'user_table_template');
+        parent::__construct(Route::USERS_TABLE, 'user_table', 'user_table');
     }
 
     public function getBodyContent(): string

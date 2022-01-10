@@ -25,7 +25,7 @@ class ArticleTable extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct(Route::ART_TABLE, 'articles_table_template');
+        parent::__construct(Route::ART_TABLE, 'articles_table', 'articles_table');
     }
 
     public function getBodyContent(): string

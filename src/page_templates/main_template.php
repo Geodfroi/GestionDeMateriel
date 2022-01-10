@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 use app\constants\Route;
@@ -46,7 +46,7 @@ use app\helpers\Authenticate;
                                     <a class="nav-link <?php echo $_SESSION['route'] === Route::ART_TABLE ? 'active' : '' ?>" href="<?php echo Route::ART_TABLE ?>">Articles</a>
                                 </li>
                                 <li class="nav-item active">
-                                    <a class="nav-link <?php echo $_SESSION['route'] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profile</a>
+                                    <a class="nav-link <?php echo $_SESSION['route'] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profil</a>
                                 </li>
                             <?php } ?>
 
@@ -111,7 +111,9 @@ use app\helpers\Authenticate;
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     </script>
-    <?php echo isset($page_script) ? $page_script : ""; ?>
+    <script>
+        <?php echo isset($page_script) ? $page_script : ""; ?>
+    </script>
 </body>
 
 </html>

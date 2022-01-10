@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 ?>
@@ -12,6 +12,7 @@
 <div>
     <div>TODO::</div>
     <br>
+    <div>Redirect to home after CRUD operation</div>
     <div>Bug with expiration date before filter in sqlite</div>
     <div>Btn to clear after before date</div>
     <div>Display limit as option.</div>
