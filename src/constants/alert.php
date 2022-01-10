@@ -35,8 +35,8 @@ class Alert
     const LOC_PRESET_REMOVE_SUCCESS = "L'emplacement a été enlevé avec succès.";
     const LOC_PRESET_UPDATE_SUCCESS = "L'emplacement a été modifié avec succès.";
 
-    //login alerts
-    const LOGIN_USER_DISC = "L'usager précédent s'est déconnecté.";
+    // //login alerts
+    // const LOGIN_USER_DISC = "L'usager précédent s'est déconnecté.";
 
     //profile alerts
     const ALIAS_DELETE_SUCCESS = "Vous avez effacé votre alias. Votre e-mail sera utilisé pour vous identifier auprès des autres utilisateurs.";

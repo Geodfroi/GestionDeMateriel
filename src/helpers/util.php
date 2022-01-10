@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\helpers;
@@ -11,6 +11,7 @@ namespace app\helpers;
 use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
+use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
@@ -147,7 +148,7 @@ class Util
         if (Database::users()->updatePassword($user->getId(), $encrypted)) {
 
             if (Mailing::passwordChangeNotification($user,  $plain_password)) {
-                $route->showAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
+                $route->storeAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
 
                 Logging::info(LogInfo::NEW_PASSWORD_ISSUED, [
                     'user-id' => $user->getId(),
@@ -159,7 +160,7 @@ class Util
             // attempt to roll back update.
             Database::users()->updatePassword($user->getId(), $former_password);
         }
-        $route->showAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+        $route->storeAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
     }
 
     /**

@@ -1,17 +1,18 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\routes;
 
-use app\constants\Alert;
-use app\constants\AlertType;
+// use app\constants\Alert;
+// use app\constants\AlertType;
 use app\constants\Route;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
 use app\helpers\Validation;
 
@@ -31,11 +32,11 @@ class Login extends BaseRoute
 
             if (isset($_GET['logout'])) {
                 Authenticate::logout();
-                $this->showAlert(AlertType::INFO, Alert::LOGIN_USER_DISC);
+                $this->requestRedirect(Route::LOGIN);
             } else {
                 $this->requestRedirect(Route::HOME);
-                return '';
             }
+            return '';
         }
 
         if (isset($_GET['old-email'])) {

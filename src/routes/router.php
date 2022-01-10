@@ -29,7 +29,10 @@ class Router
 
         //logging route if logged-in and in debug mode.
         if (App::isDebugMode() && Authenticate::isLoggedIn()) {
-            Logging::debug(LogInfo::ROUTING, ['route' => $route, 'user-id' => Authenticate::getUserId()]);
+            Logging::debug(LogInfo::ROUTING, [
+                'route' => $route,
+                'user-id' => Authenticate::getUserId()
+            ]);
         }
 
         switch ($route) {

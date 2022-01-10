@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\routes;
@@ -25,7 +25,7 @@ class ArticleTable extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct(Route::ART_TABLE, 'articles_table', 'articles_table');
+        parent::__construct(Route::ART_TABLE, 'articles_table_template', 'articles_table');
     }
 
     public function getBodyContent(): string
@@ -43,28 +43,13 @@ class ArticleTable extends BaseRoute
             $_SESSION[Session::ART_FILTERS] = [];
         }
 
-        if (isset($_GET['alert'])) {
-
-            if ($_GET['alert'] === 'added_success') {
-                $this->showAlert(AlertType::SUCCESS, Alert::ARTICLE_ADD_SUCCESS);
-            } else if ($_GET['alert'] === 'added_failure') {
-                $this->showAlert(AlertType::FAILURE, Alert::ARTICLE_ADD_FAILURE);
-            } else if ($_GET['alert'] === 'updated_success') {
-                $this->showAlert(AlertType::SUCCESS, Alert::ARTICLE_UPDATE_SUCCESS);
-            } else if ($_GET['alert'] === 'updated_failure') {
-                $this->showAlert(AlertType::FAILURE, Alert::ARTICLE_UPDATE_FAILURE);
-            }
-            goto end;
-        }
-
         if (isset($_GET['delete'])) {
             if (Database::articles()->delete($_GET['delete'])) {
-                $this->showAlert(AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
                 Logging::info(LogInfo::ARTICLE_DELETED, ['user-id' => $user_id, 'article-id' => $_GET['delete']]);
+                return $this->requestRedirect(ROUTE::ART_TABLE, AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
             } else {
-                $this->showAlert(AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
+                return $this->requestRedirect(ROUTE::ART_TABLE, AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
             }
-            goto end;
         }
 
         if (isset($_GET['orderby'])) {

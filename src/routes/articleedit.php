@@ -1,11 +1,13 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Route;
 use app\helpers\Authenticate;
@@ -18,7 +20,7 @@ class ArticleEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::ART_EDIT, 'article_edit', 'article_edit');
+        parent::__construct(Route::ART_EDIT, 'article_edit_template', 'article_edit');
     }
 
     public function getBodyContent(): string
@@ -47,9 +49,9 @@ class ArticleEdit extends BaseRoute
                 $article_id = Database::articles()->insert($article);
                 if ($article_id) {
                     Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article_id]);
-                    $this->requestRedirect(Route::ART_TABLE . '?alert=added_success');
+                    return $this->requestRedirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_ADD_SUCCESS);
                 } else {
-                    $this->requestRedirect(Route::ART_TABLE . '?alert=added_failure');
+                    return $this->requestRedirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
                 }
             }
             goto end;
@@ -67,9 +69,9 @@ class ArticleEdit extends BaseRoute
 
                 if (Database::articles()->update($article)) {
                     Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article->getId()]);
-                    $this->requestRedirect(Route::ART_TABLE . '?alert=updated_success');
+                    return $this->requestRedirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
                 } else {
-                    $this->requestRedirect(Route::ART_TABLE . '?alert=updated_failure');
+                    return $this->requestRedirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
                 }
             }
         }

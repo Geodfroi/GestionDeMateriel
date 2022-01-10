@@ -12,9 +12,9 @@
 <div>
     <div>TODO::</div>
     <br>
+    <div>Set logs with date, efface older.</div>
     <div>Redirect to home after CRUD operation</div>
     <div>Bug with expiration date before filter in sqlite</div>
-    <div>Btn to clear after before date</div>
     <div>Display limit as option.</div>
     <div>ADMIN - access user contact posts.</div>
     <div>CONTACT: create contact page</div>
@@ -24,7 +24,4 @@
     <div>LOGIN: add favicon</div>
     <div>USER_EDIT: layout for small screen.</div>
     <div>Remove old logs ?</div>
-    <div>Varying modal content
-        https://getbootstrap.com/docs/5.1/components/modal/
-    </div>
 </div>

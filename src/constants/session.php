@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 namespace app\constants;
@@ -25,4 +25,6 @@ class Session
 
     const USER_ID = 'user_id';
     const IS_ADMIN = 'is_admin';
+
+    const ALERT = 'alert';
 }

@@ -6,7 +6,7 @@
     "use_sqlite": "Use local sqlite db instead of mySql for testing the application."
   },
   "app": {
-    "clear_log": true,
+    "clear_log": false,
     "debug_mode": true,
     "log_channel": "app",
     "use_sqlite": false
