@@ -250,26 +250,8 @@ function getOwner(Article $article): string
                         <!-- Actions -->
                         <td>
                             <a class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
-                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target=<?php echo "#delete-modal-$n" ?>><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
-
-                        <!-- Modal window for article delete confirmation -->
-                        <div class="modal fade" id=<?php echo "delete-modal-$n" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=<?php echo "delete-modal-label-$n" ?> aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id=<?php echo "delete-modal-label-$n" ?>><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        Voulez-vous vraiment supprimer [<?php echo $article->getArticleName() ?>] ?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a href="<?php echo Route::ART_TABLE . '?delete=' . $article->getId() ?>" class="btn btn-primary">Confirmer</a>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         </tr>
                     <?php } ?>
             </tbody>
@@ -302,5 +284,23 @@ function getOwner(Article $article): string
 
     <div class="row">
         <a href="<?php echo Route::ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
+    </div>
+</div>
+
+<!-- Modal window for article delete confirmation -->
+<div class="modal fade" id=<?php echo "delete-modal" ?> data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimer l'article [] ?
+            </div>
+            <div class="modal-footer">
+                <a href="" class="btn btn-primary">Confirmer</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
     </div>
 </div>
