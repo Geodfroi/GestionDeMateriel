@@ -48,28 +48,7 @@ class Profile extends BaseRoute
         $delays = $user->getContactDelays();
         $user_id = $user->getId();
 
-        // if (isset($_POST['new-password'])) {
 
-        //     if (Validation::validateNewPassword($this, $password_plain)) {
-        //         if (Validation::validateNewPasswordRepeat($this, $password_plain)) {
-
-        //             $encrypted = util::encryptPassword($password_plain);
-
-        //             if (Database::users()->updatePassword($user_id, $encrypted)) {
-
-        //                 Logging::info(LogInfo::USER_UPDATED, [
-        //                     'user-id' => $user_id,
-        //                     'new-password' => '*********'
-        //                 ]);
-
-        //                 $this->showAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
-        //             } else {
-        //                 $this->showAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
-        //             }
-        //         }
-        //     }
-        //     goto end;
-        // }
 
         // if (isset($_POST['set-email'])) {
 

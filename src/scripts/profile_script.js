@@ -4,73 +4,42 @@
 
 PROFILE_ROUTE = "/profile";
 
-function getJSONWarning(json, key) {
-  if ("warnings" in json) {
-    console.log("warnings" in json);
-    console.log("key:" + key);
-    if (key in json.warnings) {
-      return json.warnings[key];
-    }
-  }
-  return false;
-}
-
-function displayWarning(json, form_id, json_key) {
-  let input = document.getElementById(form_id);
-  let feedback_element = document.getElementById(form_id + "-feedback");
-
-  input.classList.remove("is-invalid");
-  input.classList.remove("is-valid");
-
-  let warning = getJSONWarning(json, json_key);
-  console.log("warning: " + warning);
-
-  if (warning) {
-    input.classList.add("is-invalid");
-    feedback_element.innerText = warning;
-  } else {
-    input.classList.add("is-valid");
-  }
-}
-
-function submitUsername(e) {
+// post alias change
+document.getElementById("form-alias-submit").addEventListener("click", (e) => {
   e.preventDefault();
+  postData(
+    "update-profile-alias",
+    (json) => displayWarnings(json, "alias"),
+    () => getFormValues("alias")
+  );
+});
 
-  let data = {
-    req: "post-profile-alias",
-    alias: document.getElementById("form-alias").value.trim(),
-  };
+// post alias change
+document
+  .getElementById("form-password-submit")
+  .addEventListener("click", (e) => {
+    e.preventDefault();
+    postData(
+      "update-profile-password",
+      (json) => displayWarnings(json, "password", "password-repeat"),
+      () => getFormValues("password", "password-repeat")
+    );
+  });
 
-  const options = {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  };
+// fetch and display user alias when modal is opened.
+document.getElementById("alias-modal").addEventListener("show.bs.modal", () => {
+  postData("get-user", (json) => {
+    clearWarning("form-alias");
+    displayInputValue("alias", json.alias);
+  });
+});
 
-  fetch("/data", options)
-    .then((res) => res.json())
-    .then((json) => {
-      if ("url" in json) {
-        window.location.replace(json.url);
-        return;
-      }
-      displayWarning(json, "form-alias", "alias");
-      console.dir(json);
+// clear password fields when modal is opened.
+document
+  .getElementById("password-modal")
+  .addEventListener("show.bs.modal", () => {
+    postData("get-user", () => {
+      clearWarnings("password", "password-repeat");
+      clearInputValues("password", "password-repeat");
     });
-
-  //.then((res) => console.dir(res));
-  // .then((res) => res.json());
-  // .then((res) => {
-  //   console.log(res);
-  //   //   handleFeedback(json);
-  //   // if (json.validated) {
-  //   //   window.location.replace(PROFILE_ROUTE);
-  //   // }
-  // });
-}
-
-const btn = document.getElementById("form-username-submit");
-btn.addEventListener("click", submitUsername);
+  });

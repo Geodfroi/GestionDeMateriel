@@ -35,6 +35,7 @@ class RequestManager
         $json = file_get_contents('php://input');
         // Converts it into a PHP object
         $data = json_decode($json, true);
+        Logging::debug('fetch data', $data);
 
         if (!isset($data['req'])) {
             $response = ['error' => '[req] key was not defined in fetch request.'];
@@ -43,8 +44,13 @@ class RequestManager
         }
 
         switch ($data['req']) {
-            case 'post-profile-alias':
+
+            case 'get-user':
+                return Authenticate::getUser()->toJSON();
+            case 'update-profile-alias':
                 return RequestManager::updateAlias($data);
+            case 'update-profile-password':
+                return RequestManager::updatePassword($data);
 
             default:
                 $response = [
@@ -98,6 +104,40 @@ class RequestManager
             return RequestManager::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
         }
         return RequestManager::redirect(Route::PROFILE, AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
+    }
+
+    private static function updatePassword($json): string
+    {
+        $user  = Authenticate::getUser();
+        if (!$user) {
+
+            return RequestManager::redirect(Route::HOME);
+        }
+        $password = $json["password"];
+        $password_repeat = $json["password-repeat"];
+        $warnings = [];
+
+        if (Validation::validateNewPassword_req($password, $warnings)) {
+        }
+        //         if (Validation::validateNewPasswordRepeat($this, $password_plain)) {
+
+        //             $encrypted = util::encryptPassword($password_plain);
+
+        //             if (Database::users()->updatePassword($user_id, $encrypted)) {
+
+        //                 Logging::info(LogInfo::USER_UPDATED, [
+        //                     'user-id' => $user_id,
+        //                     'new-password' => '*********'
+        //                 ]);
+
+        //                 $this->showAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
+        //             } else {
+        //                 $this->showAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
+        //             }
+        //         }
+        //     }
+
+
     }
 
     /**

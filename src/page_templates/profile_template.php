@@ -13,7 +13,7 @@ use app\constants\Route;
     </div>
 
     <div class="row" data-bs-toggle="tooltip" title="Par défaut, l'email est utilisé pour identifier l'utilisateur au sein de l'application. Un nom d'usager peut être défini de façon facultative." data-bs-placement="bottom">
-        <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto mt-4" data-bs-toggle="modal" data-bs-target="#username-modal">Définir un nom d'usager.</a>
+        <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto mt-4" data-bs-toggle="modal" data-bs-target="#alias-modal">Définir un nom d'usager.</a>
     </div>
 
     <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" data-bs-toggle="modal" data-bs-target="#password-modal">Changer de mot de passe</a></div>
@@ -28,17 +28,17 @@ use app\constants\Route;
 </div>
 
 
-<!-- Modal window for new username -->
-<div id="username-modal" class="modal fade" id="username-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<!-- Modal window for new alias -->
+<div id="alias-modal" class="modal fade" id="alias-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action=<?php echo Route::PROFILE ?>>
+            <form>
                 <div class="modal-header">
                     <h5 class="modal-title">Définir un nom d'usager.</h5>
                 </div>
                 <div class="modal-body">
                     <div class="input-group">
-                        <input id='form-alias' name="alias" type="text" class="form-control <?php echo isset($warnings['alias']) ? ' is-invalid' : '' ?>" value="<?php echo htmlentities($alias) ?>">
+                        <input id='form-alias' name="alias" type="text" class="form-control">
                         <div id="form-alias-feedback" class='invalid-feedback'></div>
                         <div class="form-text">Définissez un alias au sein de l'application. Il est plus facile pour autrui d'identifier un utilisateur par un alias plutôt que par un e-mail.</div>
                     </div>
@@ -46,7 +46,7 @@ use app\constants\Route;
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button id="form-username-submit" type="submit" name="set-alias" class="btn btn-primary">Enregistrer</button>
+                    <button id="form-alias-submit" type="submit" class="btn btn-primary">Enregistrer</button>
                 </div>
             </form>
         </div>
@@ -57,37 +57,27 @@ use app\constants\Route;
 <div class="modal fade" id="password-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action=<?php echo Route::PROFILE ?>>
+            <form>
                 <div class="modal-header">
                     <h5 class="modal-title">Changer de mot de passe.</h5>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <input name="password" type="password" id="password" value="<?php echo htmlentities($password) ?>" class="form-control
-                            <?php echo isset($warnings['password']) ? ' is-invalid' : '' ?>
-                            <?php echo $password ? ' is-valid' : '' ?>">
-                        <?php if (isset($warnings['password'])) { ?>
-                            <div class='invalid-feedback'><?php echo $warnings['password'] ?> </div>
-                        <?php } else { ?>
-                            <div class="form-text">Entrer un nouveau mot de passe.</div>
-                        <?php } ?>
+                        <input id="form-password" name="password" type="password" class="form-control">
+                        <div id="form-password-feedback" class='invalid-feedback'></div>
+                        <div class="form-text">Entrez un nouveau mot de passe.</div>
                     </div>
 
                     <div>
-                        <input name="password-repeat" type="password" id="password-repeat" value="<?php echo htmlentities($password_repeat) ?>" class="form-control 
-                            <?php echo isset($warnings['password-repeat']) ? ' is-invalid' : '' ?>
-                            <?php echo $password ? ' is-valid' : '' ?>">
-                        <?php if (isset($warnings['password-repeat'])) { ?>
-                            <div class='invalid-feedback'><?php echo $warnings['password-repeat'] ?> </div>
-                        <?php } else { ?>
-                            <div class="form-text">Entrer le nouveau mot de passe une seconde fois.</div>
-                        <?php } ?>
+                        <input id="form-password-repeat" name="password-repeat" type="password" class="form-control">
+                        <div id="form-password-repeat-feedback" class='invalid-feedback'></div>
+                        <div class="form-text">Entrez le nouveau mot de passe une seconde fois.</div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" name="new-password" class="btn btn-primary">Enregistrer</button>
+                    <button id="form-password-submit" type="submit" name="new-password" class="btn btn-primary">Enregistrer</button>
                 </div>
             </form>
         </div>

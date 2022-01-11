@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.11 ###
 ##############################
 
 namespace app\models;
@@ -148,6 +148,23 @@ class User
     public function setId(int $value)
     {
         $this->id = $value;
+    }
+
+    /**
+     * Return as JSON data.
+     */
+    public function toJSON()
+    {
+        $array = [
+            'id' => $this->id,
+            'alias' => $this->alias,
+            'contact_delay' => $this->contact_delay,
+            'contact_email' => $this->contact_email,
+            'creation_date' => $this->creation_date->format('Y-m-d'),
+            'is_admin' => $this->is_admin,
+            'last_login' => $this->last_login->format('Y-m-d'),
+        ];
+        return json_encode($array);
     }
 
     /**

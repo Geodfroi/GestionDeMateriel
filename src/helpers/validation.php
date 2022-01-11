@@ -263,6 +263,33 @@ class Validation
     }
 
     /**
+     * Validate input and fill $warning array with proper warning to be displayed in case of failure.
+     * https://www.codexworld.com/how-to/validate-password-strength-in-php/
+     * 
+     * @param string $password_candidate Proposed user password by reference.
+     * @param $warnings collect warning messages
+     * @return bool True if password is properly formatted;
+     */
+    public static function validateNewPassword_req(string $password_candidate, array $warnings): bool
+    {
+        if ($password_candidate === '') {
+            array_push($warnings, Warning::PASSWORD_EMPTY);
+            return false;
+        }
+        if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
+            array_push($warnings, printf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
+            return false;
+        }
+        $has_number = preg_match('@[0-9]@', $password_candidate);
+        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
+        if (!$has_number || (!$has_letters)) {
+            array_push($warnings, Warning::PASSWORD_WEAK);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validate the repeated password.
      * 
      * @param BaseRoute $route Route to forward error messages. 
