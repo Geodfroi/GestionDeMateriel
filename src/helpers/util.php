@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.11 ###
 ##############################
 
 namespace app\helpers;
@@ -11,6 +11,7 @@ namespace app\helpers;
 use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
+use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
@@ -105,6 +106,36 @@ class Util
             }
         }
         return $content;
+    }
+
+    /**
+     * Send a header to the browser requesting a redirection to the path provided. Optionaly display an alert after redirection.
+     * 
+     * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
+     * @param string $alert_type Optional alert type. Use AlertType const.
+     * @param string $alert_msg Optional alert message to be displayed after redirection.
+     * @return string Return empty string.
+     */
+    public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = ""): string
+    {
+        if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
+            Util::storeAlert($alert_type, $alert_msg, $uri);
+        }
+        //The header php function will send a header message to the browser, here signaling for redirection.
+        header("Location: $uri", true);
+        return "";
+    }
+
+    /**
+     * Store alert content to be fetched in next page display.
+     * 
+     * @param string $msg Alert message.
+     * @param string $type Alert type. Use AlertType const.
+     * @param string $display_page Page on which to display the alert.
+     */
+    public static function storeAlert(string $type, string $msg, string $display_page)
+    {
+        $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
     }
 
     /**

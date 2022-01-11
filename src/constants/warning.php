@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.11 ###
 ##############################
 
 namespace app\constants;
@@ -36,6 +36,7 @@ class Warning
 
     //profile warnings
     const ALIAS_TOO_SHORT = "Votre alias doit au moins mesurer %s caractères.";
+    const ALIAS_ALREADY_EXISTS = "Un autre utilisateur utilise déjà cet alias.";
     const DELAYS_NONE = "Il est nécessaire de cocher au moins une option.";
     const PASSWORD_DIFFERENT = "Ce mot de passe n'est pas identique au précédent.";
     const PASSWORD_REPEAT_NULL = "Il vous faut répéter votre mot de passe";

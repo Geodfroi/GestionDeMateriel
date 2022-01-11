@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.11 ###
 ##############################
 
 namespace app\routes;
@@ -49,6 +49,7 @@ abstract class BaseRoute
 
     public function showAlert()
     {
+        Logging::debug('error: call to showAlert');
     }
 
     public function getAlert()
@@ -127,14 +128,7 @@ abstract class BaseRoute
     protected function requestRedirect(string $uri, string $alert_type = "", $alert_msg = "")
     {
         $this->redirectUri = $uri;
-
-        if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            $this->storeAlert($alert_type, $alert_msg, $uri);
-        }
-
-        //The header php function will send a header message to the browser, here signaling for redirection.
-        header("Location: $uri", true);
-        return "";
+        return Util::requestRedirect($uri, $alert_type, $alert_msg);
     }
 
     /**
@@ -203,6 +197,6 @@ abstract class BaseRoute
         if (strlen($display_page) == 0) {
             $display_page = $_SESSION['route'];
         }
-        $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
+        Util::storeAlert($type, $msg,  $display_page);
     }
 }

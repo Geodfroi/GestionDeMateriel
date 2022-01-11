@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.11 ###
 ##############################
 
 use app\constants\Route;
@@ -29,7 +29,7 @@ use app\constants\Route;
 
 
 <!-- Modal window for new username -->
-<div class="modal fade" id="username-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<div id="username-modal" class="modal fade" id="username-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" action=<?php echo Route::PROFILE ?>>
@@ -38,19 +38,15 @@ use app\constants\Route;
                 </div>
                 <div class="modal-body">
                     <div class="input-group">
-                        <input name=" alias" type="text" id="alias" class="form-control <?php echo isset($warnings['alias']) ? ' is-invalid' : '' ?>" value=<?php echo htmlentities($alias) ?>>
-
-                        <?php if (isset($warnings['alias'])) { ?>
-                            <div class='invalid-feedback'><?php echo $warnings['alias'] ?> </div>
-                        <?php } else { ?>
-                            <div id="id-descr" class="form-text">Définissez un alias au sein de l'application. Il est plus facile pour autrui d'identifier un utilisateur par un alias plutôt que par un e-mail.</div>
-                        <?php } ?>
+                        <input id='form-alias' name="alias" type="text" class="form-control <?php echo isset($warnings['alias']) ? ' is-invalid' : '' ?>" value="<?php echo htmlentities($alias) ?>">
+                        <div id="form-alias-feedback" class='invalid-feedback'></div>
+                        <div class="form-text">Définissez un alias au sein de l'application. Il est plus facile pour autrui d'identifier un utilisateur par un alias plutôt que par un e-mail.</div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" name="set-alias" class="btn btn-primary">Enregistrer</button>
+                    <button id="form-username-submit" type="submit" name="set-alias" class="btn btn-primary">Enregistrer</button>
                 </div>
             </form>
         </div>

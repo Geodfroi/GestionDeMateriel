@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13###
+## Joël Piguet - 2022.01.11 ###
 ##############################
 
 namespace app\helpers;
@@ -20,21 +20,16 @@ class Validation
     /**
      * Validate user alias. Alias can be set to empty string in which cas e-mail root is used in the app.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string|null $alias Optional alias by reference.
      * @return bool True if Alias is conform or empty.
      */
-    public static function validateAlias(BaseRoute $route, &$alias): bool
+    public static function validateAlias(&$alias): bool
     {
         $alias = trim($_POST['alias']) ?? '';
         if ($alias === '') {
             return true;
         }
-        if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            $route->showWarning('alias', sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
-            return false;
-        }
-        return true;
+        return strlen($alias) >= Settings::ALIAS_MIN_LENGHT;
     }
 
     /**
