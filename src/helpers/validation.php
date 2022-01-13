@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
 namespace app\helpers;
@@ -83,23 +83,19 @@ class Validation
     /**
      * Validate contact email. Email must a valid email format or set to null.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param string|null $contact_email Contact e-mail by reference.
-     * @return bool True if e-mail is set to empty string or is a valid email format.
+     * @param string $contact_email Contact e-mail candidate.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateContactEmail(BaseRoute $route, &$email): bool
+    public static function validateContactEmail(string $email): string
     {
-        $email = trim($_POST['contact-email']) ?? '';
-
         if ($email  === '') {
-            return true;
+            return "";
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $route->showWarning('contact-email', Warning::LOGIN_EMAIL_INVALID);
-            return false;
+            return Warning::LOGIN_EMAIL_INVALID;
         }
-        return true;
+        return "";
     }
 
     /**
@@ -267,47 +263,40 @@ class Validation
      * https://www.codexworld.com/how-to/validate-password-strength-in-php/
      * 
      * @param string $password_candidate Proposed user password by reference.
-     * @param $warnings collect warning messages
-     * @return bool True if password is properly formatted;
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewPassword_req(string $password_candidate, array $warnings): bool
+    public static function validateNewPassword_request(string $password_candidate): string
     {
         if ($password_candidate === '') {
-            array_push($warnings, Warning::PASSWORD_EMPTY);
-            return false;
+            return Warning::PASSWORD_EMPTY;
         }
         if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            array_push($warnings, printf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
-            return false;
+            return sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH);
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if (!$has_number || (!$has_letters)) {
-            array_push($warnings, Warning::PASSWORD_WEAK);
-            return false;
+            return Warning::PASSWORD_WEAK;
         }
-        return true;
+        return "";
     }
 
     /**
      * Validate the repeated password.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string $password_first Proposed user password entered in first field.
-     * @return bool True if repeat-password corresponds to first entry.
+     * @param string $password_repeat Repeat of proposed password to filter typing mishaps.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewPasswordRepeat(BaseRoute $route, string $password_first): bool
+    public static function validateNewPasswordRepeat(string $password_first, string $password_repeat): string
     {
-        $password_repeat = trim($_POST['password-repeat']) ?? '';
         if (!$password_repeat) {
-            $route->showWarning('password-repeat', Warning::PASSWORD_REPEAT_NULL);
-            return false;
+            return Warning::PASSWORD_REPEAT_NULL;
         }
 
         if ($password_first !== $password_repeat) {
-            $route->showWarning('password-repeat', Warning::PASSWORD_DIFFERENT);
-            return false;
+            return Warning::PASSWORD_DIFFERENT;
         }
-        return true;
+        return "";
     }
 }

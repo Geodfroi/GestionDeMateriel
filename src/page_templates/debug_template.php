@@ -12,6 +12,7 @@
 <div>
     <div>TODO::</div>
     <br>
+    <div>Add password reveal btn</div>
     <div>Set logs with date, efface older.</div>
     <div>Redirect to home after CRUD operation</div>
     <div>Bug with expiration date before filter in sqlite</div>

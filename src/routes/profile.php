@@ -50,71 +50,7 @@ class Profile extends BaseRoute
 
 
 
-        // if (isset($_POST['set-email'])) {
 
-
-        //     if (Validation::validateContactEmail($this, $contact_email)) {
-
-
-        //         if ($contact_email === $user->getLoginEmail()) {
-        //             $contact_email  = '';
-        //         }
-
-        //         if (Database::users()->updateContactEmail($user_id, $contact_email)) {
-
-        //             Logging::info(LogInfo::USER_UPDATED, [
-        //                 'user-id' => $user_id,
-        //                 'new-contact-email' => $contact_email
-        //             ]);
-
-        //             // if contact is null or empty, then contact is the login email.
-        //             if (strlen($contact_email) > 0) {
-        //                 $this->showAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
-        //             } else {
-        //                 $this->showAlert(AlertType::SUCCESS, sprintf(Alert::CONTACT_RESET_SUCCESS, $user->getLoginEmail()));
-        //             }
-        //         } else {
-        //             $this->showAlert(AlertType::FAILURE,  Alert::CONTACT_SET_FAILURE);
-        //         }
-        //     }
-        //     goto end;
-        // }
-
-        // if (isset($_POST['set-delay'])) {
-
-        //     $delays = [];
-        //     if (isset($_POST['delay-3'])) {
-        //         array_push($delays, 3);
-        //     }
-        //     if (isset($_POST['delay-7'])) {
-        //         array_push($delays, 7);
-        //     }
-        //     if (isset($_POST['delay-14'])) {
-        //         array_push($delays, 14);
-        //     }
-        //     if (isset($_POST['delay-30'])) {
-        //         array_push($delays, 30);
-        //     }
-
-        //     if (count($delays) == 0) {
-        //         $this->showWarning('delays',  Warning::DELAYS_NONE);
-        //     } else {
-
-        //         $str = implode('-', $delays);
-
-        //         if (Database::users()->updateContactDelay($user_id, $str)) {
-
-        //             Logging::info(LogInfo::USER_UPDATED, [
-        //                 'user-id' => $user_id,
-        //                 'new-contact-delays' => $str
-        //             ]);
-
-        //             $this->showAlert(AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
-        //         } else {
-        //             $this->showAlert(AlertType::FAILURE, Alert::DELAY_SET_FAILURE);
-        //         }
-        //     }
-        // }
 
         // end:
 

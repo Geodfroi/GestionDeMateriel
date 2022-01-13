@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
 namespace app\helpers;
@@ -43,14 +43,22 @@ class RequestManager
             return json_encode($response);
         }
 
+        if (App::isDebugMode()) {
+            Logging::info("Request to server", ['data' => $data['req']]);
+        }
+
         switch ($data['req']) {
 
             case 'get-user':
                 return Authenticate::getUser()->toJSON();
-            case 'update-profile-alias':
+            case 'update-alias':
                 return RequestManager::updateAlias($data);
-            case 'update-profile-password':
+            case 'update-delay':
+                return RequestManager::updateDelays($data);
+            case 'update-password':
                 return RequestManager::updatePassword($data);
+            case "update-contact-email":
+                return RequestManager::updateContactEmail($data);
 
             default:
                 $response = [
@@ -79,9 +87,8 @@ class RequestManager
         }
 
         //validate alias
-        if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
+        if (strlen($alias) > 0 && strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
             return RequestManager::issueWarnings(['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT)]);
-            // return json_encode(['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT)]);
         }
         $alias_arg = $alias ? $alias : $user->getLoginEmail();
         if ($existing_user = Database::users()->queryByAlias($alias_arg)) {
@@ -106,38 +113,117 @@ class RequestManager
         return RequestManager::redirect(Route::PROFILE, AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
     }
 
-    private static function updatePassword($json): string
+    private static function updateDelays($json): string
     {
         $user  = Authenticate::getUser();
+        if (!$user) {
+            return RequestManager::redirect(Route::HOME);
+        }
+
+        $user_id = $user->getId();
+        $delay = $json["delay"];
+
+        if (!$delay) {
+            Logging::debug('warning', ['delay' => Warning::DELAYS_NONE]);
+            return RequestManager::issueWarnings(['delay' => Warning::DELAYS_NONE]);
+        }
+
+        if (Database::users()->updateContactDelay($user_id, $delay)) {
+
+            Logging::info(LogInfo::USER_UPDATED, [
+                'user-id' => $user_id,
+                'new-contact-delays' => $delay
+            ]);
+
+            return RequestManager::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
+        }
+        return RequestManager::redirect(
+            Route::PROFILE,
+            AlertType::FAILURE,
+            Alert::DELAY_SET_FAILURE
+        );
+    }
+
+    private static function updateContactEmail($json): string
+    {
+        $user  = Authenticate::getUser();
+        if (!$user) {
+            return RequestManager::redirect(Route::HOME);
+        }
+
+        $user_id = $user->getId();
+        $contact_email = $json["contact-email"];
+
+
+        if ($warning = Validation::validateContactEmail($contact_email)) {
+            return RequestManager::issueWarnings(['contact-email' => $warning]);
+        }
+
+        if ($contact_email === $user->getLoginEmail()) {
+            $contact_email  = '';
+        }
+
+        if (Database::users()->updateContactEmail($user_id, $contact_email)) {
+
+            Logging::info(LogInfo::USER_UPDATED, [
+                'user-id' => $user_id,
+                'new-contact-email' => $contact_email
+            ]);
+
+            // if contact is null or empty, then contact is the login email.
+            if (strlen($contact_email) > 0) {
+                return RequestManager::redirect(Route::PROFILE, AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
+            }
+            return RequestManager::redirect(
+                Route::PROFILE,
+                AlertType::SUCCESS,
+                sprintf(Alert::CONTACT_RESET_SUCCESS, $user->getLoginEmail())
+            );
+        }
+        return RequestManager::redirect(
+            Route::PROFILE,
+            AlertType::FAILURE,
+            Alert::CONTACT_SET_FAILURE
+        );
+    }
+
+    private static function updatePassword($json): string
+    {
+        $user = Authenticate::getUser();
         if (!$user) {
 
             return RequestManager::redirect(Route::HOME);
         }
-        $password = $json["password"];
+        $user_id = $user->getId();
+        $password_plain = $json["password"];
         $password_repeat = $json["password-repeat"];
         $warnings = [];
 
-        if (Validation::validateNewPassword_req($password, $warnings)) {
+        $val = Validation::validateNewPassword_request($password_plain);
+        $val_repeat = Validation::validateNewPasswordRepeat($password_plain, $password_repeat);
+
+        if ($val) {
+            $warnings['password'] = $val;
         }
-        //         if (Validation::validateNewPasswordRepeat($this, $password_plain)) {
+        if ($val_repeat) {
+            $warnings['password-repeat'] = $val_repeat;
+        }
 
-        //             $encrypted = util::encryptPassword($password_plain);
+        if ($val || $val_repeat) {
+            return RequestManager::issueWarnings($warnings);
+        }
 
-        //             if (Database::users()->updatePassword($user_id, $encrypted)) {
+        $encrypted = util::encryptPassword($password_plain);
 
-        //                 Logging::info(LogInfo::USER_UPDATED, [
-        //                     'user-id' => $user_id,
-        //                     'new-password' => '*********'
-        //                 ]);
+        if (Database::users()->updatePassword($user_id, $encrypted)) {
 
-        //                 $this->showAlert(AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
-        //             } else {
-        //                 $this->showAlert(AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
-        //             }
-        //         }
-        //     }
-
-
+            Logging::info(LogInfo::USER_UPDATED, [
+                'user-id' => $user_id,
+                'new-password' => '*********'
+            ]);
+            return RequestManager::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
+        }
+        return RequestManager::redirect(Route::PROFILE, AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
     }
 
     /**
