@@ -61,28 +61,9 @@ function displayWarnings(json) {
   console.log("displayewd");
 }
 
-function setFeedback(feedback_id, feedback) {
-  if (!feedback) {
-    return;
-  }
-
-  if (!feedback_id.endsWith("-feedback")) {
-    feedback_id = feedback_id + "-feedback";
-  }
-  let feedback_element = document.getElementById(feedback_id);
-  feedback_element.innerText = feedback;
-}
-
-function setValidTag(id, status) {
-  let input = document.getElementById(id);
-  input.classList.remove("is-invalid");
-  input.classList.remove("is-valid");
-
-  if (status) {
-    input.classList.add("is-valid");
-  } else {
-    input.classList.add("is-invalid");
-  }
+function getCheckboxValue(id) {
+  let element = document.getElementById(id);
+  return element.checked;
 }
 
 /**
@@ -123,7 +104,7 @@ function getFormValues() {
  * @param {*} id Btn id
  * @param {*} callback
  */
-function hookBtnSubmit(id, callback) {
+function hookBtnClicked(id, callback) {
   document.getElementById(id).addEventListener("click", (e) => {
     e.preventDefault();
     callback();
@@ -159,10 +140,9 @@ function htmlEntities(str) {
  * @param {*} callback function handling the server response to the fetch request.
  * @param {*} compilePostData function yielding the json data package to sent to server.
  */
-function postData(req, callback, compilePostData = null) {
+function call(req, callback, compilePostData = null) {
   let data = compilePostData == null ? {} : compilePostData();
   data["req"] = req;
-  console.log(data);
 
   const options = {
     method: "POST",
@@ -173,27 +153,52 @@ function postData(req, callback, compilePostData = null) {
     },
   };
 
-  fetch("/data", options)
-    .then((res) => res.json())
+  fetch("/request", options)
+    .then((res) => {
+      console.dir(res);
+      // console.log(res);
+      // console.log(res.json());
+      return res.json();
+    })
     .then((json) => {
       if ("url" in json) {
         window.location.replace(json.url);
         return;
       }
+      // if (callback != null) {
+      //   callback(json);
+      // }
       callback(json);
     });
 }
 
-function getCheckboxValue(id) {
-  let element = document.getElementById(id);
-  return element.checked;
-}
-
 function setCheckboxValue(id, status) {
   let element = document.getElementById(id);
-  // console.log("id: " + id);
-  // console.log(element);
   element.checked = status;
+}
+
+function setFeedback(feedback_id, feedback) {
+  if (!feedback) {
+    return;
+  }
+
+  if (!feedback_id.endsWith("-feedback")) {
+    feedback_id = feedback_id + "-feedback";
+  }
+  let feedback_element = document.getElementById(feedback_id);
+  feedback_element.innerText = feedback;
+}
+
+function setValidTag(id, status) {
+  let input = document.getElementById(id);
+  input.classList.remove("is-invalid");
+  input.classList.remove("is-valid");
+
+  if (status) {
+    input.classList.add("is-valid");
+  } else {
+    input.classList.add("is-invalid");
+  }
 }
 
 // function explode_to_ints(array_str) {

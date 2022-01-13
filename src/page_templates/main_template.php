@@ -1,9 +1,10 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
+use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Settings;
 use app\helpers\App;
@@ -67,7 +68,7 @@ use app\helpers\Authenticate;
                             <li class="nav-item ms-auto">
                                 <?php if (Authenticate::isLoggedIn()) { ?>
                                     <div>
-                                        <a class="nav-link" href="<?php echo Route::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
+                                        <a class="nav-link" href="<?php echo Requests::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
                                     </div>
                                 <?php } else { ?>
                                     <a class="nav-link" href="<?php echo Route::LOGIN ?>">Connexion</a>

@@ -32,8 +32,8 @@ function getFormDelays() {
 }
 
 // post alias change
-hookBtnSubmit("alias-submit", () => {
-  postData(
+hookBtnClicked("alias-submit", () => {
+  call(
     "update-alias",
     (json) => displayWarnings(json, "alias"),
     () => getFormValues("alias")
@@ -41,24 +41,26 @@ hookBtnSubmit("alias-submit", () => {
 });
 
 // post alias change
-hookBtnSubmit("password-submit", () => {
-  postData(
+hookBtnClicked("password-submit", () => {
+  call(
     "update-password",
     (json) => displayWarnings(json, "password", "password-repeat"),
     () => getFormValues("password", "password-repeat")
   );
 });
 
-hookBtnSubmit("contact-submit", () => {
-  postData(
+// post contact email change
+hookBtnClicked("contact-submit", () => {
+  call(
     "update-contact-email",
     (json) => displayWarnings(json, "contact-email"),
     () => getFormValues("contact-email")
   );
 });
 
-hookBtnSubmit("delay-submit", () => {
-  postData(
+// post peremption delay change
+hookBtnClicked("delay-submit", () => {
+  call(
     "update-delay",
     (json) => displayDelayWarnings(json),
     () => getFormDelays()
@@ -67,7 +69,7 @@ hookBtnSubmit("delay-submit", () => {
 
 // fetch and display user alias when modal is opened.
 hookModalShown("alias-modal", () => {
-  postData("get-user", (json) => {
+  call("get-user", (json) => {
     clearWarnings("alias");
     displayInputValue("alias", json.alias);
   });
@@ -75,22 +77,22 @@ hookModalShown("alias-modal", () => {
 
 // clear password fields when modal is opened.
 hookModalShown("password-modal", () => {
-  postData("get-user", () => {
+  call("get-user", () => {
     clearWarningsAndInputs("password", "password-repeat");
   });
 });
 
-// clear password fields when modal is opened.
+// fetch and display user contact email when modal is opened.
 hookModalShown("contact-modal", () => {
-  postData("get-user", (json) => {
+  call("get-user", (json) => {
     clearWarnings("contact-email");
     displayInputValue("contact-email", json.contact_email);
   });
 });
 
-// clear password fields when modal is opened.
+// fetch and display user delay options when modal is opened.
 hookModalShown("delay-modal", () => {
-  postData("get-user", (json) => {
+  call("get-user", (json) => {
     clearWarnings("delay-3", "delay-7", "delay-14", "delay-30");
     let json_delays = json.contact_delay.split("-");
     for (let index = 0; index < 4; index++) {

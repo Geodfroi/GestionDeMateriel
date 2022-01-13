@@ -144,24 +144,21 @@ class Validation
     /**
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param ?string $email User email by reference.
-     * @return bool True if properly filled-in.
+     * @param string $email User email by reference.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateLoginEmail(BaseRoute $route, ?string &$email): bool
+    public static function validateLoginEmail(string &$email): string
     {
-        $email = trim($_POST['login-email']) ?? '';
-
         if ($email  === '') {
-            $route->showWarning('login-email', Warning::LOGIN_EMAIL_EMPTY);
+            return Warning::LOGIN_EMAIL_EMPTY;
             return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $route->showWarning('login-email', Warning::LOGIN_EMAIL_INVALID);
+            return  Warning::LOGIN_EMAIL_INVALID;
             return false;
         }
-        return true;
+        return "";
     }
 
     /**
@@ -213,49 +210,19 @@ class Validation
     /**
      * Validate input and fill $errors array with proper email error text to be displayed if it fails.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param ?string $email User email by reference.
-     * @return bool True if properly filled-in.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewLogin(BaseRoute $route, ?string &$email): bool
+    public static function validateNewLogin(?string &$email): string
     {
-        if (!Validation::validateLoginEmail($route, $email)) {
-            return false;
+        if ($warning = Validation::validateLoginEmail($email)) {
+            return $warning;
         }
 
         if (Database::users()->queryByEmail($email)) {
-            $route->showWarning('login-email', Warning::USER_EMAIL_USED);
-            return false;
+            return Warning::USER_EMAIL_USED;
         }
-        return true;
-    }
-
-    /**
-     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
-     * https://www.codexworld.com/how-to/validate-password-strength-in-php/
-     * 
-     * @param BaseRoute $route Route to forward error messages.
-     * @param string|null $password_candidate Proposed user password by reference.
-     * @return bool True if password is properly formatted;
-     */
-    public static function validateNewPassword(BaseRoute $route, ?string &$password_candidate): bool
-    {
-        $password_candidate = trim($_POST['password']) ?? '';
-        if ($password_candidate === '') {
-            $route->showWarning('password', Warning::PASSWORD_EMPTY);
-            return false;
-        }
-        if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            $route->showWarning('password', sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
-            return false;
-        }
-        $has_number = preg_match('@[0-9]@', $password_candidate);
-        $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
-        if (!$has_number || (!$has_letters)) {
-            $route->showWarning('password', Warning::PASSWORD_WEAK);
-            return false;
-        }
-        return true;
+        return "";
     }
 
     /**
@@ -265,7 +232,7 @@ class Validation
      * @param string $password_candidate Proposed user password by reference.
      * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewPassword_request(string $password_candidate): string
+    public static function validateNewPassword(string &$password_candidate): string
     {
         if ($password_candidate === '') {
             return Warning::PASSWORD_EMPTY;

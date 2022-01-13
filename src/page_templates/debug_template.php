@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
 ?>
@@ -12,6 +12,8 @@
 <div>
     <div>TODO::</div>
     <br>
+    <div>Login with username or password</div>
+    <div>Remove alerts after timer is out</div>
     <div>Add password reveal btn</div>
     <div>Set logs with date, efface older.</div>
     <div>Redirect to home after CRUD operation</div>

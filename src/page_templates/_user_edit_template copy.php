@@ -14,19 +14,28 @@ use app\constants\Route;
 
             <div class="mb-2">
                 <label for="login-email" class="form-label col-12">E-mail de l'utilisateur:</label>
-                <input id="login-email" name="login-email" type="email" class="form-control">
-                <div id="login-email-feedback" class='invalid-feedback'> </div>
+                <input id="login-email" name="login-email" type="email" value="<?php echo htmlentities($login_email) ?>" class="form-control 
+                    <?php echo isset($warnings['login-email']) ? ' is-invalid' : '' ?>
+                    <?php echo $email ? ' is-valid' : '' ?>">
+                <?php if (isset($warnings['login-email'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['login-email'] ?> </div>
+                <?php } ?>
             </div>
 
             <div class="input-group mb-3">
                 <label for="password" class="form-label col-12">Password:</label>
-                <input id="password" name="password" type="text" class="form-control">
+                <input id="password" name="password" type="text" value="<?php echo htmlentities($password) ?>" class="form-control 
+                    <?php echo isset($warnings['password']) ? ' is-invalid' : '' ?>
+                    <?php echo $password ? ' is-valid' : '' ?>">
                 <button id="regen-password" name="regen-password" class="btn btn-secondary">Regénérer</button>
-                <div id="password-feedback" class='invalid-feedback'> </div>
+
+                <?php if (isset($warnings['password'])) { ?>
+                    <div class='invalid-feedback'><?php echo $warnings['password'] ?> </div>
+                <?php } ?>
             </div>
 
             <div class="form-check form-switch mb-3">
-                <input id="is-admin" class="form-check-input" type="checkbox" role="switch" name="is-admin" id="flexSwitchCheckDefault">
+                <input class="form-check-input" type="checkbox" role="switch" name="is-admin" id="flexSwitchCheckDefault" <?php echo $is_admin ? 'checked' : '' ?>>
                 <label class="form-check-label" for="flexSwitchCheckDefault>">Accorder les privilèges administratif à cet utilisateur.</label>
             </div>
 

@@ -125,7 +125,7 @@ abstract class BaseRoute
      * @param string $alert_msg Optional alert message to be displayed after redirection.
      * @return string Return empty string.
      */
-    protected function requestRedirect(string $uri, string $alert_type = "", $alert_msg = "")
+    protected function requestRedirect(string $uri, string $alert_type = "", $alert_msg = ""): string
     {
         $this->redirectUri = $uri;
         return Util::requestRedirect($uri, $alert_type, $alert_msg);

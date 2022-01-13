@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
 namespace app\routes;
@@ -22,7 +22,7 @@ class UserEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::USER_EDIT, 'user_edit_template');
+        parent::__construct(Route::USER_EDIT, 'user_edit_template', 'user_edit_script');
     }
 
     public function getBodyContent(): string
@@ -40,11 +40,22 @@ class UserEdit extends BaseRoute
         $admin_id = Authenticate::getUserId();
 
         if (isset($_POST['new-user'])) {
-            $p_val = Validation::validateNewPassword($this, $password_plain);
-            $e_val = Validation::validateNewLogin($this, $login_email);
+            $login_email = trim($_POST['login-email']) ?? '';
+            $password_plain = trim($_POST['password']) ?? '';
+
+            $password_warning = Validation::validateNewPassword($password_plain);
+            if ($password_warning) {
+                $this->showWarning('password', $password_warning);
+            }
+
+            $login_warning = Validation::validateNewLogin($login_email);
+            if ($login_warning) {
+                $this->showWarning('login-email', $login_warning);
+            }
+
             $is_admin = isset($_POST['is-admin']);
 
-            if ($p_val && $e_val) {
+            if (!$password_warning && !$login_warning) {
                 $user = User::fromForm($login_email, $password_plain, $is_admin);
 
                 $id = Database::users()->insert($user);
@@ -62,17 +73,7 @@ class UserEdit extends BaseRoute
                 }
                 return $this->requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
             }
-            goto end;
         }
-
-        if (isset($_POST['regen-password'])) {
-            $is_admin = isset($_POST['is_admin']);
-            $password_plain = Util::getRandomPassword();
-            Validation::validateNewLogin($this, $login_email);
-            goto end;
-        }
-
-        end:
 
         return $this->renderTemplate([
             'login_email' => $login_email ?? '',

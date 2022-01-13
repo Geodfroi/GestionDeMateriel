@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
 namespace app\routes;
@@ -23,41 +23,21 @@ class Login extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct(Route::LOGIN, 'login_template');
+        parent::__construct(Route::LOGIN, 'login_template', 'login_script');
     }
 
     public function getBodyContent(): string
     {
         if (Authenticate::isLoggedIn()) {
-
-            if (isset($_GET['logout'])) {
-                Authenticate::logout();
-                $this->requestRedirect(Route::LOGIN);
-            } else {
-                $this->requestRedirect(Route::HOME);
-            }
-            return '';
-        }
-
-        if (isset($_GET['old-email'])) {
-
-            // handle demand for new password.
-            $login_email  = $_GET['old-email'];
-            $user = Database::users()->queryByEmail($login_email);
-
-            if (isset($user)) {
-                if (Util::renewPassword($user)) {
-                    return $this->requestRedirect(Route::LOGIN, AlertType::SUCCESS, printf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
-                }
-                return $this->requestRedirect(Route::LOGIN, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
-            }
-
-            goto end;
+            return $this->requestRedirect(Route::HOME);
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $login_email = trim($_POST['login-email']) ?? '';
 
-            if (Validation::validateLoginEmail($this, $login_email)) {
+            if ($warning = Validation::validateLoginEmail($login_email)) {
+                $this->showWarning('login-email', $warning);
+            } else {
                 $user = Database::users()->queryByEmail($login_email);
             }
 

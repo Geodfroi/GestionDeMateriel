@@ -119,7 +119,7 @@ class Util
     public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = ""): string
     {
         if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            Util::storeAlert($alert_type, $alert_msg, $uri);
+            Util::sstoreAlert($uri, $alert_type, $alert_msg);
         }
         //The header php function will send a header message to the browser, here signaling for redirection.
         header("Location: $uri", true);
@@ -133,7 +133,7 @@ class Util
      * @param string $type Alert type. Use AlertType const.
      * @param string $display_page Page on which to display the alert.
      */
-    public static function storeAlert(string $type, string $msg, string $display_page)
+    public static function sstoreAlert(string $display_page, string $type, string $msg)
     {
         $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
     }

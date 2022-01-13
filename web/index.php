@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.13 ###
 ##############################
 
 // The single entry point for the application inside the web folder. The code in this page is executed with each refresh.
@@ -21,8 +21,8 @@ App::setMode(Mode::WEB_APP);
 session_start();
 $templateData = [];
 
-if ($_SERVER['PATH_INFO'] === '/data') {
-    echo RequestManager::fetchData();
+if ($_SERVER['PATH_INFO'] === '/request') {
+    echo RequestManager::call();
 } else {
     echo Router::renderRoute();
 }
