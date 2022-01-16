@@ -3,13 +3,15 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 namespace app\constants;
 
 class Requests
 {
+    const DELETE_USER = '/request?deleteuser=';
     const LOGOUT = '/request?logout=true';
-    const RENEW_PASSWORD = '/request?renewpassword=';
+    const FORGOTTEN_PASSWORD = '/request?forgottenpassword=';
+    const RENEW_USER_PASSWORD = '/request?renewuserpassword=';
 }

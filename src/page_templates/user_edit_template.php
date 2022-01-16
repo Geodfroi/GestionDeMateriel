@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 use app\constants\Route;
@@ -20,7 +20,7 @@ use app\constants\Route;
 
             <div class="input-group mb-3">
                 <label for="password" class="form-label col-12">Password:</label>
-                <input id="password" name="password" type="text" class="form-control">
+                <input id="password" name="password" type="text" class="form-control" value="<?php echo htmlentities($password) ?>">
                 <button id="regen-password" name="regen-password" class="btn btn-secondary">Regénérer</button>
                 <div id="password-feedback" class='invalid-feedback'> </div>
             </div>
@@ -30,8 +30,7 @@ use app\constants\Route;
                 <label class="form-check-label" for="flexSwitchCheckDefault>">Accorder les privilèges administratif à cet utilisateur.</label>
             </div>
 
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-modal">Ajouter</button>
+            <button id="add-btn" type="button" class="btn btn-primary">Ajouter</button>
             <a href="<?php echo Route::ADMIN ?>" class="btn btn-secondary">Annuler</a>
         </form>
     </div>
@@ -47,7 +46,7 @@ use app\constants\Route;
             <div class="modal-body">
                 A l'ajout de l'utilisateur, un e-mail lui est automatiquement envoyé pour lui confirmer son inscription.</div>
             <div class="modal-footer">
-                <button id="new-user-submit" type="submit" name="new-user" class="btn btn-primary">Confirmer</button>
+                <button id="submit-btn" type="submit" name="new-user" class="btn btn-primary">Confirmer</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>

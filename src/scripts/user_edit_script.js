@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.13 ###
+// ## Joël Piguet - 2022.01.16 ###
 // ##############################
 
 function getFormData() {
@@ -8,17 +8,26 @@ function getFormData() {
   return json;
 }
 
+function handleValidation(json) {
+  displayWarnings(json, "login-email", "password");
+  if (json.validated) {
+    // call confirm modal
+    showModal("create-modal");
+  }
+}
+
 hookBtnClicked("regen-password", () => {
   call("regen-password", (json) => {
-    displayInputValue("form-password", json.password);
+    displayInputValue("password", json.password);
   });
 });
 
+//two step process: the confirmation modal is only shown if the form is properly validated.
+hookBtnClicked("add-btn", () => {
+  call("validate-user", handleValidation, getFormData);
+});
+
 // post new user
-hookBtnClicked("new-user-submit", () => {
-  call(
-    "new-user",
-    (json) => displayWarnings(json, "login-email", "password"),
-    getFormData()
-  );
+hookBtnClicked("submit-btn", () => {
+  call("add-user", null, getFormData);
 });

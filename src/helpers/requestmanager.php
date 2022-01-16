@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 namespace app\helpers;
@@ -20,8 +20,7 @@ use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\helpers\Validation;
-use Exception;
-use SebastianBergmann\Environment\Console;
+use app\models\User;
 
 /**
  * Handle fetch requests for data from javascript.
@@ -48,40 +47,88 @@ class RequestManager
     private static function handleGetRequests(): string
     {
         if (App::isDebugMode()) {
-            Logging::info("Get request to server", ['args' => $_GET]);
+            Logging::info("GET request to server", ['args' => $_GET]);
+        }
+
+        if (isset($_GET['deleteuser'])) {
+            $id = intval($_GET['deleteuser']);
+            return RequestManager::deleteUser($id);
         }
 
         if (isset($_GET['logout'])) {
-            Logging::debug('logout');
-            Authenticate::logout();
-            header("Location: /login", true);
-            return "";
+            return RequestManager::logout();
         }
 
-        if (isset($_GET['renewpassword'])) {
-            Logging::debug('renewpassword');
-            // handle demand for new password.
-            $login_email  = trim($_GET['renewpassword']);
-            $user = Database::users()->queryByEmail($login_email);
+        if (isset($_GET['renewuserpassword'])) {
+            $id = intval($_GET['renewuserpassword']);
+            return RequestManager::renewUserPassword($id);
+        }
 
-            if (isset($user)) {
-                if (Util::renewPassword($user)) {
-                    return Util::requestRedirect(
-                        Route::LOGIN,
-                        AlertType::SUCCESS,
-                        sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail())
-                    );
-                }
-            }
-            return Util::requestRedirect(
-                Route::LOGIN,
-                AlertType::FAILURE,
-                Alert::NEW_PASSWORD_FAILURE
-            );
+        if (isset($_GET['forgottenpassword'])) {
+            $email = trim($_GET['forgottenpassword']);
+            return RequestManager::renewForgottenPassword($email);
         }
         Logging::error("Invalid get request to server", ['args' => $_GET]);
         return "Invalid get request to server";
     }
+    #region GET requests
+
+    private static function deleteUser($id): string
+    {
+        if (Database::users()->delete($id)) {
+
+            Logging::info(LogInfo::USER_DELETED, [
+                'admin-id' => Authenticate::getUserId(),
+                'user-id' => $id
+            ]);
+            return Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
+        }
+        return Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
+    }
+
+    private static function logout(): string
+    {
+        Authenticate::logout();
+        return Util::requestRedirect(Route::LOGIN);
+    }
+
+    /**
+     * Called by admin on user-table to re-issue user a new password.
+     */
+    private static function renewUserPassword($id): string
+    {
+        $user = Database::users()->queryById(intval($id));
+        if (Util::renewPassword($user)) {
+            return Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
+        }
+        return Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+    }
+
+    /**
+     * Called from login screen when the user can't log-in.
+     */
+    private static function renewForgottenPassword($login_email): string
+    {
+        // handle demand for new password.
+        $user = Database::users()->queryByEmail($login_email);
+
+        if (isset($user)) {
+            if (Util::renewPassword($user)) {
+                return Util::requestRedirect(
+                    Route::LOGIN,
+                    AlertType::SUCCESS,
+                    sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail())
+                );
+            }
+        }
+        return Util::requestRedirect(
+            Route::LOGIN,
+            AlertType::FAILURE,
+            Alert::NEW_PASSWORD_FAILURE
+        );
+    }
+
+    #endregion
 
     /**
      * Note: Post requests use RequestManager::redirect for redirection (signal javascript to redirect)
@@ -105,15 +152,12 @@ class RequestManager
         }
 
         switch ($data['req']) {
-
+            case 'add-user':
+                return RequestManager::addNewUser($data);
             case 'get-user':
-                Logging::debug('get-user');
-                $user = Authenticate::getUser()->toJSON();
-                Logging::debug($user);
                 return Authenticate::getUser()->toJSON();
             case 'regen-password':
                 return RequestManager::regenPassword();
-
             case 'update-alias':
                 return RequestManager::updateAlias($data);
             case 'update-delay':
@@ -122,7 +166,8 @@ class RequestManager
                 return RequestManager::updatePassword($data);
             case "update-contact-email":
                 return RequestManager::updateContactEmail($data);
-
+            case 'validate-user':
+                return RequestManager::validateNewUser($data);
             default:
                 $response = [
                     'error' => '[req] key was not found in fetch request.',
@@ -133,8 +178,51 @@ class RequestManager
         }
         return json_encode($data);
     }
+    #region POST requests
 
-    private static function regenPassword()
+    private static function validateNewUser($json): string
+    {
+        $login_email = $json['login-email'];
+        $password_plain = $json['password'];
+
+        $warnings = [];
+
+        if ($login_warning = Validation::validateNewLogin($login_email)) {
+            $warnings['login-email'] = $login_warning;
+        }
+
+        if ($password_warning  = Validation::validateNewPassword($password_plain)) {
+            $warnings['password'] = $password_warning;
+        }
+        $json['warnings'] = $warnings;
+        $json['validated'] = !$login_warning && !$password_warning;
+
+        return json_encode($json);
+    }
+
+    private static function addNewUser($json): string
+    {
+        $login_email = $json['login-email'];
+        $password_plain = $json['password'];
+        $is_admin = $json['is-admin'];
+
+        $new_user = User::fromForm($login_email, $password_plain, $is_admin);
+        $id = Database::users()->insert($new_user);
+        if ($id) {
+            if (Mailing::userInviteNotification($new_user, $password_plain)) {
+                Logging::info(LogInfo::USER_CREATED, [
+                    'admin-id' => Authenticate::getUserId(),
+                    'new-user' => $login_email
+                ]);
+                return RequestManager::redirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
+            }
+            //attempt to roll back adding new user to db.
+            Database::users()->delete($id);
+        }
+        return RequestManager::redirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
+    }
+
+    private static function regenPassword(): string
     {
         return json_encode(['password' => Util::getRandomPassword()]);
     }
@@ -259,7 +347,6 @@ class RequestManager
     {
         $user = Authenticate::getUser();
         if (!$user) {
-
             return RequestManager::redirect(Route::HOME);
         }
         $user_id = $user->getId();
@@ -267,17 +354,17 @@ class RequestManager
         $password_repeat = $json["password-repeat"];
         $warnings = [];
 
-        $val = Validation::validateNewPassword($password_plain);
-        $val_repeat = Validation::validateNewPasswordRepeat($password_plain, $password_repeat);
+        $password_warning = Validation::validateNewPassword($password_plain);
+        $password_warning_repeat = Validation::validateNewPasswordRepeat($password_plain, $password_repeat);
 
-        if ($val) {
-            $warnings['password'] = $val;
+        if ($password_warning) {
+            $warnings['password'] = $password_warning;
         }
-        if ($val_repeat) {
-            $warnings['password-repeat'] = $val_repeat;
+        if ($password_warning_repeat) {
+            $warnings['password-repeat'] = $password_warning_repeat;
         }
 
-        if ($val || $val_repeat) {
+        if ($password_warning || $password_warning_repeat) {
             return RequestManager::issueWarnings($warnings);
         }
 
@@ -311,6 +398,8 @@ class RequestManager
     }
 
     /**
+     * Send a json response containing invalid form warnings.
+     * 
      * @param string $warnings. Warnings associative array with input field as key.
      * @return string json response.
      */
@@ -321,4 +410,6 @@ class RequestManager
             'warnings' => $warnings,
         ]);
     }
+
+    #endregion
 }

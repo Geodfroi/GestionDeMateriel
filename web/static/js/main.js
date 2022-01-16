@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.13 ###
+// ## Joël Piguet - 2022.01.16 ###
 // ##############################
 
 /**
@@ -58,7 +58,6 @@ function displayWarnings(json) {
     setValidTag(input_id, !warning);
     setFeedback(input_id, warning);
   }
-  console.log("displayewd");
 }
 
 function getCheckboxValue(id) {
@@ -112,14 +111,14 @@ function hookBtnClicked(id, callback) {
 }
 
 /**
- * Execute callback when the modal is shown. Used to customize form before presenting it to user.
+ * Execute callback when the modal is shown. Used to customize modal form before presenting it to user.
+ *
  * @param {*} id
  * @param {*} callback
  */
 function hookModalShown(id, callback) {
-  document.getElementById(id).addEventListener("show.bs.modal", (e) => {
-    callback();
-  });
+  const modal = document.getElementById(id);
+  modal.addEventListener("show.bs.modal", (e) => callback(e, modal));
 }
 
 /**
@@ -140,7 +139,7 @@ function htmlEntities(str) {
  * @param {*} callback function handling the server response to the fetch request.
  * @param {*} compilePostData function yielding the json data package to sent to server.
  */
-function call(req, callback, compilePostData = null) {
+function call(req, callback = null, compilePostData = null) {
   let data = compilePostData == null ? {} : compilePostData();
   data["req"] = req;
 
@@ -155,9 +154,6 @@ function call(req, callback, compilePostData = null) {
 
   fetch("/request", options)
     .then((res) => {
-      console.dir(res);
-      // console.log(res);
-      // console.log(res.json());
       return res.json();
     })
     .then((json) => {
@@ -165,10 +161,9 @@ function call(req, callback, compilePostData = null) {
         window.location.replace(json.url);
         return;
       }
-      // if (callback != null) {
-      //   callback(json);
-      // }
-      callback(json);
+      if (callback != null) {
+        callback(json);
+      }
     });
 }
 
@@ -199,6 +194,16 @@ function setValidTag(id, status) {
   } else {
     input.classList.add("is-invalid");
   }
+}
+
+/**
+ *Open modal by id.
+ *
+ * @param {String} modal_id
+ */
+function showModal(modal_id) {
+  let modal = document.getElementById(modal_id);
+  new bootstrap.Modal(modal).show();
 }
 
 // function explode_to_ints(array_str) {

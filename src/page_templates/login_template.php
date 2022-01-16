@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 use app\constants\Requests;
@@ -45,7 +45,7 @@ use app\constants\Requests;
         <div class="col-6 mx-auto">
             <!-- Display a link to propose to send a new password to email. -->
             <?php if (isset($warnings['password']) && strlen($login_email) > 0) { ?>
-                <a href='<?php echo Requests::RENEW_PASSWORD . $login_email ?>'>Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
+                <a href='<?php echo Requests::FORGOTTEN_PASSWORD . $login_email ?>'>Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
             <?php } ?>
         </div>
     </div>

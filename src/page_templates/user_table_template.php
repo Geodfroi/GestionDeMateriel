@@ -1,9 +1,10 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 use app\constants\OrderBy;
+use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Session;
 
@@ -133,7 +134,7 @@ function disLinkAdm(string $header): string
         <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
     </div>
 </div>
-
+<div><?php echo Requests::DELETE_USER ?></div>
 
 <!-- Modal window for user delete confirmation -->
 <div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden="true">
@@ -142,9 +143,9 @@ function disLinkAdm(string $header): string
             <div class="modal-header">
                 <h5 class="modal-title" id="delete-modal-label"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
             </div>
-            <div class="modal-body"> Voulez-vous vraiment supprimer le compte utilisateur [] ? </div>
+            <div class="modal-body">Voulez-vous vraiment supprimer le compte utilisateur [] ? </div>
             <div class="modal-footer">
-                <a href="" class="btn btn-primary">Confirmer</a>
+                <a href-start="<?php echo Requests::DELETE_USER ?>" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>
@@ -160,7 +161,7 @@ function disLinkAdm(string $header): string
             </div>
             <div class="modal-body">Envoyer un nouveau mot de passe à [] ? </div>
             <div class="modal-footer">
-                <a href="" class="btn btn-primary">Confirmer</a>
+                <a href-start="<?php echo Requests::RENEW_USER_PASSWORD ?>" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>

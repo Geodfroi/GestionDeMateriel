@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 namespace app\constants;
@@ -28,7 +28,7 @@ class Warning
     const LOCATION_PRESET_EXISTS = "Cet emplacement est déjà présent dans la liste.";
 
     //login warnings
-    const LOGIN_EMAIL_EMPTY = 'Un e-mail est nécessaire pour vous connecter.';
+    const LOGIN_EMAIL_EMPTY = 'Une adresse e-mail valide est nécessaire.';
     const LOGIN_PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
     const LOGIN_EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
     const LOGIN_NOT_FOUND = "Il n'existe pas d'usager employant cette adresse e-mail.";
