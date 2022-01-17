@@ -3,12 +3,11 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.16 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\helpers;
 
-use app\constants\Requests;
 use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
@@ -49,6 +48,16 @@ class RequestManager
     {
         if (App::isDebugMode()) {
             Logging::info("GET request to server", ['args' => $_GET]);
+        }
+
+        if (isset($_GET['deletearticle'])) {
+            $id = intval($_GET['deletearticle']);
+            return RequestManager::deleteArticle($id);
+        }
+
+        if (isset($_GET['deletelocpreset'])) {
+            $id = intval($_GET['deletelocpreset']);
+            return RequestManager::deleteLocationPreset($id);
         }
 
         if (isset($_GET['deleteuser'])) {
@@ -95,9 +104,10 @@ class RequestManager
         }
 
         switch ($data['req']) {
-
             case 'add-article':
                 return RequestManager::addArticle($data);
+            case 'add-loc-preset':
+                return RequestManager::addLocationPreset($data);
             case 'add-user':
                 return RequestManager::addNewUser($data);
             case 'get-article':
@@ -112,6 +122,8 @@ class RequestManager
                 return RequestManager::updateAlias($data);
             case 'update-delay':
                 return RequestManager::updateDelays($data);
+            case 'update-loc-preset':
+                return RequestManager::updateLocationPreset($data);
             case 'update-password':
                 return RequestManager::updatePassword($data);
             case "update-contact-email":
@@ -160,6 +172,31 @@ class RequestManager
     }
 
     #region GET requests
+
+    private static function deleteArticle($id): string
+    {
+        if (Database::articles()->delete($id)) {
+            $user_id = Authenticate::getUserId();
+            Logging::info(LogInfo::ARTICLE_DELETED, ['user-id' => $user_id, 'article-id' => $id]);
+            return Util::requestRedirect(ROUTE::ART_TABLE, AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
+        }
+        return Util::requestRedirect(ROUTE::ART_TABLE, AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
+    }
+
+    private static function deleteLocationPreset($id): string
+    {
+        $former_location = Database::locations()->queryById($id);
+        if (Database::locations()->delete($id)) {
+
+            $user_id = Authenticate::getUserId();
+            Logging::info(LogInfo::LOCATION_DELETED, [
+                'user-id' => $user_id,
+                'former-value' => $former_location
+            ]);
+            return Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
+        }
+        return  Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
+    }
 
     private static function deleteUser($id): string
     {
@@ -220,6 +257,58 @@ class RequestManager
 
     #region POST requests
 
+    private static function addLocationPreset($json): string
+    {
+        $content = $json['content'];
+        $warnings = [];
+
+        if ($content_warning = Validation::validateLocationPreset($content)) {
+            $warnings['content'] = $content_warning;
+            return RequestManager::issueWarnings($warnings);
+        }
+
+        if (Database::locations()->insert($content)) {
+
+            Logging::info(LogInfo::LOCATION_CREATED, [
+                'user-id' => Authenticate::getUserId(),
+                'content' => $content
+            ]);
+            return  RequestManager::redirect(Route::LOCAL_PRESETS);
+        }
+        return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
+    }
+
+    private static function updateLocationPreset($json): string
+    {
+        $id = intval($json['id']);
+        $content = $json['content'];
+        $warnings = [];
+
+        $former_content = Database::locations()->queryById($id)->getContent();
+
+        // no change to content
+        if (strcasecmp($content, $former_content) == 0) {
+            return RequestManager::redirect(Route::LOCAL_PRESETS);
+        }
+
+        // strcasecmp must be placed before, otherwise validation will always be invalid and show LOCATION_PRESET_EXISTS warning.
+        if ($content_warning = Validation::validateLocationPreset($content)) {
+            $warnings['content'] = $content_warning;
+            return RequestManager::issueWarnings($warnings);
+        }
+
+        if (Database::locations()->update($id, $content)) {
+
+            Logging::info(LogInfo::LOCATION_UPDATED, [
+                'user-id' => Authenticate::getUserId(),
+                'former-value' => $former_content,
+                'new-value' => $content
+            ]);
+            return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
+        }
+        return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
+    }
+
 
     private static function addArticle($json): string
     {
@@ -229,7 +318,6 @@ class RequestManager
         $comments = $json['comments'];
         $warnings = [];
 
-        Logging::debug('addarticle');
         if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
             $user_id = Authenticate::getUserId();
             $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
@@ -246,7 +334,6 @@ class RequestManager
 
     private static function updateArticle($json): string
     {
-        Logging::debug('updateArticle', ['json' => $json]);
         $article_id  = intval($json['id']);
         $article_name = $json['article-name'];
         $location = $json['location'];
@@ -255,16 +342,11 @@ class RequestManager
         $warnings = [];
 
         if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
-            Logging::debug('validated');
             $user_id = Authenticate::getUserId();
-
             $article = Database::articles()->queryById($article_id);
-            Logging::debug('$article', ['val' => $article]);
             $article->updateFields($article_name, $location, $exp_date_str, $comments);
 
-            Logging::debug('validated2');
             if (Database::articles()->update($article)) {
-                Logging::debug('updated');
                 Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article_id]);
                 return RequestManager::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
             }

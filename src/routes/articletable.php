@@ -1,22 +1,19 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\routes;
 
-use app\constants\Alert;
-use app\constants\AlertType;
 use app\constants\ArtFilter;
-use app\constants\LogInfo;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
-use app\helpers\Logging;
+// use app\helpers\Logging;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
@@ -25,7 +22,7 @@ class ArticleTable extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct(Route::ART_TABLE, 'articles_table_template', 'articles_table');
+        parent::__construct(Route::ART_TABLE, 'articles_table_template', 'articles_table_script');
     }
 
     public function getBodyContent(): string
@@ -34,22 +31,11 @@ class ArticleTable extends BaseRoute
             $this->requestRedirect(Route::LOGIN);
         }
 
-        $user_id = Authenticate::getUserId();
-
         $_SESSION[Session::ART_PAGE] ??= 1;
         $_SESSION[Session::ART_ORDERBY] ??= OrderBy::DELAY_ASC;
 
         if (!isset($_SESSION[Session::ART_FILTERS])) {
             $_SESSION[Session::ART_FILTERS] = [];
-        }
-
-        if (isset($_GET['delete'])) {
-            if (Database::articles()->delete($_GET['delete'])) {
-                Logging::info(LogInfo::ARTICLE_DELETED, ['user-id' => $user_id, 'article-id' => $_GET['delete']]);
-                return $this->requestRedirect(ROUTE::ART_TABLE, AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
-            } else {
-                return $this->requestRedirect(ROUTE::ART_TABLE, AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
-            }
         }
 
         if (isset($_GET['orderby'])) {

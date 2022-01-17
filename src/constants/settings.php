@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\constants;
@@ -35,7 +35,7 @@ class Settings
     const ARTICLE_DATE_FUTURE_LIMIT = '2050-01-01';
 
     const LOCATION_MIN_LENGHT = 6;
-    const LOCATION_MAX_LENGHT = 30;
+    const LOCATION_MAX_LENGHT = 60;
 
     const TABLE_DISPLAY_COUNT = 10;
 

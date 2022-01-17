@@ -159,6 +159,17 @@ class Validation
         return true;
     }
 
+    public static function validateLocationPreset(string &$location): string
+    {
+        if ($warning = Validation::validateLocation($location)) {
+            return $warning;
+        }
+        if (Database::locations()->contentExists($location)) {
+            return Warning::LOCATION_PRESET_EXISTS;
+        }
+        return "";
+    }
+
     /**
      * Location validation. Location must not be empty and under a set number of caracters.
      * 

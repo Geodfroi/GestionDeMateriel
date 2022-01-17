@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\constants;
@@ -31,9 +31,11 @@ class Alert
 
     // local presets alerts
     const LOCATION_PRESET_INSERT = "Il n'a pas été possible d'ajouter le nouvel emplacement à la liste.";
-    const LOC_PRESET_REMOVE_FAILURE = "L'emplacement n' pas pu être enlevé.";
+    const LOC_PRESET_REMOVE_FAILURE = "L'emplacement n'pas pu être enlevé.";
     const LOC_PRESET_REMOVE_SUCCESS = "L'emplacement a été enlevé avec succès.";
     const LOC_PRESET_UPDATE_SUCCESS = "L'emplacement a été modifié avec succès.";
+    const LOC_PRESET_UPDATE_FAILURE = "L'emplacement n'a pas pu être modifié.";
+
 
     // //login alerts
     // const LOGIN_USER_DISC = "L'usager précédent s'est déconnecté.";

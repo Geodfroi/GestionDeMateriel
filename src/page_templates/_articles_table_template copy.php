@@ -1,11 +1,10 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 use app\constants\ArtFilter;
 use app\constants\OrderBy;
-use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Database;
@@ -299,7 +298,7 @@ function getOwner(Article $article): string
                 Voulez-vous vraiment supprimer l'article [] ?
             </div>
             <div class="modal-footer">
-                <a href-start="<?php echo Requests::DELETE_ARTICLE ?>" href="" class="btn btn-primary">Confirmer</a>
+                <a href="" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>

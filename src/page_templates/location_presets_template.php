@@ -1,9 +1,9 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
-use app\constants\Route;
+use app\constants\Requests;
 
 ?>
 
@@ -13,70 +13,60 @@ use app\constants\Route;
         <table class="table table-striped table-bordered align-middle">
             <tbody>
                 <?php foreach ($locations as $item) { ?>
-
-                    <?php if ($item->getId() === $selected) { ?>
-                        <tr class='table-primary'>
-                        <?php } else { ?>
-                        <tr>
-                        <?php } ?>
-
+                    <tr>
                         <td><?php echo $item->getContent() ?></td>
+                        <td>
+                            <a class="link-secondary" data-bs-toggle="modal" data-bs-target="#edit-modal" data-bs-id="<?php echo $item->getId() ?>" data-bs-content="<?php echo $item->getContent() ?>" href=""><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label="update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
 
-                        <?php if ($selected === 0) { ?>
-                            <td>
-                                <a class="link-secondary" href=<?php echo Route::LOCAL_PRESETS . '?update=' . $item->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
-                                <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal-<?php echo $item->getId() ?>"><i class=" bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
-                            </td>
-
-                            <!-- Modal window for location preset delete confirmation -->
-                            <div class="modal fade" id="delete-modal-<?php echo $item->getId() ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modalLabel-<?php echo $item->getId() ?>" aria-hidden=" true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="delete-modalLabel-<?php echo $item->getId() ?>"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
-                                        </div>
-                                        <div class="modal-body">
-                                            Voulez-vous vraiment supprimer [<?php echo $item->getContent() ?>] ?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a href="<?php echo Route::LOCAL_PRESETS . '?delete=' . $item->getId() ?>" class="btn btn-primary">Confirmer</a>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } ?>
-                        </tr>
-                    <?php } ?>
+                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $item->getId() ?>" data-bs-content="<?php echo $item->getContent() ?>"><i class=" bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                        </td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
     </ul>
 
-    <form method="post" action="<?php echo Route::LOCAL_PRESETS ?>">
+    <div class="row">
+        <a data-bs-toggle="modal" data-bs-target="#edit-modal" data-bs-id="" href="" class="btn btn-primary">Ajouter un preset</a>
+    </div>
+</div>
 
-        <input type="hidden" name="id" value="<?php echo $selected ?>">
-
-        <div class="input-group mt-3 mb-3">
-
-            <?php if ($selected === 0) { ?>
-                <label for="location" class="input-group-text"> Nouvelle saisie </label>
-            <?php } ?>
-
-            <input id="location" type="text" name='location' value="<?php echo htmlentities($location_field); ?>" class="form-control 
-                        <?php echo isset($warnings['location']) ? ' is-invalid' : '' ?>
-                        <?php echo $location_field ? ' is-valid' : '' ?>">
-
-            <?php if ($selected === 0) { ?>
-                <button type="submit" name="add-new" class="btn btn-primary">Ajouter</button>
-            <?php } else { ?>
-                <button type="submit" name="update" class="btn btn-primary">Mettre à jour</button>
-            <?php } ?>
-
-            <?php if (isset($warnings['location'])) { ?>
-                <div class='invalid-feedback'><?php echo $warnings['location'] ?> </div>
-            <?php } ?>
+<!-- Modal window content edit -->
+<div class="modal fade" id="edit-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 id="modal-title" class="modal-title">Nouvelle saisie. </h5>
+                </div>
+                <div class="modal-body">
+                    <input id="id" type="hidden" name="id">
+                    <input id="content" type="text" name='content' class="form-control">
+                    <div id="content-feedback" class="invalid-feedback"> </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="submit-btn" type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                </div>
+            </form>
         </div>
+    </div>
+</div>
 
-        <a href="<?php echo Route::ADMIN ?>" class="btn btn-secondary">Retour</a>
-    </form>
+<!-- Modal window for location preset delete confirmation -->
+<div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden=" true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label"><i class="bi bi-exclamation-triangle text-danger"></i> Attention!</h5>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimer [] ?
+            </div>
+            <div class="modal-footer">
+                <a href-start="<?php echo Requests::DELETE_LOC_PRESET ?>" href="" class="btn btn-primary">Confirmer</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
 </div>

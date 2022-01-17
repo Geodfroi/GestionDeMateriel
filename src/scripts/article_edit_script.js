@@ -37,8 +37,6 @@ function getFormData() {
 }
 
 function handleValidation(json) {
-  console.log("handleValidation");
-  console.log(json);
   displayWarnings(
     json,
     "article-name",

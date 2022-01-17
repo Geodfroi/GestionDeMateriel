@@ -3,6 +3,41 @@
 // ##############################
 
 /**
+ * Use javascript fetch ajax method to post data to the server and handle the server response.
+ *
+ * @param {*} req request identifier.
+ * @param {*} callback function handling the server response to the fetch request.
+ * @param {*} compilePostData function yielding the json data package to sent to server.
+ */
+function call(req, callback = null, compilePostData = null) {
+  let data = compilePostData == null ? {} : compilePostData();
+  data["req"] = req;
+
+  const options = {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  };
+
+  fetch("/request", options)
+    .then((res) => {
+      return res.json();
+    })
+    .then((json) => {
+      if ("url" in json) {
+        window.location.replace(json.url);
+        return;
+      }
+      if (callback != null) {
+        callback(json);
+      }
+    });
+}
+
+/**
  * Clear input valu.
  */
 function clearInputValues() {
@@ -111,8 +146,6 @@ function getFormValues() {
       // json[input_id] = htmlEntities(input.value.trim());
     }
   }
-  console.log("getFormValues");
-  console.log(json);
   return json;
 }
 
@@ -139,10 +172,10 @@ function hookBtn(id, callback) {
 function hookBtnCollection(class_name, callback) {
   let collection = document.getElementsByClassName(class_name);
   for (let index = 0; index < collection.length; index++) {
-    const btn = collection[index];
-    btn.addEventListener("click", (e) => {
+    const element = collection[index];
+    element.addEventListener("click", (e) => {
       e.preventDefault();
-      callback(e, btn);
+      callback(e, element);
     });
   }
 }
@@ -159,38 +192,14 @@ function hookModalShown(id, callback) {
 }
 
 /**
- * Use javascript fetch ajax method to post data to the server and handle the server response.
- *
- * @param {*} req request identifier.
- * @param {*} callback function handling the server response to the fetch request.
- * @param {*} compilePostData function yielding the json data package to sent to server.
+ * https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/
  */
-function call(req, callback = null, compilePostData = null) {
-  let data = compilePostData == null ? {} : compilePostData();
-  data["req"] = req;
-
-  const options = {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  };
-
-  fetch("/request", options)
-    .then((res) => {
-      return res.json();
-    })
-    .then((json) => {
-      if ("url" in json) {
-        window.location.replace(json.url);
-        return;
-      }
-      if (callback != null) {
-        callback(json);
-      }
-    });
+function htmlEntities(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function setCheckboxValue(id, status) {
@@ -243,14 +252,3 @@ function showModal(modal_id) {
 //   }
 //   return array_ints;
 // }
-
-/**
- * https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/
- */
-function htmlEntities(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
