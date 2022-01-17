@@ -78,63 +78,8 @@ function getOwner(Article $article): string
         </a>
     </div>
 
-    <!-- Filter Modal -->
-    <div class="modal fade" id="filter-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="filter-modal-label" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="filter-modal-label">Filtrer les articles selon les paramètres suivants: </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="post" action="<?php echo Route::ART_TABLE ?>">
-                    <div class="modal-body">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text col-md-3">Par nom d'article:</span>
-                                        <input name="filter-name" class="form-control" type="text" aria-label="Filter-name" value="<?php echo htmlentities($filter_name) ?>">
-                                    </div>
-
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text col-md-3">Par emplacement:</span>
-                                        <input name="filter-location" class="form-control" type="text" aria-label="Filter-name" value="<?php echo htmlentities($filter_location) ?>">
-                                    </div>
-
-                                    <div class="input-group mb-2">
-                                        <button id="filter-date-btn" class="btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
-                                            <?php echo $filter_date_type === ArtFilter::DATE_BEFORE ? 'Péremption avant le' : 'Péremption après le'; ?>
-                                        </button>
-                                        <input id="filter-date-type" name="filter-date-type" type="hidden" value="<?php echo $filter_date_type; ?>">
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><span id="filter-date-before" class="dropdown-item filter-date-select">Péremption avant le</span></li>
-                                            <li><span id="filter-date-after" class="dropdown-item filter-date-select">Péremption après le</span></li>
-                                        </ul>
-                                        <input id="filter-date-val" name="filter-date-val" class="form-control" type="date" value="<?php echo $filter_date_val; ?>">
-                                        <button id="filter-date-clear" class="btn btn-outline-primary">Effacer</button>
-                                    </div>
-
-                                    <div class="form-check form-switch mb-1">
-                                        <input id="show-expired" name="show-expired" class="form-check-input" type="checkbox" role="switch" <?php if ($filter_show_expired) { ?> checked <?php } ?>>
-                                        <label class="form-check-label" for="show-expired">Montrer également les articles arrivés à péremption.</label>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary" name="filter">Filtrer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <div class="row">
-        <table id='table' cclass="table table-striped">
+        <table id='table' class="table table-striped">
 
             <thead>
                 <tr>
@@ -257,6 +202,61 @@ function getOwner(Article $article): string
                 <a href-start="<?php echo Requests::DELETE_ARTICLE ?>" href="" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filter-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="filter-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filter-modal-label">Filtrer les articles selon les paramètres suivants: </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="<?php echo Route::ART_TABLE ?>">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="input-group mb-1">
+                                    <span class="input-group-text col-md-3">Par nom d'article:</span>
+                                    <input id="filter-name" name="filter-name" class="form-control" type="text" aria-label="Filter-name" value="<?php echo htmlentities($filter_name) ?>">
+                                </div>
+
+                                <div class="input-group mb-1">
+                                    <span class="input-group-text col-md-3">Par emplacement:</span>
+                                    <input name="filter-location" class="form-control" type="text" aria-label="Filter-name" value="<?php echo htmlentities($filter_location) ?>">
+                                </div>
+
+                                <div class="input-group mb-2">
+                                    <button id="filter-date-btn" class="btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
+                                        <?php echo $filter_date_type === ArtFilter::DATE_BEFORE ? 'Péremption avant le' : 'Péremption après le'; ?>
+                                    </button>
+                                    <input id="filter-date-type" name="filter-date-type" type="hidden" value="<?php echo $filter_date_type; ?>">
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><span id="filter-date-before" class="dropdown-item filter-date-select">Péremption avant le</span></li>
+                                        <li><span id="filter-date-after" class="dropdown-item filter-date-select">Péremption après le</span></li>
+                                    </ul>
+                                    <input id="filter-date-val" name="filter-date-val" class="form-control" type="date" value="<?php echo $filter_date_val; ?>">
+                                    <button id="filter-date-clear" class="btn btn-outline-primary">Effacer</button>
+                                </div>
+
+                                <div class="form-check form-switch mb-1">
+                                    <input id="show-expired" name="show-expired" class="form-check-input" type="checkbox" role="switch" <?php if ($filter_show_expired) { ?> checked <?php } ?>>
+                                    <label class="form-check-label" for="show-expired">Montrer également les articles arrivés à péremption.</label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary" name="filter">Filtrer</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
