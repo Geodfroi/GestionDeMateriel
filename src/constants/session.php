@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\constants;
@@ -19,6 +19,7 @@ class Session
     /**
      * store associative array with key as filter type and value as filter params.
      */
+    const ART_DISPLAY_COUNT = 'article_display_count';
     const ART_FILTERS = 'article_filters';
     const ART_ORDERBY = 'articles_orderby';
     const ART_PAGE = 'articles_page';

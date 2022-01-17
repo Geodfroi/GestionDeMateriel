@@ -5,6 +5,25 @@
 const DATE_BEFORE = "before-peremption";
 const DATE_AFTER = "after-peremption";
 
+function displayCount() {
+  let nav = document.getElementById("display-nav");
+  let count = nav.getAttribute("display-count");
+  console.log(count);
+
+  // show selection
+  let id = `display-${count}`;
+  let selection_link = document.getElementById(id);
+  selection_link.setAttribute("active", true);
+  selection_link.classList.add("text-secondary");
+  selection_link.classList.add("text-decoration-underline");
+}
+
+// Clear date filter btn
+hookBtn(
+  "filter-date-clear",
+  () => (document.getElementById("filter-date-val").value = "")
+);
+
 // set date filter btn inner text and fill date type input value.
 hookBtnCollection("filter-date-select", (e, element) => {
   //change btn label.
@@ -26,12 +45,6 @@ for (let index = 0; index < collection.length; index++) {
   element.addEventListener("click", (e) => {});
 }
 
-// Clear date filter btn
-hookBtn(
-  "filter-date-clear",
-  () => (document.getElementById("filter-date-val").value = "")
-);
-
 //fill in delete article modal info when called.
 hookModalShown("delete-modal", (e, modal) => {
   if (e.relatedTarget) {
@@ -48,3 +61,5 @@ hookModalShown("delete-modal", (e, modal) => {
     btn.setAttribute("href", href_start + id);
   }
 });
+
+displayCount();

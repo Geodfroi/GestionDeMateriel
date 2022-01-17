@@ -37,8 +37,6 @@ class Settings
     const LOCATION_MIN_LENGHT = 6;
     const LOCATION_MAX_LENGHT = 60;
 
-    const TABLE_DISPLAY_COUNT = 10;
-
     const DEFAULT_PASSWORD_LENGTH = 12;
     const USER_PASSWORD_MIN_LENGTH = 8;
 

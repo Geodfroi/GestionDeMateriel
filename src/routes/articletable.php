@@ -38,6 +38,10 @@ class ArticleTable extends BaseRoute
             $_SESSION[Session::ART_FILTERS] = [];
         }
 
+        if (isset($_GET['display'])) {
+            $_SESSION[Session::ART_DISPLAY_COUNT] = intval($_GET['display']);
+        }
+
         if (isset($_GET['orderby'])) {
             $_SESSION[Session::ART_ORDERBY] = intval($_GET['orderby']);
             goto end;
@@ -87,12 +91,13 @@ class ArticleTable extends BaseRoute
 
         end:
 
+        $display_count = $_SESSION[Session::ART_DISPLAY_COUNT] ?? 20;
         $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTERS]);
-        $offset = ($_SESSION[Session::ART_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
-        $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
+        $offset = ($_SESSION[Session::ART_PAGE] - 1) * $display_count;
+        $page_count = ceil($item_count / $display_count);
 
         $articles = Database::articles()->queryAll(
-            Settings::TABLE_DISPLAY_COUNT,
+            $display_count,
             $offset,
             $_SESSION[Session::ART_ORDERBY],
             $_SESSION[Session::ART_FILTERS]
@@ -101,6 +106,7 @@ class ArticleTable extends BaseRoute
         return $this->renderTemplate([
             'articles' =>  $articles,
             'page_count' => $page_count,
+            'display_count' =>  $display_count
         ]);
     }
 }

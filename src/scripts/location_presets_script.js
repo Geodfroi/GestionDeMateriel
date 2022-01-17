@@ -2,8 +2,6 @@
 // ## Joël Piguet - 2022.01.17 ###
 // ##############################
 
-function getFormData() {}
-
 //fill in delete location modal info when called.
 hookModalShown("delete-modal", (e, modal) => {
   if (e.relatedTarget) {

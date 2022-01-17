@@ -260,6 +260,26 @@ function getOwner(Article $article): string
     </div>
 
     <nav>
+        <ul id="display-nav" display-count=<?php echo $display_count ?> class="nav justify-content-center">
+            <li class="nav-item">
+                <!-- text-secondary text-decoration-underline -->
+                <a id="display-10" display-count="10" class="display-option nav-link px-0 active" href="<?php echo Route::ART_TABLE . '?display=10' ?>">10</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-0 text-primary">|</a>
+            </li>
+            </li>
+            <li class="nav-item">
+                <a id="display-20" display-count="20" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display=20' ?>">20</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-0 text-primary">|</a>
+            </li>
+            <li class="nav-item">
+                <a id="display-50" display-count="50" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display=50' ?>">50</a>
+            </li>
+        </ul>
+
         <ul class="pagination justify-content-end">
 
             <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
@@ -270,7 +290,7 @@ function getOwner(Article $article): string
             </li>
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
-                <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
+                <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
                     <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
                 </li>
             <?php  } ?>
@@ -281,11 +301,12 @@ function getOwner(Article $article): string
                 </a>
             </li>
         </ul>
-    </nav>
 
+    </nav>
     <div class="row">
         <a href="<?php echo Route::ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
     </div>
+
 </div>
 
 <!-- Modal window for article delete confirmation -->
