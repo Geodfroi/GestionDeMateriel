@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\helpers;
@@ -12,26 +12,11 @@ use DateTime;
 
 use app\constants\Settings;
 use app\constants\Warning;
+
 // use app\helpers\Logging;
-use app\routes\BaseRoute;
 
 class Validation
 {
-    /**
-     * Validate user alias. Alias can be set to empty string in which cas e-mail root is used in the app.
-     * 
-     * @param string|null $alias Optional alias by reference.
-     * @return bool True if Alias is conform or empty.
-     */
-    public static function validateAlias(&$alias): bool
-    {
-        $alias = trim($_POST['alias']) ?? '';
-        if ($alias === '') {
-            return true;
-        }
-        return strlen($alias) >= Settings::ALIAS_MIN_LENGHT;
-    }
-
     /**
      * Article name validation. Article name must not be empty, exceed a set length and under a set number of caracters.
      * 
@@ -132,12 +117,10 @@ class Validation
     {
         if ($email  === '') {
             return Warning::LOGIN_EMAIL_EMPTY;
-            return false;
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
             return  Warning::LOGIN_EMAIL_INVALID;
-            return false;
         }
         return "";
     }
@@ -145,27 +128,13 @@ class Validation
     /**
      * Validate input and fill $errors array with proper password error text to be displayed if it fails.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string $password User password by reference
-     * @return bool True if properly filled;
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateLoginPassword(BaseRoute $route, &$password)
+    public static function validateLoginPassword(&$password): string
     {
-        $password = trim($_POST['password']) ?? '';
         if ($password === '') {
-            $route->showWarning('password', Warning::LOGIN_PASSWORD_EMPTY);
-            return false;
-        }
-        return true;
-    }
-
-    public static function validateLocationPreset(string &$location): string
-    {
-        if ($warning = Validation::validateLocation($location)) {
-            return $warning;
-        }
-        if (Database::locations()->contentExists($location)) {
-            return Warning::LOCATION_PRESET_EXISTS;
+            return Warning::LOGIN_PASSWORD_EMPTY;
         }
         return "";
     }
@@ -189,6 +158,23 @@ class Validation
 
         if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
             return sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT);
+        }
+        return "";
+    }
+
+    /**
+     * Location preset validation. Location must not be empty, under a set number of caracters and not yet exist.
+     * 
+     * @param string &$location Article's location within the school by reference.
+     * @return string Empty string if value is validated or warning message in case of failure.
+     */
+    public static function validateLocationPreset(string &$location): string
+    {
+        if ($warning = Validation::validateLocation($location)) {
+            return $warning;
+        }
+        if (Database::locations()->contentExists($location)) {
+            return Warning::LOCATION_PRESET_EXISTS;
         }
         return "";
     }

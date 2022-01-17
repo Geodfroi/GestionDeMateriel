@@ -100,8 +100,6 @@ function displayInputValues(json) {
  * @param {*} json json fetch response.
  */
 function displayWarnings(json) {
-  console.log("displayWarnings");
-  console.log(json);
   for (let i = 1; i < arguments.length; i++) {
     let input_id = arguments[i];
     let warning = getJSONWarning(json, input_id);
@@ -143,7 +141,6 @@ function getFormValues() {
     let input = document.getElementById(input_id);
     if (input) {
       json[input_id] = input.value.trim();
-      // json[input_id] = htmlEntities(input.value.trim());
     }
   }
   return json;

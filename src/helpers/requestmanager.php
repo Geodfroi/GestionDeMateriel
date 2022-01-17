@@ -116,6 +116,8 @@ class RequestManager
                 return Authenticate::getUser()->toJSON();
             case 'regen-password':
                 return RequestManager::regenPassword();
+            case "submit-login":
+                return RequestManager::submitLogin($data);
             case 'update-article':
                 return RequestManager::updateArticle($data);
             case 'update-alias':
@@ -413,6 +415,35 @@ class RequestManager
     private static function regenPassword(): string
     {
         return json_encode(['password' => Util::getRandomPassword()]);
+    }
+
+    private static function submitLogin($json): string
+    {
+        $email = $json['email'];
+        $password = $json['password'];
+        $warnings = [];
+
+        if ($warning_email = Validation::validateLoginEmail($email)) {
+            $warnings['email'] = $warning_email;
+        }
+        if ($warning_password = Validation::validateLoginPassword($password)) {
+            $warnings['password'] = $warning_password;
+        }
+        if ($warning_email || $warning_password) {
+            return RequestManager::issueWarnings($warnings);
+        }
+
+        $user = Database::users()->queryByEmail($email);
+        if (!$user) {
+            // if (!isset($user)) {}
+            return RequestManager::issueWarnings(['email' => Warning::LOGIN_NOT_FOUND]);
+        }
+
+        if ($user->verifyPassword($password)) {
+            Authenticate::login($user);
+            return RequestManager::redirect(Route::HOME);
+        }
+        return RequestManager::issueWarnings(['password' => Warning::LOGIN_INVALID_PASSWORD]);
     }
 
     private static function updateAlias($json): string

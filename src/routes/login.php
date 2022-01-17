@@ -32,30 +32,6 @@ class Login extends BaseRoute
             return $this->requestRedirect(Route::HOME);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $login_email = trim($_POST['login-email']) ?? '';
-
-            if ($warning = Validation::validateLoginEmail($login_email)) {
-                $this->showWarning('login-email', $warning);
-            } else {
-                $user = Database::users()->queryByEmail($login_email);
-            }
-
-            if (!isset($user)) {
-                $this->showWarning('login-email', Warning::LOGIN_NOT_FOUND);
-            } else {
-                if (Validation::validateLoginPassword($this, $password)) {
-                    if ($user->verifyPassword($password)) {
-                        Authenticate::login($user);
-                        $this->requestRedirect(Route::HOME);
-                        return "";
-                    } else {
-                        $this->showWarning('password', Warning::LOGIN_INVALID_PASSWORD);
-                    }
-                }
-            }
-        }
-
         end:
         return $this->renderTemplate([
             'login_email' => $login_email ?? '',
