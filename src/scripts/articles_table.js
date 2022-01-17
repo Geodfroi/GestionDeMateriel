@@ -1,10 +1,6 @@
 // ################################
-// ## Joël Piguet - 2022.01.10 ###
+// ## Joël Piguet - 2022.01.17 ###
 // ##############################
-
-ARTICLES_ROUTE = "/articlesTable";
-
-// script for date filter
 
 // set date filter btn inner text and fill date type input value.
 let btn = document.getElementById("filter-date-btn");

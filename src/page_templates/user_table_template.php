@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.16 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 use app\constants\OrderBy;
@@ -134,7 +134,6 @@ function disLinkAdm(string $header): string
         <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
     </div>
 </div>
-<div><?php echo Requests::DELETE_USER ?></div>
 
 <!-- Modal window for user delete confirmation -->
 <div class="modal fade" id="delete-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden="true">

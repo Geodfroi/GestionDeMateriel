@@ -1,12 +1,9 @@
 // ################################
-// ## Joël Piguet - 2022.01.16 ###
+// ## Joël Piguet - 2022.01.17 ###
 // ##############################
-
-USER_ROUTE = "/usersTable";
 
 //fill in delete modal info when called.
 hookModalShown("delete-modal", (e, modal) => {
-  console.log("delete-modal");
   if (e.relatedTarget) {
     let button = e.relatedTarget;
     let id = button.getAttribute("data-bs-id");

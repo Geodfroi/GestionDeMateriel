@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.13 ###
+// ## Joël Piguet - 2022.01.16 ###
 // ##############################
 
 PROFILE_ROUTE = "/profile";
@@ -32,7 +32,7 @@ function getFormDelays() {
 }
 
 // post alias change
-hookBtnClicked("alias-submit", () => {
+hookBtn("alias-submit", () => {
   call(
     "update-alias",
     (json) => displayWarnings(json, "alias"),
@@ -41,7 +41,7 @@ hookBtnClicked("alias-submit", () => {
 });
 
 // post alias change
-hookBtnClicked("password-submit", () => {
+hookBtn("password-submit", () => {
   call(
     "update-password",
     (json) => displayWarnings(json, "password", "password-repeat"),
@@ -50,7 +50,7 @@ hookBtnClicked("password-submit", () => {
 });
 
 // post contact email change
-hookBtnClicked("contact-submit", () => {
+hookBtn("contact-submit", () => {
   call(
     "update-contact-email",
     (json) => displayWarnings(json, "contact-email"),
@@ -59,7 +59,7 @@ hookBtnClicked("contact-submit", () => {
 });
 
 // post peremption delay change
-hookBtnClicked("delay-submit", () => {
+hookBtn("delay-submit", () => {
   call(
     "update-delay",
     (json) => displayDelayWarnings(json),
@@ -71,7 +71,7 @@ hookBtnClicked("delay-submit", () => {
 hookModalShown("alias-modal", () => {
   call("get-user", (json) => {
     clearWarnings("alias");
-    displayInputValue("alias", json.alias);
+    displayInputValue(json, "alias");
   });
 });
 
@@ -86,7 +86,7 @@ hookModalShown("password-modal", () => {
 hookModalShown("contact-modal", () => {
   call("get-user", (json) => {
     clearWarnings("contact-email");
-    displayInputValue("contact-email", json.contact_email);
+    displayInputValue(json, "contact-email");
   });
 });
 

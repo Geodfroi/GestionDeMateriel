@@ -16,18 +16,18 @@ function handleValidation(json) {
   }
 }
 
-hookBtnClicked("regen-password", () => {
+hookBtn("regen-password", () => {
   call("regen-password", (json) => {
-    displayInputValue("password", json.password);
+    displayInputValue(json, "password");
   });
 });
 
 //two step process: the confirmation modal is only shown if the form is properly validated.
-hookBtnClicked("add-btn", () => {
+hookBtn("add-btn", () => {
   call("validate-user", handleValidation, getFormData);
 });
 
 // post new user
-hookBtnClicked("submit-btn", () => {
+hookBtn("submit-btn", () => {
   call("add-user", null, getFormData);
 });

@@ -34,7 +34,6 @@ class UserTable extends BaseRoute
 
         if (isset($_GET['orderby'])) {
             $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
-            goto end;
         }
 
         if (isset($_GET['page'])) {

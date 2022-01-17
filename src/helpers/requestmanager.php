@@ -20,6 +20,7 @@ use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\helpers\Validation;
+use app\models\Article;
 use app\models\User;
 
 /**
@@ -71,6 +72,93 @@ class RequestManager
         Logging::error("Invalid get request to server", ['args' => $_GET]);
         return "Invalid get request to server";
     }
+
+    /**
+     * Note: Post requests use RequestManager::redirect for redirection (signal javascript to redirect)
+     */
+    private static function handlePostRequests(): string
+    {
+        // Takes raw data from the request
+        $json = file_get_contents('php://input');
+        // Converts it into a PHP object
+        $data = json_decode($json, true);
+        Logging::debug('fetch data', $data);
+
+        if (!isset($data['req'])) {
+            $response = ['error' => '[req] key was not defined in fetch request.'];
+            Logging::error('data request error', $response);
+            return json_encode($response);
+        }
+
+        if (App::isDebugMode()) {
+            Logging::info("Post request to server", ['data' => $data['req']]);
+        }
+
+        switch ($data['req']) {
+
+            case 'add-article':
+                return RequestManager::addArticle($data);
+            case 'add-user':
+                return RequestManager::addNewUser($data);
+            case 'get-article':
+                return Database::articles()->queryById(intval($data['id']))->toJSON();
+            case 'get-user':
+                return Authenticate::getUser()->toJSON();
+            case 'regen-password':
+                return RequestManager::regenPassword();
+            case 'update-article':
+                return RequestManager::updateArticle($data);
+            case 'update-alias':
+                return RequestManager::updateAlias($data);
+            case 'update-delay':
+                return RequestManager::updateDelays($data);
+            case 'update-password':
+                return RequestManager::updatePassword($data);
+            case "update-contact-email":
+                return RequestManager::updateContactEmail($data);
+            case 'validate-user':
+                return RequestManager::validateNewUser($data);
+            default:
+                $response = [
+                    'error' => '[req] key was not found in fetch request.',
+                    'req' => $data['req']
+                ];
+                Logging::error('data request error', $response);
+                return json_encode($response);
+        }
+        return json_encode($data);
+    }
+
+    /**
+     * Send a json response containing invalid form warnings.
+     * 
+     * @param string $warnings. Warnings associative array with input field as key.
+     * @return string json response.
+     */
+    private static function issueWarnings(array $warnings): string
+    {
+        return json_encode([
+            'validated' => false,
+            'warnings' => $warnings,
+        ]);
+    }
+
+    /**
+     * Instruct js fetch function to redirect to url.
+     * 
+     * @param string $url The redirection path. Use the constants in Routes class to avoir typing mistakes.
+     * @param string $alert_type Optional alert type. Use AlertType const.
+     * @param string $alert_msg Optional alert message to be displayed after redirection.
+     * @return string json response.
+     */
+    private static function redirect(string $url, string $alert_type = "", string $alert_msg = ""): string
+    {
+        if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
+            Util::sstoreAlert($url, $alert_type, $alert_msg);
+        }
+        return json_encode(['url' => $url]);
+    }
+
     #region GET requests
 
     private static function deleteUser($id): string
@@ -130,74 +218,92 @@ class RequestManager
 
     #endregion
 
-    /**
-     * Note: Post requests use RequestManager::redirect for redirection (signal javascript to redirect)
-     */
-    private static function handlePostRequests(): string
-    {
-        // Takes raw data from the request
-        $json = file_get_contents('php://input');
-        // Converts it into a PHP object
-        $data = json_decode($json, true);
-        Logging::debug('fetch data', $data);
-
-        if (!isset($data['req'])) {
-            $response = ['error' => '[req] key was not defined in fetch request.'];
-            Logging::error('data request error', $response);
-            return json_encode($response);
-        }
-
-        if (App::isDebugMode()) {
-            Logging::info("Post request to server", ['data' => $data['req']]);
-        }
-
-        switch ($data['req']) {
-            case 'add-user':
-                return RequestManager::addNewUser($data);
-            case 'get-user':
-                return Authenticate::getUser()->toJSON();
-            case 'regen-password':
-                return RequestManager::regenPassword();
-            case 'update-alias':
-                return RequestManager::updateAlias($data);
-            case 'update-delay':
-                return RequestManager::updateDelays($data);
-            case 'update-password':
-                return RequestManager::updatePassword($data);
-            case "update-contact-email":
-                return RequestManager::updateContactEmail($data);
-            case 'validate-user':
-                return RequestManager::validateNewUser($data);
-            default:
-                $response = [
-                    'error' => '[req] key was not found in fetch request.',
-                    'req' => $data['req']
-                ];
-                Logging::error('data request error', $response);
-                return json_encode($response);
-        }
-        return json_encode($data);
-    }
     #region POST requests
 
-    private static function validateNewUser($json): string
-    {
-        $login_email = $json['login-email'];
-        $password_plain = $json['password'];
 
+    private static function addArticle($json): string
+    {
+        $article_name = $json['article-name'];
+        $location = $json['location'];
+        $exp_date_str = $json['expiration-date'];
+        $comments = $json['comments'];
         $warnings = [];
 
-        if ($login_warning = Validation::validateNewLogin($login_email)) {
-            $warnings['login-email'] = $login_warning;
+        Logging::debug('addarticle');
+        if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
+            $user_id = Authenticate::getUserId();
+            $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
+
+            $article_id = Database::articles()->insert($article);
+            if ($article_id) {
+                Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article_id]);
+                return RequestManager::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_ADD_SUCCESS);
+            }
+            return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
+        }
+        return RequestManager::issueWarnings($warnings);
+    }
+
+    private static function updateArticle($json): string
+    {
+        Logging::debug('updateArticle', ['json' => $json]);
+        $article_id  = intval($json['id']);
+        $article_name = $json['article-name'];
+        $location = $json['location'];
+        $exp_date_str = $json['expiration-date'];
+        $comments = $json['comments'];
+        $warnings = [];
+
+        if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
+            Logging::debug('validated');
+            $user_id = Authenticate::getUserId();
+
+            $article = Database::articles()->queryById($article_id);
+            Logging::debug('$article', ['val' => $article]);
+            $article->updateFields($article_name, $location, $exp_date_str, $comments);
+
+            Logging::debug('validated2');
+            if (Database::articles()->update($article)) {
+                Logging::debug('updated');
+                Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article_id]);
+                return RequestManager::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
+            }
+            return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
+        }
+        Logging::debug('warnings-update', ['warnings' => $warnings]);
+        return RequestManager::issueWarnings($warnings);
+    }
+
+    /**
+     * Validate form inputs before using it to add/update article.
+     * 
+     * @param array &$string $article_name Article name by reference.
+     * @param string &$location Article's location within the school by reference.
+     * @param string &$exp_date Expiration date.
+     * @param string &$comments Comments to be attached to the reminder by reference.
+     * @param array $warnings Array filled with warning messages if validation is unsuccessfull by reference.
+     * @return bool True if validation is successful.
+     */
+    private static function validateArticleInputs(string &$article_name, string &$location, string &$exp_date, string &$comments, array &$warnings): bool
+    {
+        Logging::debug('validateArticleInputs');
+        if ($article_warning = Validation::validateArticleName($article_name)) {
+            $warnings['article-name'] = $article_warning;
+        }
+        Logging::debug('$warnings', ['w' => $warnings]);
+        if ($location_warning = Validation::validateLocation($location)) {
+            $warnings['location']  = $location_warning;
+        }
+        Logging::debug('$warnings', ['w' => $warnings]);
+        if ($exp_warning = Validation::validateExpirationDate($exp_date)) {
+            $warnings['expiration-date']  = $exp_warning;
+        }
+        Logging::debug('$warnings', ['w' => $warnings]);
+        if ($comments_warning = Validation::validateComments($comments)) {
+            $warnings['comments']  = $comments_warning;
         }
 
-        if ($password_warning  = Validation::validateNewPassword($password_plain)) {
-            $warnings['password'] = $password_warning;
-        }
-        $json['warnings'] = $warnings;
-        $json['validated'] = !$login_warning && !$password_warning;
-
-        return json_encode($json);
+        return count($warnings) == 0;
     }
 
     private static function addNewUser($json): string
@@ -381,34 +487,24 @@ class RequestManager
         return RequestManager::redirect(Route::PROFILE, AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
     }
 
-    /**
-     * Instruct js fetch function to redirect to url.
-     * 
-     * @param string $url The redirection path. Use the constants in Routes class to avoir typing mistakes.
-     * @param string $alert_type Optional alert type. Use AlertType const.
-     * @param string $alert_msg Optional alert message to be displayed after redirection.
-     * @return string json response.
-     */
-    private static function redirect(string $url, string $alert_type = "", string $alert_msg = ""): string
+    private static function validateNewUser($json): string
     {
-        if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            Util::sstoreAlert($url, $alert_type, $alert_msg);
-        }
-        return json_encode(['url' => $url]);
-    }
+        $login_email = $json['login-email'];
+        $password_plain = $json['password'];
 
-    /**
-     * Send a json response containing invalid form warnings.
-     * 
-     * @param string $warnings. Warnings associative array with input field as key.
-     * @return string json response.
-     */
-    private static function issueWarnings(array $warnings): string
-    {
-        return json_encode([
-            'validated' => false,
-            'warnings' => $warnings,
-        ]);
+        $warnings = [];
+
+        if ($login_warning = Validation::validateNewLogin($login_email)) {
+            $warnings['login-email'] = $login_warning;
+        }
+
+        if ($password_warning  = Validation::validateNewPassword($password_plain)) {
+            $warnings['password'] = $password_warning;
+        }
+        $json['warnings'] = $warnings;
+        $json['validated'] = !$login_warning && !$password_warning;
+
+        return json_encode($json);
     }
 
     #endregion

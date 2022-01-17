@@ -35,49 +35,37 @@ class Validation
     /**
      * Article name validation. Article name must not be empty, exceed a set length and under a set number of caracters.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param array &$string $article_name Article name by reference.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateArticleName(BaseRoute $route, ?string &$article_name): bool
+    public static function validateArticleName(string &$article_name): string
     {
-        $article_name = trim($_POST['article-name']) ?? '';
-
-        if (
-            $article_name === ''
-        ) {
-            $route->showWarning('article-name', Warning::ARTICLE_ADD_EMPTY);
-            return false;
+        if ($article_name === '') {
+            return Warning::ARTICLE_ADD_EMPTY;
         }
 
         if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
-            $route->showWarning('article-name', sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
-            return false;
+            return sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT);
         }
 
         if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
-            $route->showWarning('article-name', sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
-            return false;
+            return sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH);
         }
-        return true;
+        return "";
     }
 
     /**
      * Comments validation. Comments can be empty string but be under a set number of caracters.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string &$comments Comments to be attached to the reminder by reference.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateComments(BaseRoute $route, ?string &$comments): bool
+    public static function validateComments(string &$comments): string
     {
-        $comments = trim($_POST['comments']) ?? '';
-
         if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
-            $route->showWarning('comments', sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
-            return false;
+            return sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT);
         }
-        return true;
+        return "";
     }
 
     /**
@@ -101,44 +89,37 @@ class Validation
     /**
      * Date validation. Date must not be empty and correspond to format yyyy-mm-dd
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string &$validated_date Validated expiration date.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateExpirationDate(BaseRoute $route, ?string &$date): bool
+    public static function validateExpirationDate(string &$date): string
     {
-        $date = trim($_POST['expiration-date'] ?? '');
-
         if ($date === '') {
-            $route->showWarning('expiration-date', Warning::DATE_EMPTY);
-            return false;
+            return Warning::DATE_EMPTY;
         }
 
+        // verify than the date can be created from format.
         $validated_date = DateTime::createFromFormat('Y-m-d', $date);
+        if (!$validated_date) {
+            return Warning::DATE_INVALID;
+        }
+
         $date = $validated_date->format('Y-m-d');
+
+        if ($validated_date < new DateTime()) {
+            return Warning::DATE_PAST;
+        }
 
         static $future_limit;
         if (is_null($future_limit)) {
             $future_limit = DateTime::createFromFormat('Y-m-d', Settings::ARTICLE_DATE_FUTURE_LIMIT);
         }
 
-        if ($validated_date) {
-
-            if ($validated_date < new DateTime()) {
-                $route->showWarning('expiration-date', Warning::DATE_PAST);
-                return false;
-            }
-
-            if ($validated_date >= $future_limit) {
-                $route->showWarning('expiration-date', Warning::DATE_FUTURE);
-                return false;
-            }
-
-            return true;
+        if ($validated_date >= $future_limit) {
+            return Warning::DATE_FUTURE;
         }
 
-        $route->showWarning('expiration-date', Warning::DATE_INVALID);
-        return false;
+        return "";
     }
 
     /**
@@ -181,30 +162,24 @@ class Validation
     /**
      * Location validation. Location must not be empty and under a set number of caracters.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string &$location Article's location within the school by reference.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateLocation(BaseRoute $route, ?string &$location): bool
+    public static function validateLocation(string &$location): string
     {
-        $location = trim($_POST['location']) ?? '';
-
         if (strlen($location) === 0) {
-            $route->showWarning('location', Warning::LOCATION_EMPTY);
-            return false;
+            return  Warning::LOCATION_EMPTY;
         }
 
         $location = ucwords($location);
         if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
-            $route->showWarning('location', sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
-            return false;
+            return sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT);
         }
 
         if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
-            $route->showWarning('location', sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
-            return false;
+            return sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT);
         }
-        return true;
+        return "";
     }
 
     /**

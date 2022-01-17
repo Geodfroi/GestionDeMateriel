@@ -3,33 +3,33 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.08 ###
+## Joël Piguet - 2022.01.16 ###
 ##############################
 
 namespace app\models;
 
 use app\helpers\Convert;
-
+use app\helpers\Logging;
 use DateTime;
 
 class Article
 {
     private int $id;
 
-    private int $user_id;
-
     private string $article_name;
-
-    private string $location;
-
-    private DateTime $expiration_date;
-
-    private DateTime $creation_date;
 
     /**
      * Free comments set by the user appended to the email remainder sent when the expiration date is close.
      */
     private string $comments;
+
+    private string $location;
+
+    private DateTime $creation_date;
+
+    private DateTime $expiration_date;
+
+    private int $user_id;
 
     /**
      * Load article instance from database row.
@@ -112,6 +112,23 @@ class Article
     public function setId($value)
     {
         $this->id = $value;
+    }
+
+    /**
+     * Return as JSON data.
+     */
+    public function toJSON()
+    {
+        $array = [
+            'id' => $this->id,
+            'article-name' => $this->article_name,
+            'comments' => $this->comments,
+            'location' => $this->location,
+            'creation-date' => $this->creation_date->format('Y-m-d'),
+            'expiration-date' => $this->expiration_date->format('Y-m-d'),
+            'user-id' => $this->user_id,
+        ];
+        return json_encode($array);
     }
 
     /**

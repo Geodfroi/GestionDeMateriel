@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\models;
@@ -158,11 +158,11 @@ class User
         $array = [
             'id' => $this->id,
             'alias' => $this->alias,
-            'contact_delay' => $this->contact_delay,
-            'contact_email' => $this->contact_email,
-            'creation_date' => $this->creation_date->format('Y-m-d'),
-            'is_admin' => $this->is_admin,
-            'last_login' => $this->last_login->format('Y-m-d'),
+            'contact-delay' => $this->contact_delay,
+            'contact-email' => $this->contact_email,
+            'creation-date' => $this->creation_date->format('Y-m-d'),
+            'is-admin' => $this->is_admin,
+            'last-login' => $this->last_login->format('Y-m-d'),
         ];
         return json_encode($array);
     }
