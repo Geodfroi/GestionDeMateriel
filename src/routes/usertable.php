@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.16 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\routes;
@@ -33,7 +33,7 @@ class UserTable extends BaseRoute
         $_SESSION[Session::USERS_ORDERBY] ??= OrderBy::EMAIL_ASC;
 
         if (isset($_GET['orderby'])) {
-            $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
+            $_SESSION[Session::USERS_ORDERBY] = $_GET['orderby'];
         }
 
         if (isset($_GET['page'])) {

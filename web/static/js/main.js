@@ -70,6 +70,30 @@ function clearWarningsAndInputs() {
   clearInputValues();
 }
 
+function displayPage(route) {
+  let nav = document.getElementById("page-nav");
+  let current_page = parseInt(nav.getAttribute("page-current"));
+  let page_count = parseInt(nav.getAttribute("page-count"));
+
+  const page_last = document.getElementById("page-last");
+  const page_next = document.getElementById("page-next");
+
+  page_last
+    .querySelector("a")
+    .setAttribute("href", `${route}?page=${current_page - 1}`);
+
+  page_next
+    .querySelector("a")
+    .setAttribute("href", `${route}?page=${current_page + 1}`);
+
+  if (current_page == 1) {
+    page_last.classList.add("disabled");
+  }
+  if (current_page == page_count) {
+    page_next.classList.add("disabled");
+  }
+}
+
 /**
  * Display input value.
  *

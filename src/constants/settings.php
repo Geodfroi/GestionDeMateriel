@@ -41,4 +41,6 @@ class Settings
     const USER_PASSWORD_MIN_LENGTH = 8;
 
     const BACKUP_FILES_MAX = 14;
+
+    const TABLE_DISPLAY_COUNT = 20;
 }

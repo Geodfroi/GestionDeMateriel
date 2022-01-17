@@ -4,7 +4,6 @@
 ##############################
 
 use app\constants\ArtFilter;
-use app\constants\OrderBy;
 use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Session;
@@ -14,6 +13,7 @@ use app\helpers\Util;
 use app\models\Article;
 
 $page = $_SESSION[Session::ART_PAGE];
+$orderby = $_SESSION[Session::ART_ORDERBY];
 $filters = $_SESSION[Session::ART_FILTERS];
 
 $filter_name = isset($filters[ArtFilter::NAME]) ? $filters[ArtFilter::NAME] : '';
@@ -28,68 +28,6 @@ if (isset($filters[ArtFilter::DATE_BEFORE])) {
 }
 
 $filter_show_expired = isset($filters[ArtFilter::SHOW_EXPIRED]);
-
-/**
- * Display caret icon besides table header to display order setting depending on _SESSION[ADMIN_ORDER_BY]
- * 
- * @param string $header Table header name
- * @return string Icon class name.
- */
-function disCaretArt(string $header): string
-{
-    $orderby = $_SESSION[Session::ART_ORDERBY];
-
-    if ($header === 'article') {
-        if ($orderby === OrderBy::NAME_ASC) {
-            return 'bi-caret-up';
-        } else if ($orderby === OrderBy::NAME_DESC) {
-            return 'bi-caret-down';
-        }
-    } else if ($header === 'location') {
-        if ($orderby === OrderBy::LOCATION_ASC) {
-            return 'bi-caret-up';
-        } else if ($orderby === OrderBy::LOCATION_DESC) {
-            return 'bi-caret-down';
-        }
-    } else if ($header === 'per_date') {
-        if ($orderby === OrderBy::DELAY_ASC) {
-            return 'bi-caret-up';
-        } else if ($orderby === OrderBy::DELAY_DESC) {
-            return 'bi-caret-down';
-        }
-    } else if ($header === 'owner') {
-        if ($orderby === OrderBy::OWNED_BY_ASC) {
-            return 'bi-caret-up';
-        } else if ($orderby === OrderBy::OWNED_BY_DESC) {
-            return 'bi-caret-down';
-        }
-    }
-    return '';
-}
-
-/**
- * Compile header link depending on _SESSION[ADMIN_ORDER_BY]
- * 
- * @param string $header Table header name
- * @return string Header link to display in href.
- */
-function disLinkArt(string $header): string
-{
-    $root = Route::ART_TABLE . '?orderby=';
-    $orderby = $_SESSION[Session::ART_ORDERBY];
-
-    // play with ASC / DESC to set default behavior the first time the column is clicked; ie per_date is listed most recent first.
-    if ($header === 'article') {
-        return $orderby === OrderBy::NAME_ASC ? $root . OrderBy::NAME_DESC : $root . OrderBy::NAME_ASC;
-    } else if ($header === 'location') {
-        return $orderby === OrderBy::LOCATION_ASC ? $root . OrderBy::LOCATION_DESC : $root . OrderBy::LOCATION_ASC;
-    } else if ($header === 'per_date') {
-        return $orderby === OrderBy::DELAY_DESC ? $root . OrderBy::DELAY_ASC : $root . OrderBy::DELAY_DESC;
-    } else if ($header === 'owner') {
-        return $orderby === OrderBy::OWNED_BY_DESC ? $root . OrderBy::OWNED_BY_ASC : $root . OrderBy::OWNED_BY_DESC;
-    }
-    return '';
-}
 
 /**
  * @return string Article owner display alias.
@@ -196,18 +134,14 @@ function getOwner(Article $article): string
     </div>
 
     <div class="row">
-        <table class="table table-striped">
+        <table id='table' cclass="table table-striped">
 
             <thead>
                 <tr>
-                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('article') ?>">Article <span class="<?php echo disCaretArt('article') ?>"></span></a>
-
-                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('location') ?>">Location <span class="<?php echo disCaretArt('location') ?>"></span></a>
-
-                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('per_date') ?>">Délai de péremption <span class="<?php echo disCaretArt('per_date') ?>"></span></a>
-
-                    <th><a class="text-decoration-none" href="<?php echo disLinkArt('owner') ?>">Créé par <span class="<?php echo disCaretArt('owner') ?>"></span></a>
-
+                    <th id="article-header"><a class="text-decoration-none" href="#">Article <span></span></a>
+                    <th id="location-header"><a class="text-decoration-none" href="#">Location <span></span></a>
+                    <th id="per-date-header"><a class="text-decoration-none" href="#">Délai de péremption <span></span></a>
+                    <th id="owner-header"><a class="text-decoration-none" href="#">Créé par <span></span></a>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -280,10 +214,10 @@ function getOwner(Article $article): string
             </li>
         </ul>
 
-        <ul class="pagination justify-content-end">
+        <ul id="page-nav" page-current=<?php echo $page ?> page-count=<?php echo $page_count ?> class="pagination justify-content-end">
 
-            <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo Route::ART_TABLE . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+            <li id="page-last" class="page-item">
+                <a href="#" class="page-link" aria-label="Previous" tabindex="-1">
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
@@ -291,12 +225,12 @@ function getOwner(Article $article): string
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
                 <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                    <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link"><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
-            <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo Route::ART_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+            <li id="page-next" class="page-item">
+                <a href="#" class="page-link" aria-label="Next" tabindex="-1">
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>

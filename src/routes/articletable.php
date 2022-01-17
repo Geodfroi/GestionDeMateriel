@@ -10,7 +10,6 @@ use app\constants\ArtFilter;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
-use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 // use app\helpers\Logging;
@@ -40,10 +39,11 @@ class ArticleTable extends BaseRoute
 
         if (isset($_GET['display'])) {
             $_SESSION[Session::ART_DISPLAY_COUNT] = intval($_GET['display']);
+            goto end;
         }
 
         if (isset($_GET['orderby'])) {
-            $_SESSION[Session::ART_ORDERBY] = intval($_GET['orderby']);
+            $_SESSION[Session::ART_ORDERBY] = $_GET['orderby'];
             goto end;
         }
 

@@ -3,78 +3,23 @@
 ## Joël Piguet - 2022.01.17 ###
 ##############################
 
-use app\constants\OrderBy;
 use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Session;
 
 $page = $_SESSION[Session::USERS_PAGE];
-
-/**
- * Display caret icon besides table header to display order setting depending on _SESSION[USERS_ORDERBY]
- * 
- * @param string $header Table header name
- * @return string Icon class name.
- */
-function disCaretAdm(string $header): string
-{
-    $orderby = $_SESSION[Session::USERS_ORDERBY];
-    if ($header === 'email') {
-        if ($orderby === OrderBy::EMAIL_DESC) {
-            return 'bi-caret-down';
-        } else if ($orderby === OrderBy::EMAIL_ASC) {
-            return 'bi-caret-up';
-        }
-    } else if ($header === 'login') {
-        if ($orderby === OrderBy::LOGIN_DESC) {
-            return 'bi-caret-down';
-        } else if ($orderby === OrderBy::LOGIN_ASC) {
-            return 'bi-caret-up';
-        }
-    } else if ($header === 'creation') {
-        if ($orderby === OrderBy::CREATED_DESC) {
-            return 'bi-caret-down';
-        } else if ($orderby === OrderBy::CREATED_ASC) {
-            return 'bi-caret-up';
-        }
-    }
-    return '';
-}
-
-/**
- * Compile header link depending on Session USERS_ORDERBY
- * 
- * @param string $header Table header name
- * @return string Header link to display in href.
- */
-function disLinkAdm(string $header): string
-{
-    $root = Route::USERS_TABLE . '?orderby=';
-    $orderby = $_SESSION[Session::USERS_ORDERBY];
-
-    // play with ASC / DESC to set default behavior the first time the column is clicked; ie creation is listed most recent first.
-    if ($header === 'email') {
-        return $orderby === OrderBy::EMAIL_ASC ? $root . OrderBy::EMAIL_DESC : $root . OrderBy::EMAIL_ASC;
-    } else if ($header === 'login') {
-        return $orderby === OrderBy::LOGIN_DESC ? $root . OrderBy::LOGIN_ASC : $root . OrderBy::LOGIN_DESC;
-    } else if ($header === 'creation') {
-        return $orderby === OrderBy::CREATED_DESC ? $root . OrderBy::CREATED_ASC : $root . OrderBy::CREATED_DESC;
-    }
-    return '';
-}
-
+$orderby = $_SESSION[Session::USERS_ORDERBY];
 ?>
 
 <div class="container mt-3">
 
     <div class="row col-12">
-        <table class="table table-striped table-bordered align-middle">
+        <table id='table' orderby=<?php echo $orderby ?> class="table table-striped table-bordered align-middle">
             <thead>
                 <tr>
-                    <th><a class="text-decoration-none" href="<?php echo disLinkAdm('email') ?>">E-mail <span class="<?php echo disCaretAdm('email') ?>"></span></a>
-                    <th><a class="text-decoration-none" href="<?php echo disLinkAdm('creation') ?>">Date de création <span class="<?php echo disCaretAdm('creation') ?>"></span></a>
-                    <th><a class="text-decoration-none" href="<?php echo disLinkAdm('login') ?>">Dernière connection <span class="<?php echo disCaretAdm('login') ?>"></span></a>
-
+                    <th id="email-header"><a class="text-decoration-none" href="#">E-mail <span></span></a>
+                    <th id="creation-header"><a class="text-decoration-none" href="#">Date de création <span></span></a>
+                    <th id="last-login-header"><a class="text-decoration-none" href="#">Dernière connection <span></span></a>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -107,23 +52,23 @@ function disLinkAdm(string $header): string
     </div>
 
     <nav aria-label="list-pagination">
-        <ul class="pagination justify-content-end">
+        <ul id="page-nav" page-current=<?php echo $page ?> page-count=<?php echo $page_count ?> class="pagination justify-content-end">
 
-            <li class="page-item <?php echo $page == 1 ? 'disabled' : '' ?>">
-                <a href="<?php echo Route::USERS_TABLE  . '?page=' . strval(intval($page) - 1) ?>" class="page-link" aria-label="Previous" <?php echo $page == 1 ? 'tabindex = "-1"' : '' ?>>
+            <li id="page-last" class="page-item">
+                <a href="#" class="page-link" aria-label="Previous" tabindex="-1">
                     <span aria-hidden="true" class="bi-chevron-double-left">
                     </span>
                 </a>
             </li>
 
             <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
-                <li class=" page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo Route::USERS_TABLE . '?page=' . $n ?>" class="page-link" <?php echo $n == $page ? 'tabindex = "-1"' : '' ?>><?php echo $n ?></a>
+                <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
+                    <a href="<?php echo Route::USERS_TABLE . '?page=' . $n ?>" class="page-link"><?php echo $n ?></a>
                 </li>
             <?php  } ?>
 
-            <li class="page-item  <?php echo $page == $page_count ? 'disabled' : '' ?>">
-                <a href="<?php echo Route::USERS_TABLE . '?page=' .  strval(intval($page) + 1) ?>" class="page-link" aria-label="Next" <?php echo $page == $page_count ? 'tabindex = "-1"' : '' ?>>
+            <li id="page-next" class="page-item">
+                <a href="#" class="page-link" aria-label="Next" tabindex="-1">
                     <span aria-hidden="true" class="bi-chevron-double-right"></span>
                 </a>
             </li>

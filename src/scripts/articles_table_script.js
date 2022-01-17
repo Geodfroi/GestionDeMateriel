@@ -2,13 +2,101 @@
 // ## Joël Piguet - 2022.01.17 ###
 // ##############################
 
+const ART_TABLE = "/articlesTable";
+
 const DATE_BEFORE = "before-peremption";
 const DATE_AFTER = "after-peremption";
+
+/**
+ * Set header links depending on orderby value.
+ */
+function setHeaderLinks() {
+  let table = document.getElementById("table");
+  let orderby = table.getAttribute("orderby");
+
+  const article_header = document.getElementById("article-header");
+  const location_header = document.getElementById("location-header");
+  const date_header = document.getElementById("per-date-header");
+  const owner_header = document.getElementById("owner-header");
+
+  let root_href = `${ART_TABLE}?orderby=`;
+
+  article_header
+    .querySelector("a")
+    .setAttribute(
+      "href",
+      orderby === "NAME_ASC" ? `${root_href}NAME_DESC` : `${root_href}NAME_ASC`
+    );
+
+  location_header
+    .querySelector("a")
+    .setAttribute(
+      "href",
+      orderby === "LOCATION_ASC"
+        ? `${root_href}LOCATION_DESC`
+        : `${root_href}LOCATION_ASC`
+    );
+
+  date_header
+    .querySelector("a")
+    .setAttribute(
+      "href",
+      orderby === "DELAY_DESC"
+        ? `${root_href}DELAY_ASC`
+        : `${root_href}DELAY_DESC`
+    );
+
+  owner_header
+    .querySelector("a")
+    .setAttribute(
+      "href",
+      orderby === "OWNED_BY_DESC"
+        ? `${root_href}OWNED_BY_ASC`
+        : `${root_href}OWNED_BY_DESC`
+    );
+}
+
+/**
+ * Display caret icon besides table header to show orderby value.
+ */
+function displayCarets() {
+  let table = document.getElementById("table");
+  let orderby = table.getAttribute("orderby");
+
+  const article_header = document.getElementById("article-header");
+  const location_header = document.getElementById("location-header");
+  const date_header = document.getElementById("per-date-header");
+  const owner_header = document.getElementById("owner-header");
+
+  // display carets
+  if (orderby === "NAME_ASC") {
+    article_header.querySelector("span").classList.add("bi-caret-down");
+  } else if (orderby === "NAME_DESC") {
+    article_header.querySelector("span").classList.add("bi-caret-up");
+  }
+
+  if (orderby === "LOCATION_ASC") {
+    location_header.querySelector("span").classList.add("bi-caret-down");
+  } else if (orderby === "LOCATION_DESC") {
+    location_header.querySelector("span").classList.add("bi-caret-up");
+  }
+
+  if (orderby === "DELAY_ASC") {
+    date_header.querySelector("span").classList.add("bi-caret-up");
+  } else if (orderby === "DELAY_DESC") {
+    date_header.querySelector("span").classList.add("bi-caret-down");
+  }
+
+  if (orderby === "OWNED_BY_DESC") {
+    owner_header.querySelector("span").classList.add("bi-caret-up");
+  } else if (orderby === "OWNED_BY_ASC") {
+    owner_header.querySelector("span").classList.add("bi-caret-down");
+  }
+}
 
 function displayCount() {
   let nav = document.getElementById("display-nav");
   let count = nav.getAttribute("display-count");
-  console.log(count);
 
   // show selection
   let id = `display-${count}`;
@@ -62,4 +150,7 @@ hookModalShown("delete-modal", (e, modal) => {
   }
 });
 
+displayCarets();
 displayCount();
+displayPage(ART_TABLE);
+setHeaderLinks();

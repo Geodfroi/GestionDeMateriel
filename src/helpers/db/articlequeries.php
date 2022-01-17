@@ -154,10 +154,10 @@ class ArticleQueries extends Queries
     /**
      * Compose ORDER BY clause.
      * 
-     * @param int $param OrderBy constant value.
+     * @param string $param OrderBy constant value.
      * @return string orderby clause.
      */
-    public static function printOrderStatement(int $param): string
+    public static function printOrderStatement(string $param): string
     {
         // CURRENT_TIMESTAMP - expiration_date <- Order old articles at the end.
 
@@ -310,11 +310,11 @@ class ArticleQueries extends Queries
      * 
      * @param int $limit The maximum number of items to be returned.
      * @param int $offset The number of result items to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use OrderBy constants as parameter.
+     * @param string $orderby Order parameter. Use OrderBy constants as parameter.
      * @param array $filters Array of ArtFilter instances.
      * @return array An array of articles.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, string $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
         // Logging::debug('queryAll', $filters);
 

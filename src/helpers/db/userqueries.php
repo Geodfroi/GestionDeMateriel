@@ -109,10 +109,10 @@ class UserQueries extends Queries
     /**
      * Compose ORDER BY clause.
      * 
-     * @param int $param OrderBy constant value.
+     * @param string $param OrderBy constant value.
      * @return string orderby clause.
      */
-    public static function getOrderStatement(int $param): string
+    public static function getOrderStatement(string $param): string
     {
         switch ($param) {
                 //simply by email which are unique.
@@ -349,11 +349,11 @@ class UserQueries extends Queries
      * 
      * @param int $limit The maximum number of users to be returned.
      * @param int $offset The number of result users to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use OrderBy constants as parameter.
+     * @param string $orderby Order parameter. Use OrderBy constants as parameter.
      * @param bool $excludeAdmins Count only common users.
      * @return array Array of users.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, string $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
     {
         $order_statement = UserQueries::getOrderStatement($orderby);
         $filter_statement = $excludeAdmins ? ' WHERE is_admin = False' : '';
