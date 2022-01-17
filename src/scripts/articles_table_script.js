@@ -46,6 +46,5 @@ hookModalShown("delete-modal", (e, modal) => {
     const btn = modal.querySelector(".btn-primary");
     let href_start = btn.getAttribute("href-start");
     btn.setAttribute("href", href_start + id);
-    // btn.setAttribute("href", ARTICLES_ROUTE + "?delete=" + id);
   }
 });

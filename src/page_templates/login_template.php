@@ -32,7 +32,7 @@ use app\constants\Requests;
     <div id="rewew-div" hidden class="row-12 justify-content-center">
         <div class="col-6 mx-auto">
             <!-- Display a link to propose to send a new password to email. -->
-            <a href-start="<?php echo Requests::FORGOTTEN_PASSWORD ?>" href="">Envoyer un nouveau mot de passe à l'adresse ci-dessus.</a>
+            <a id="renew-link" href-start="<?php echo Requests::FORGOTTEN_PASSWORD ?>" href="">Envoyer un nouveau mot de passe à </a>
         </div>
     </div>
 </div>

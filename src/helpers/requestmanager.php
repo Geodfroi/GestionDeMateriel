@@ -146,15 +146,16 @@ class RequestManager
     /**
      * Send a json response containing invalid form warnings.
      * 
-     * @param string $warnings. Warnings associative array with input field as key.
+     * @param array $original request data sent back to javascript.
+     * @param array $warnings. Warnings associative array with input field as key.
      * @return string json response.
      */
-    private static function issueWarnings(array $warnings): string
+    private static function issueWarnings(array $json, array $warnings): string
     {
-        return json_encode([
-            'validated' => false,
-            'warnings' => $warnings,
-        ]);
+        $json['validated'] = false;
+        $json['warnings'] = $warnings;
+
+        return json_encode($json);
     }
 
     /**
@@ -266,7 +267,7 @@ class RequestManager
 
         if ($content_warning = Validation::validateLocationPreset($content)) {
             $warnings['content'] = $content_warning;
-            return RequestManager::issueWarnings($warnings);
+            return RequestManager::issueWarnings($json, $warnings);
         }
 
         if (Database::locations()->insert($content)) {
@@ -296,7 +297,7 @@ class RequestManager
         // strcasecmp must be placed before, otherwise validation will always be invalid and show LOCATION_PRESET_EXISTS warning.
         if ($content_warning = Validation::validateLocationPreset($content)) {
             $warnings['content'] = $content_warning;
-            return RequestManager::issueWarnings($warnings);
+            return RequestManager::issueWarnings($json, $warnings);
         }
 
         if (Database::locations()->update($id, $content)) {
@@ -310,7 +311,6 @@ class RequestManager
         }
         return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
     }
-
 
     private static function addArticle($json): string
     {
@@ -331,7 +331,7 @@ class RequestManager
             }
             return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
         }
-        return RequestManager::issueWarnings($warnings);
+        return RequestManager::issueWarnings($json, $warnings);
     }
 
     private static function updateArticle($json): string
@@ -355,7 +355,7 @@ class RequestManager
             return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
         }
         Logging::debug('warnings-update', ['warnings' => $warnings]);
-        return RequestManager::issueWarnings($warnings);
+        return RequestManager::issueWarnings($json, $warnings);
     }
 
     /**
@@ -425,25 +425,34 @@ class RequestManager
 
         if ($warning_email = Validation::validateLoginEmail($email)) {
             $warnings['email'] = $warning_email;
+        } else {
+            $user = Database::users()->queryByEmail($email);
+            if (!$user) {
+                $warnings['email'] = Warning::LOGIN_NOT_FOUND;
+            }
         }
+
         if ($warning_password = Validation::validateLoginPassword($password)) {
             $warnings['password'] = $warning_password;
-        }
-        if ($warning_email || $warning_password) {
-            return RequestManager::issueWarnings($warnings);
-        }
-
-        $user = Database::users()->queryByEmail($email);
-        if (!$user) {
-            // if (!isset($user)) {}
-            return RequestManager::issueWarnings(['email' => Warning::LOGIN_NOT_FOUND]);
+        } else {
+            if ($user->verifyPassword($password)) {
+                Authenticate::login($user);
+                return RequestManager::redirect(Route::HOME);
+            } else {
+                $warnings['password'] = Warning::LOGIN_INVALID_PASSWORD;
+            }
         }
 
-        if ($user->verifyPassword($password)) {
-            Authenticate::login($user);
-            return RequestManager::redirect(Route::HOME);
-        }
-        return RequestManager::issueWarnings(['password' => Warning::LOGIN_INVALID_PASSWORD]);
+        // if ($warning_email || $warning_password) {
+        //     return json_encode([
+        //         'email' => $email,
+        //         'validated' => false,
+        //         'warnings' => $warnings,
+        //     ]);
+        //     return RequestManager::issueWarnings($warnings);
+        // }
+
+        return RequestManager::issueWarnings($json, $warnings);
     }
 
     private static function updateAlias($json): string
@@ -463,13 +472,13 @@ class RequestManager
 
         //validate alias
         if (strlen($alias) > 0 && strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            return RequestManager::issueWarnings(['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT)]);
+            return RequestManager::issueWarnings($json, ['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT)]);
         }
         $alias_arg = $alias ? $alias : $user->getLoginEmail();
         if ($existing_user = Database::users()->queryByAlias($alias_arg)) {
             if ($existing_user->getId() !== $user_id) {
                 // alias already exists and assigned to another user.
-                return RequestManager::issueWarnings(['alias' => Warning::ALIAS_ALREADY_EXISTS]);
+                return RequestManager::issueWarnings($json, ['alias' => Warning::ALIAS_ALREADY_EXISTS]);
             }
         }
 
@@ -500,7 +509,7 @@ class RequestManager
 
         if (!$delay) {
             Logging::debug('warning', ['delay' => Warning::DELAYS_NONE]);
-            return RequestManager::issueWarnings(['delay' => Warning::DELAYS_NONE]);
+            return RequestManager::issueWarnings($json, ['delay' => Warning::DELAYS_NONE]);
         }
 
         if (Database::users()->updateContactDelay($user_id, $delay)) {
@@ -531,7 +540,7 @@ class RequestManager
 
 
         if ($warning = Validation::validateContactEmail($contact_email)) {
-            return RequestManager::issueWarnings(['contact-email' => $warning]);
+            return RequestManager::issueWarnings($json, ['contact-email' => $warning]);
         }
 
         if ($contact_email === $user->getLoginEmail()) {
@@ -584,7 +593,7 @@ class RequestManager
         }
 
         if ($password_warning || $password_warning_repeat) {
-            return RequestManager::issueWarnings($warnings);
+            return RequestManager::issueWarnings($json, $warnings);
         }
 
         $encrypted = util::encryptPassword($password_plain);

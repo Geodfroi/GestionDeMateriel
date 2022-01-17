@@ -1,20 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\routes;
 
-use app\constants\Alert;
-use app\constants\AlertType;
 use app\constants\Route;
-use app\constants\Warning;
 use app\helpers\Authenticate;
-use app\helpers\Database;
 // use app\helpers\Logging;
-use app\helpers\Util;
-use app\helpers\Validation;
 
 /**
  * Route class containing behavior linked to login_template
@@ -32,10 +26,6 @@ class Login extends BaseRoute
             return $this->requestRedirect(Route::HOME);
         }
 
-        end:
-        return $this->renderTemplate([
-            'login_email' => $login_email ?? '',
-            'password' => $password ?? '',
-        ]);
+        return $this->renderTemplate();
     }
 }
