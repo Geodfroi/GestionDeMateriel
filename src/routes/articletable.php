@@ -12,6 +12,8 @@ use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Util;
+
 // use app\helpers\Logging;
 
 /**
@@ -106,7 +108,8 @@ class ArticleTable extends BaseRoute
         return $this->renderTemplate([
             'articles' =>  $articles,
             'page_count' => $page_count,
-            'display_count' =>  $display_count
+            'display_count' =>  $display_count,
+            'filter_str' => json_encode($_SESSION[Session::ART_FILTERS]) // Util::associativeToString($_SESSION[Session::ART_FILTERS]),
         ]);
     }
 }

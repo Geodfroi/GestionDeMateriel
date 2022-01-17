@@ -264,6 +264,21 @@ function showModal(modal_id) {
   new bootstrap.Modal(modal).show();
 }
 
+/**
+ * Create date instance from string in format YYYY-mm-dd
+ *
+ * @param {*} str
+ * @returns {Date}
+ */
+function toDate(str) {
+  let array = str.split("-");
+  let year = parseInt(array[0]);
+  let month = parseInt(array[1]) - 1;
+  let day = parseInt(array[2]);
+
+  return new Date(year, month, day);
+}
+
 // function explode_to_ints(array_str) {
 //   let array = array_str.split("-");
 //   let array_ints = [];

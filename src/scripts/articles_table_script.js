@@ -106,6 +106,62 @@ function displayCount() {
   selection_link.classList.add("text-decoration-underline");
 }
 
+/**
+ * Return formatted date.
+ * https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
+ *
+ * @param {Date} date
+ * @returns date in 'YYYY-mm-dd' format.
+ */
+function frenchFormat(date) {
+  var d = new Date(date),
+    month = "" + (d.getMonth() + 1),
+    day = "" + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = "0" + month;
+  if (day.length < 2) day = "0" + day;
+
+  return [day, month, year].join("-");
+}
+
+/**
+ * Display current applied filters.
+ */
+function displayFilter() {
+  let filter_str = document
+    .getElementById("filter-data")
+    .getAttribute("filter");
+  let obj = JSON.parse(filter_str);
+
+  console.log(obj);
+
+  let str = "Filters";
+  if (obj.name) {
+    str += ` [article: ${obj.name}]`;
+  }
+
+  if (obj.location) {
+    str += ` [location: ${obj.location}]`;
+  }
+
+  if (obj.before_peremption) {
+    let peremption_date = toDate(obj.before_peremption);
+    str += ` [péremption avant le: ${frenchFormat(peremption_date)}]`;
+  }
+
+  if (obj.after_peremption) {
+    let peremption_date = toDate(obj.after_peremption);
+    str += ` [péremption après le: ${frenchFormat(peremption_date)}]`;
+  }
+
+  if (obj.show_expired) {
+    str += " [articles périmés inclus]";
+  }
+
+  document.getElementById("filter-label").innerText = str;
+}
+
 // Clear date filter btn
 hookBtn(
   "filter-date-clear",
@@ -150,7 +206,12 @@ hookModalShown("delete-modal", (e, modal) => {
   }
 });
 
+// hookModalShown("filter-modal", (e, modal) => {
+//   // modal.querySelector("#filter-name").;
+// });
+
 displayCarets();
 displayCount();
 displayPage(ART_TABLE);
 setHeaderLinks();
+displayFilter();

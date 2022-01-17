@@ -3,19 +3,16 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\helpers;
 
-use app\constants\Alert;
-use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
-use app\routes\BaseRoute;
 
 use DateTime;
 
@@ -233,3 +230,15 @@ class Util
         return DateTime::createFromFormat('Y-m-d', $date->format('Y-m-d'));
     }
 }
+
+    // /**
+    //  * Turn an associative array into a string.
+    //  */
+    // public static function associativeToString(array $array): string
+    // {
+    //     $str = "";
+    //     foreach ($array as $key => $val) {
+    //         $str = $str . strval($key) . '=' . strval($val) . ';';
+    //     }
+    //     return $str;
+    // }

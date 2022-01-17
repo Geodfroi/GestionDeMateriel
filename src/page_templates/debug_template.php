@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 ?>
@@ -12,6 +12,7 @@
 <div>
     <div>TODO::</div>
     <br>
+    <div>clear all filters</div>
     <div>Login with username or password</div>
     <div>Remove alerts after timer is out</div>
     <div>Add password reveal btn</div>

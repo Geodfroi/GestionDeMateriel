@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.18 ###
 ##############################
 
 use app\constants\ArtFilter;
@@ -15,6 +15,7 @@ use app\models\Article;
 $page = $_SESSION[Session::ART_PAGE];
 $orderby = $_SESSION[Session::ART_ORDERBY];
 $filters = $_SESSION[Session::ART_FILTERS];
+// $filter_str = implode(';', $filters);
 
 $filter_name = isset($filters[ArtFilter::NAME]) ? $filters[ArtFilter::NAME] : '';
 $filter_location = isset($filters[ArtFilter::LOCATION]) ? $filters[ArtFilter::LOCATION] : '';
@@ -46,34 +47,14 @@ function getOwner(Article $article): string
 
 ?>
 
+<div id="filter-data" filter=<?php echo $filter_str ?>><?php echo $filter_str ?></div>
+
 <div class="container mt-3">
 
     <div class="row">
         <a class="link-info text-decoration-none col-12 text-center fw-bold" href="" data-bs-toggle="modal" data-bs-target="#filter-modal" aria-label="filter">
             <i class="bi bi-filter" role="img" style="font-size: 1.5rem;"></i>
-            <span>Filtres
-                <?php
-                $str = '';
-                if ($filter_name) {
-                    $str .= " [article: {$filter_name}]";
-                }
-                if ($filter_location) {
-                    $str .= " [emplacement: {$filter_location}]";
-                }
-
-                if ($filter_date_val) {
-                    if ($filter_date_type === ArtFilter::DATE_BEFORE) {
-                        $str .= sprintf(" [péremption avant le: %s]", (new DateTime($filter_date_val))->format('d/m/Y'));
-                    } else if ($filter_date_type === ArtFilter::DATE_AFTER) {
-                        $str .= sprintf(" [péremption après le: %s]", (new DateTime($filter_date_val))->format('d/m/Y'));
-                    }
-                }
-
-                if ($filter_show_expired) {
-                    $str .= '[articles périmés inclus]';
-                }
-                echo $str;
-                ?>
+            <span id="filter-label">Filtres
             </span>
         </a>
     </div>
