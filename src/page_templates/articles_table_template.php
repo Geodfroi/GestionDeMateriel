@@ -13,22 +13,23 @@ use app\helpers\Util;
 use app\models\Article;
 
 $page = $_SESSION[Session::ART_PAGE];
-$orderby = $_SESSION[Session::ART_ORDERBY];
-$filters = $_SESSION[Session::ART_FILTERS];
+// $orderby = $_SESSION[Session::ART_ORDERBY];
+
+// $filters = $_SESSION[Session::ART_FILTERS];
 // $filter_str = implode(';', $filters);
 
-$filter_name = isset($filters[ArtFilter::NAME]) ? $filters[ArtFilter::NAME] : '';
-$filter_location = isset($filters[ArtFilter::LOCATION]) ? $filters[ArtFilter::LOCATION] : '';
+// $filter_name = isset($filters[ArtFilter::NAME]) ? $filters[ArtFilter::NAME] : '';
+// $filter_location = isset($filters[ArtFilter::LOCATION]) ? $filters[ArtFilter::LOCATION] : '';
 
-$filter_date_type = isset($filters[ArtFilter::DATE_BEFORE]) ? ArtFilter::DATE_BEFORE : ArtFilter::DATE_AFTER;
-$filter_date_val = '';
-if (isset($filters[ArtFilter::DATE_BEFORE])) {
-    $filter_date_val = $filters[ArtFilter::DATE_BEFORE];
-} else if (isset($filters[ArtFilter::DATE_AFTER])) {
-    $filter_date_val = $filters[ArtFilter::DATE_AFTER];
-}
+// $filter_date_type = isset($filters[ArtFilter::DATE_BEFORE]) ? ArtFilter::DATE_BEFORE : ArtFilter::DATE_AFTER;
+// $filter_date_val = '';
+// if (isset($filters[ArtFilter::DATE_BEFORE])) {
+//     $filter_date_val = $filters[ArtFilter::DATE_BEFORE];
+// } else if (isset($filters[ArtFilter::DATE_AFTER])) {
+//     $filter_date_val = $filters[ArtFilter::DATE_AFTER];
+// }
 
-$filter_show_expired = isset($filters[ArtFilter::SHOW_EXPIRED]);
+// $filter_show_expired = isset($filters[ArtFilter::SHOW_EXPIRED]);
 
 /**
  * @return string Article owner display alias.
@@ -196,36 +197,36 @@ function getOwner(Article $article): string
                 <h5 class="modal-title" id="filter-modal-label">Filtrer les articles selon les paramètres suivants: </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="<?php echo Route::ART_TABLE ?>">
+            <form method="GET" action="<?php echo Route::ART_TABLE ?>">
                 <div class="modal-body">
                     <div class="container">
                         <div class="row">
                             <div class="col">
                                 <div class="input-group mb-1">
                                     <span class="input-group-text col-md-3">Par nom d'article:</span>
-                                    <input id="filter-name" name="filter-name" class="form-control" type="text" aria-label="Filter-name" value="<?php echo htmlentities($filter_name) ?>">
+                                    <input id="filter-name" name="filter-name" class="form-control" type="text" aria-label="Filter-name">
                                 </div>
 
                                 <div class="input-group mb-1">
                                     <span class="input-group-text col-md-3">Par emplacement:</span>
-                                    <input name="filter-location" class="form-control" type="text" aria-label="Filter-name" value="<?php echo htmlentities($filter_location) ?>">
+                                    <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-name">
                                 </div>
 
                                 <div class="input-group mb-2">
                                     <button id="filter-date-btn" class="btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
-                                        <?php echo $filter_date_type === ArtFilter::DATE_BEFORE ? 'Péremption avant le' : 'Péremption après le'; ?>
                                     </button>
-                                    <input id="filter-date-type" name="filter-date-type" type="hidden" value="<?php echo $filter_date_type; ?>">
+                                    <input id="filter-date-type" name="filter-date-type" type="hidden">
+                                    </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><span id="filter-date-before" class="dropdown-item filter-date-select">Péremption avant le</span></li>
                                         <li><span id="filter-date-after" class="dropdown-item filter-date-select">Péremption après le</span></li>
                                     </ul>
-                                    <input id="filter-date-val" name="filter-date-val" class="form-control" type="date" value="<?php echo $filter_date_val; ?>">
+                                    <input id="filter-date-val" name="filter-date-val" class="form-control" type="date">
                                     <button id="filter-date-clear" class="btn btn-outline-primary">Effacer</button>
                                 </div>
 
                                 <div class="form-check form-switch mb-1">
-                                    <input id="show-expired" name="show-expired" class="form-check-input" type="checkbox" role="switch" <?php if ($filter_show_expired) { ?> checked <?php } ?>>
+                                    <input id="filter-show-expired" name="filter-show-expired" class="form-check-input" type="checkbox" role="switch">
                                     <label class="form-check-label" for="show-expired">Montrer également les articles arrivés à péremption.</label>
                                 </div>
 

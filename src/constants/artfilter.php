@@ -16,7 +16,10 @@ class ArtFilter
     // //db article filters
     const NAME = 'name';
     const LOCATION = 'location';
-    const DATE_BEFORE = 'before_peremption';
-    const DATE_AFTER = 'after_peremption';
+    const DATE_VALUE = 'peremption_value';
+    const DATE_TYPE = 'peremption_type';
     const SHOW_EXPIRED = 'show_expired';
+
+    const DATE_BEFORE = 'before';
+    const DATE_AFTER = 'after';
 }

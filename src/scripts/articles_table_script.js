@@ -1,12 +1,11 @@
 // ################################
-// ## Joël Piguet - 2022.01.17 ###
+// ## Joël Piguet - 2022.01.18 ###
 // ##############################
 
 const ART_TABLE = "/articlesTable";
 
-const DATE_BEFORE = "before-peremption";
-const DATE_AFTER = "after-peremption";
-
+const DATE_BEFORE = "before";
+const DATE_AFTER = "after";
 /**
  * Set header links depending on orderby value.
  */
@@ -107,25 +106,6 @@ function displayCount() {
 }
 
 /**
- * Return formatted date.
- * https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
- *
- * @param {Date} date
- * @returns date in 'YYYY-mm-dd' format.
- */
-function frenchFormat(date) {
-  var d = new Date(date),
-    month = "" + (d.getMonth() + 1),
-    day = "" + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = "0" + month;
-  if (day.length < 2) day = "0" + day;
-
-  return [day, month, year].join("-");
-}
-
-/**
  * Display current applied filters.
  */
 function displayFilter() {
@@ -133,8 +113,6 @@ function displayFilter() {
     .getElementById("filter-data")
     .getAttribute("filter");
   let obj = JSON.parse(filter_str);
-
-  console.log(obj);
 
   let str = "Filters";
   if (obj.name) {
@@ -145,14 +123,13 @@ function displayFilter() {
     str += ` [location: ${obj.location}]`;
   }
 
-  if (obj.before_peremption) {
-    let peremption_date = toDate(obj.before_peremption);
-    str += ` [péremption avant le: ${frenchFormat(peremption_date)}]`;
-  }
-
-  if (obj.after_peremption) {
-    let peremption_date = toDate(obj.after_peremption);
-    str += ` [péremption après le: ${frenchFormat(peremption_date)}]`;
+  if (obj.peremption_value && obj.peremption_type) {
+    let peremption_date = toDate(obj.peremption_date);
+    if (obj.peremption_type == DATE_BEFORE) {
+      str += ` [péremption avant le: ${frenchFormat(peremption_date)}]`;
+    } else if (obj.peremption_type == DATE_AFTER) {
+      str += ` [péremption après le: ${frenchFormat(peremption_date)}]`;
+    }
   }
 
   if (obj.show_expired) {
@@ -162,32 +139,56 @@ function displayFilter() {
   document.getElementById("filter-label").innerText = str;
 }
 
-// Clear date filter btn
-hookBtn(
-  "filter-date-clear",
-  () => (document.getElementById("filter-date-val").value = "")
-);
+function fillFilterModal(_, modal) {
+  let filter_str = document
+    .getElementById("filter-data")
+    .getAttribute("filter");
+
+  let obj = JSON.parse(filter_str);
+
+  // name
+  modal.querySelector("#filter-name").value = obj.name ? obj.name : "";
+  // location
+  modal.querySelector("#filter-location").value = obj.location
+    ? obj.location
+    : "";
+
+  // peremption date
+  let date_defined = obj.peremption_type && obj.peremption_value;
+  let is_before = date_defined && obj.peremption_type === DATE_BEFORE;
+
+  modal.querySelector("#filter-date-btn").innerText = is_before
+    ? "Péremption avant le"
+    : "Péremption après le";
+
+  modal.querySelector("#filter-date-type").value = is_before
+    ? DATE_BEFORE
+    : DATE_AFTER;
+
+  if (obj.peremption_value) {
+    modal.querySelector("#filter-date-val").value = obj.peremption_value;
+  }
+
+  // show expired
+  modal.querySelector("#filter-show-expired").checked = obj.show_expired;
+}
 
 // set date filter btn inner text and fill date type input value.
-hookBtnCollection("filter-date-select", (e, element) => {
+hookBtnCollection("filter-date-select", (_, element) => {
   //change btn label.
   let btn = document.getElementById("filter-date-btn");
   btn.innerText = element.innerText;
 
   // set hidden post value.
   let date_input = document.getElementById("filter-date-type");
+  console.log("element id: " + element.id);
   if (element.id === "filter-date-before") {
+    console.log("input before");
     date_input.value = DATE_BEFORE;
   } else {
     date_input.value = DATE_AFTER;
   }
 });
-
-let collection = document.getElementsByClassName("filter-date-select");
-for (let index = 0; index < collection.length; index++) {
-  const element = collection[index];
-  element.addEventListener("click", (e) => {});
-}
 
 //fill in delete article modal info when called.
 hookModalShown("delete-modal", (e, modal) => {
@@ -206,9 +207,7 @@ hookModalShown("delete-modal", (e, modal) => {
   }
 });
 
-// hookModalShown("filter-modal", (e, modal) => {
-//   // modal.querySelector("#filter-name").;
-// });
+hookModalShown("filter-modal", fillFilterModal);
 
 displayCarets();
 displayCount();

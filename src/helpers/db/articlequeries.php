@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.18 ###
 ##############################
 
 namespace app\helpers\db;
@@ -124,18 +124,23 @@ class ArticleQueries extends Queries
             $count += 1;
         }
 
-        if (isset($filters[ArtFilter::DATE_BEFORE]) && $filters[ArtFilter::DATE_BEFORE]) {
-            if ($count > 1) {
-                $str .= ' AND ';
+        if (isset($filters[ArtFilter::DATE_VALUE]) && $filters[ArtFilter::DATE_VALUE]) {
+            if (isset($filters[ArtFilter::DATE_TYPE]) && $filters[ArtFilter::DATE_TYPE]) {
+
+                $date = $filters[ArtFilter::DATE_VALUE];
+                $type = $filters[ArtFilter::DATE_TYPE];
+
+                if ($count > 1) {
+                    $str .= ' AND ';
+                }
+
+                if ($type === ArtFilter::DATE_BEFORE) {
+                    $str .= App::useSQLite() ? "(expiration_date < '{$date}')" : "expiration_date < :fdate";
+                } else {
+                    $str .= App::useSQLite() ? "(expiration_date > '{$date}')" : "expiration_date > :fdate";
+                }
+                $count += 1;
             }
-            $str .= App::useSQLite() ? "(expiration_date < '{$filters[ArtFilter::DATE_BEFORE]}')" : "expiration_date < :fbefore";
-            $count += 1;
-        } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
-            if ($count > 0) {
-                $str .= ' AND ';
-            }
-            $str .= App::useSQLite() ? "(expiration_date > '{$filters[ArtFilter::DATE_AFTER]}')" : "expiration_date > :fafter";
-            $count += 1;
         }
 
         if (!isset($filters[ArtFilter::SHOW_EXPIRED])) {
@@ -289,11 +294,8 @@ class ArticleQueries extends Queries
         if (Util::str_contains($filter_statement, ':floc')) {
             $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], $this->data_types['str']);
         }
-        if (Util::str_contains($filter_statement, ':fbefore')) {
-            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], $this->data_types['str']);
-        }
-        if (Util::str_contains($filter_statement, ':fafter')) {
-            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], $this->data_types['str']);
+        if (Util::str_contains($filter_statement, ':fdate')) {
+            $stmt->bindParam(':fdate', $filters[ArtFilter::DATE_VALUE], $this->data_types['str']);
         }
 
         $r = $stmt->execute();
@@ -349,14 +351,9 @@ class ArticleQueries extends Queries
         if (Util::str_contains($filter_statement, ':floc')) {
             $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], $this->data_types['str']);
         }
-        if (Util::str_contains($filter_statement, ':fbefore')) {
-            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], $this->data_types['str']);
+        if (Util::str_contains($filter_statement, ':fdate')) {
+            $stmt->bindParam(':fdate', $filters[ArtFilter::DATE_VALUE], $this->data_types['str']);
         }
-        if (Util::str_contains($filter_statement, ':fafter')) {
-            Logging::debug(':fafter');
-            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], $this->data_types['str']);
-        }
-
         $stmt->bindParam(':lim', $limit, $this->data_types['int']);
         $stmt->bindParam(':off', $offset, $this->data_types['int']);
 

@@ -12,6 +12,7 @@ use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Authenticate;
 use app\helpers\Database;
+use app\helpers\Logging;
 use app\helpers\Util;
 
 // use app\helpers\Logging;
@@ -54,44 +55,56 @@ class ArticleTable extends BaseRoute
             goto end;
         }
 
-        if (isset($_POST['filter'])) {
-            if ($_POST['filter-name']) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::NAME] = $_POST['filter-name'];
+        if (isset($_GET['filter'])) {
+
+            Logging::debug('filter-get ,', $_GET);
+
+            if ($_GET['filter-name']) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::NAME] = $_GET['filter-name'];
             } else {
                 // if null of empty unset from filter array.
                 unset($_SESSION[Session::ART_FILTERS][ArtFilter::NAME]);
             }
 
-            if ($_POST['filter-location']) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION] = $_POST['filter-location'];
+            if ($_GET['filter-location']) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION] = $_GET['filter-location'];
             } else {
                 unset($_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION]);
             }
 
-            // remove date filters from associative array
-            unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE]);
-            unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER]);
+            // // remove date filters from associative array
+            // unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE]);
+            // unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER]);
 
-            $date_val = isset($_POST['filter-date-val']) ? $_POST['filter-date-val'] : '';
+            // $_SESSION[Session::ART_FILTERS][DAte] = isset($_GET['filter-date-val']) ? $_GET['filter-date-val'] : '';
 
-            // add date filter from input selection with correct type as key
-
-            if ($_POST['filter-date-type'] === ArtFilter::DATE_BEFORE) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE] = $date_val;
-            } elseif ($_POST['filter-date-type'] === ArtFilter::DATE_AFTER) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER] = $date_val;
+            if (isset($_GET['filter-date-val'])) {
+                $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_VALUE] =
+                    $_GET['filter-date-val'];
+            } else {
+                unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_VALUE]);
             }
 
-            if (isset($_POST['show-expired'])) {
+            $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_TYPE] = $_GET['filter-date-type'];
+
+            // // add date filter from input selection with correct type as key
+            // if ($_GET['filter-date-type'] === 'DATE_BEFORE') {
+            //     Logging::debug('datebefore');
+            //     $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE] = $date_val;
+            // } elseif ($_GET['filter-date-type'] === ArtFilter::DATE_AFTER) {
+            //     $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER] = $date_val;
+            // }
+
+            if (isset($_GET['filter-show-expired'])) {
                 $_SESSION[Session::ART_FILTERS][ArtFilter::SHOW_EXPIRED] = true;
             } else {
                 unset($_SESSION[Session::ART_FILTERS][ArtFilter::SHOW_EXPIRED]);
             }
-
             goto end;
         }
 
         end:
+        Logging::debug('session', $_SESSION[Session::ART_FILTERS]);
 
         $display_count = $_SESSION[Session::ART_DISPLAY_COUNT] ?? 20;
         $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTERS]);
