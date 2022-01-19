@@ -106,14 +106,14 @@ final class ArticleQueriesTest extends TestClass
                 ArtFilter::DATE_AFTER => '2022-01-01',
                 ArtFilter::NAME => 'Pro'
             ], OrderBy::DELAY_ASC],
-            // [[ArtFilter::DATE_BEFORE => '2022-01-01'], OrderBy::DELAY_ASC],
+            [[ArtFilter::DATE_BEFORE => '2022-01-01'], OrderBy::DELAY_ASC],
         ];
     }
 
     /**
      * @dataProvider queryAllProvider
      */
-    public function testQueryAll(array $filters, int $order_by): void
+    public function testQueryAll(array $filters, string $order_by): void
     {
         $array = ArticleQueriesTest::$queries->queryAll(PHP_INT_MAX, 0, $order_by, $filters);
         // assert($array);

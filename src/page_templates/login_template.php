@@ -17,7 +17,7 @@ use app\constants\Requests;
                     <label for="login" class="form-label">Adresse e-mail ou alias</label>
                     <input id="login" type="text" name='login' aria-describedby="id-descr" class="form-control">
                     <div id="id-descr" class="form-text">Entrer votre adresse e-mail ou alias pour vous identifier.</div>
-                    <div id="login-feedback" class='invalid-feedback'><?php echo $warnings['login'] ?> </div>
+                    <div id="login-feedback" class='invalid-feedback'></div>
                 </div>
                 <div class="mt-3 mb-3">
                     <label for="password" class="form-label">Mot de passe</label>

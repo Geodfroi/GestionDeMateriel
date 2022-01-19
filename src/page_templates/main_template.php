@@ -15,11 +15,8 @@ use app\helpers\Authenticate;
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 
-<div>a</div>
-<div>a</div>
-<div>a</div>
 <!-- insert $json_data string into an empty div attribute to be made available to javascript. -->
-<div id="php-data"><?php echo $json_data ?></div>
+<div id="php-data" hidden><?php echo $json_data ?></div>
 
 <head>
     <meta charset="UTF-8">

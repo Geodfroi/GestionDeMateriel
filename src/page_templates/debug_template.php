@@ -12,7 +12,6 @@
 <div>
     <div>TODO::</div>
     <br>
-    <div>Remove alerts after timer is out</div>
     <div>Set logs with date, efface older.</div>
     <div>Remove old logs ?</div>
     <div>Bug with expiration date before filter in sqlite</div>

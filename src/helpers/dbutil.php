@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\helpers;
@@ -17,7 +17,6 @@ use app\helpers\db\UserQueries;
 use app\helpers\Logging;
 
 use DateTime;
-use DirectoryIterator;
 use \PDO;
 use SQLite3;
 
@@ -62,19 +61,20 @@ class DBUtil
     /**
      * Set up temporary sqlite db for tests and populate it with dummy data.
      * 
-     * @param string $folder_path
-     * @param string $file_name File name without ext.
+     * @param string $file_path DB file path
      * @param bool populate Populate with dummy data.
      * @return SQLite3|false SQLite3 db connection or false in case of error.
      */
-    public static function localDBSetup(string $folder_path, string $file_name, bool $populate = false): SQLite3
+    public static function localDBSetup(string $file_path, bool $populate = false): SQLite3
     {
+        $path_info = pathinfo($file_path);
+        $folder_path = $path_info['dirname'];
+
         // create folder if it doesn't exists
         if (!is_dir($folder_path)) {
             mkdir($folder_path, 0777, true);
         }
 
-        $file_path = $folder_path . DIRECTORY_SEPARATOR . $file_name . '.db';
         if (file_exists($file_path)) {
             unlink($file_path);
         }
@@ -108,42 +108,18 @@ class DBUtil
     public static function backup_db($conn, $backup_folder, $max_files = Settings::BACKUP_FILES_MAX): bool
     {
         $current_date = (new DateTime('now'))->format('Ymd');
+        $path = $backup_folder . DIRECTORY_SEPARATOR . 'backup_' . $current_date . '.db';
 
         // establish backup connection and link it to sqlite backup.
-        $backup_conn = DBUtil::localDBSetup($backup_folder, 'backup_' . $current_date);
+        $backup_conn = DBUtil::localDBSetup($path);
 
         $backup_loc = (new LocationQueries($conn))->backup($backup_conn);
         $backup_users = (new UserQueries($conn))->backup($backup_conn);
         $backup_articles = (new ArticleQueries($conn))->backup($backup_conn);
 
-        $dates = [];
-
-        // find backup files in folder and extract their date component.
-        foreach (new DirectoryIterator($backup_folder) as $file) {
-            if (!$file->isDot()) {
-                $file_name = $file->getFilename();
-                // check if file name match the pattern 'backup_20220101.db' with regex
-                if (preg_match("/^backup_\d{8}\.db$/", $file_name)) {
-
-                    // recover date from file name;
-                    $str_date = substr($file_name, strlen('backup_'), 8);
-                    array_push($dates, $str_date);
-                }
-            }
-        }
-
-        // sort date array in reverse alphabetical order => oldest date will be last in array.
-        rsort($dates);
-
-        // cull oldest files when the number of file exceeds $max_files limit.
-        for ($n = $max_files; $n < count($dates); $n++) {
-            $date = $dates[$n];
-            $file_path = $backup_folder . DIRECTORY_SEPARATOR . 'backup_' . $date . '.db';
-            unlink($file_path);
-        }
+        $path_info = pathinfo($path);
+        Util::eraseOldFiles($backup_folder, 'backup', 'db', $max_files);
 
         return $backup_loc &&  $backup_users && $backup_articles;
-        // return $backup_users;
-        // return $backup_articles;
     }
 }

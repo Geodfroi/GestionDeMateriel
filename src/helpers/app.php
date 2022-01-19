@@ -3,13 +3,15 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\helpers;
 
-use app\constants\AppPaths;
+use DirectoryIterator;
 use Exception;
+
+use app\constants\AppPaths;
 
 /**
  * Global config parameters accessible through the application.
@@ -31,15 +33,21 @@ class App
     {
         $json = file_get_contents(AppPaths::CONFIG_FILE);
         $this->content =  json_decode($json, true);
-
         $this->mode = $mode;
     }
 
     private function clearLog()
     {
         $channel = $this->getData('log_channel');
-        $path = AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $channel . '.log';
-        unlink($path);
+        foreach (new DirectoryIterator(AppPaths::LOG_FOLDER) as $file) {
+            if (!$file->isDot()) {
+                $file_name = $file->getFilename();
+                if (Util::startsWith($file_name, $channel)) {
+                    $path = AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $file_name;
+                    unlink($path);
+                }
+            }
+        }
     }
 
     /**
@@ -94,28 +102,3 @@ class App
         return App::$instance->getData("debug_mode");
     }
 }
-
-    // /**
-    //  * @param string Global Logging channel. Use LogChannel const.
-    //  * @param bool $use_sqlite Use local sqlite db instead of MySQL for testing purposes.
-    //  * @param bool $debug_mode Set debug mode to true enabling debug page display in html and logging.
-    //  */
-    // public static function setConfig(string $log_channel, bool $use_sqlite, bool $debug_mode)
-    // {
-    //     $app = App::getInstance(false);
-    //     $app->use_sqlite = $use_sqlite;
-    //     $app->log_channel = $log_channel;
-    //     $app->debug_mode = $debug_mode;
-    // }
-
-        // /**
-    //  * @param $mode Current mode; Use Mode constants
-    //  */
-    // private static function getInstance(int $mode)
-    // {
-    //     static $instance;
-    //     if (is_null($instance)) {
-    //         $instance = new static();
-    //     }
-    //     return $instance;
-    // }

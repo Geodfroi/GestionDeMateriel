@@ -32,13 +32,6 @@ final class UserQueriesTest extends TestClass
     {
     }
 
-    // public static function testBackup()
-    // {
-    //     $backup_conn = DBUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'users_backup', false);
-    //     assertNotNull($backup_conn);
-    //     assertTrue(UserQueriesTest::$queries->backup($backup_conn));
-    // }
-
     public function testInsert()
     {
         $user = User::fromForm('my.email@gmail.com', '0123456789', true);

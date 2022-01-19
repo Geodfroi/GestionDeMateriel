@@ -8,13 +8,14 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use DateTime;
+use DirectoryIterator;
+
 use app\constants\LogInfo;
 use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
-
-use DateTime;
 
 /**
  * Utility class containing useful static functions.
@@ -47,6 +48,44 @@ class Util
             'msg' => $alert_array[1],
             'timer' => Settings::ALERT_TIMER,
         ];
+    }
+
+    /**
+     * Erase old files from the specified folder, starting from the oldest, when they are appened with "_YYYYmmdd" date suffix. Used to remove old logs or old db backups.
+     * 
+     * @param $folder
+     * @param $file_name File original name.
+     * @param $file_ext File extension without dot.
+     * @param int $max_files Maximum # of files left in folder. 
+     */
+    public static function eraseOldFiles(string $folder, string $file_root, string $file_ext, int $max_count)
+    {
+        $dates = [];
+
+        // find files in folder and extract their date component.
+        foreach (new DirectoryIterator($folder) as $file) {
+            if (!$file->isDot()) {
+                $file_name = $file->getFilename();
+
+                // check if file name match the pattern. e.g. find 'backup_20220101.db' with regex
+                $pattern = "/^" . $file_root . "_\d{8}\." . $file_ext . "$/";
+                if (preg_match($pattern, $file_name)) {
+                    // recover date from file name; e.g. recover '20211215' string from 'backup_20211215.db'
+                    $str_date = substr($file_name, strlen($file_root) + 1, 8);
+                    array_push($dates, $str_date);
+                }
+            }
+        }
+
+        // sort date array in reverse alphabetical order => oldest date will be last in array.
+        rsort($dates);
+
+        // cull oldest files when the number of file exceeds $max_files limit.
+        for ($n = $max_count; $n < count($dates); $n++) {
+            $date = $dates[$n];
+            $file_path = $folder . DIRECTORY_SEPARATOR . $file_root . '_' . $date . '.' . $file_ext;
+            unlink($file_path);
+        }
     }
 
     /**
@@ -161,6 +200,19 @@ class Util
     public static function storeAlert(string $display_page, string $type, string $msg)
     {
         $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
+    }
+
+    /**
+     * https://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php
+     * 
+     * @param string $haystack;
+     * @param string $needle;
+     * @return bool True if $haystack start with $needle.
+     */
+    public static function startsWith(string $haystack, string $needle): bool
+    {
+        $length = strlen($needle);
+        return substr($haystack, 0, $length) === $needle;
     }
 
     /**

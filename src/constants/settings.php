@@ -49,6 +49,11 @@ class Settings
     const BACKUP_FILES_MAX = 14;
 
     /**
+     * # of log files to conserve for each log channel.
+     */
+    const LOG_FILES_MAX = 7;
+
+    /**
      * # of elements displayed by default in a table.
      */
     const TABLE_DISPLAY_COUNT = 20;
