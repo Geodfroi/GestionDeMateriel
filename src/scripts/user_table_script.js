@@ -5,11 +5,39 @@
 const USERS_TABLE = "/usersTable";
 
 /**
+ * Display caret icon besides table header to show orderby value.
+ */
+function displayCarets() {
+  let orderby = json_data.display_data.orderby;
+
+  const email_header = document.getElementById("email-header");
+  const creation_header = document.getElementById("creation-header");
+  const login_header = document.getElementById("last-login-header");
+
+  if (orderby === "EMAIL_DESC") {
+    email_header.querySelector("span").classList.add("bi-caret-up");
+  } else if (orderby === "EMAIL_ASC") {
+    email_header.querySelector("span").classList.add("bi-caret-down");
+  }
+
+  if (orderby === "CREATED_DESC") {
+    creation_header.querySelector("span").classList.add("bi-caret-down");
+  } else if (orderby === "CREATED_ASC") {
+    creation_header.querySelector("span").classList.add("bi-caret-up");
+  }
+
+  if (orderby === "LOGIN_DESC") {
+    login_header.querySelector("span").classList.add("bi-caret-down");
+  } else if (orderby === "LOGIN_ASC") {
+    login_header.querySelector("span").classList.add("bi-caret-up");
+  }
+}
+
+/**
  * Set header links depending on orderby value.
  */
 function setHeaderLinks() {
-  let table = document.getElementById("table");
-  let orderby = table.getAttribute("orderby");
+  let orderby = json_data.display_data.orderby;
 
   const email_header = document.getElementById("email-header");
   const creation_header = document.getElementById("creation-header");
@@ -41,36 +69,6 @@ function setHeaderLinks() {
         ? `${root_href}LOGIN_ASC`
         : `${root_href}LOGIN_DESC`
     );
-}
-
-/**
- * Display caret icon besides table header to show orderby value.
- */
-function displayCarets() {
-  let table = document.getElementById("table");
-  let orderby = table.getAttribute("orderby");
-
-  const email_header = document.getElementById("email-header");
-  const creation_header = document.getElementById("creation-header");
-  const login_header = document.getElementById("last-login-header");
-
-  if (orderby === "EMAIL_DESC") {
-    email_header.querySelector("span").classList.add("bi-caret-up");
-  } else if (orderby === "EMAIL_ASC") {
-    email_header.querySelector("span").classList.add("bi-caret-down");
-  }
-
-  if (orderby === "CREATED_DESC") {
-    creation_header.querySelector("span").classList.add("bi-caret-down");
-  } else if (orderby === "CREATED_ASC") {
-    creation_header.querySelector("span").classList.add("bi-caret-up");
-  }
-
-  if (orderby === "LOGIN_DESC") {
-    login_header.querySelector("span").classList.add("bi-caret-down");
-  } else if (orderby === "LOGIN_ASC") {
-    login_header.querySelector("span").classList.add("bi-caret-up");
-  }
 }
 
 //fill in delete modal info when called.
@@ -109,4 +107,4 @@ hookModalShown("renew-modal", (e, modal) => {
 
 displayCarets();
 setHeaderLinks();
-displayPage(USERS_TABLE);
+displayPageNavbar(USERS_TABLE);

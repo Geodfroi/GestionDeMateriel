@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\routes;
@@ -29,24 +29,35 @@ class UserTable extends BaseRoute
             $this->requestRedirect(Route::LOGIN);
         }
 
-        $_SESSION[Session::USERS_PAGE] ??= 1;
-        $_SESSION[Session::USERS_ORDERBY] ??= OrderBy::EMAIL_ASC;
+        if (isset($_SESSION[Session::USERS_DISPLAY])) {
+            $display_data = json_decode($_SESSION[Session::USERS_DISPLAY], true);
+        } else {
+            $display_data = [
+                'page' => 1,
+                'orderby' => OrderBy::EMAIL_ASC,
+            ];
+        }
 
         if (isset($_GET['orderby'])) {
-            $_SESSION[Session::USERS_ORDERBY] = $_GET['orderby'];
+            $display_data['orderby'] = $_GET['orderby'];
         }
 
         if (isset($_GET['page'])) {
-            $_SESSION[Session::USERS_PAGE] = intval($_GET['page']);
+            $display_data['page'] = intval($_GET['page']);
         }
 
+        $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
+
+        $display_count = Settings::TABLE_DISPLAY_COUNT;
         $item_count = Database::users()->queryCount(false);
-        $offset =   ($_SESSION[Session::USERS_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
-        $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
-        $users = Database::users()->queryAll(Settings::TABLE_DISPLAY_COUNT, $offset, $_SESSION[Session::USERS_ORDERBY], false);
+        $offset =   ($display_data['page'] - 1) *      $display_count;
+        $page_count = ceil($item_count /      $display_count);
+
+        $users = Database::users()->queryAll($display_count, $offset, $display_data['orderby'], false);
 
         return $this->renderTemplate([
             'users' =>  $users,
+            'display_data' => $display_data,
             'page_count' => $page_count,
         ]);
     }

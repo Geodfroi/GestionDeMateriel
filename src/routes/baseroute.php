@@ -19,7 +19,6 @@ abstract class BaseRoute
 {
     private string $redirectUri = "";
 
-    // private $warnings = [];
     private $javascript_name;
     private $template_name;
     private $show_header;

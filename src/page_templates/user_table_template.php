@@ -1,20 +1,17 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 use app\constants\Requests;
 use app\constants\Route;
-use app\constants\Session;
 
-$page = $_SESSION[Session::USERS_PAGE];
-$orderby = $_SESSION[Session::USERS_ORDERBY];
 ?>
 
 <div class="container mt-3">
 
     <div class="row col-12">
-        <table id='table' orderby=<?php echo $orderby ?> class="table table-striped table-bordered align-middle">
+        <table id='table' class="table table-striped table-bordered align-middle">
             <thead>
                 <tr>
                     <th id="email-header"><a class="text-decoration-none" href="#">E-mail <span></span></a>
@@ -38,13 +35,14 @@ $orderby = $_SESSION[Session::USERS_ORDERBY];
                         <td><?php echo $user->getCreationDate()->format('d-m-Y') ?></td>
                         <!-- login -->
                         <td><?php echo $user->getLastLogin()->format('d-m-Y H:i:s') ?></td>
-                        <td>
-                            <a class="link-secondary" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
 
-                            <?php if (!$user->isAdmin()) { ?>
+                        <?php if (!$user->isAdmin()) { ?>
+                            <td>
+                                <a class="link-secondary" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+
                                 <a class="link-secondary text-info ms-2" data-bs-toggle="modal" data-bs-target="#renew-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-key" role="img" style="font-size: 1.2rem;" aria-label="renew-password" data-bs-toggle="tooltip" title="Renouveler le mot de passe." data-bs-placement="bottom"></i></a>
-                            <?php } ?>
-                        </td>
+                            </td>
+                        <?php } ?>
                     </tr>
                 <?php } ?>
             </tbody>
@@ -52,7 +50,7 @@ $orderby = $_SESSION[Session::USERS_ORDERBY];
     </div>
 
     <nav aria-label="list-pagination">
-        <ul id="page-nav" page-current=<?php echo $page ?> page-count=<?php echo $page_count ?> class="pagination justify-content-end">
+        <ul id="page-nav" class="pagination justify-content-end">
 
             <li id="page-last" class="page-item">
                 <a href="#" class="page-link" aria-label="Previous" tabindex="-1">

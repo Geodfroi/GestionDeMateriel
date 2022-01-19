@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.17 ###
+// ## Joël Piguet - 2022.01.19 ###
 // ##############################
 
 /**
@@ -13,7 +13,6 @@
 function call(req, callback = null, compilePostData = null, url = null) {
   let data = compilePostData == null ? {} : compilePostData();
   data["req"] = req;
-
   const options = {
     method: "POST",
     body: JSON.stringify(data),
@@ -37,30 +36,6 @@ function call(req, callback = null, compilePostData = null, url = null) {
         callback(json);
       }
     });
-}
-
-/**
- * Use javascript fetch ajax method to send a GET request.
- *
- * @param {*} req request identifier.
- * @param {*} compileJSON function yielding the json data used to construct the GET request path.
- * @param {*} url server route; '/request' by default.
- */
-function send(url, compileJSON = null) {
-  let url_inst = new URL(url, window.location.origin);
-
-  console.log("url, " + url_inst);
-
-  let json = compileJSON == null ? {} : compileJSON();
-  console.log("json: " + json);
-  let keys = Object.keys(json);
-  for (let index = 0; index < keys.length; index++) {
-    let key = keys[index];
-    url_inst.searchParams.append(key, json[key]);
-  }
-
-  console.log("url_inst: " + url_inst);
-  fetch(url_inst);
 }
 
 /**
@@ -102,9 +77,8 @@ function clearWarningsAndInputs() {
  * @param {*} route
  */
 function displayPageNavbar(route) {
-  let nav = document.getElementById("page-nav");
-  let current_page = parseInt(nav.getAttribute("page-current"));
-  let page_count = parseInt(nav.getAttribute("page-count"));
+  let current_page = json_data.display_data.page;
+  let page_count = json_data.page_count;
 
   const page_last = document.getElementById("page-last");
   const page_next = document.getElementById("page-next");
@@ -273,6 +247,18 @@ function htmlEntities(str) {
     .replace(/"/g, "&quot;");
 }
 
+/**
+ * Fetch json object containing data defined in Route::renderTemplate function.
+ *
+ * @returns JSON object.
+ */
+function retrieveRouteData() {
+  let data_element = document.getElementById("php-data");
+  let json_str = data_element.innerText;
+  console.log("json_str: " + json_str);
+  return JSON.parse(json_str);
+}
+
 function setCheckboxValue(id, status) {
   let element = document.getElementById(id);
   element.checked = status;
@@ -305,6 +291,30 @@ function setValidTag(id, status) {
 }
 
 /**
+ * Use javascript fetch ajax method to send a GET request.
+ *
+ * @param {*} req request identifier.
+ * @param {*} compileJSON function yielding the json data used to construct the GET request path.
+ * @param {*} url server route; '/request' by default.
+ */
+function send(url, compileJSON = null) {
+  let url_inst = new URL(url, window.location.origin);
+
+  console.log("url, " + url_inst);
+
+  let json = compileJSON == null ? {} : compileJSON();
+  console.log("json: " + json);
+  let keys = Object.keys(json);
+  for (let index = 0; index < keys.length; index++) {
+    let key = keys[index];
+    url_inst.searchParams.append(key, json[key]);
+  }
+
+  console.log("url_inst: " + url_inst);
+  fetch(url_inst);
+}
+
+/**
  *Open modal by id.
  *
  * @param {String} modal_id
@@ -329,28 +339,6 @@ function toDate(str) {
   return new Date(year, month, day);
 }
 
-/**
- * Fetch json object containing data defined in Route::renderTemplate function.
- *
- * @returns JSON object.
- */
-function fetchRouteData() {
-  let data_element = document.getElementById("php-data");
-  let json_str = data_element.innerText;
-  console.log("json_str: " + json_str);
-  return JSON.parse(json_str);
-}
-
-json_data = fetchRouteData();
+json_data = retrieveRouteData();
 console.log("json data: ");
 console.dir(json_data);
-
-// function explode_to_ints(array_str) {
-//   let array = array_str.split("-");
-//   let array_ints = [];
-//   for (let index = 0; index < array.length; index++) {
-//     const element = array[index].trim();
-//     array_ints.push(parseInt(element));
-//   }
-//   return array_ints;
-// }

@@ -30,11 +30,9 @@ class ArticleTable extends BaseRoute
         if (!Authenticate::isLoggedIn()) {
             $this->requestRedirect(Route::LOGIN);
         }
-        Logging::debug('ArticleTable GET', $_GET);
 
-        if (isset($_SESSION[Session::ARTICLE_DISPLAY])) {
-            $display_data = json_decode($_SESSION[Session::ARTICLE_DISPLAY], true);
-            Logging::debug('session: ' . $_SESSION[Session::ARTICLE_DISPLAY]);
+        if (isset($_SESSION[Session::ARTICLES_DISPLAY])) {
+            $display_data = json_decode($_SESSION[Session::ARTICLES_DISPLAY], true);
         } else {
             $display_data = [
                 'page' => 1,
@@ -63,7 +61,7 @@ class ArticleTable extends BaseRoute
 
             if ($_GET['filter'] === 'clearAll') {
                 $display_data['filters'] = [];
-                $_SESSION[Session::ARTICLE_DISPLAY] = json_encode($display_data);
+                $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
                 return $this->requestRedirect(Route::ART_TABLE);
             }
 
@@ -99,8 +97,7 @@ class ArticleTable extends BaseRoute
 
         end:
 
-        $_SESSION[Session::ARTICLE_DISPLAY] = json_encode($display_data);
-        Logging::debug('filters', $display_data);
+        $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
 
         $display_count = $display_data['display_count'] ?? 20;
         $item_count = Database::articles()->queryCount($display_data['filters']);
