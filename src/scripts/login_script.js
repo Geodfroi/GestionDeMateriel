@@ -3,7 +3,6 @@
 // ##############################
 
 function callback(json) {
-  console.log(json);
   displayWarnings(json, "email", "password");
 
   if (!getJSONWarning(json, "email")) {

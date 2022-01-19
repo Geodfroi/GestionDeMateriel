@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\routes;
@@ -78,7 +78,8 @@ class Router
                 $templateData['page_script'] = $route->getScript();
                 $templateData['show_header'] = $route->showHeader();
                 $templateData['show_footer'] = $route->showFooter();
-                $templateData['alert'] = $route->getAlert();
+                $templateData['alert'] = Util::displayAlert();
+                $templateData['json_data'] = $route->getJSONData();
             }
         }
         // insert dynamically generated html content into the main template.

@@ -1,14 +1,14 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Route;
 use app\helpers\Database;
-
+// use app\helpers\Logging;
 
 class ArticleEdit extends BaseRoute
 {
@@ -19,13 +19,16 @@ class ArticleEdit extends BaseRoute
 
     public function getBodyContent(): string
     {
-        // An invisible field in the form will hold the id value if the form is used to update an existing Article.
-
+        $mode = 'add';
         if (isset($_GET['update'])) {
             $article = Database::articles()->queryById($_GET['update']);
-            $article_id = $article->getId();
+            $mode = 'update';
         }
 
-        return $this->renderTemplate(['id' => $article_id ?? '']);
+        return $this->renderTemplate([
+            'article' => $mode == 'update' ? $article->asArray() : '',
+            'mode' =>  $mode,
+            'loc_presets' =>  Database::locations()->queryAll(),
+        ]);
     }
 }

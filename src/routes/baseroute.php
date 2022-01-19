@@ -1,13 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.11 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\AppPaths;
-use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\App;
 use app\helpers\Logging;
@@ -19,13 +18,17 @@ use app\helpers\Util;
 abstract class BaseRoute
 {
     private string $redirectUri = "";
-    private $alert = [];
-    private $warnings = [];
 
+    // private $warnings = [];
     private $javascript_name;
     private $template_name;
     private $show_header;
     private $show_footer;
+
+    /**
+     * Set data to be accessible by javascript scripts.
+     */
+    private $json_data;
 
     /**
      * Link a Route with its designated template in the constructor.
@@ -43,18 +46,6 @@ abstract class BaseRoute
         $this->javascript_name = $javascript_name;
         $this->show_header = $show_header;
         $this->show_footer = $show_footer;
-
-        $this->displayAlert();
-    }
-
-    public function showAlert()
-    {
-        Logging::debug('error: call to showAlert');
-    }
-
-    public function getAlert()
-    {
-        return $this->alert ?? [];
     }
 
     /**
@@ -72,6 +63,16 @@ abstract class BaseRoute
     public function getHeaderTitle(): string
     {
         return Settings::APP_NAME;
+    }
+
+    /**
+     * Get json so that variables are also available in javascript scripts.
+     * 
+     * @return string JSON encoded as a single string.
+     */
+    public function getJSONData()
+    {
+        return $this->json_data;
     }
 
     /**
@@ -99,7 +100,7 @@ abstract class BaseRoute
     /** 
      * Load a php template in memory and returns a content string.
      * 
-     * @param array $data The variables to be used in php templates.
+     * @param array $data Associative array to be made avaible in both php templates and javascript scripts.
      */
     protected function renderTemplate(array $data = []): string
     {
@@ -113,7 +114,8 @@ abstract class BaseRoute
             }
         }
 
-        $data['warnings'] = $this->warnings ?? [];
+        // $data['warnings'] = $this->warnings ?? [];
+        $this->json_data = json_encode($data, JSON_UNESCAPED_UNICODE);
         return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES);
     }
 
@@ -132,45 +134,6 @@ abstract class BaseRoute
     }
 
     /**
-     * Display a popup alert message recovered from SESSION storage.
-     */
-    public function displayAlert()
-    {
-        if (!isset($_SESSION[SESSION::ALERT])) {
-            return;
-        }
-
-        $alert_array = $_SESSION[SESSION::ALERT];
-        Logging::debug('alert_array', $alert_array);
-        //check if it is the correct page to display stored alert.
-        if ($alert_array[2] != $_SESSION['route']) {
-            return;
-        }
-
-        unset($_SESSION[SESSION::ALERT]);
-
-        if (App::isDebugMode()) {
-            Logging::debug('alert', $alert_array);
-        }
-        $this->alert = [
-            'type' => $alert_array[0],
-            'msg' => $alert_array[1],
-        ];
-    }
-
-    /**
-     * Set a warning to be displayed beneath invalid input in forms.
-     */
-    public function showWarning(string $key, string $content)
-    {
-        if (App::isDebugMode()) {
-            Logging::debug('warning', [$key => $content]);
-        }
-
-        $this->warnings[$key] = $content;
-    }
-
-    /**
      * Display html footer.
      */
     public function showFooter(): bool
@@ -184,19 +147,16 @@ abstract class BaseRoute
     {
         return $this->show_header;
     }
-
-    /**
-     * Store alert content in storage.
-     * 
-     * @param string $msg Alert message.
-     * @param string $type Alert type. Use AlertType const.
-     * @param string $display_page Where to display the alert.
-     */
-    public function storeAlert(string $type, string $msg, string $display_page = "")
-    {
-        if (strlen($display_page) == 0) {
-            $display_page = $_SESSION['route'];
-        }
-        Util::storeAlert($type, $msg,  $display_page);
-    }
 }
+
+    // /**
+    //  * Set a warning to be displayed beneath invalid input in forms.
+    //  */
+    // public function showWarning(string $key, string $content)
+    // {
+    //     if (App::isDebugMode()) {
+    //         Logging::debug('warning', [$key => $content]);
+    //     }
+
+    //     $this->warnings[$key] = $content;
+    // }

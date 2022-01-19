@@ -1,35 +1,14 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.18 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
-use app\constants\ArtFilter;
 use app\constants\Requests;
 use app\constants\Route;
-use app\constants\Session;
 use app\helpers\Database;
 // use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\Article;
-
-$page = $_SESSION[Session::ART_PAGE];
-// $orderby = $_SESSION[Session::ART_ORDERBY];
-
-// $filters = $_SESSION[Session::ART_FILTERS];
-// $filter_str = implode(';', $filters);
-
-// $filter_name = isset($filters[ArtFilter::NAME]) ? $filters[ArtFilter::NAME] : '';
-// $filter_location = isset($filters[ArtFilter::LOCATION]) ? $filters[ArtFilter::LOCATION] : '';
-
-// $filter_date_type = isset($filters[ArtFilter::DATE_BEFORE]) ? ArtFilter::DATE_BEFORE : ArtFilter::DATE_AFTER;
-// $filter_date_val = '';
-// if (isset($filters[ArtFilter::DATE_BEFORE])) {
-//     $filter_date_val = $filters[ArtFilter::DATE_BEFORE];
-// } else if (isset($filters[ArtFilter::DATE_AFTER])) {
-//     $filter_date_val = $filters[ArtFilter::DATE_AFTER];
-// }
-
-// $filter_show_expired = isset($filters[ArtFilter::SHOW_EXPIRED]);
 
 /**
  * @return string Article owner display alias.
@@ -47,8 +26,6 @@ function getOwner(Article $article): string
 }
 
 ?>
-
-<div id="filter-data" filter=<?php echo $filter_str ?>><?php echo $filter_str ?></div>
 
 <div class="container mt-3">
 
@@ -121,27 +98,27 @@ function getOwner(Article $article): string
     </div>
 
     <nav>
-        <ul id="display-nav" display-count=<?php echo $display_count ?> class="nav justify-content-center">
+        <ul id="display-nav" class="nav justify-content-center">
             <li class="nav-item">
                 <!-- text-secondary text-decoration-underline -->
-                <a id="display-10" display-count="10" class="display-option nav-link px-0 active" href="<?php echo Route::ART_TABLE . '?display=10' ?>">10</a>
+                <a id="display-10" display-count="10" class="display-option nav-link px-0 active" href="<?php echo Route::ART_TABLE . '?display_count=10' ?>">10</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link px-0 text-primary">|</a>
             </li>
             </li>
             <li class="nav-item">
-                <a id="display-20" display-count="20" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display=20' ?>">20</a>
+                <a id="display-20" display-count="20" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display_count=20' ?>">20</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link px-0 text-primary">|</a>
             </li>
             <li class="nav-item">
-                <a id="display-50" display-count="50" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display=50' ?>">50</a>
+                <a id="display-50" display-count="50" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display_count=50' ?>">50</a>
             </li>
         </ul>
 
-        <ul id="page-nav" page-current=<?php echo $page ?> page-count=<?php echo $page_count ?> class="pagination justify-content-end">
+        <ul id="page-nav" class="pagination justify-content-end">
 
             <li id="page-last" class="page-item">
                 <a href="#" class="page-link" aria-label="Previous" tabindex="-1">
@@ -236,6 +213,7 @@ function getOwner(Article $article): string
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <a href="<?php echo Route::ART_TABLE . "?filter=clearAll" ?>" id="clear-filters-btn" type="button" class="btn btn-light">Enlever les filtres</a>
                     <button type="submit" class="btn btn-primary" name="filter">Filtrer</button>
                 </div>
             </form>

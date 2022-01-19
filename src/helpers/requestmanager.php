@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\helpers;
@@ -111,7 +111,8 @@ class RequestManager
             case 'add-user':
                 return RequestManager::addNewUser($data);
             case 'get-article':
-                return Database::articles()->queryById(intval($data['id']))->toJSON();
+                $article = Database::articles()->queryById(intval($data['id']));
+                return json_encode($article->asArray());
             case 'get-user':
                 return Authenticate::getUser()->toJSON();
             case 'regen-password':
@@ -169,7 +170,7 @@ class RequestManager
     private static function redirect(string $url, string $alert_type = "", string $alert_msg = ""): string
     {
         if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            Util::sstoreAlert($url, $alert_type, $alert_msg);
+            Util::storeAlert($url, $alert_type, $alert_msg);
         }
         return json_encode(['url' => $url]);
     }

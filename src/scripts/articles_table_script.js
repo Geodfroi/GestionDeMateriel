@@ -1,17 +1,130 @@
 // ################################
-// ## Joël Piguet - 2022.01.18 ###
+// ## Joël Piguet - 2022.01.19 ###
 // ##############################
 
 const ART_TABLE = "/articlesTable";
 
 const DATE_BEFORE = "before";
 const DATE_AFTER = "after";
+
+/**
+ * Display caret icon besides table header to show orderby value.
+ */
+function displayCarets() {
+  let orderby = json_data.display_data.orderby;
+
+  const article_header = document.getElementById("article-header");
+  const location_header = document.getElementById("location-header");
+  const date_header = document.getElementById("per-date-header");
+  const owner_header = document.getElementById("owner-header");
+
+  // display carets
+  if (orderby === "NAME_ASC") {
+    article_header.querySelector("span").classList.add("bi-caret-down");
+  } else if (orderby === "NAME_DESC") {
+    console.log("caret up");
+    article_header.querySelector("span").classList.add("bi-caret-up");
+  }
+
+  if (orderby === "LOCATION_ASC") {
+    location_header.querySelector("span").classList.add("bi-caret-down");
+  } else if (orderby === "LOCATION_DESC") {
+    location_header.querySelector("span").classList.add("bi-caret-up");
+  }
+
+  if (orderby === "DELAY_ASC") {
+    date_header.querySelector("span").classList.add("bi-caret-up");
+  } else if (orderby === "DELAY_DESC") {
+    date_header.querySelector("span").classList.add("bi-caret-down");
+  }
+
+  if (orderby === "OWNED_BY_DESC") {
+    owner_header.querySelector("span").classList.add("bi-caret-up");
+  } else if (orderby === "OWNED_BY_ASC") {
+    owner_header.querySelector("span").classList.add("bi-caret-down");
+  }
+}
+
+/**
+ * Configure display of item count navbar.
+ */
+function displayCountNavbar() {
+  let count = json_data.display_data.display_count;
+
+  // show selection
+  let id = `display-${count}`;
+  let selection_link = document.getElementById(id);
+  selection_link.setAttribute("active", true);
+  selection_link.classList.add("text-secondary");
+  selection_link.classList.add("text-decoration-underline");
+}
+
+/**
+ * Display current applied filters.
+ */
+function displayFilter() {
+  let filters = json_data.display_data.filters;
+
+  let str = "Filters";
+  if (filters.name) {
+    str += ` [article: ${filters.name}]`;
+  }
+
+  if (filters.location) {
+    str += ` [location: ${filters.location}]`;
+  }
+
+  if (filters.peremption_value && filters.peremption_type) {
+    let date = toDate(filters.peremption_value);
+    if (filters.peremption_type == DATE_BEFORE) {
+      str += ` [péremption avant le: ${frenchFormat(date)}]`;
+    } else if (filters.peremption_type == DATE_AFTER) {
+      str += ` [péremption après le: ${frenchFormat(date)}]`;
+    }
+  }
+
+  if (filters.show_expired) {
+    str += " [articles périmés inclus]";
+  }
+
+  document.getElementById("filter-label").innerText = str;
+}
+
+function fillFilterModal(_, modal) {
+  let filters = json_data.display_data.filters;
+
+  // name
+  modal.querySelector("#filter-name").value = filters.name ? filters.name : "";
+  // location
+  modal.querySelector("#filter-location").value = filters.location
+    ? filters.location
+    : "";
+
+  // peremption date
+  let date_defined = filters.peremption_type && filters.peremption_value;
+  let is_before = date_defined && filters.peremption_type === DATE_BEFORE;
+
+  modal.querySelector("#filter-date-btn").innerText = is_before
+    ? "Péremption avant le"
+    : "Péremption après le";
+
+  modal.querySelector("#filter-date-type").value = is_before
+    ? DATE_BEFORE
+    : DATE_AFTER;
+
+  if (filters.peremption_value) {
+    modal.querySelector("#filter-date-val").value = filters.peremption_value;
+  }
+
+  // show expired
+  modal.querySelector("#filter-show-expired").checked = filters.show_expired;
+}
+
 /**
  * Set header links depending on orderby value.
  */
 function setHeaderLinks() {
-  let table = document.getElementById("table");
-  let orderby = table.getAttribute("orderby");
+  let orderby = json_data.display_data.orderby;
 
   const article_header = document.getElementById("article-header");
   const location_header = document.getElementById("location-header");
@@ -49,129 +162,15 @@ function setHeaderLinks() {
     .querySelector("a")
     .setAttribute(
       "href",
-      orderby === "OWNED_BY_DESC"
-        ? `${root_href}OWNED_BY_ASC`
-        : `${root_href}OWNED_BY_DESC`
+      orderby === "OWNED_BY_ASC"
+        ? `${root_href}OWNED_BY_DESC`
+        : `${root_href}OWNED_BY_ASC`
     );
 }
 
-/**
- * Display caret icon besides table header to show orderby value.
- */
-function displayCarets() {
-  let table = document.getElementById("table");
-  let orderby = table.getAttribute("orderby");
-
-  const article_header = document.getElementById("article-header");
-  const location_header = document.getElementById("location-header");
-  const date_header = document.getElementById("per-date-header");
-  const owner_header = document.getElementById("owner-header");
-
-  // display carets
-  if (orderby === "NAME_ASC") {
-    article_header.querySelector("span").classList.add("bi-caret-down");
-  } else if (orderby === "NAME_DESC") {
-    article_header.querySelector("span").classList.add("bi-caret-up");
-  }
-
-  if (orderby === "LOCATION_ASC") {
-    location_header.querySelector("span").classList.add("bi-caret-down");
-  } else if (orderby === "LOCATION_DESC") {
-    location_header.querySelector("span").classList.add("bi-caret-up");
-  }
-
-  if (orderby === "DELAY_ASC") {
-    date_header.querySelector("span").classList.add("bi-caret-up");
-  } else if (orderby === "DELAY_DESC") {
-    date_header.querySelector("span").classList.add("bi-caret-down");
-  }
-
-  if (orderby === "OWNED_BY_DESC") {
-    owner_header.querySelector("span").classList.add("bi-caret-up");
-  } else if (orderby === "OWNED_BY_ASC") {
-    owner_header.querySelector("span").classList.add("bi-caret-down");
-  }
-}
-
-function displayCount() {
-  let nav = document.getElementById("display-nav");
-  let count = nav.getAttribute("display-count");
-
-  // show selection
-  let id = `display-${count}`;
-  let selection_link = document.getElementById(id);
-  selection_link.setAttribute("active", true);
-  selection_link.classList.add("text-secondary");
-  selection_link.classList.add("text-decoration-underline");
-}
-
-/**
- * Display current applied filters.
- */
-function displayFilter() {
-  let filter_str = document
-    .getElementById("filter-data")
-    .getAttribute("filter");
-  let obj = JSON.parse(filter_str);
-
-  let str = "Filters";
-  if (obj.name) {
-    str += ` [article: ${obj.name}]`;
-  }
-
-  if (obj.location) {
-    str += ` [location: ${obj.location}]`;
-  }
-
-  if (obj.peremption_value && obj.peremption_type) {
-    let peremption_date = toDate(obj.peremption_date);
-    if (obj.peremption_type == DATE_BEFORE) {
-      str += ` [péremption avant le: ${frenchFormat(peremption_date)}]`;
-    } else if (obj.peremption_type == DATE_AFTER) {
-      str += ` [péremption après le: ${frenchFormat(peremption_date)}]`;
-    }
-  }
-
-  if (obj.show_expired) {
-    str += " [articles périmés inclus]";
-  }
-
-  document.getElementById("filter-label").innerText = str;
-}
-
-function fillFilterModal(_, modal) {
-  let filter_str = document
-    .getElementById("filter-data")
-    .getAttribute("filter");
-
-  let obj = JSON.parse(filter_str);
-
-  // name
-  modal.querySelector("#filter-name").value = obj.name ? obj.name : "";
-  // location
-  modal.querySelector("#filter-location").value = obj.location
-    ? obj.location
-    : "";
-
-  // peremption date
-  let date_defined = obj.peremption_type && obj.peremption_value;
-  let is_before = date_defined && obj.peremption_type === DATE_BEFORE;
-
-  modal.querySelector("#filter-date-btn").innerText = is_before
-    ? "Péremption avant le"
-    : "Péremption après le";
-
-  modal.querySelector("#filter-date-type").value = is_before
-    ? DATE_BEFORE
-    : DATE_AFTER;
-
-  if (obj.peremption_value) {
-    modal.querySelector("#filter-date-val").value = obj.peremption_value;
-  }
-
-  // show expired
-  modal.querySelector("#filter-show-expired").checked = obj.show_expired;
-}
+hookBtn("filter-date-clear", () => {
+  document.getElementById("filter-date-val").value = "";
+});
 
 // set date filter btn inner text and fill date type input value.
 hookBtnCollection("filter-date-select", (_, element) => {
@@ -181,7 +180,6 @@ hookBtnCollection("filter-date-select", (_, element) => {
 
   // set hidden post value.
   let date_input = document.getElementById("filter-date-type");
-  console.log("element id: " + element.id);
   if (element.id === "filter-date-before") {
     console.log("input before");
     date_input.value = DATE_BEFORE;
@@ -190,7 +188,7 @@ hookBtnCollection("filter-date-select", (_, element) => {
   }
 });
 
-//fill in delete article modal info when called.
+//fill in delete article modal info when postRequested.
 hookModalShown("delete-modal", (e, modal) => {
   if (e.relatedTarget) {
     let button = e.relatedTarget;
@@ -210,7 +208,7 @@ hookModalShown("delete-modal", (e, modal) => {
 hookModalShown("filter-modal", fillFilterModal);
 
 displayCarets();
-displayCount();
-displayPage(ART_TABLE);
+displayCountNavbar();
+displayPageNavbar(ART_TABLE);
 setHeaderLinks();
 displayFilter();

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\routes;
@@ -10,15 +10,13 @@ use app\constants\ArtFilter;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
+use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Logging;
-use app\helpers\Util;
-
-// use app\helpers\Logging;
 
 /**
- * Route class containing behavior linked to user_template. This route display an user Article list and allows create-remove-update tasks on articles list.
+ * Route class containing behavior linked to user_template. This route display an user Article list.
  */
 class ArticleTable extends BaseRoute
 {
@@ -32,97 +30,94 @@ class ArticleTable extends BaseRoute
         if (!Authenticate::isLoggedIn()) {
             $this->requestRedirect(Route::LOGIN);
         }
+        Logging::debug('ArticleTable GET', $_GET);
 
-        $_SESSION[Session::ART_PAGE] ??= 1;
-        $_SESSION[Session::ART_ORDERBY] ??= OrderBy::DELAY_ASC;
-
-        if (!isset($_SESSION[Session::ART_FILTERS])) {
-            $_SESSION[Session::ART_FILTERS] = [];
+        if (isset($_SESSION[Session::ARTICLE_DISPLAY])) {
+            $display_data = json_decode($_SESSION[Session::ARTICLE_DISPLAY], true);
+            Logging::debug('session: ' . $_SESSION[Session::ARTICLE_DISPLAY]);
+        } else {
+            $display_data = [
+                'page' => 1,
+                'display_count' => Settings::TABLE_DISPLAY_COUNT,
+                'filters' => [],
+                'orderby' => OrderBy::DELAY_ASC,
+            ];
         }
 
-        if (isset($_GET['display'])) {
-            $_SESSION[Session::ART_DISPLAY_COUNT] = intval($_GET['display']);
+        if (isset($_GET['display_count'])) {
+            $display_data['display_count'] = intval($_GET['display_count']);
             goto end;
         }
 
         if (isset($_GET['orderby'])) {
-            $_SESSION[Session::ART_ORDERBY] = $_GET['orderby'];
+            $display_data['orderby'] = $_GET['orderby'];
             goto end;
         }
 
         if (isset($_GET['page'])) {
-            $_SESSION[Session::ART_PAGE] = intval($_GET['page']);
+            $display_data['page'] = intval($_GET['page']);
             goto end;
         }
 
         if (isset($_GET['filter'])) {
 
-            Logging::debug('filter-get ,', $_GET);
+            if ($_GET['filter'] === 'clearAll') {
+                $display_data['filters'] = [];
+                $_SESSION[Session::ARTICLE_DISPLAY] = json_encode($display_data);
+                return $this->requestRedirect(Route::ART_TABLE);
+            }
 
             if ($_GET['filter-name']) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::NAME] = $_GET['filter-name'];
+                $display_data['filters'][ArtFilter::NAME] = $_GET['filter-name'];
             } else {
                 // if null of empty unset from filter array.
-                unset($_SESSION[Session::ART_FILTERS][ArtFilter::NAME]);
+                unset($display_data['filters'][ArtFilter::NAME]);
             }
 
             if ($_GET['filter-location']) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION] = $_GET['filter-location'];
+                $display_data['filters'][ArtFilter::LOCATION] = $_GET['filter-location'];
             } else {
-                unset($_SESSION[Session::ART_FILTERS][ArtFilter::LOCATION]);
+                unset($display_data['filters'][ArtFilter::LOCATION]);
             }
-
-            // // remove date filters from associative array
-            // unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE]);
-            // unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER]);
-
-            // $_SESSION[Session::ART_FILTERS][DAte] = isset($_GET['filter-date-val']) ? $_GET['filter-date-val'] : '';
 
             if (isset($_GET['filter-date-val'])) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_VALUE] =
+                $display_data['filters'][ArtFilter::DATE_VALUE] =
                     $_GET['filter-date-val'];
             } else {
-                unset($_SESSION[Session::ART_FILTERS][ArtFilter::DATE_VALUE]);
+                unset($display_data['filters'][ArtFilter::DATE_VALUE]);
             }
 
-            $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_TYPE] = $_GET['filter-date-type'];
-
-            // // add date filter from input selection with correct type as key
-            // if ($_GET['filter-date-type'] === 'DATE_BEFORE') {
-            //     Logging::debug('datebefore');
-            //     $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_BEFORE] = $date_val;
-            // } elseif ($_GET['filter-date-type'] === ArtFilter::DATE_AFTER) {
-            //     $_SESSION[Session::ART_FILTERS][ArtFilter::DATE_AFTER] = $date_val;
-            // }
+            $display_data['filters'][ArtFilter::DATE_TYPE] = $_GET['filter-date-type'];
 
             if (isset($_GET['filter-show-expired'])) {
-                $_SESSION[Session::ART_FILTERS][ArtFilter::SHOW_EXPIRED] = true;
+                $display_data['filters'][ArtFilter::SHOW_EXPIRED] = true;
             } else {
-                unset($_SESSION[Session::ART_FILTERS][ArtFilter::SHOW_EXPIRED]);
+                unset($display_data['filters'][ArtFilter::SHOW_EXPIRED]);
             }
             goto end;
         }
 
         end:
-        Logging::debug('session', $_SESSION[Session::ART_FILTERS]);
 
-        $display_count = $_SESSION[Session::ART_DISPLAY_COUNT] ?? 20;
-        $item_count = Database::articles()->queryCount($_SESSION[Session::ART_FILTERS]);
-        $offset = ($_SESSION[Session::ART_PAGE] - 1) * $display_count;
+        $_SESSION[Session::ARTICLE_DISPLAY] = json_encode($display_data);
+        Logging::debug('filters', $display_data);
+
+        $display_count = $display_data['display_count'] ?? 20;
+        $item_count = Database::articles()->queryCount($display_data['filters']);
+        $offset = ($display_data['page'] - 1) * $display_count;
         $page_count = ceil($item_count / $display_count);
 
         $articles = Database::articles()->queryAll(
             $display_count,
             $offset,
-            $_SESSION[Session::ART_ORDERBY],
-            $_SESSION[Session::ART_FILTERS]
+            $display_data['orderby'],
+            $display_data['filters']
         );
 
         return $this->renderTemplate([
             'articles' =>  $articles,
+            'display_data' => $display_data,
             'page_count' => $page_count,
-            'display_count' =>  $display_count,
-            'filter_str' => json_encode($_SESSION[Session::ART_FILTERS]) // Util::associativeToString($_SESSION[Session::ART_FILTERS]),
         ]);
     }
 }

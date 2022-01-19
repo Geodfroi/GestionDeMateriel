@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\helpers;
@@ -21,6 +21,33 @@ use DateTime;
  */
 class Util
 {
+    /**
+     * Display a popup alert message recovered from SESSION storage.
+     */
+    public static function displayAlert()
+    {
+        if (!isset($_SESSION[SESSION::ALERT])) {
+            return [];
+        }
+
+        $alert_array = $_SESSION[SESSION::ALERT];
+        Logging::debug('alert_array', $alert_array);
+        //check if it is the correct page to display stored alert.
+        if ($alert_array[2] != $_SESSION['route']) {
+            return [];
+        }
+
+        unset($_SESSION[SESSION::ALERT]);
+
+        if (App::isDebugMode()) {
+            Logging::debug('alert', $alert_array);
+        }
+        return [
+            'type' => $alert_array[0],
+            'msg' => $alert_array[1],
+        ];
+    }
+
     /**
      * Encrypt password in plain text into a 30 caracters encrypted hashed string.
      * 
@@ -116,7 +143,7 @@ class Util
     public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = ""): string
     {
         if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            Util::sstoreAlert($uri, $alert_type, $alert_msg);
+            Util::storeAlert($uri, $alert_type, $alert_msg);
         }
         //The header php function will send a header message to the browser, here signaling for redirection.
         header("Location: $uri", true);
@@ -130,7 +157,7 @@ class Util
      * @param string $type Alert type. Use AlertType const.
      * @param string $display_page Page on which to display the alert.
      */
-    public static function sstoreAlert(string $display_page, string $type, string $msg)
+    public static function storeAlert(string $display_page, string $type, string $msg)
     {
         $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
     }

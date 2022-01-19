@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.16 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\models;
 
 use app\helpers\Convert;
-use app\helpers\Logging;
+// use app\helpers\Logging;
 use DateTime;
 
 class Article
@@ -115,20 +115,21 @@ class Article
     }
 
     /**
-     * Return as JSON data.
+     * Return as associative array.
+     * 
+     * @return array
      */
-    public function toJSON()
+    public function asArray(): array
     {
-        $array = [
+        return [
             'id' => $this->id,
             'article-name' => $this->article_name,
             'comments' => $this->comments,
             'location' => $this->location,
             'creation-date' => $this->creation_date->format('Y-m-d'),
             'expiration-date' => $this->expiration_date->format('Y-m-d'),
-            'user-id' => $this->user_id,
+            'user-id' => $this->user_id
         ];
-        return json_encode($array);
     }
 
     /**

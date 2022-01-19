@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\constants;
@@ -25,7 +25,7 @@ class Settings
      * Used as hyperlink in emails; must be set to proper url once the project is online. 
      */
     const APP_URL = '';
-    const LAST_MODIFICATION = '09 janvier 2022';
+    const LAST_MODIFICATION = '19 janvier 2022';
 
     const ALIAS_MIN_LENGHT = 6;
     const ARTICLE_NAME_MIN_LENGHT = 6;

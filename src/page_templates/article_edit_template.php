@@ -1,12 +1,9 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 use app\constants\Route;
-use app\helpers\Database;
-
-$loc_presets = Database::locations()->queryAll();
 
 ?>
 
@@ -14,7 +11,6 @@ $loc_presets = Database::locations()->queryAll();
     <div class="row col-8">
         <form>
             <label id='form-label' class="h4 m-4">Ajouter un article</article></label>
-            <input id="id" type="hidden" name="id" value="<?php echo $id ?>">
             <div class="mb-2">
                 <label for="article-name" class="form-label col-3">Nom de l'article:</label>
                 <input id="article-name" name="article-name" type="text" class="form-control">
