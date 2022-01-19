@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 use app\constants\Requests;
@@ -14,15 +14,18 @@ use app\constants\Requests;
             <form>
                 <label class="h4 m-4">Formulaire d'identification</label>
                 <div class="mb-3">
-                    <label for="email" class="form-label">Adresse e-mail</label>
-                    <input id="email" type="email" name='login-email' aria-describedby="id-descr" class="form-control ">
-                    <div id="id-descr" class="form-text">Entrer votre adresse e-mail pour vous identifier.</div>
-                    <div id="email-feedback" class='invalid-feedback'><?php echo $warnings['login-email'] ?> </div>
+                    <label for="login" class="form-label">Adresse e-mail ou alias</label>
+                    <input id="login" type="text" name='login' aria-describedby="id-descr" class="form-control">
+                    <div id="id-descr" class="form-text">Entrer votre adresse e-mail ou alias pour vous identifier.</div>
+                    <div id="login-feedback" class='invalid-feedback'><?php echo $warnings['login'] ?> </div>
                 </div>
                 <div class="mt-3 mb-3">
                     <label for="password" class="form-label">Mot de passe</label>
-                    <input id="password" type="password" name='password' class="form-control ">
-                    <div id="password-feedback" class='invalid-feedback'> </div>
+                    <div class="input-group">
+                        <input id="password" type="password" name='password' class="form-control">
+                        <button id="show-password-btn" class="btn btn-outline-primary"><i class="bi bi-eye"></i></button>
+                        <div id="password-feedback" class='invalid-feedback'></div>
+                    </div>
                 </div>
                 <button id="submit-btn" type="submit" class="btn btn-primary">Transmettre</button>
             </form>

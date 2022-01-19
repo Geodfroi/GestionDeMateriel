@@ -340,5 +340,4 @@ function toDate(str) {
 }
 
 json_data = retrieveRouteData();
-console.log("json data: ");
-console.dir(json_data);
+// console.dir(json_data);

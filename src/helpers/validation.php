@@ -108,38 +108,6 @@ class Validation
     }
 
     /**
-     * Validate input and fill $errors array with proper email error text to be displayed if it fails.
-     * 
-     * @param string $email User email by reference.
-     * @return string Empty string if value is validated or warning message in case of failure.
-     */
-    public static function validateLoginEmail(string &$email): string
-    {
-        if ($email  === '') {
-            return Warning::LOGIN_EMAIL_EMPTY;
-        }
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            return  Warning::LOGIN_EMAIL_INVALID;
-        }
-        return "";
-    }
-
-    /**
-     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
-     * 
-     * @param string $password User password by reference
-     * @return string Empty string if value is validated or warning message in case of failure.
-     */
-    public static function validateLoginPassword(&$password): string
-    {
-        if ($password === '') {
-            return Warning::LOGIN_PASSWORD_EMPTY;
-        }
-        return "";
-    }
-
-    /**
      * Location validation. Location must not be empty and under a set number of caracters.
      * 
      * @param string &$location Article's location within the school by reference.
@@ -152,12 +120,12 @@ class Validation
         }
 
         $location = ucwords($location);
-        if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
-            return sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT);
+        if (strlen($location) < Settings::ARTICLE_LOCATION_MIN_LENGHT) {
+            return sprintf(Warning::LOCATION_TOO_SHORT, Settings::ARTICLE_LOCATION_MIN_LENGHT);
         }
 
-        if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
-            return sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT);
+        if (strlen($location) > Settings::ARTICLE_LOCATION_MAX_LENGHT) {
+            return sprintf(Warning::LOCATION_TOO_LONG, Settings::ARTICLE_LOCATION_MAX_LENGHT);
         }
         return "";
     }
@@ -180,15 +148,20 @@ class Validation
     }
 
     /**
-     * Validate input and fill $errors array with proper email error text to be displayed if it fails.
+     * Validate input and fill $errors array with proper error text to be displayed if it fails.
      * 
      * @param ?string $email User email by reference.
      * @return string Empty string if value is validated or warning message in case of failure.
      */
     public static function validateNewLogin(?string &$email): string
     {
-        if ($warning = Validation::validateLoginEmail($email)) {
-            return $warning;
+        if ($email  === '') {
+            return Warning::LOGIN_EMAIL_EMPTY;
+        }
+
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+        if (!$email) {
+            return Warning::LOGIN_EMAIL_INVALID;
         }
 
         if (Database::users()->queryByEmail($email)) {

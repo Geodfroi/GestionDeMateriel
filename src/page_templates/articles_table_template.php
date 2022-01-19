@@ -5,25 +5,8 @@
 
 use app\constants\Requests;
 use app\constants\Route;
-use app\helpers\Database;
 // use app\helpers\Logging;
 use app\helpers\Util;
-use app\models\Article;
-
-/**
- * @return string Article owner display alias.
- */
-function getOwner(Article $article): string
-{
-    $user = Database::users()->queryById($article->getUserId());
-    if ($user) {
-
-        //take only caracters before @ if it is an email.
-        $alias  = explode('@', $user->getAlias())[0];
-        return sprintf("%s (%s)", $alias, $article->getCreationDate()->format('d.m.Y'));
-    }
-    return "Inconnu";
-}
 
 ?>
 
@@ -85,7 +68,7 @@ function getOwner(Article $article): string
                         </td>
 
                         <!-- Créé par -->
-                        <td><?php echo getOwner($article) ?></td>
+                        <td><?php echo $article->getOwner() ?></td>
                         <!-- Actions -->
                         <td>
                             <a class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>

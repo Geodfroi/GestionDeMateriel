@@ -82,17 +82,20 @@ use app\helpers\Authenticate;
                             </li>
                         </ul>
                     </div>
+                </div>
+            </nav>
 
-                    <!-- show alert message over navbar -->
-                    <div class="row fixed-top">
-                        <div class="col-12">
-                            <?php if (isset($alert['type'])) { ?>
-                                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                                </div>
-                            <?php } ?>
+            <!-- show alert message over navbar -->
+            <?php if (isset($alert['type'])) { ?>
+                <div class="row fixed-top">
+                    <div class="col-12">
+                        <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                         </div>
                     </div>
+                </div>
+            <?php } ?>
+
         </header>
     <?php } ?>
 
@@ -130,9 +133,20 @@ use app\helpers\Authenticate;
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     </script>
+
+    <!-- route specific script -->
     <script>
         <?php echo isset($page_script) ? $page_script : ""; ?>
     </script>
+
+    <!-- dismiss alert after timer -->
+    <?php if (isset($alert['type'])) { ?>
+        <script>
+            let alert = document.getElementsByClassName('alert')[0];
+            let time = <?php echo $alert['timer'] ?>;
+            window.setTimeout(() => alert.classList.remove('show'), time);
+        </script>
+    <?php } ?>
 </body>
 
 </html>

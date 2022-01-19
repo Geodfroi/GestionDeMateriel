@@ -8,9 +8,11 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use app\helpers\Convert;
-// use app\helpers\Logging;
 use DateTime;
+
+use app\helpers\Convert;
+use app\helpers\Database;
+// use app\helpers\Logging;
 
 class Article
 {
@@ -102,6 +104,22 @@ class Article
     public function getLocation(): string
     {
         return $this->location;
+    }
+
+    /**
+     * Get article creator's alias.
+     * 
+     * @return string Article owner display alias.
+     */
+    public function getOwner(): string
+    {
+        $user = Database::users()->queryById($this->user_id);
+        if ($user) {
+            //take only caracters before @ if it is an email.
+            $alias  = explode('@', $user->getAlias())[0];
+            return sprintf("%s (%s)", $alias, $this->creation_date->format('d.m.Y'));
+        }
+        return "Inconnu";
     }
 
     public function getUserId(): int

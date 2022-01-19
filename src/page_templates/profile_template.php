@@ -3,8 +3,6 @@
 ## Joël Piguet - 2022.01.13 ###
 ##############################
 
-use app\constants\Route;
-
 ?>
 
 <div class="container">

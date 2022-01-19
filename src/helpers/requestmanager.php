@@ -91,7 +91,6 @@ class RequestManager
         $json = file_get_contents('php://input');
         // Converts it into a PHP object
         $data = json_decode($json, true);
-        Logging::debug('fetch data', $data);
 
         if (!isset($data['req'])) {
             $response = ['error' => '[req] key was not defined in fetch request.'];
@@ -282,37 +281,6 @@ class RequestManager
         return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
     }
 
-    private static function updateLocationPreset($json): string
-    {
-        $id = intval($json['id']);
-        $content = $json['content'];
-        $warnings = [];
-
-        $former_content = Database::locations()->queryById($id)->getContent();
-
-        // no change to content
-        if (strcasecmp($content, $former_content) == 0) {
-            return RequestManager::redirect(Route::LOCAL_PRESETS);
-        }
-
-        // strcasecmp must be placed before, otherwise validation will always be invalid and show LOCATION_PRESET_EXISTS warning.
-        if ($content_warning = Validation::validateLocationPreset($content)) {
-            $warnings['content'] = $content_warning;
-            return RequestManager::issueWarnings($json, $warnings);
-        }
-
-        if (Database::locations()->update($id, $content)) {
-
-            Logging::info(LogInfo::LOCATION_UPDATED, [
-                'user-id' => Authenticate::getUserId(),
-                'former-value' => $former_content,
-                'new-value' => $content
-            ]);
-            return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
-        }
-        return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
-    }
-
     private static function addArticle($json): string
     {
         $article_name = $json['article-name'];
@@ -333,62 +301,6 @@ class RequestManager
             return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
         }
         return RequestManager::issueWarnings($json, $warnings);
-    }
-
-    private static function updateArticle($json): string
-    {
-        $article_id  = intval($json['id']);
-        $article_name = $json['article-name'];
-        $location = $json['location'];
-        $exp_date_str = $json['expiration-date'];
-        $comments = $json['comments'];
-        $warnings = [];
-
-        if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
-            $user_id = Authenticate::getUserId();
-            $article = Database::articles()->queryById($article_id);
-            $article->updateFields($article_name, $location, $exp_date_str, $comments);
-
-            if (Database::articles()->update($article)) {
-                Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article_id]);
-                return RequestManager::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
-            }
-            return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
-        }
-        Logging::debug('warnings-update', ['warnings' => $warnings]);
-        return RequestManager::issueWarnings($json, $warnings);
-    }
-
-    /**
-     * Validate form inputs before using it to add/update article.
-     * 
-     * @param array &$string $article_name Article name by reference.
-     * @param string &$location Article's location within the school by reference.
-     * @param string &$exp_date Expiration date.
-     * @param string &$comments Comments to be attached to the reminder by reference.
-     * @param array $warnings Array filled with warning messages if validation is unsuccessfull by reference.
-     * @return bool True if validation is successful.
-     */
-    private static function validateArticleInputs(string &$article_name, string &$location, string &$exp_date, string &$comments, array &$warnings): bool
-    {
-        Logging::debug('validateArticleInputs');
-        if ($article_warning = Validation::validateArticleName($article_name)) {
-            $warnings['article-name'] = $article_warning;
-        }
-        Logging::debug('$warnings', ['w' => $warnings]);
-        if ($location_warning = Validation::validateLocation($location)) {
-            $warnings['location']  = $location_warning;
-        }
-        Logging::debug('$warnings', ['w' => $warnings]);
-        if ($exp_warning = Validation::validateExpirationDate($exp_date)) {
-            $warnings['expiration-date']  = $exp_warning;
-        }
-        Logging::debug('$warnings', ['w' => $warnings]);
-        if ($comments_warning = Validation::validateComments($comments)) {
-            $warnings['comments']  = $comments_warning;
-        }
-
-        return count($warnings) == 0;
     }
 
     private static function addNewUser($json): string
@@ -420,38 +332,45 @@ class RequestManager
 
     private static function submitLogin($json): string
     {
-        $email = $json['email'];
+        $login = $json['login'];
         $password = $json['password'];
+        $json['display_renew_btn'] = false;
         $warnings = [];
 
-        if ($warning_email = Validation::validateLoginEmail($email)) {
-            $warnings['email'] = $warning_email;
-        } else {
+        if ($login  === '') {
+            $warnings['login'] =  Warning::LOGIN_EMPTY;
+            $warnings['password'] =  Warning::LOGIN_EMPTY;
+            return RequestManager::issueWarnings($json, $warnings);
+        }
+
+        $email = filter_var($login, FILTER_VALIDATE_EMAIL);
+        $user = null;
+
+        if ($email) {
             $user = Database::users()->queryByEmail($email);
             if (!$user) {
-                $warnings['email'] = Warning::LOGIN_NOT_FOUND;
+                $warnings['login'] = Warning::LOGIN_EMAIL_NOT_FOUND;
             }
-        }
-
-        if ($warning_password = Validation::validateLoginPassword($password)) {
-            $warnings['password'] = $warning_password;
         } else {
-            if ($user->verifyPassword($password)) {
-                Authenticate::login($user);
-                return RequestManager::redirect(Route::HOME);
-            } else {
-                $warnings['password'] = Warning::LOGIN_INVALID_PASSWORD;
+            $user = Database::users()->queryByAlias($login);
+            if (!$user) {
+                $warnings['login'] = Warning::LOGIN_ALIAS_NOT_FOUND;
             }
         }
 
-        // if ($warning_email || $warning_password) {
-        //     return json_encode([
-        //         'email' => $email,
-        //         'validated' => false,
-        //         'warnings' => $warnings,
-        //     ]);
-        //     return RequestManager::issueWarnings($warnings);
-        // }
+        if ($password === '') {
+            $warnings['password'] = Warning::LOGIN_PASSWORD_EMPTY;
+        } else {
+            if ($user) {
+                $json['display_renew'] = true;
+                if ($user->verifyPassword($password)) {
+                    Authenticate::login($user);
+                    return RequestManager::redirect(Route::HOME);
+                } else {
+                    $warnings['password'] = Warning::LOGIN_INVALID_PASSWORD;
+                }
+            }
+        }
 
         return RequestManager::issueWarnings($json, $warnings);
     }
@@ -472,8 +391,8 @@ class RequestManager
         }
 
         //validate alias
-        if (strlen($alias) > 0 && strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            return RequestManager::issueWarnings($json, ['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT)]);
+        if (strlen($alias) > 0 && strlen($alias) < Settings::USER_ALIAS_MIN_LENGHT) {
+            return RequestManager::issueWarnings($json, ['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::USER_ALIAS_MIN_LENGHT)]);
         }
         $alias_arg = $alias ? $alias : $user->getLoginEmail();
         if ($existing_user = Database::users()->queryByAlias($alias_arg)) {
@@ -496,6 +415,30 @@ class RequestManager
             return RequestManager::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
         }
         return RequestManager::redirect(Route::PROFILE, AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
+    }
+
+    private static function updateArticle($json): string
+    {
+        $article_id  = intval($json['id']);
+        $article_name = $json['article-name'];
+        $location = $json['location'];
+        $exp_date_str = $json['expiration-date'];
+        $comments = $json['comments'];
+        $warnings = [];
+
+        if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
+            $user_id = Authenticate::getUserId();
+            $article = Database::articles()->queryById($article_id);
+            $article->updateFields($article_name, $location, $exp_date_str, $comments);
+
+            if (Database::articles()->update($article)) {
+                Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article_id]);
+                return RequestManager::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
+            }
+            return RequestManager::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
+        }
+        Logging::debug('warnings-update', ['warnings' => $warnings]);
+        return RequestManager::issueWarnings($json, $warnings);
     }
 
     private static function updateDelays($json): string
@@ -572,6 +515,37 @@ class RequestManager
         );
     }
 
+    private static function updateLocationPreset($json): string
+    {
+        $id = intval($json['id']);
+        $content = $json['content'];
+        $warnings = [];
+
+        $former_content = Database::locations()->queryById($id)->getContent();
+
+        // no change to content
+        if (strcasecmp($content, $former_content) == 0) {
+            return RequestManager::redirect(Route::LOCAL_PRESETS);
+        }
+
+        // strcasecmp must be placed before, otherwise validation will always be invalid and show LOCATION_PRESET_EXISTS warning.
+        if ($content_warning = Validation::validateLocationPreset($content)) {
+            $warnings['content'] = $content_warning;
+            return RequestManager::issueWarnings($json, $warnings);
+        }
+
+        if (Database::locations()->update($id, $content)) {
+
+            Logging::info(LogInfo::LOCATION_UPDATED, [
+                'user-id' => Authenticate::getUserId(),
+                'former-value' => $former_content,
+                'new-value' => $content
+            ]);
+            return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
+        }
+        return RequestManager::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
+    }
+
     private static function updatePassword($json): string
     {
         $user = Authenticate::getUser();
@@ -608,6 +582,38 @@ class RequestManager
             return RequestManager::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
         }
         return RequestManager::redirect(Route::PROFILE, AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
+    }
+
+    /**
+     * Validate form inputs before using it to add/update article.
+     * 
+     * @param array &$string $article_name Article name by reference.
+     * @param string &$location Article's location within the school by reference.
+     * @param string &$exp_date Expiration date.
+     * @param string &$comments Comments to be attached to the reminder by reference.
+     * @param array $warnings Array filled with warning messages if validation is unsuccessfull by reference.
+     * @return bool True if validation is successful.
+     */
+    private static function validateArticleInputs(string &$article_name, string &$location, string &$exp_date, string &$comments, array &$warnings): bool
+    {
+        Logging::debug('validateArticleInputs');
+        if ($article_warning = Validation::validateArticleName($article_name)) {
+            $warnings['article-name'] = $article_warning;
+        }
+        Logging::debug('$warnings', ['w' => $warnings]);
+        if ($location_warning = Validation::validateLocation($location)) {
+            $warnings['location']  = $location_warning;
+        }
+        Logging::debug('$warnings', ['w' => $warnings]);
+        if ($exp_warning = Validation::validateExpirationDate($exp_date)) {
+            $warnings['expiration-date']  = $exp_warning;
+        }
+        Logging::debug('$warnings', ['w' => $warnings]);
+        if ($comments_warning = Validation::validateComments($comments)) {
+            $warnings['comments']  = $comments_warning;
+        }
+
+        return count($warnings) == 0;
     }
 
     private static function validateNewUser($json): string
