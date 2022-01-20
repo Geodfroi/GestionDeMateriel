@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.19 ###
+// ## Joël Piguet - 2022.01.20 ###
 // ##############################
 
 const ART_TABLE = "/articlesTable";
@@ -20,28 +20,28 @@ function displayCarets() {
 
   // display carets
   if (orderby === "NAME_ASC") {
-    article_header.querySelector("span").classList.add("bi-caret-down");
+    article_header.querySelector(".icon").classList.add("bi-caret-down");
   } else if (orderby === "NAME_DESC") {
     console.log("caret up");
-    article_header.querySelector("span").classList.add("bi-caret-up");
+    article_header.querySelector(".icon").classList.add("bi-caret-up");
   }
 
   if (orderby === "LOCATION_ASC") {
-    location_header.querySelector("span").classList.add("bi-caret-down");
+    location_header.querySelector(".icon").classList.add("bi-caret-down");
   } else if (orderby === "LOCATION_DESC") {
-    location_header.querySelector("span").classList.add("bi-caret-up");
+    location_header.querySelector(".icon").classList.add("bi-caret-up");
   }
 
   if (orderby === "DELAY_ASC") {
-    date_header.querySelector("span").classList.add("bi-caret-up");
+    date_header.querySelector(".icon").classList.add("bi-caret-up");
   } else if (orderby === "DELAY_DESC") {
-    date_header.querySelector("span").classList.add("bi-caret-down");
+    date_header.querySelector(".icon").classList.add("bi-caret-down");
   }
 
   if (orderby === "OWNED_BY_DESC") {
-    owner_header.querySelector("span").classList.add("bi-caret-up");
+    owner_header.querySelector(".icon").classList.add("bi-caret-up");
   } else if (orderby === "OWNED_BY_ASC") {
-    owner_header.querySelector("span").classList.add("bi-caret-down");
+    owner_header.querySelector(".icon").classList.add("bi-caret-down");
   }
 }
 
@@ -65,7 +65,7 @@ function displayCountNavbar() {
 function displayFilter() {
   let filters = json_data.display_data.filters;
 
-  let str = "Filters";
+  let str = "Filtres";
   if (filters.name) {
     str += ` [article: ${filters.name}]`;
   }

@@ -255,7 +255,6 @@ function htmlEntities(str) {
 function retrieveRouteData() {
   let data_element = document.getElementById("php-data");
   let json_str = data_element.innerText;
-  console.log("json_str: " + json_str);
   return JSON.parse(json_str);
 }
 

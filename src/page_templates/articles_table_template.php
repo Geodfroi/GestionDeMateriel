@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.20 ###
 ##############################
 
 use app\constants\Requests;
@@ -12,7 +12,7 @@ use app\helpers\Util;
 
 <div class="container mt-3">
 
-    <div class="row">
+    <div class="row mx-auto">
         <a class="link-info text-decoration-none col-12 text-center fw-bold" href="" data-bs-toggle="modal" data-bs-target="#filter-modal" aria-label="filter">
             <i class="bi bi-filter" role="img" style="font-size: 1.5rem;"></i>
             <span id="filter-label">Filtres
@@ -20,16 +20,22 @@ use app\helpers\Util;
         </a>
     </div>
 
-    <div class="row">
-        <table id='table' class="table table-striped">
-
+    <div class="row mx-auto">
+        <table id='table' class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th id="article-header"><a class="text-decoration-none" href="#">Article <span></span></a>
-                    <th id="location-header"><a class="text-decoration-none" href="#">Location <span></span></a>
-                    <th id="per-date-header"><a class="text-decoration-none" href="#">Délai de péremption <span></span></a>
-                    <th id="owner-header"><a class="text-decoration-none" href="#">Créé par <span></span></a>
-                    <th>Actions</th>
+                    <th id="article-header"><a class="text-decoration-none" href="#">Article <span class="icon"></span></a></th>
+                    <th id="location-header"><a class="text-decoration-none" href="#">Location <span class="icon"></span></a></th>
+                    <th id="per-date-header">
+                        <a class="text-decoration-none" href="#">
+                            <span class="d-none d-md-inline">Délai de péremption </span>
+                            <span class="d-inline d-md-none">Péremption </span>
+                            <span class="icon"></span>
+                        </a>
+                    </th>
+                    <th class="d-none d-md-block" id="owner-header"><a class="text-decoration-none" href="#">Créé par <span class="icon"></span></a>
+                    </th>
+                    <th class="d-none d-md-block">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,9 +74,9 @@ use app\helpers\Util;
                         </td>
 
                         <!-- Créé par -->
-                        <td><?php echo $article->getOwner() ?></td>
+                        <td class="d-none d-md-block"><?php echo $article->getOwner() ?></td>
                         <!-- Actions -->
-                        <td>
+                        <td class="d-none d-md-block">
                             <a class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
 
                             <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
@@ -82,51 +88,54 @@ use app\helpers\Util;
     </div>
 
     <nav>
-        <ul id="display-nav" class="nav justify-content-center">
-            <li class="nav-item">
-                <!-- text-secondary text-decoration-underline -->
-                <a id="display-10" display-count="10" class="display-option nav-link px-0 active" href="<?php echo Route::ART_TABLE . '?display_count=10' ?>">10</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link px-0 text-primary">|</a>
-            </li>
-            </li>
-            <li class="nav-item">
-                <a id="display-20" display-count="20" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display_count=20' ?>">20</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link px-0 text-primary">|</a>
-            </li>
-            <li class="nav-item">
-                <a id="display-50" display-count="50" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display_count=50' ?>">50</a>
-            </li>
-        </ul>
-
-        <ul id="page-nav" class="pagination justify-content-end">
-
-            <li id="page-last" class="page-item">
-                <a href="#" class="page-link" aria-label="Previous" tabindex="-1">
-                    <span aria-hidden="true" class="bi-chevron-double-left">
-                    </span>
-                </a>
-            </li>
-
-            <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
-                <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
-                    <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link"><?php echo $n ?></a>
+        <div class="row mx-auto">
+            <div class="col-0 col-md-5"></div>
+            <ul id="display-nav" class="nav justify-content-md-center col-6 col-md-2">
+                <li class="nav-item">
+                    <!-- text-secondary text-decoration-underline -->
+                    <a id="display-10" display-count="10" class="display-option nav-link px-0 active" href="<?php echo Route::ART_TABLE . '?display_count=10' ?>">10</a>
                 </li>
-            <?php  } ?>
+                <li class="nav-item">
+                    <a class="nav-link px-0 text-primary">|</a>
+                </li>
+                </li>
+                <li class="nav-item">
+                    <a id="display-20" display-count="20" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display_count=20' ?>">20</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-0 text-primary">|</a>
+                </li>
+                <li class="nav-item">
+                    <a id="display-50" display-count="50" class="display-option nav-link px-0" href="<?php echo Route::ART_TABLE . '?display_count=50' ?>">50</a>
+                </li>
+            </ul>
 
-            <li id="page-next" class="page-item">
-                <a href="#" class="page-link" aria-label="Next" tabindex="-1">
-                    <span aria-hidden="true" class="bi-chevron-double-right"></span>
-                </a>
-            </li>
-        </ul>
+            <ul id="page-nav" class="pagination justify-content-end col-6 col-md-2 ms-auto">
+
+                <li id="page-last" class="page-item">
+                    <a href="#" class="page-link" aria-label="Previous" tabindex="-1">
+                        <span aria-hidden="true" class="bi-chevron-double-left">
+                        </span>
+                    </a>
+                </li>
+
+                <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
+                    <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
+                        <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link"><?php echo $n ?></a>
+                    </li>
+                <?php  } ?>
+
+                <li id="page-next" class="page-item">
+                    <a href="#" class="page-link" aria-label="Next" tabindex="-1">
+                        <span aria-hidden="true" class="bi-chevron-double-right"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
     </nav>
-    <div class="row">
-        <a href="<?php echo Route::ART_EDIT ?>" class="btn btn-primary">Ajouter une saisie</a>
+    <div class="row justify-content-center mx-auto">
+        <a href="<?php echo Route::ART_EDIT ?>" class="btn btn-primary col-12 col-md-6">Ajouter une saisie</a>
     </div>
 
 </div>

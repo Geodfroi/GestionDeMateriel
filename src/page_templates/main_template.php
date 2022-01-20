@@ -40,7 +40,8 @@ use app\helpers\Authenticate;
         <header>
             <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
                 <div class="container-fluid">
-                    <span class="navbar-brand me-4" href="#">HEdS - Gestionnaire d'inventaire</span>
+                    <span class="navbar-brand me-4 d-md-none" href="#">Gestionnaire d'inv.</span>
+                    <span class="navbar-brand me-4 d-none d-md-inline" href="#">HEdS - Gestionnaire d'inventaire</span>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>

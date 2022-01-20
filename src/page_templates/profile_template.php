@@ -1,27 +1,27 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.13 ###
+## Joël Piguet - 2022.01.20 ###
 ##############################
 
 ?>
 
 <div class="container">
-    <div class="row">
-        <span class="text-center text-info border border-primary border-2 rounded mt-4 mb-2 py-2 col-12 col-md-6 mx-auto"> <?php echo "Compte utilisateur : $login_email" ?></span>
+    <div class="row justify-content-center mx-auto mt-4 mb-2">
+        <span class="text-center text-info border border-primary border-2 rounded py-2 col-12 col-md-8"> <?php echo "Compte utilisateur : $login_email" ?></span>
     </div>
 
-    <div class="row" data-bs-toggle="tooltip" title="Par défaut, l'email est utilisé pour identifier l'utilisateur au sein de l'application. Un nom d'usager peut être défini de façon facultative." data-bs-placement="bottom">
-        <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto mt-4" data-bs-toggle="modal" data-bs-target="#alias-modal">Définir un nom d'usager.</a>
+    <div class="row justify-content-center mx-auto  mb-3" data-bs-toggle="tooltip" title="Par défaut, l'email est utilisé pour identifier l'utilisateur au sein de l'application. Un nom d'usager peut être défini de façon facultative." data-bs-placement="bottom">
+        <a class="btn btn-outline-primary col-12 col-md-8 mt-4" data-bs-toggle="modal" data-bs-target="#alias-modal">Définir un nom d'usager.</a>
     </div>
 
-    <div class="row"> <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" data-bs-toggle="modal" data-bs-target="#password-modal">Changer de mot de passe</a></div>
+    <div class="row justify-content-center mx-auto"> <a class="btn btn-outline-primary mb-3 col-12 col-md-8" data-bs-toggle="modal" data-bs-target="#password-modal">Changer de mot de passe</a></div>
 
-    <div class="row" data-bs-toggle="tooltip" title="Il n'est pas possible de changer l'adresse de login, mais une adresse de contact supplémentaire peut être ajoutée." data-bs-placement="bottom">
-        <a class=" btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" data-bs-toggle="modal" data-bs-target="#contact-modal">Ajouter une adresse de contact</a>
+    <div class="row justify-content-center mx-auto mb-3 " data-bs-toggle="tooltip" title="Il n'est pas possible de changer l'adresse de login, mais une adresse de contact supplémentaire peut être ajoutée." data-bs-placement="bottom">
+        <a class=" btn btn-outline-primary col-12 col-md-8 " data-bs-toggle="modal" data-bs-target="#contact-modal">Ajouter une adresse de contact</a>
     </div>
 
-    <div class="row" data-bs-toggle="tooltip" title="Par défault, l'application envoie un e-mail de rappel une première fois 2 semaines  avant qu'un article arrive à péremption, puis une nouvelle fois trois jours avant." data-bs-placement="bottom">
-        <a class="btn btn-outline-primary mb-3 col-12 col-md-6 mx-auto" data-bs-toggle="modal" data-bs-target="#delay-modal">Modifier le délai de contact</a>
+    <div class="row justify-content-center mx-auto mb-3  " data-bs-toggle="tooltip" title="Par défault, l'application envoie un e-mail de rappel une première fois 2 semaines  avant qu'un article arrive à péremption, puis une nouvelle fois trois jours avant." data-bs-placement="bottom">
+        <a class="btn btn-outline-primary col-12 col-md-8" data-bs-toggle="modal" data-bs-target="#delay-modal">Modifier le délai de contact</a>
     </div>
 </div>
 

@@ -8,12 +8,10 @@
 <div class="container">
 </div>
 
-<br><br><br><br>
+<br><br>
 <div>
     <div>TODO::</div>
     <br>
-    <div>Set logs with date, efface older.</div>
-    <div>Remove old logs ?</div>
     <div>Bug with expiration date before filter in sqlite</div>
     <div>ADMIN - access user contact posts.</div>
     <div>CONTACT: create contact page</div>

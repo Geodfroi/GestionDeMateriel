@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.20 ###
 ##############################
 
 use app\constants\Requests;
@@ -10,14 +10,18 @@ use app\constants\Route;
 
 <div class="container mt-3">
 
-    <div class="row col-12">
+    <div class="row justify-content-center d-md-none mb-1">
+        <label class="text-center h4 ">Utilisateurs</label>
+    </div>
+
+    <div class="row mx-auto">
         <table id='table' class="table table-striped table-bordered align-middle">
             <thead>
                 <tr>
-                    <th id="email-header"><a class="text-decoration-none" href="#">E-mail <span></span></a>
-                    <th id="creation-header"><a class="text-decoration-none" href="#">Date de création <span></span></a>
-                    <th id="last-login-header"><a class="text-decoration-none" href="#">Dernière connection <span></span></a>
-                    <th>Actions</th>
+                    <th scope="col" class="row-3" id="email-header"><a class="text-decoration-none" href="#">E-mail <span></span></a>
+                    <th scope="col" class="row-3" id="creation-header"><a class="text-decoration-none" href="#">Date de création <span></span></a>
+                    <th scope="col" class="row-3" id="last-login-header"><a class="text-decoration-none" href="#">Dernière connection <span></span></a>
+                    <th scope="col" class="row-3">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,7 +32,7 @@ use app\constants\Route;
                         <td>
                             <?php echo $user->getAlias(); ?>
                             <?php if ($user->isAdmin()) { ?>
-                                <i class="bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
+                                <i class=" bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
                             <?php } ?>
                         </td>
                         <!-- creation -->
@@ -73,8 +77,8 @@ use app\constants\Route;
         </ul>
     </nav>
 
-    <div class="row">
-        <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary">Ajouter un utilisateur</a>
+    <div class="row-12">
+        <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary col-12 mx-auto">Ajouter un utilisateur</a>
     </div>
 </div>
 

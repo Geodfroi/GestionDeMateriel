@@ -25,7 +25,7 @@ class Settings
      * Used as hyperlink in emails; must be set to proper url once the project is online. 
      */
     const APP_URL = '';
-    const LAST_MODIFICATION = '19 janvier 2022';
+    const LAST_MODIFICATION = '20 janvier 2022';
 
     /**
      * Time until alert is dismissed in milliseconds.

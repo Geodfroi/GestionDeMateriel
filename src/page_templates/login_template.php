@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.20 ###
 ##############################
 
 use app\constants\Requests;
@@ -8,11 +8,12 @@ use app\constants\Requests;
 ?>
 
 <div class="container">
-
-    <div class="row-12 justify-content-center">
-        <div class="col-6 mx-auto mb-5">
-            <form>
-                <label class="h4 m-4">Formulaire d'identification</label>
+    <form>
+        <div class="row justify-content-center">
+            <label class="text-center h4 m-4">Formulaire d'identification</label>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 mx-auto">
                 <div class="mb-3">
                     <label for="login" class="form-label">Adresse e-mail ou alias</label>
                     <input id="login" type="text" name='login' aria-describedby="id-descr" class="form-control">
@@ -27,10 +28,12 @@ use app\constants\Requests;
                         <div id="password-feedback" class='invalid-feedback'></div>
                     </div>
                 </div>
-                <button id="submit-btn" type="submit" class="btn btn-primary">Transmettre</button>
-            </form>
+            </div>
         </div>
-    </div>
+        <div class="row justify-content-center mt-2 mx-auto">
+            <button id="submit-btn" type="submit" class="btn btn-primary col-12 col-md-4">Transmettre</button>
+        </div>
+    </form>
 
     <div id="rewew-div" class="row-12 justify-content-center" hidden>
         <div class="col-6 mx-auto">
