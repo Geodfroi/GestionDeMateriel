@@ -12,6 +12,10 @@ use app\helpers\Util;
 
 <div class="container mt-3">
 
+    <div class="row justify-content-center mx-auto">
+        <a class="btn btn-primary col-12 d-md-none" href="<?php echo Route::ART_EDIT ?>">Ajouter une saisie</a>
+    </div>
+
     <div class="row mx-auto">
         <a class="link-info text-decoration-none col-12 text-center fw-bold" href="" data-bs-toggle="modal" data-bs-target="#filter-modal" aria-label="filter">
             <i class="bi bi-filter" role="img" style="font-size: 1.5rem;"></i>
@@ -20,22 +24,35 @@ use app\helpers\Util;
         </a>
     </div>
 
+
     <div class="row mx-auto">
         <table id='table' class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th id="article-header"><a class="text-decoration-none" href="#">Article <span class="icon"></span></a></th>
-                    <th id="location-header"><a class="text-decoration-none" href="#">Location <span class="icon"></span></a></th>
-                    <th id="per-date-header">
-                        <a class="text-decoration-none" href="#">
-                            <span class="d-none d-md-inline">Délai de péremption </span>
-                            <span class="d-inline d-md-none">Péremption </span>
+                    <th id="article-header">
+                        <a class="text-decoration-none" href="#">Article
+                            <span class="d-none d-md-inline">Article</span>
+                            <span class="d-inline d-md-none">Art. </span>
                             <span class="icon"></span>
                         </a>
                     </th>
-                    <th class="d-none d-md-block" id="owner-header"><a class="text-decoration-none" href="#">Créé par <span class="icon"></span></a>
+                    <th id="location-header">
+                        <a class="text-decoration-none" href="#">
+                            <span class="d-none d-md-inline">Location</span>
+                            <span class="d-inline d-md-none">Loc. </span>
+                            <span class="icon"></span>
+                        </a>
                     </th>
-                    <th class="d-none d-md-block">Actions</th>
+                    <th id="per-date-header">
+                        <a class="text-decoration-none" href="#">
+                            <span class="d-none d-md-inline">Délai de péremption </span>
+                            <span class="d-inline d-md-none">Date pér. </span>
+                            <span class="icon"></span>
+                        </a>
+                    </th>
+                    <th class="d-none d-md-table-cell" id="owner-header"><a class="text-decoration-none" href="#">Créé par <span class="icon"></span></a>
+                    </th>
+                    <th class="d-none d-md-table-cell">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,13 +61,13 @@ use app\helpers\Util;
                     $day_until = Util::getDaysUntil($article->getExpirationDate()); ?>
 
                     <?php if ($day_until <= 0) { ?>
-                        <tr class="bg-secondary">
+                        <tr class="table-row bg-secondary">
                         <?php } else { ?>
-                        <tr>
+                        <tr class="table-row">
                         <?php } ?>
 
                         <!-- Article -->
-                        <td><?php echo $article->getArticleName()  ?>
+                        <td id="cell-name"><?php echo $article->getArticleName()  ?>
                             <?php if (strlen($article->getComments()) > 0) { ?>
                                 <span class="bi-text-left text-info" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span>
                             <?php } ?>
@@ -74,9 +91,10 @@ use app\helpers\Util;
                         </td>
 
                         <!-- Créé par -->
-                        <td class="d-none d-md-block"><?php echo $article->getOwner() ?></td>
+                        <td class="d-none d-md-table-cell"><?php echo $article->getOwner() ?></td>
+
                         <!-- Actions -->
-                        <td class="d-none d-md-block">
+                        <td class="d-none d-md-table-cell">
                             <a class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
 
                             <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
@@ -134,8 +152,9 @@ use app\helpers\Util;
         </div>
 
     </nav>
+
     <div class="row justify-content-center mx-auto">
-        <a href="<?php echo Route::ART_EDIT ?>" class="btn btn-primary col-12 col-md-6">Ajouter une saisie</a>
+        <a class="btn btn-primary col-6 d-none d-md-block" href="<?php echo Route::ART_EDIT ?>">Ajouter une saisie</a>
     </div>
 
 </div>
@@ -210,6 +229,24 @@ use app\helpers\Util;
                     <button type="submit" class="btn btn-primary" name="filter">Filtrer</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="action-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="filter-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="h5 mx-auto">Modifier []</span>
+            </div>
+            <div class="modal-body">
+                <div class="row"><button type="button" class="btn btn-primary">Mettre à jour</button></div>
+                <div class="row mt-2"><button type="button" class="btn btn-warning">Effacer</button></div>
+                <div class="row mt-2"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button></div>
+            </div>
+
         </div>
     </div>
 </div>

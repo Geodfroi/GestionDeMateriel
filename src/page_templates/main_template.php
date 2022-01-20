@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.20 ###
 ##############################
 
 use app\constants\Requests;
@@ -122,6 +122,9 @@ use app\helpers\Authenticate;
     <!-- bootstrap javascript by CDN -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
 
+    <script src="/static/js/bs-detect-breakpoints.js"></script>
+
+    <!-- javascript utility functions -->
     <script src="/static/js/main.js"></script>
 
     <!-- bootstrap javascript to activate tooltips -->

@@ -212,3 +212,26 @@ displayCountNavbar();
 displayPageNavbar(ART_TABLE);
 setHeaderLinks();
 displayFilter();
+
+/**
+ * Show options modal when row is clicke if in mobile mode
+ *
+ * @param {*} _
+ * @param {*} row
+ */
+function selectRow(_, row) {
+  // var currentBreakpoint = getCurrentBreakpoint();
+  // if (currentBreakpoint.name == "xs" || currentBreakpoint.name == "sm") {
+  //   console.log("click: ");
+  // }
+  let article_name = row.querySelector("#cell-name").innerText;
+  console.log(article_name);
+
+  showModal("action-modal", (modal) => {
+    modal.querySelector(
+      ".modal-header span"
+    ).innerText = `Modifier [${article_name}]`;
+  });
+}
+
+hookBtnCollection("table-row", selectRow);

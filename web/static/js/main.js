@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.19 ###
+// ## Joël Piguet - 2022.01.20 ###
 // ##############################
 
 /**
@@ -216,8 +216,10 @@ function hookBtn(id, callback) {
  */
 function hookBtnCollection(class_name, callback) {
   let collection = document.getElementsByClassName(class_name);
+
   for (let index = 0; index < collection.length; index++) {
     const element = collection[index];
+    console.log(element);
     element.addEventListener("click", (e) => {
       e.preventDefault();
       callback(e, element);
@@ -317,9 +319,13 @@ function send(url, compileJSON = null) {
  *Open modal by id.
  *
  * @param {String} modal_id
+ * @param {*} callback To be executed before the modal is shown.
  */
-function showModal(modal_id) {
+function showModal(modal_id, callback = null) {
   let modal = document.getElementById(modal_id);
+  if (callback) {
+    callback(modal);
+  }
   new bootstrap.Modal(modal).show();
 }
 
