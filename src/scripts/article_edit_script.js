@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.19 ###
+// ## Joël Piguet - 2022.01.28 ###
 // ##############################
 
 /**
@@ -9,7 +9,12 @@ function customizeForm() {
   let article = json_data.article;
   if (article) {
     document.getElementById("form-label").innerText = "Modifier l'article.";
-    document.getElementById("submit-btn").innerText = "Modifier";
+
+    let btns = document.getElementsByClassName("submit-btn");
+    for (let index = 0; index < btns.length; index++) {
+      const btn = btns[index];
+      btn.innerText = "Modifier";
+    }
 
     displayInputValues(
       article,
@@ -22,12 +27,12 @@ function customizeForm() {
 }
 
 function getFormData() {
-  let json = getFormValues(
+  let json = getFormValues([
     "article-name",
     "expiration-date",
     "location",
-    "comments"
-  );
+    "comments",
+  ]);
   if (json_data.article) {
     json.id = json_data.article.id;
   }
@@ -44,7 +49,7 @@ function handleValidation(json) {
   );
 }
 
-hookBtn("submit-btn", () => {
+hookBtnCollection("submit-btn", () => {
   let article = json_data.article;
   let call_id = article ? "update-article" : "add-article";
 

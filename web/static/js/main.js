@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.20 ###
+// ## Joël Piguet - 2022.01.28 ###
 // ##############################
 
 /**
@@ -55,8 +55,6 @@ function clearWarnings() {
   for (let i = 0; i < arguments.length; i++) {
     let input_id = arguments[i];
     let input = document.getElementById(input_id);
-    // console.log("input_id: " + input_id);
-    // console.log("input: " + input);
 
     input.classList.remove("is-invalid");
     input.classList.remove("is-valid");
@@ -178,17 +176,37 @@ function getJSONWarning(json, key) {
   return false;
 }
 
+function getFormValue(id) {
+  let input = document.getElementById(id);
+  if (input) {
+    let type = input.getAttribute("type");
+    if (type == "checkbox") {
+      return input.checked ? true : null;
+    }
+    if (input.value) {
+      return input.value.trim();
+    }
+  }
+  return null;
+}
+
 /**
  * Return json from given keys
+ *
+ * @param {array} json_ids
+ * @param {array} use_alternate_id alternate ids if screen is small.
+ * @returns {string} json
  */
-function getFormValues() {
+function getFormValues(array, alternate_ids = null) {
+  let use_alternate_ids = alternate_ids && isSmallScreen();
   let json = {};
 
-  for (let i = 0; i < arguments.length; i++) {
-    let input_id = arguments[i];
-    let input = document.getElementById(input_id);
-    if (input) {
-      json[input_id] = input.value.trim();
+  for (let i = 0; i < array.length; i++) {
+    let json_id = array[i];
+    let input_id = use_alternate_ids ? alternate_ids[i] : json_id;
+    let val = getFormValue(input_id);
+    if (val) {
+      json[json_id] = val;
     }
   }
   return json;
@@ -214,14 +232,15 @@ function hookBtn(id, callback) {
  * @param {*} class_name
  * @param {*} callback
  */
-function hookBtnCollection(class_name, callback) {
+function hookBtnCollection(class_name, callback, preventDefault = true) {
   let collection = document.getElementsByClassName(class_name);
 
   for (let index = 0; index < collection.length; index++) {
     const element = collection[index];
-    console.log(element);
     element.addEventListener("click", (e) => {
-      e.preventDefault();
+      if (preventDefault) {
+        e.preventDefault();
+      }
       callback(e, element);
     });
   }
@@ -247,6 +266,11 @@ function htmlEntities(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function isSmallScreen() {
+  let currentBreakpoint = getCurrentBreakpoint();
+  return currentBreakpoint.name == "xs" || currentBreakpoint.name == "sm";
 }
 
 /**
@@ -295,23 +319,18 @@ function setValidTag(id, status) {
  * Use javascript fetch ajax method to send a GET request.
  *
  * @param {*} req request identifier.
- * @param {*} compileJSON function yielding the json data used to construct the GET request path.
+ * @param {*} json json data used to construct the GET request path.
  * @param {*} url server route; '/request' by default.
  */
-function send(url, compileJSON = null) {
+function getRequest(url, json = null) {
   let url_inst = new URL(url, window.location.origin);
-
-  console.log("url, " + url_inst);
-
-  let json = compileJSON == null ? {} : compileJSON();
-  console.log("json: " + json);
+  json = json != null ? json : {};
   let keys = Object.keys(json);
   for (let index = 0; index < keys.length; index++) {
     let key = keys[index];
     url_inst.searchParams.append(key, json[key]);
   }
 
-  console.log("url_inst: " + url_inst);
   fetch(url_inst);
 }
 

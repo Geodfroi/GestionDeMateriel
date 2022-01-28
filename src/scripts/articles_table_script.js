@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.20 ###
+// ## Joël Piguet - 2022.01.28 ###
 // ##############################
 
 const ART_TABLE = "/articlesTable";
@@ -90,11 +90,28 @@ function displayFilter() {
   document.getElementById("filter-label").innerText = str;
 }
 
+function fillDeleteModal(e, modal) {
+  if (e.relatedTarget) {
+    let button = e.relatedTarget;
+    let id = button.getAttribute("data-bs-id");
+    let article_name = button.getAttribute("data-bs-name");
+
+    modal.querySelector(
+      ".modal-body"
+    ).innerText = `Voulez-vous vraiment supprimer l'article [${article_name}] ?`;
+
+    const btn = modal.querySelector(".btn-primary");
+    let href_start = btn.getAttribute("href-start");
+    btn.setAttribute("href", href_start + id);
+  }
+}
+
 function fillFilterModal(_, modal) {
   let filters = json_data.display_data.filters;
 
   // name
   modal.querySelector("#filter-name").value = filters.name ? filters.name : "";
+
   // location
   modal.querySelector("#filter-location").value = filters.location
     ? filters.location
@@ -104,9 +121,9 @@ function fillFilterModal(_, modal) {
   let date_defined = filters.peremption_type && filters.peremption_value;
   let is_before = date_defined && filters.peremption_type === DATE_BEFORE;
 
-  modal.querySelector("#filter-date-btn").innerText = is_before
-    ? "Péremption avant le"
-    : "Péremption après le";
+  setFilterDropdownLabel(
+    is_before ? "Péremption avant le" : "Péremption après le"
+  );
 
   modal.querySelector("#filter-date-type").value = is_before
     ? DATE_BEFORE
@@ -168,42 +185,70 @@ function setHeaderLinks() {
     );
 }
 
-hookBtn("filter-date-clear", () => {
+/**
+ * Show options modal when row is clicked if screen is in mobile mode.
+ *
+ * @param {*} _
+ * @param {*} row
+ */
+function selectRow(_, row) {
+  if (!isSmallScreen()) {
+    return;
+  }
+
+  showModal("action-modal", (modal) => {
+    let article_name = row.querySelector("#cell-name").innerText;
+    let article_id = row
+      .querySelector("#delete-link")
+      .getAttribute("data-bs-id");
+    let update_ref = row.querySelector("#update-link").getAttribute("href");
+
+    modal.querySelector(
+      ".modal-header span"
+    ).innerText = `Modifier [${article_name}]`;
+
+    modal.querySelector("#update-btn").setAttribute("href", update_ref);
+    modal.querySelector("#delete-btn").setAttribute("data-bs-id", article_id);
+    modal
+      .querySelector("#delete-btn")
+      .setAttribute("data-bs-name", article_name);
+  });
+}
+
+/**
+ * Display date filter dropdown inner text.
+ *
+ * @param {*} label
+ */
+function setFilterDropdownLabel(label) {
+  let btns = document.getElementsByClassName("filter-date-dropdown");
+  for (let index = 0; index < btns.length; index++) {
+    const btn = btns[index];
+    btn.innerText = label;
+  }
+}
+
+hookBtnCollection("clear-filter", () => {
   document.getElementById("filter-date-val").value = "";
 });
 
 // set date filter btn inner text and fill date type input value.
-hookBtnCollection("filter-date-select", (_, element) => {
+hookBtnCollection("filter-dropdown-item", (_, element) => {
   //change btn label.
-  let btn = document.getElementById("filter-date-btn");
-  btn.innerText = element.innerText;
-
+  setFilterDropdownLabel(element.innerText);
   // set hidden post value.
   let date_input = document.getElementById("filter-date-type");
-  if (element.id === "filter-date-before") {
-    console.log("input before");
+  if (element.getAttribute("filter-value") === "filter-date-before") {
     date_input.value = DATE_BEFORE;
   } else {
     date_input.value = DATE_AFTER;
   }
 });
 
+hookBtnCollection("table-row", selectRow, false);
+
 //fill in delete article modal info when postRequested.
-hookModalShown("delete-modal", (e, modal) => {
-  if (e.relatedTarget) {
-    let button = e.relatedTarget;
-    let id = button.getAttribute("data-bs-id");
-    let article_name = button.getAttribute("data-bs-name");
-
-    modal.querySelector(
-      ".modal-body"
-    ).innerText = `Voulez-vous vraiment supprimer l'article [${article_name}] ?`;
-
-    const btn = modal.querySelector(".btn-primary");
-    let href_start = btn.getAttribute("href-start");
-    btn.setAttribute("href", href_start + id);
-  }
-});
+hookModalShown("delete-modal", fillDeleteModal);
 
 hookModalShown("filter-modal", fillFilterModal);
 
@@ -213,25 +258,20 @@ displayPageNavbar(ART_TABLE);
 setHeaderLinks();
 displayFilter();
 
-/**
- * Show options modal when row is clicke if in mobile mode
- *
- * @param {*} _
- * @param {*} row
- */
-function selectRow(_, row) {
-  // var currentBreakpoint = getCurrentBreakpoint();
-  // if (currentBreakpoint.name == "xs" || currentBreakpoint.name == "sm") {
-  //   console.log("click: ");
-  // }
-  let article_name = row.querySelector("#cell-name").innerText;
-  console.log(article_name);
+// function submitFilter(_, _) {
+//   let json = getFormValues(
+//     [
+//       "filter-name",
+//       "filter-location",
+//       "filter-date-val",
+//       "filter-date-type",
+//       "filter-show-expired",
+//     ],
+//     true
+//   );
+//   json.filter = true;
 
-  showModal("action-modal", (modal) => {
-    modal.querySelector(
-      ".modal-header span"
-    ).innerText = `Modifier [${article_name}]`;
-  });
-}
-
-hookBtnCollection("table-row", selectRow);
+//   getRequest(ART_TABLE, json);
+//   window.location.replace(ART_TABLE);
+// }
+// hookBtn("filter-submit", submitFilter);

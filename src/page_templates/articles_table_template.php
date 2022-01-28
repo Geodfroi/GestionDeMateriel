@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.20 ###
+## Joël Piguet - 2022.01.28 ###
 ##############################
 
 use app\constants\Requests;
@@ -23,7 +23,6 @@ use app\helpers\Util;
             </span>
         </a>
     </div>
-
 
     <div class="row mx-auto">
         <table id='table' class="table table-striped table-bordered">
@@ -95,9 +94,9 @@ use app\helpers\Util;
 
                         <!-- Actions -->
                         <td class="d-none d-md-table-cell">
-                            <a class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
+                            <a id="update-link" class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
 
-                            <a class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                            <a id="delete-link" class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
                         </tr>
                     <?php } ?>
@@ -188,40 +187,56 @@ use app\helpers\Util;
             </div>
             <form method="GET" action="<?php echo Route::ART_TABLE ?>">
                 <div class="modal-body">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col">
-                                <div class="input-group mb-1">
-                                    <span class="input-group-text col-md-3">Par nom d'article:</span>
-                                    <input id="filter-name" name="filter-name" class="form-control" type="text" aria-label="Filter-name">
-                                </div>
-
-                                <div class="input-group mb-1">
-                                    <span class="input-group-text col-md-3">Par emplacement:</span>
-                                    <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-name">
-                                </div>
-
-                                <div class="input-group mb-2">
-                                    <button id="filter-date-btn" class="btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
-                                    </button>
-                                    <input id="filter-date-type" name="filter-date-type" type="hidden">
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><span id="filter-date-before" class="dropdown-item filter-date-select">Péremption avant le</span></li>
-                                        <li><span id="filter-date-after" class="dropdown-item filter-date-select">Péremption après le</span></li>
-                                    </ul>
-                                    <input id="filter-date-val" name="filter-date-val" class="form-control" type="date">
-                                    <button id="filter-date-clear" class="btn btn-outline-primary">Effacer</button>
-                                </div>
-
-                                <div class="form-check form-switch mb-1">
-                                    <input id="filter-show-expired" name="filter-show-expired" class="form-check-input" type="checkbox" role="switch">
-                                    <label class="form-check-label" for="show-expired">Montrer également les articles arrivés à péremption.</label>
-                                </div>
-
-                            </div>
+                    <div class="mb-2">
+                        <label class="d-md-none" for="filter-name">Par nom d'article:</label>
+                        <div class="input-group">
+                            <span class="d-none d-md-block input-group-text col-md-3">Par nom d'article:</span>
+                            <input id="filter-name" name="filter-name" class="form-control" type="text">
                         </div>
                     </div>
+                    <div class="mb-2">
+                        <label class="d-md-none" for="filter-location">Par emplacement:</label>
+                        <div class="input-group mb-2">
+                            <span class="d-none d-md-block input-group-text col-md-3">Par emplacement:</span>
+                            <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-name">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <input id="filter-date-type" name="filter-date-type" type="hidden">
+
+                        <div class="d-md-none mb-1 row mx-auto ">
+                            <button class="filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>
+                                <li><span filter-value="filter-date-after" class="dropdown-item filter-dropdown-item">Péremption après le</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="input-group">
+                            <!-- <div class="d-none d-md-block"> -->
+                            <button class="d-none d-md-block filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>
+                                <li><span filter-value="filter-date-after" class="dropdown-item filter-dropdown-item">Péremption après le</span></li>
+                            </ul>
+                            <!-- </div> -->
+                            <input id="filter-date-val" name="filter-date-val" class="form-control" type="date">
+                            <button class="d-none d-md-block clear-filter btn btn-outline-primary">Effacer</button>
+                        </div>
+
+                        <div class="row mx-auto mt-1 d-md-none">
+                            <button class="clear-filter col-12 btn btn-outline-primary">Effacer la date</button>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input id="filter-show-expired" name="filter-show-expired" class="form-check-input" type="checkbox" role="switch">
+                        <label class="form-check-label" for="show-expired">Montrer également les articles arrivés à péremption.</label>
+                    </div>
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -242,9 +257,9 @@ use app\helpers\Util;
                 <span class="h5 mx-auto">Modifier []</span>
             </div>
             <div class="modal-body">
-                <div class="row"><button type="button" class="btn btn-primary">Mettre à jour</button></div>
-                <div class="row mt-2"><button type="button" class="btn btn-warning">Effacer</button></div>
-                <div class="row mt-2"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button></div>
+                <div class="row"><a id="update-btn" type="button" class="btn btn-primary">Mettre à jour</a></div>
+                <div class="row mt-2"><a id="delete-btn" type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#delete-modal">Effacer</a></div>
+                <div class="row mt-2"><a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</a></div>
             </div>
 
         </div>

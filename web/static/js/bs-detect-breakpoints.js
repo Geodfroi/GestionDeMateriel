@@ -116,10 +116,3 @@ const init = () => {
     }
   };
 };
-
-// export default {
-//   init,
-//   getBreakpoint,
-//   getCurrentBreakpoint,
-//   bootstrapDetectBreakpoint,
-// };

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.28 ###
 ##############################
 
 namespace app\helpers;
@@ -262,7 +262,7 @@ class RequestManager
 
     private static function addLocationPreset($json): string
     {
-        $content = $json['content'];
+        $content = isset($json['content']) ? $json['content'] : "";
         $warnings = [];
 
         if ($content_warning = Validation::validateLocationPreset($content)) {
@@ -283,10 +283,10 @@ class RequestManager
 
     private static function addArticle($json): string
     {
-        $article_name = $json['article-name'];
-        $location = $json['location'];
-        $exp_date_str = $json['expiration-date'];
-        $comments = $json['comments'];
+        $article_name = isset($json['article-name']) ? $json['article-name'] : "";
+        $location = isset($json['location']) ? $json['location'] : "";
+        $exp_date_str = isset($json['expiration-date']) ? $json['expiration-date'] : "";
+        $comments = isset($json['comments']) ? $json['comments'] : "";
         $warnings = [];
 
         if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
@@ -305,9 +305,9 @@ class RequestManager
 
     private static function addNewUser($json): string
     {
-        $login_email = $json['login-email'];
-        $password_plain = $json['password'];
-        $is_admin = $json['is-admin'];
+        $login_email = isset($json['login-email']) ? $json['login-email'] : "";
+        $password_plain = isset($json['password']) ? $json['password'] : "";
+        $is_admin = isset($json['is-admin']) ? $json['is-admin'] : "";
 
         $new_user = User::fromForm($login_email, $password_plain, $is_admin);
         $id = Database::users()->insert($new_user);
@@ -420,10 +420,10 @@ class RequestManager
     private static function updateArticle($json): string
     {
         $article_id  = intval($json['id']);
-        $article_name = $json['article-name'];
-        $location = $json['location'];
-        $exp_date_str = $json['expiration-date'];
-        $comments = $json['comments'];
+        $article_name = isset($json['article-name']) ? $json['article-name'] : "";
+        $location = isset($json['location']) ? $json['location'] : "";
+        $exp_date_str = isset($json['expiration-date']) ? $json['expiration-date'] : "";
+        $comments = isset($json['comments']) ? $json['comments'] : "";
         $warnings = [];
 
         if (RequestManager::validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {

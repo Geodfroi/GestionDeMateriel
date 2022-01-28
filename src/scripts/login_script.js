@@ -16,7 +16,7 @@ function callback(json) {
 }
 
 function compileData() {
-  return getFormValues("login", "password");
+  return getFormValues(["login", "password"]);
 }
 
 function showPassword(_, btn) {

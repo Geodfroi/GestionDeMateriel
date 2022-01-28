@@ -3,7 +3,7 @@
 // ##############################
 
 function getFormData() {
-  let json = getFormValues("login-email", "password");
+  let json = getFormValues(["login-email", "password"]);
   json["is-admin"] = getCheckboxValue("is-admin");
   return json;
 }

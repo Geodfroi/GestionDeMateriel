@@ -13,7 +13,7 @@ use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
-// use app\helpers\Logging;
+use app\helpers\Logging;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list.
@@ -59,6 +59,8 @@ class ArticleTable extends BaseRoute
 
         if (isset($_GET['filter'])) {
 
+            logging::debug('filter', $_GET);
+
             if ($_GET['filter'] === 'clearAll') {
                 $display_data['filters'] = [];
                 $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
@@ -92,7 +94,6 @@ class ArticleTable extends BaseRoute
             } else {
                 unset($display_data['filters'][ArtFilter::SHOW_EXPIRED]);
             }
-            goto end;
         }
 
         end:
@@ -114,6 +115,7 @@ class ArticleTable extends BaseRoute
         return $this->renderTemplate([
             'articles' =>  $articles,
             'display_data' => $display_data,
+            'page' =>   $display_data['page'],
             'page_count' => $page_count,
         ]);
     }

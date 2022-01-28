@@ -36,7 +36,7 @@ hookBtn("alias-submit", () => {
   call(
     "update-alias",
     (json) => displayWarnings(json, "alias"),
-    () => getFormValues("alias")
+    () => getFormValues(["alias"])
   );
 });
 
@@ -45,7 +45,7 @@ hookBtn("password-submit", () => {
   call(
     "update-password",
     (json) => displayWarnings(json, "password", "password-repeat"),
-    () => getFormValues("password", "password-repeat")
+    () => getFormValues(["password", "password-repeat"])
   );
 });
 
@@ -54,7 +54,7 @@ hookBtn("contact-submit", () => {
   call(
     "update-contact-email",
     (json) => displayWarnings(json, "contact-email"),
-    () => getFormValues("contact-email")
+    () => getFormValues(["contact-email"])
   );
 });
 
