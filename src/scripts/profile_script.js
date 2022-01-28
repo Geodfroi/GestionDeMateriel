@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.16 ###
+// ## Joël Piguet - 2022.01.28 ###
 // ##############################
 
 PROFILE_ROUTE = "/profile";
@@ -94,7 +94,7 @@ hookModalShown("contact-modal", () => {
 hookModalShown("delay-modal", () => {
   call("get-user", (json) => {
     clearWarnings("delay-3", "delay-7", "delay-14", "delay-30");
-    let json_delays = json.contact_delay.split("-");
+    let json_delays = json["contact-delay"].split("-");
     for (let index = 0; index < 4; index++) {
       const key = delays[index];
       let input_id = "delay-" + key;

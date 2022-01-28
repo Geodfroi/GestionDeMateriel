@@ -270,7 +270,11 @@ function htmlEntities(str) {
 
 function isSmallScreen() {
   let currentBreakpoint = getCurrentBreakpoint();
-  return currentBreakpoint.name == "xs" || currentBreakpoint.name == "sm";
+  return (
+    currentBreakpoint.name == "xs" ||
+    currentBreakpoint.name == "sm" ||
+    currentBreakpoint == "md"
+  );
 }
 
 /**

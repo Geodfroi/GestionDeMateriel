@@ -13,7 +13,7 @@ use app\helpers\Util;
 <div class="container mt-3">
 
     <div class="row justify-content-center mx-auto">
-        <a class="btn btn-primary col-12 d-md-none" href="<?php echo Route::ART_EDIT ?>">Ajouter une saisie</a>
+        <a class="btn btn-primary col-12 d-lg-none" href="<?php echo Route::ART_EDIT ?>">Ajouter une saisie</a>
     </div>
 
     <div class="row mx-auto">
@@ -30,28 +30,28 @@ use app\helpers\Util;
                 <tr>
                     <th id="article-header">
                         <a class="text-decoration-none" href="#">Article
-                            <span class="d-none d-md-inline">Article</span>
-                            <span class="d-inline d-md-none">Art. </span>
+                            <span class="d-none d-lg-inline">Article</span>
+                            <span class="d-inline d-lg-none">Art. </span>
                             <span class="icon"></span>
                         </a>
                     </th>
                     <th id="location-header">
                         <a class="text-decoration-none" href="#">
-                            <span class="d-none d-md-inline">Location</span>
-                            <span class="d-inline d-md-none">Loc. </span>
+                            <span class="d-none d-lg-inline">Location</span>
+                            <span class="d-inline d-lg-none">Loc. </span>
                             <span class="icon"></span>
                         </a>
                     </th>
                     <th id="per-date-header">
                         <a class="text-decoration-none" href="#">
-                            <span class="d-none d-md-inline">Délai de péremption </span>
-                            <span class="d-inline d-md-none">Date pér. </span>
+                            <span class="d-none d-lg-inline">Délai de péremption </span>
+                            <span class="d-inline d-lg-none">Date pér. </span>
                             <span class="icon"></span>
                         </a>
                     </th>
-                    <th class="d-none d-md-table-cell" id="owner-header"><a class="text-decoration-none" href="#">Créé par <span class="icon"></span></a>
+                    <th class="d-none d-lg-table-cell" id="owner-header"><a class="text-decoration-none" href="#">Créé par <span class="icon"></span></a>
                     </th>
-                    <th class="d-none d-md-table-cell">Actions</th>
+                    <th class="d-none d-lg-table-cell">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -90,10 +90,10 @@ use app\helpers\Util;
                         </td>
 
                         <!-- Créé par -->
-                        <td class="d-none d-md-table-cell"><?php echo $article->getOwner() ?></td>
+                        <td class="d-none d-lg-table-cell"><?php echo $article->getOwner() ?></td>
 
                         <!-- Actions -->
-                        <td class="d-none d-md-table-cell">
+                        <td class="d-none d-lg-table-cell">
                             <a id="update-link" class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
 
                             <a id="delete-link" class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
@@ -106,8 +106,8 @@ use app\helpers\Util;
 
     <nav>
         <div class="row mx-auto">
-            <div class="col-0 col-md-5"></div>
-            <ul id="display-nav" class="nav justify-content-md-center col-6 col-md-2">
+            <div class="col-0 col-lg-5"></div>
+            <ul id="display-nav" class="nav justify-content-lg-center col-6 col-lg-2">
                 <li class="nav-item">
                     <!-- text-secondary text-decoration-underline -->
                     <a id="display-10" display-count="10" class="display-option nav-link px-0 active" href="<?php echo Route::ART_TABLE . '?display_count=10' ?>">10</a>
@@ -127,7 +127,7 @@ use app\helpers\Util;
                 </li>
             </ul>
 
-            <ul id="page-nav" class="pagination justify-content-end col-6 col-md-2 ms-auto">
+            <ul id="page-nav" class="pagination justify-content-end col-6 col-lg-2 ms-auto">
 
                 <li id="page-last" class="page-item">
                     <a href="#" class="page-link" aria-label="Previous" tabindex="-1">
@@ -153,7 +153,7 @@ use app\helpers\Util;
     </nav>
 
     <div class="row justify-content-center mx-auto">
-        <a class="btn btn-primary col-6 d-none d-md-block" href="<?php echo Route::ART_EDIT ?>">Ajouter une saisie</a>
+        <a class="btn btn-primary col-6 d-none d-lg-block" href="<?php echo Route::ART_EDIT ?>">Ajouter une saisie</a>
     </div>
 
 </div>
@@ -188,24 +188,24 @@ use app\helpers\Util;
             <form method="GET" action="<?php echo Route::ART_TABLE ?>">
                 <div class="modal-body">
                     <div class="mb-2">
-                        <label class="d-md-none" for="filter-name">Par nom d'article:</label>
+                        <label class="d-lg-none" for="filter-name">Par nom d'article:</label>
                         <div class="input-group">
-                            <span class="d-none d-md-block input-group-text col-md-3">Par nom d'article:</span>
+                            <span class="d-none d-lg-block input-group-text col-lg-3">Par nom d'article:</span>
                             <input id="filter-name" name="filter-name" class="form-control" type="text">
                         </div>
                     </div>
                     <div class="mb-2">
-                        <label class="d-md-none" for="filter-location">Par emplacement:</label>
+                        <label class="d-lg-none" for="filter-location">Par emplacement:</label>
                         <div class="input-group mb-2">
-                            <span class="d-none d-md-block input-group-text col-md-3">Par emplacement:</span>
+                            <span class="d-none d-lg-block input-group-text col-lg-3">Par emplacement:</span>
                             <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-name">
                         </div>
                     </div>
                     <div class="mb-2">
                         <input id="filter-date-type" name="filter-date-type" type="hidden">
 
-                        <div class="d-md-none mb-1 row mx-auto ">
-                            <button class="filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
+                        <div class="d-lg-none mb-1 row mx-auto ">
+                            <button class="filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>
@@ -214,8 +214,8 @@ use app\helpers\Util;
                         </div>
 
                         <div class="input-group">
-                            <!-- <div class="d-none d-md-block"> -->
-                            <button class="d-none d-md-block filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-md-3" aria-expanded="false" data-bs-toggle="dropdown">
+                            <!-- <div class="d-none d-lg-block"> -->
+                            <button class="d-none d-lg-block filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>
@@ -223,10 +223,10 @@ use app\helpers\Util;
                             </ul>
                             <!-- </div> -->
                             <input id="filter-date-val" name="filter-date-val" class="form-control" type="date">
-                            <button class="d-none d-md-block clear-filter btn btn-outline-primary">Effacer</button>
+                            <button class="d-none d-lg-block clear-filter btn btn-outline-primary">Effacer</button>
                         </div>
 
-                        <div class="row mx-auto mt-1 d-md-none">
+                        <div class="row mx-auto mt-1 d-lg-none">
                             <button class="clear-filter col-12 btn btn-outline-primary">Effacer la date</button>
                         </div>
                     </div>
@@ -235,14 +235,14 @@ use app\helpers\Util;
                         <input id="filter-show-expired" name="filter-show-expired" class="form-check-input" type="checkbox" role="switch">
                         <label class="form-check-label" for="show-expired">Montrer également les articles arrivés à péremption.</label>
                     </div>
-
-
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <a href="<?php echo Route::ART_TABLE . "?filter=clearAll" ?>" id="clear-filters-btn" type="button" class="btn btn-light">Enlever les filtres</a>
-                    <button type="submit" class="btn btn-primary" name="filter">Filtrer</button>
+                    <button type="button" class="btn btn-secondary col-12 col-lg-2" data-bs-dismiss="modal">Annuler</button>
+                    <a class="btn btn-light col-12 col-lg-3" href="<?php echo Route::ART_TABLE . "?filter=clearAll" ?>" id="clear-filters-btn" type="button">Enlever tous les filtres</a>
+                    <button type="submit" class="btn btn-primary col-12 col-lg-2" name="filter">Filtrer</button>
                 </div>
+
             </form>
         </div>
     </div>

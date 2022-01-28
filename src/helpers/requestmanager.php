@@ -332,8 +332,8 @@ class RequestManager
 
     private static function submitLogin($json): string
     {
-        $login = $json['login'];
-        $password = $json['password'];
+        $login = isset($json['login']) ? $json['login'] : "";
+        $password = isset($json['password']) ? $json['password'] : "";
         $json['display_renew_btn'] = false;
         $warnings = [];
 
@@ -383,7 +383,7 @@ class RequestManager
         }
 
         $user_id = $user->getId();
-        $alias = $json["alias"];
+        $alias = isset($json["alias"]) ? $json["alias"] : "";
 
         // alias was not actually changed
         if ($alias === $user->getAlias()) {
@@ -449,7 +449,7 @@ class RequestManager
         }
 
         $user_id = $user->getId();
-        $delay = $json["delay"];
+        $delay = isset($json["delay"]) ?  $json["delay"] : "";
 
         if (!$delay) {
             Logging::debug('warning', ['delay' => Warning::DELAYS_NONE]);
@@ -480,8 +480,7 @@ class RequestManager
         }
 
         $user_id = $user->getId();
-        $contact_email = $json["contact-email"];
-
+        $contact_email = isset($json["contact-email"]) ? $json["contact-email"] : "";
 
         if ($warning = Validation::validateContactEmail($contact_email)) {
             return RequestManager::issueWarnings($json, ['contact-email' => $warning]);
@@ -518,7 +517,7 @@ class RequestManager
     private static function updateLocationPreset($json): string
     {
         $id = intval($json['id']);
-        $content = $json['content'];
+        $content = isset($json['content']) ? $json['content'] : "";
         $warnings = [];
 
         $former_content = Database::locations()->queryById($id)->getContent();
@@ -553,8 +552,8 @@ class RequestManager
             return RequestManager::redirect(Route::HOME);
         }
         $user_id = $user->getId();
-        $password_plain = $json["password"];
-        $password_repeat = $json["password-repeat"];
+        $password_plain = isset($json["password"]) ? $json["password"] : "";
+        $password_repeat = isset($json["password-repeat"]) ? $json["password-repeat"] : "";
         $warnings = [];
 
         $password_warning = Validation::validateNewPassword($password_plain);
@@ -618,8 +617,8 @@ class RequestManager
 
     private static function validateNewUser($json): string
     {
-        $login_email = $json['login-email'];
-        $password_plain = $json['password'];
+        $login_email = isset($json['login-email']) ? $json['login-email'] : "";
+        $password_plain = isset($json['password']) ? $json['password'] : "";
 
         $warnings = [];
 

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.28 ###
 ##############################
 
 namespace app\routes;
@@ -31,15 +31,21 @@ class ArticleTable extends BaseRoute
             $this->requestRedirect(Route::LOGIN);
         }
 
-        if (isset($_SESSION[Session::ARTICLES_DISPLAY])) {
-            $display_data = json_decode($_SESSION[Session::ARTICLES_DISPLAY], true);
-        } else {
-            $display_data = [
-                'page' => 1,
-                'display_count' => Settings::TABLE_DISPLAY_COUNT,
-                'filters' => [],
-                'orderby' => OrderBy::DELAY_ASC,
-            ];
+        $display_data = isset($_SESSION[Session::ARTICLES_DISPLAY]) ? json_decode($_SESSION[Session::ARTICLES_DISPLAY], true) : [];
+        logging::debug('display_data', $display_data);
+
+        if (!isset($display_data['page'])) {
+            $display_data['page'] = 1;
+        }
+        if (!isset($display_data['display_count'])) {
+            $display_data['display_count'] =
+                Settings::TABLE_DISPLAY_COUNT;
+        }
+        if (!isset($display_data['filters'])) {
+            $display_data['filters'] = [];
+        }
+        if (!isset($display_data['orderby'])) {
+            $display_data['orderby'] = OrderBy::DELAY_ASC;
         }
 
         if (isset($_GET['display_count'])) {
@@ -59,10 +65,10 @@ class ArticleTable extends BaseRoute
 
         if (isset($_GET['filter'])) {
 
-            logging::debug('filter', $_GET);
+            // logging::debug('filter', $_GET);
+            $display_data['filters'] = [];
 
             if ($_GET['filter'] === 'clearAll') {
-                $display_data['filters'] = [];
                 $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
                 return $this->requestRedirect(Route::ART_TABLE);
             }
@@ -98,6 +104,7 @@ class ArticleTable extends BaseRoute
 
         end:
 
+        // logging::debug('display_data2', $display_data);
         $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
 
         $display_count = $display_data['display_count'] ?? 20;
