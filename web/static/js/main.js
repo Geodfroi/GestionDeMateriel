@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.28 ###
+// ## Joël Piguet - 2022.01.30 ###
 // ##############################
 
 /**
@@ -210,6 +210,25 @@ function getFormValues(array, alternate_ids = null) {
     }
   }
   return json;
+}
+
+/**
+ * Get attribute of first parent element owning that attribute.
+ *
+ * @param {*} element
+ * @param {*} attribute
+ * @returns attribute value.
+ */
+function getParentAttribute(element, attribute) {
+  const parent = element.parentElement;
+  if (parent) {
+    let attr = parent.getAttribute(attribute);
+    if (attr) {
+      return attr;
+    }
+    return getParentAttribute(parent, attribute);
+  }
+  return null;
 }
 
 /**

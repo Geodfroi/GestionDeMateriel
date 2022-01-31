@@ -32,8 +32,7 @@ class ArticleTable extends BaseRoute
         }
 
         $display_data = isset($_SESSION[Session::ARTICLES_DISPLAY]) ? json_decode($_SESSION[Session::ARTICLES_DISPLAY], true) : [];
-        logging::debug('display_data', $display_data);
-
+        // logging::debug('display_data', $display_data);
         if (!isset($display_data['page'])) {
             $display_data['page'] = 1;
         }

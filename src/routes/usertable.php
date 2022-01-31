@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.01.30 ###
 ##############################
 
 namespace app\routes;
@@ -29,13 +29,12 @@ class UserTable extends BaseRoute
             $this->requestRedirect(Route::LOGIN);
         }
 
-        if (isset($_SESSION[Session::USERS_DISPLAY])) {
-            $display_data = json_decode($_SESSION[Session::USERS_DISPLAY], true);
-        } else {
-            $display_data = [
-                'page' => 1,
-                'orderby' => OrderBy::EMAIL_ASC,
-            ];
+        $display_data = isset($_SESSION[Session::USERS_DISPLAY]) ? json_decode($_SESSION[Session::USERS_DISPLAY], true) : [];
+        if (!isset($display_data['page'])) {
+            $display_data['page'] = 1;
+        }
+        if (!isset($display_data['orderby'])) {
+            $display_data['orderby'] = OrderBy::EMAIL_ASC;
         }
 
         if (isset($_GET['orderby'])) {
@@ -46,7 +45,7 @@ class UserTable extends BaseRoute
             $display_data['page'] = intval($_GET['page']);
         }
 
-        $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
+        $_SESSION[Session::USERS_DISPLAY] = json_encode($display_data);
 
         $display_count = Settings::TABLE_DISPLAY_COUNT;
         $item_count = Database::users()->queryCount(false);

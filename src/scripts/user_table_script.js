@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.17 ###
+// ## Joël Piguet - 2022.01.30 ###
 // ##############################
 
 const USERS_TABLE = "/usersTable";
@@ -15,21 +15,21 @@ function displayCarets() {
   const login_header = document.getElementById("last-login-header");
 
   if (orderby === "EMAIL_DESC") {
-    email_header.querySelector("span").classList.add("bi-caret-up");
+    email_header.querySelector(".icon").classList.add("bi-caret-up");
   } else if (orderby === "EMAIL_ASC") {
-    email_header.querySelector("span").classList.add("bi-caret-down");
+    email_header.querySelector(".icon").classList.add("bi-caret-down");
   }
 
   if (orderby === "CREATED_DESC") {
-    creation_header.querySelector("span").classList.add("bi-caret-down");
+    creation_header.querySelector(".icon").classList.add("bi-caret-down");
   } else if (orderby === "CREATED_ASC") {
-    creation_header.querySelector("span").classList.add("bi-caret-up");
+    creation_header.querySelector(".icon").classList.add("bi-caret-up");
   }
 
   if (orderby === "LOGIN_DESC") {
-    login_header.querySelector("span").classList.add("bi-caret-down");
+    login_header.querySelector(".icon").classList.add("bi-caret-down");
   } else if (orderby === "LOGIN_ASC") {
-    login_header.querySelector("span").classList.add("bi-caret-up");
+    login_header.querySelector(".icon").classList.add("bi-caret-up");
   }
 }
 
@@ -71,12 +71,45 @@ function setHeaderLinks() {
     );
 }
 
+/**
+ * Show options modal when row is clicked if screen is in mobile mode.
+ *
+ * @param {*} _
+ * @param {*} row
+ */
+function selectRow(_, row) {
+  if (!isSmallScreen()) {
+    return;
+  }
+  let is_admin = row.getAttribute("data-bs-admin");
+  if (is_admin) {
+    return;
+  }
+
+  showModal("action-modal", (modal) => {
+    let user_id = row.getAttribute("data-bs-id");
+    let user_email = row.getAttribute("data-bs-email");
+
+    if (is_admin) {
+      close;
+    }
+
+    modal.setAttribute("data-bs-id", user_id);
+    modal.setAttribute("data-bs-email", user_email);
+
+    modal.querySelector(
+      ".modal-header span"
+    ).innerText = `Intéragir avec [${user_email}]`;
+  });
+}
+
+hookBtnCollection("table-row", selectRow, false);
+
 //fill in delete modal info when called.
 hookModalShown("delete-modal", (e, modal) => {
   if (e.relatedTarget) {
-    let button = e.relatedTarget;
-    let id = button.getAttribute("data-bs-id");
-    let email = button.getAttribute("data-bs-email");
+    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
+    let email = getParentAttribute(e.relatedTarget, "data-bs-email");
 
     modal.querySelector(
       ".modal-body"
@@ -91,9 +124,8 @@ hookModalShown("delete-modal", (e, modal) => {
 //fill in renew password modal info when called.
 hookModalShown("renew-modal", (e, modal) => {
   if (e.relatedTarget) {
-    let button = e.relatedTarget;
-    let id = button.getAttribute("data-bs-id");
-    let email = button.getAttribute("data-bs-email");
+    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
+    let email = getParentAttribute(e.relatedTarget, "data-bs-email");
 
     modal.querySelector(
       ".modal-body"

@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.20 ###
+## Joël Piguet - 2022.01.30 ###
 ##############################
 
 use app\constants\Requests;
@@ -14,37 +14,55 @@ use app\constants\Route;
         <label class="text-center h4 ">Utilisateurs</label>
     </div>
 
+    <div class="row justify-content-center mx-auto mb-3">
+        <a class="btn btn-primary col-12 mx-auto d-lg-none" href="<?php echo Route::USER_EDIT ?>">Ajouter un utilisateur</a>
+    </div>
+
     <div class="row mx-auto">
         <table id='table' class="table table-striped table-bordered align-middle">
             <thead>
                 <tr>
-                    <th scope="col" class="row-3" id="email-header"><a class="text-decoration-none" href="#">E-mail <span></span></a>
-                    <th scope="col" class="row-3" id="creation-header"><a class="text-decoration-none" href="#">Date de création <span></span></a>
-                    <th scope="col" class="row-3" id="last-login-header"><a class="text-decoration-none" href="#">Dernière connection <span></span></a>
-                    <th scope="col" class="row-3">Actions</th>
+                    <th scope="col" id="email-header">
+                        <a class="text-decoration-none" href="#">
+                            <span>Alias</span>
+                            <span class="icon"></span>
+                        </a>
+                    <th class="d-none d-lg-table-cell" scope="col" id="creation-header">
+                        <a class="text-decoration-none" href="#">
+                            <span>Date de création</span>
+                            <span class="icon"></span>
+                        </a>
+                    <th scope="col" id="last-login-header">
+                        <a class="text-decoration-none" href="#">
+                            <span class="d-none d-lg-inline">Dernière connection</span>
+                            <span class="d-inline d-lg-none">Dern. conn.</span>
+                            <span class="icon"></span>
+                        </a>
+                    <th scope="col" class="d-none d-lg-table-cell">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php for ($n = 0; $n < count($users); $n++) {
                     $user = $users[$n]; ?>
-                    <tr>
-                        <!-- email -->
+                    <tr class="table-row " data-bs-admin="<?php echo $user->isAdmin(); ?>" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>">
+                        <!-- alias -->
                         <td>
                             <?php echo $user->getAlias(); ?>
-                            <?php if ($user->isAdmin()) { ?>
-                                <i class=" bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
+                            <?php if ($user->isAdmin()) { ?> <i class=" bi bi-hdd" aria-label="is-admin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="bottom"></i>
                             <?php } ?>
+
                         </td>
                         <!-- creation -->
-                        <td><?php echo $user->getCreationDate()->format('d-m-Y') ?></td>
+                        <td class="d-none d-lg-table-cell"><?php echo $user->getCreationDate()->format('d-m-Y') ?></td>
                         <!-- login -->
                         <td><?php echo $user->getLastLogin()->format('d-m-Y H:i:s') ?></td>
 
+                        <!-- Actions -->
                         <?php if (!$user->isAdmin()) { ?>
-                            <td>
-                                <a class="link-secondary" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                            <td class="d-none d-lg-table-cell">
+                                <a id="delete-link" class="link-secondary" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
 
-                                <a class="link-secondary text-info ms-2" data-bs-toggle="modal" data-bs-target="#renew-modal" data-bs-id="<?php echo $user->getId() ?>" data-bs-email="<?php echo $user->getLoginEmail() ?>"><i class="bi bi-key" role="img" style="font-size: 1.2rem;" aria-label="renew-password" data-bs-toggle="tooltip" title="Renouveler le mot de passe." data-bs-placement="bottom"></i></a>
+                                <a id="renew-link" class="link-secondary text-info ms-2" data-bs-toggle="modal" data-bs-target="#renew-modal"><i class="bi bi-key" role="img" style="font-size: 1.2rem;" aria-label="renew-password" data-bs-toggle="tooltip" title="Renouveler le mot de passe." data-bs-placement="bottom"></i></a>
                             </td>
                         <?php } ?>
                     </tr>
@@ -77,7 +95,7 @@ use app\constants\Route;
         </ul>
     </nav>
 
-    <div class="row-12">
+    <div class="row-12 d-none d-lg-block">
         <a href="<?php echo Route::USER_EDIT ?>" class="btn btn-primary col-12 mx-auto">Ajouter un utilisateur</a>
     </div>
 </div>
@@ -109,6 +127,23 @@ use app\constants\Route;
             <div class="modal-footer">
                 <a href-start="<?php echo Requests::RENEW_USER_PASSWORD ?>" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Modal -->
+<div class="modal fade" id="action-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="filter-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="h5 mx-auto">Intéragir avec []</span>
+            </div>
+            <div class="modal-body">
+                <div class="row"><a id="renew-btn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renew-modal">Renouveler le mot de passe.</a></div>
+                <div class="row mt-2"><a id="delete-btn" type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#delete-modal">Supprimer.</a></div>
+                <div class="row mt-2"><a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</a></div>
             </div>
         </div>
     </div>

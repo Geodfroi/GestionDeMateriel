@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.28 ###
+// ## Joël Piguet - 2022.01.30 ###
 // ##############################
 
 const ART_TABLE = "/articlesTable";
@@ -92,9 +92,8 @@ function displayFilter() {
 
 function fillDeleteModal(e, modal) {
   if (e.relatedTarget) {
-    let button = e.relatedTarget;
-    let id = button.getAttribute("data-bs-id");
-    let article_name = button.getAttribute("data-bs-name");
+    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
+    let article_name = getParentAttribute(e.relatedTarget, "data-bs-name");
 
     modal.querySelector(
       ".modal-body"
@@ -197,21 +196,18 @@ function selectRow(_, row) {
   }
 
   showModal("action-modal", (modal) => {
-    let article_name = row.querySelector("#cell-name").innerText;
-    let article_id = row
-      .querySelector("#delete-link")
-      .getAttribute("data-bs-id");
-    let update_ref = row.querySelector("#update-link").getAttribute("href");
+    let article_name = row.getAttribute("data-bs-name");
+    let article_id = row.getAttribute("data-bs-id");
+
+    modal.setAttribute("data-bs-id", article_id);
+    modal.setAttribute("data-bs-name", article_name);
 
     modal.querySelector(
       ".modal-header span"
     ).innerText = `Modifier [${article_name}]`;
 
+    let update_ref = row.querySelector("#update-link").getAttribute("href");
     modal.querySelector("#update-btn").setAttribute("href", update_ref);
-    modal.querySelector("#delete-btn").setAttribute("data-bs-id", article_id);
-    modal
-      .querySelector("#delete-btn")
-      .setAttribute("data-bs-name", article_name);
   });
 }
 
@@ -247,7 +243,6 @@ hookBtnCollection("filter-dropdown-item", (_, element) => {
 
 hookBtnCollection("table-row", selectRow, false);
 
-//fill in delete article modal info when postRequested.
 hookModalShown("delete-modal", fillDeleteModal);
 
 hookModalShown("filter-modal", fillFilterModal);
@@ -257,21 +252,3 @@ displayCountNavbar();
 displayPageNavbar(ART_TABLE);
 setHeaderLinks();
 displayFilter();
-
-// function submitFilter(_, _) {
-//   let json = getFormValues(
-//     [
-//       "filter-name",
-//       "filter-location",
-//       "filter-date-val",
-//       "filter-date-type",
-//       "filter-show-expired",
-//     ],
-//     true
-//   );
-//   json.filter = true;
-
-//   getRequest(ART_TABLE, json);
-//   window.location.replace(ART_TABLE);
-// }
-// hookBtn("filter-submit", submitFilter);

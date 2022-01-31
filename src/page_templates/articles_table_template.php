@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.28 ###
+## Joël Piguet - 2022.01.30 ###
 ##############################
 
 use app\constants\Requests;
@@ -60,13 +60,13 @@ use app\helpers\Util;
                     $day_until = Util::getDaysUntil($article->getExpirationDate()); ?>
 
                     <?php if ($day_until <= 0) { ?>
-                        <tr class="table-row bg-secondary">
+                        <tr class="table-row bg-secondary" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>">
                         <?php } else { ?>
-                        <tr class="table-row">
+                        <tr class="table-row" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>">
                         <?php } ?>
 
                         <!-- Article -->
-                        <td id="cell-name"><?php echo $article->getArticleName()  ?>
+                        <td><?php echo $article->getArticleName()  ?>
                             <?php if (strlen($article->getComments()) > 0) { ?>
                                 <span class="bi-text-left text-info" data-bs-toggle="tooltip" title="<?php echo $article->getComments() ?>" data-bs-placement="right"></span>
                             <?php } ?>
@@ -96,7 +96,7 @@ use app\helpers\Util;
                         <td class="d-none d-lg-table-cell">
                             <a id="update-link" class="link-success" href=<?php echo Route::ART_EDIT . '?update=' . $article->getId() ?>><i class="bi bi-pencil" role="img" style="font-size: 1.2rem;" aria-label=" update" data-bs-toggle="tooltip" title="Modifier" data-bs-placement="bottom"></i></a>
 
-                            <a id="delete-link" class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal" data-bs-id="<?php echo $article->getId() ?>" data-bs-name="<?php echo $article->getArticleName() ?>"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
+                            <a id="delete-link" class="link-danger ms-2" data-bs-toggle="modal" data-bs-target="#delete-modal"><i class="bi bi-trash" role="img" style="font-size: 1.2rem;" aria-label="delete" data-bs-toggle="tooltip" title="Supprimer" data-bs-placement="bottom"></i></a>
                         </td>
                         </tr>
                     <?php } ?>
@@ -248,7 +248,7 @@ use app\helpers\Util;
     </div>
 </div>
 
-<!-- Filter Modal -->
+<!-- Action Modal -->
 <div class="modal fade" id="action-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="filter-modal-label" aria-hidden="true">
     <div class="modal-dialog">
 

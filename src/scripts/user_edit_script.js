@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.16 ###
+// ## Joël Piguet - 2022.01.30 ###
 // ##############################
 
 function getFormData() {
@@ -23,7 +23,7 @@ hookBtn("regen-password", () => {
 });
 
 //two step process: the confirmation modal is only shown if the form is properly validated.
-hookBtn("add-btn", () => {
+hookBtnCollection("add-btn", () => {
   call("validate-user", handleValidation, getFormData);
 });
 
