@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.30 ###
+// ## Joël Piguet - 2022.01.31 ###
 // ##############################
 
 /**
@@ -7,11 +7,11 @@
  *
  * @param {*} req request identifier.
  * @param {*} callback function handling the server response to the fetch request.
- * @param {*} compilePostData function yielding the json data package to sent to server.
+ * @param {*} data json data package to sent to server.
  * @param {*} req server route; '/request' by default.
  */
-function call(req, callback = null, compilePostData = null, url = null) {
-  let data = compilePostData == null ? {} : compilePostData();
+function postRequest(req, callback = null, data = null, url = null) {
+  data ??= {};
   data["req"] = req;
   const options = {
     method: "POST",
@@ -22,7 +22,7 @@ function call(req, callback = null, compilePostData = null, url = null) {
     },
   };
 
-  url = url == null ? "/request" : url;
+  url ??= "/request";
   fetch(url, options)
     .then((res) => {
       return res.json();
@@ -347,7 +347,7 @@ function setValidTag(id, status) {
  */
 function getRequest(url, json = null) {
   let url_inst = new URL(url, window.location.origin);
-  json = json != null ? json : {};
+  json ??= {};
   let keys = Object.keys(json);
   for (let index = 0; index < keys.length; index++) {
     let key = keys[index];

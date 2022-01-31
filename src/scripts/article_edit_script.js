@@ -63,7 +63,7 @@ function submitArticle() {
   let article = json_data.article;
   let call_id = article ? "update-article" : "add-article";
 
-  call(call_id, handleValidation, getFormData);
+  postRequest(call_id, handleValidation, getFormData());
 }
 
 hookBtnCollection("submit-btn", submitArticle);

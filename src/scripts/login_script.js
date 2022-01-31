@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.19 ###
+// ## Joël Piguet - 2022.01.31 ###
 // ##############################
 
 function callback(json) {
@@ -35,7 +35,7 @@ function showPassword(_, btn) {
 }
 
 function submit_login() {
-  call("submit-login", callback, compileData);
+  postRequest("submit-login", callback, compileData());
 }
 
 hookBtn("submit-btn", submit_login);

@@ -40,10 +40,10 @@ function submitEdit() {
   let preset_id = document.getElementById("id").value;
   let call_id = preset_id ? "update-loc-preset" : "add-loc-preset";
 
-  call(
+  postRequest(
     call_id,
     (json) => displayWarnings(json, "content"),
-    () => getFormValues(["id", "content"])
+    getFormValues(["id", "content"])
   );
 }
 

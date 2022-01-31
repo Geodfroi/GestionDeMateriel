@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.28 ###
+## Joël Piguet - 2022.01.31 ###
 ##############################
 
 ?>
@@ -12,7 +12,6 @@
 <div>
     <div>TODO::</div>
     <br>
-    <div>clear option in profiles</div>
     <div>Bug with expiration date before filter in sqlite</div>
     <div>ADMIN - access user contact posts.</div>
     <div>CONTACT: create contact page</div>

@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.30 ###
+// ## Joël Piguet - 2022.01.31 ###
 // ##############################
 
 function getFormData() {
@@ -17,20 +17,20 @@ function handleValidation(json) {
 }
 
 function regenPassword() {
-  call("regen-password", (json) => {
+  postRequest("regen-password", (json) => {
     displayInputValue(json, "password");
   });
 }
 
 function postUser() {
-  call("add-user", null, getFormData);
+  postRequest("add-user", null, getFormData());
 }
 
 /**
  * Validate user data before calling user create confirmation modal.
  */
 function validateUser() {
-  call("validate-user", handleValidation, getFormData);
+  postRequest("validate-user", handleValidation, getFormData());
 }
 
 hookBtn("regen-password", regenPassword);

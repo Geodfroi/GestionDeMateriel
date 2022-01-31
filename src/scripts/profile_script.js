@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.30 ###
+// ## Joël Piguet - 2022.01.31 ###
 // ##############################
 
 PROFILE_ROUTE = "/profile";
@@ -10,7 +10,7 @@ const delays = ["3", "7", "14", "30"];
  * fetch and display user alias when modal is opened.
  */
 function aliasModalShown() {
-  call("get-user", (json) => {
+  postRequest("get-user", (json) => {
     clearWarnings("alias");
     displayInputValue(json, "alias");
   });
@@ -20,7 +20,7 @@ function aliasModalShown() {
  * Fetch and display user contact email when modal is opened.
  */
 function contactModalShown() {
-  call("get-user", (json) => {
+  postRequest("get-user", (json) => {
     clearWarnings("contact-email");
     displayInputValue(json, "contact-email");
   });
@@ -30,7 +30,7 @@ function contactModalShown() {
  * Fetch and display user delay options when modal is opened.
  */
 function delayModalShown() {
-  call("get-user", (json) => {
+  postRequest("get-user", (json) => {
     clearWarnings("delay-3", "delay-7", "delay-14", "delay-30");
     let json_delays = json["contact-delay"].split("-");
     for (let index = 0; index < 4; index++) {
@@ -39,6 +39,14 @@ function delayModalShown() {
       setCheckboxValue(input_id, json_delays.includes(key));
     }
   });
+}
+
+function deleteAlias() {
+  postRequest("update-alias", null, { alias: "" });
+}
+
+function deleteContactEmail() {
+  postRequest("update-contact-email", null, { "contact-email": "" });
 }
 
 function displayDelayWarnings(json) {
@@ -70,7 +78,7 @@ function getFormDelays() {
  * Clear password fields when modal is opened.
  */
 function passwordModalShown() {
-  call("get-user", () => {
+  postRequest("get-user", () => {
     clearWarningsAndInputs("password", "password-repeat");
   });
 }
@@ -79,10 +87,10 @@ function passwordModalShown() {
  * Post alias change
  */
 function submitAlias() {
-  call(
+  postRequest(
     "update-alias",
     (json) => displayWarnings(json, "alias"),
-    () => getFormValues(["alias"])
+    getFormValues(["alias"])
   );
 }
 
@@ -90,10 +98,10 @@ function submitAlias() {
  * Post contact email change
  */
 function submitContactEmail() {
-  call(
+  postRequest(
     "update-contact-email",
     (json) => displayWarnings(json, "contact-email"),
-    () => getFormValues(["contact-email"])
+    getFormValues(["contact-email"])
   );
 }
 
@@ -101,10 +109,10 @@ function submitContactEmail() {
  * Post peremption delay change
  */
 function submitDelay() {
-  call(
+  postRequest(
     "update-delay",
     (json) => displayDelayWarnings(json),
-    () => getFormDelays()
+    getFormDelays()
   );
 }
 
@@ -112,10 +120,10 @@ function submitDelay() {
  * Post password change
  */
 function submitPassword() {
-  call(
+  postRequest(
     "update-password",
     (json) => displayWarnings(json, "password", "password-repeat"),
-    () => getFormValues(["password", "password-repeat"])
+    getFormValues(["password", "password-repeat"])
   );
 }
 
@@ -123,6 +131,9 @@ hookBtn("alias-submit", submitAlias);
 hookBtn("password-submit", submitPassword);
 hookBtn("contact-submit", submitContactEmail);
 hookBtn("delay-submit", submitDelay);
+
+hookBtn("alias-erase", deleteAlias);
+hookBtn("contact-erase", deleteContactEmail);
 
 hookModalShown("alias-modal", aliasModalShown);
 hookModalShown("password-modal", passwordModalShown);

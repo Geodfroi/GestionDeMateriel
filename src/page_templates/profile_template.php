@@ -50,6 +50,9 @@
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary col-12 col-lg-2" type="button" data-bs-dismiss="modal">Annuler</button>
+
+                    <button class="btn btn-light col-12 col-lg-2" type="button" data-bs-dismiss="modal" id="alias-erase">Effacer</button>
+
                     <button class="btn btn-primary col-12 col-lg-2" id="alias-submit" type="submit">Enregistrer</button>
                 </div>
             </form>
@@ -103,6 +106,9 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary col-12 col-lg-2" type="button" data-bs-dismiss="modal">Annuler</button>
+
+                    <button class="btn btn-light col-12 col-lg-2" type="button" data-bs-dismiss="modal" id="contact-erase">Effacer</button>
+
                     <button class="btn btn-primary col-12 col-lg-2" id="contact-submit" type="submit" name="set-email">Enregistrer</button>
                 </div>
             </form>
