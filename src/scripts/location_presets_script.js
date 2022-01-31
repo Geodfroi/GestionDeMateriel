@@ -1,14 +1,11 @@
 // ################################
-// ## Joël Piguet - 2022.01.17 ###
+// ## Joël Piguet - 2022.01.30 ###
 // ##############################
 
-//fill in delete location modal info when called.
-hookModalShown("delete-modal", (e, modal) => {
+function deleteModalShown(e, modal) {
   if (e.relatedTarget) {
-    let button = e.relatedTarget;
-    let id = button.getAttribute("data-bs-id");
-    let content = button.getAttribute("data-bs-content");
-
+    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
+    let content = getParentAttribute(e.relatedTarget, "data-bs-content");
     modal.querySelector(
       ".modal-body"
     ).innerText = `Voulez-vous vraiment supprimer [${content}] ?`;
@@ -17,28 +14,29 @@ hookModalShown("delete-modal", (e, modal) => {
     let href_start = btn.getAttribute("href-start");
     btn.setAttribute("href", href_start + id);
   }
-});
+}
 
-hookModalShown("edit-modal", (e, modal) => {
-  let button = e.relatedTarget;
-  let id = button.getAttribute("data-bs-id");
+function editModalShown(e, modal) {
+  let id = getParentAttribute(e.relatedTarget, "data-bs-id");
 
-  document.getElementById("modal-title").innerText = id
+  modal.querySelector("#modal-title").innerText = id
     ? "Modifier le contenu"
     : "Nouvelle saisie";
 
-  document.getElementById("submit-btn").innerText = id ? "Modifier" : "Ajouter";
+  modal.querySelector("#submit-edit-btn").innerText = id
+    ? "Modifier"
+    : "Ajouter";
 
   if (id) {
-    let content = button.getAttribute("data-bs-content");
-    document.getElementById("id").value = id;
-    document.getElementById("content").value = content;
+    let content = getParentAttribute(e.relatedTarget, "data-bs-content");
+    modal.querySelector("#id").value = id;
+    modal.querySelector("#content").value = content;
   } else {
-    document.getElementById("content").value = "";
+    modal.querySelector("#content").value = "";
   }
-});
+}
 
-hookBtn("submit-btn", () => {
+function submitEdit() {
   let preset_id = document.getElementById("id").value;
   let call_id = preset_id ? "update-loc-preset" : "add-loc-preset";
 
@@ -47,4 +45,33 @@ hookBtn("submit-btn", () => {
     (json) => displayWarnings(json, "content"),
     () => getFormValues(["id", "content"])
   );
-});
+}
+
+/**
+ * Show options modal when row is clicked if screen is in mobile mode.
+ *
+ * @param {*} _
+ * @param {*} row
+ */
+function selectRow(_, row) {
+  if (!isSmallScreen()) {
+    return;
+  }
+
+  showModal("action-modal", (modal) => {
+    let location_id = row.getAttribute("data-bs-id");
+    let location_content = row.getAttribute("data-bs-content");
+
+    modal.setAttribute("data-bs-id", location_id);
+    modal.setAttribute("data-bs-content", location_content);
+    modal.querySelector(
+      ".modal-header span"
+    ).innerText = `[${location_content}]`;
+  });
+}
+
+hookBtn("submit-edit-btn", submitEdit);
+hookBtnCollection("table-row", selectRow, false);
+
+hookModalShown("delete-modal", deleteModalShown);
+hookModalShown("edit-modal", editModalShown);

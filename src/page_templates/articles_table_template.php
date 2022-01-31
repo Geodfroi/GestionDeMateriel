@@ -258,7 +258,7 @@ use app\helpers\Util;
             </div>
             <div class="modal-body">
                 <div class="row"><a id="update-btn" type="button" class="btn btn-primary">Mettre à jour</a></div>
-                <div class="row mt-2"><a id="delete-btn" type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#delete-modal">Effacer</a></div>
+                <div class="row mt-2"><a id="delete-btn" type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#delete-modal">Supprimer</a></div>
                 <div class="row mt-2"><a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</a></div>
             </div>
 

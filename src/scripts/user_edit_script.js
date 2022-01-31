@@ -16,18 +16,24 @@ function handleValidation(json) {
   }
 }
 
-hookBtn("regen-password", () => {
+function regenPassword() {
   call("regen-password", (json) => {
     displayInputValue(json, "password");
   });
-});
+}
 
-//two step process: the confirmation modal is only shown if the form is properly validated.
-hookBtnCollection("add-btn", () => {
-  call("validate-user", handleValidation, getFormData);
-});
-
-// post new user
-hookBtn("submit-btn", () => {
+function postUser() {
   call("add-user", null, getFormData);
-});
+}
+
+/**
+ * Validate user data before calling user create confirmation modal.
+ */
+function validateUser() {
+  call("validate-user", handleValidation, getFormData);
+}
+
+hookBtn("regen-password", regenPassword);
+hookBtn("submit-btn", postUser);
+
+hookBtnCollection("add-btn", validateUser);

@@ -7,6 +7,10 @@ const ART_TABLE = "/articlesTable";
 const DATE_BEFORE = "before";
 const DATE_AFTER = "after";
 
+function clearFilter() {
+  document.getElementById("filter-date-val").value = "";
+}
+
 /**
  * Display caret icon besides table header to show orderby value.
  */
@@ -90,7 +94,7 @@ function displayFilter() {
   document.getElementById("filter-label").innerText = str;
 }
 
-function fillDeleteModal(e, modal) {
+function deleteModalShown(e, modal) {
   if (e.relatedTarget) {
     let id = getParentAttribute(e.relatedTarget, "data-bs-id");
     let article_name = getParentAttribute(e.relatedTarget, "data-bs-name");
@@ -105,7 +109,7 @@ function fillDeleteModal(e, modal) {
   }
 }
 
-function fillFilterModal(_, modal) {
+function filterModalShown(_, modal) {
   let filters = json_data.display_data.filters;
 
   // name
@@ -212,6 +216,24 @@ function selectRow(_, row) {
 }
 
 /**
+ * Set date filter btn inner text and fill date type input value.
+ *
+ * @param {*} e
+ * @param {*} element
+ */
+function setDateFilter(_, element) {
+  //change btn label.
+  setFilterDropdownLabel(element.innerText);
+  // set hidden post value.
+  let date_input = document.getElementById("filter-date-type");
+  if (element.getAttribute("filter-value") === "filter-date-before") {
+    date_input.value = DATE_BEFORE;
+  } else {
+    date_input.value = DATE_AFTER;
+  }
+}
+
+/**
  * Display date filter dropdown inner text.
  *
  * @param {*} label
@@ -224,28 +246,12 @@ function setFilterDropdownLabel(label) {
   }
 }
 
-hookBtnCollection("clear-filter", () => {
-  document.getElementById("filter-date-val").value = "";
-});
-
-// set date filter btn inner text and fill date type input value.
-hookBtnCollection("filter-dropdown-item", (_, element) => {
-  //change btn label.
-  setFilterDropdownLabel(element.innerText);
-  // set hidden post value.
-  let date_input = document.getElementById("filter-date-type");
-  if (element.getAttribute("filter-value") === "filter-date-before") {
-    date_input.value = DATE_BEFORE;
-  } else {
-    date_input.value = DATE_AFTER;
-  }
-});
-
+hookBtnCollection("clear-filter", clearFilter);
+hookBtnCollection("filter-dropdown-item", setDateFilter);
 hookBtnCollection("table-row", selectRow, false);
 
-hookModalShown("delete-modal", fillDeleteModal);
-
-hookModalShown("filter-modal", fillFilterModal);
+hookModalShown("delete-modal", deleteModalShown);
+hookModalShown("filter-modal", filterModalShown);
 
 displayCarets();
 displayCountNavbar();

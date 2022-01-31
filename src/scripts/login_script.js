@@ -34,8 +34,9 @@ function showPassword(_, btn) {
   }
 }
 
-hookBtn("submit-btn", () => {
+function submit_login() {
   call("submit-login", callback, compileData);
-});
+}
 
+hookBtn("submit-btn", submit_login);
 hookBtn("show-password-btn", showPassword);

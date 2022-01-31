@@ -49,17 +49,24 @@ function handleValidation(json) {
   );
 }
 
-hookBtnCollection("submit-btn", () => {
+/**
+ * Set location input value from location presets
+ * @param {*} e
+ * @param {*} btn
+ * @returns
+ */
+function setLocationInput(_, btn) {
+  return (document.getElementById("location").value = btn.innerText);
+}
+
+function submitArticle() {
   let article = json_data.article;
   let call_id = article ? "update-article" : "add-article";
 
   call(call_id, handleValidation, getFormData);
-});
+}
 
-// set location input value from location presets
-hookBtnCollection(
-  "loc-preset",
-  (_, btn) => (document.getElementById("location").value = btn.innerText)
-);
+hookBtnCollection("submit-btn", submitArticle);
+hookBtnCollection("loc-preset", setLocationInput);
 
 customizeForm();
