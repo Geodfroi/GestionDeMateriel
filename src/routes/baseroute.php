@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.02.08 ###
 ##############################
 
 namespace app\routes;
@@ -11,6 +11,7 @@ use app\constants\Settings;
 use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
+use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * Abstract class of all routes containing common utility functions.
@@ -25,7 +26,7 @@ abstract class BaseRoute
     private $show_footer;
 
     /**
-     * Set data to be accessible by javascript scripts.
+     * Set data to be accessible by javascript scripts. Data is encoded to a json string inserted as inner text to a hidden div in main html file.
      */
     private $json_data;
 
@@ -100,8 +101,10 @@ abstract class BaseRoute
      * Load a php template in memory and returns a content string.
      * 
      * @param array $data Associative array to be made avaible in both php templates and javascript scripts.
+     * @param bool $encodeInJSON Encode data as a json string to be made available to javascript.
+     * @return string templated html
      */
-    protected function renderTemplate(array $data = []): string
+    protected function renderTemplate(array $data = [], bool $encodeInJSON = true): string
     {
         // log post and get request if debug is active
         if (App::isDebugMode()) {
@@ -113,8 +116,7 @@ abstract class BaseRoute
             }
         }
 
-        // $data['warnings'] = $this->warnings ?? [];
-        $this->json_data = json_encode($data, JSON_UNESCAPED_UNICODE);
+        $this->json_data = $encodeInJSON ? json_encode($data, JSON_UNESCAPED_UNICODE) : '{}';
         return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES);
     }
 

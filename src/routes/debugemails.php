@@ -55,6 +55,6 @@ class DebugEmails extends BaseRoute
         return $this->renderTemplate([
             'html_template' =>  $html_template ?? '',
             'plaintext' =>  $plaintext ?? '',
-        ]);
+        ], false);
     }
 }
