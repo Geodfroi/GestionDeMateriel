@@ -4,7 +4,7 @@
 
 PHP v7.4.25 with Composer, coded with VSCode.
 
-- The app was created to work on both desktop and smartphone. Use chrome or edge devKit to switch to phone view to see the result.
+
 
 Folders:
     config.json: variables controlant le comportement de l'application, le serveur ou les tests.
@@ -44,5 +44,11 @@ Fake credentials to use the app:
 Debug mode: 
     verbose logging in local/logs.
     Also, in debug mode all emails are sent to the development email instead of user emails.
+
+Extra functionality
+    Sqlite implementation on top of mysql for local testing (change in config.json).
+    Use own gmail address to send reminder emails.
+    Server backup to sqlite local db each day.
+    App was created to work on both desktop and smartphone. Use chrome or edge devKit to switch to phone view to see the result.
 
 Reminder: modify const APP_FULL_URL to proper url once the app is online.
