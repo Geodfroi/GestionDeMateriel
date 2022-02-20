@@ -26,7 +26,6 @@ function displayCarets() {
   if (orderby === "NAME_ASC") {
     article_header.querySelector(".icon").classList.add("bi-caret-down");
   } else if (orderby === "NAME_DESC") {
-    console.log("caret up");
     article_header.querySelector(".icon").classList.add("bi-caret-up");
   }
 
