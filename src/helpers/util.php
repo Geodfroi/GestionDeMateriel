@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
@@ -40,7 +40,7 @@ class Util
 
         unset($_SESSION[SESSION::ALERT]);
 
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             Logging::debug('alert', $alert_array);
         }
         return [

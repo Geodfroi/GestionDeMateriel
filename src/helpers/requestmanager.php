@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.28 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
@@ -46,7 +46,7 @@ class RequestManager
      */
     private static function handleGetRequests(): string
     {
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             Logging::info("GET request to server", ['args' => $_GET]);
         }
 
@@ -98,7 +98,7 @@ class RequestManager
             return json_encode($response);
         }
 
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             Logging::info("Post request to server", ['data' => $data['req']]);
         }
 

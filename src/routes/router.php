@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\routes;
@@ -9,7 +9,6 @@ namespace app\routes;
 use app\constants\AppPaths;
 use app\constants\Route;
 use app\constants\LogInfo;
-use app\helpers\App;
 use app\helpers\Authenticate;
 use app\helpers\Logging;
 use app\helpers\Util;
@@ -30,7 +29,7 @@ class Router
         $route = $_SERVER['PATH_INFO'] ?? Route::HOME;
 
         //logging route if logged-in and in debug mode.
-        if (App::isDebugMode() && Authenticate::isLoggedIn()) {
+        if (DEBUG_MODE && Authenticate::isLoggedIn()) {
             Logging::debug(LogInfo::ROUTING, [
                 'route' => $route,
                 'user-id' => Authenticate::getUserId()

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
@@ -28,7 +28,7 @@ class Mailing
 {
     private static function appUrl(): string
     {
-        return App::isDebugMode() ? Settings::APP_URL_DEBUG : Settings::APP_URL;
+        return DEBUG_MODE ? Settings::APP_URL_DEBUG : Settings::APP_URL;
     }
 
     /**
@@ -154,7 +154,7 @@ class Mailing
      */
     private static function send(array $recipients, string $subject, string $html_content, string $plain_content): bool
     {
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             $recipients = [SETTINGS::DEBUG_EMAIL];
         }
 

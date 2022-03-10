@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
@@ -71,7 +71,7 @@ class Database
         static $instance;
         if (is_null($instance)) {
             try {
-                if (APP::useSQLite()) {
+                if (USE_SQLITE) {
                     $local_path = AppPaths::LOCAL_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
                     $instance = new static(DBUtil::getSQLiteConn($local_path));
                 } else {

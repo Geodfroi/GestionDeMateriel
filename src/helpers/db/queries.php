@@ -3,16 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers\db;
+// use app\helpers\Logging;
 
 use \PDO;
 use SQLite3;
-
-use app\helpers\App;
-use app\helpers\Logging;
 
 /**
  * Base class for db queries; handle differences between MySQL and SQLite queries
@@ -29,9 +27,9 @@ class Queries
     {
         $this->conn = $conn;
         $this->data_types = [
-            'int' => APP::useSQLite() ? SQLITE3_INTEGER : PDO::PARAM_INT,
-            'str' => APP::useSQLite() ? SQLITE3_TEXT : PDO::PARAM_STR,
-            'bool' => APP::useSQLite() ? SQLITE3_INTEGER : PDO::PARAM_BOOL,
+            'int' => USE_SQLITE ? SQLITE3_INTEGER : PDO::PARAM_INT,
+            'str' => USE_SQLITE ? SQLITE3_TEXT : PDO::PARAM_STR,
+            'bool' => USE_SQLITE ? SQLITE3_INTEGER : PDO::PARAM_BOOL,
         ];
     }
 
@@ -41,7 +39,7 @@ class Queries
      */
     protected function count($r, $stmt): int
     {
-        if (App::useSQLite()) {
+        if (USE_SQLITE) {
             $array = $r->fetchArray();
             return $array['COUNT(*)'];
         }
@@ -54,7 +52,7 @@ class Queries
      */
     protected function error($stmt): string
     {
-        if (App::useSQLite()) {
+        if (USE_SQLITE) {
             $this->conn->lastErrorMsg();
         }
         list(,, $error) = $stmt->errorInfo();
@@ -67,11 +65,11 @@ class Queries
      */
     protected function fetchRow($r, $stmt)
     {
-        return App::useSQLite() ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
+        return USE_SQLITE ? $r->fetchArray(SQLITE3_ASSOC) : $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     protected function rowId(): int
     {
-        return App::useSQLite() ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
+        return USE_SQLITE ? $this->conn->lastInsertRowID() : intval($this->conn->lastInsertId());
     }
 }

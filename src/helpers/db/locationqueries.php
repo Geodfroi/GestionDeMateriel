@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers\db;
@@ -157,7 +157,7 @@ class LocationQueries extends Queries
         $stmt->bindParam(':str', $content, $this->data_types['str']);
         $r = $stmt->execute();
         if ($r) {
-            if (App::useSQLite()) {
+            if (USE_SQLITE) {
                 return $r->numColumns() === 1;
             }
             $c = $stmt->fetchColumn();

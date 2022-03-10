@@ -1,17 +1,15 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.02.08 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\AppPaths;
 use app\constants\Settings;
-use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
-use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * Abstract class of all routes containing common utility functions.
@@ -107,7 +105,7 @@ abstract class BaseRoute
     protected function renderTemplate(array $data = [], bool $encodeInJSON = true): string
     {
         // log post and get request if debug is active
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             if (count($_GET) > 0) {
                 Logging::debug('GET', $_GET);
             }
@@ -155,7 +153,7 @@ abstract class BaseRoute
     //  */
     // public function showWarning(string $key, string $content)
     // {
-    //     if (App::isDebugMode()) {
+    //     if (DEBUG_MODE) {
     //         Logging::debug('warning', [$key => $content]);
     //     }
 

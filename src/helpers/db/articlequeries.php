@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.18 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers\db;
@@ -112,7 +112,7 @@ class ArticleQueries extends Queries
 
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
-            $str .= App::useSQLite() ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
+            $str .= USE_SQLITE ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
             $count += 1;
         }
 
@@ -120,7 +120,7 @@ class ArticleQueries extends Queries
             if ($count > 1) {
                 $str .= ' AND ';
             }
-            $str .= App::useSQLite() ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
+            $str .= USE_SQLITE ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
             $count += 1;
         }
 
@@ -135,9 +135,9 @@ class ArticleQueries extends Queries
                 }
 
                 if ($type === ArtFilter::DATE_BEFORE) {
-                    $str .= App::useSQLite() ? "(expiration_date < '{$date}')" : "expiration_date < :fdate";
+                    $str .= USE_SQLITE ? "(expiration_date < '{$date}')" : "expiration_date < :fdate";
                 } else {
-                    $str .= App::useSQLite() ? "(expiration_date > '{$date}')" : "expiration_date > :fdate";
+                    $str .= USE_SQLITE ? "(expiration_date > '{$date}')" : "expiration_date > :fdate";
                 }
                 $count += 1;
             }

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
@@ -33,7 +33,7 @@ class DBUtil
         ];
         $instance = new PDO($dsn, PrivateSettings::MYSQL_ADMIN_ID, PrivateSettings::MYSQL_ADMIN_PASSWORD, $options);
 
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             Logging::info('Connection to mysql', ['schema' => PrivateSettings::MYSQL_SCHEMA]);
         }
 
@@ -52,7 +52,7 @@ class DBUtil
     {
         $conn = new SQLite3($local_path);
 
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             Logging::info('Connection to SQLITE DB', ['path' => $local_path]);
         }
         return $conn;

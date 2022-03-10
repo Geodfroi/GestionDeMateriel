@@ -1,13 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.20 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Settings;
-use app\helpers\App;
 use app\helpers\Authenticate;
 
 ?>
@@ -64,7 +63,7 @@ use app\helpers\Authenticate;
                                 </li>
                             <?php } ?>
 
-                            <?php if (App::isDebugMode()) { ?>
+                            <?php if (DEBUG_MODE) { ?>
                                 <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
                                 <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
                             <?php } ?>
