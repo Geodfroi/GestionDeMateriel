@@ -3,13 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.01.10 ###
 ##############################
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
+require_once __DIR__ . '/config.php';
 
-use app\constants\Mode;
-use app\helpers\App;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Mailing;
@@ -62,6 +61,6 @@ function sendPeremptionWarnings()
     }
 }
 
-App::setMode(Mode::SERVER);
+// App::setMode(Mode::SERVER);
 Database::backup();
 sendPeremptionWarnings();
