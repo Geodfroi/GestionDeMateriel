@@ -5,7 +5,6 @@
 PHP v7.4.25 with Composer, coded with VSCode.
 
 
-
 Folders:
     config.json: variables controlant le comportement de l'application, le serveur ou les tests.
 
