@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.28 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\routes;
@@ -10,7 +10,6 @@ use app\constants\ArtFilter;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
-use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
 use app\helpers\Logging;
@@ -38,7 +37,7 @@ class ArticleTable extends BaseRoute
         }
         if (!isset($display_data['display_count'])) {
             $display_data['display_count'] =
-                Settings::TABLE_DISPLAY_COUNT;
+                TABLE_DISPLAY_COUNT;
         }
         if (!isset($display_data['filters'])) {
             $display_data['filters'] = [];

@@ -11,9 +11,8 @@ use app\helpers\RequestManager;
 
 use app\routes\Router;
 
+require_once __DIR__ . '/loader.php';
 require_once __DIR__ . '/vendor/autoload.php'; // use composer to load autofile.
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/local/localsettings.php';
 
 // initiate session allowing for data permanence in _SESSION array as long as the browser is open.
 session_start();
