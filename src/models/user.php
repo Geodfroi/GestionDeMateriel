@@ -55,9 +55,9 @@ class User
     private $last_login;
 
     /**
-     * Password hash encrypted with PASSWORD_BCRYPT algorithm. No plaintext password are ever stored into the database.
+     * string Password hash encrypted with PASSWORD_BCRYPT algorithm. No plaintext password are ever stored into the database.
      */
-    private string $password_hash;
+    private $password_hash;
 
     /**
      * Load user instance from database row.

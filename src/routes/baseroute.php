@@ -1,13 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\AppPaths;
-use app\constants\Settings;
 use app\helpers\Logging;
 use app\helpers\Util;
 
@@ -16,7 +15,10 @@ use app\helpers\Util;
  */
 abstract class BaseRoute
 {
-    private string $redirectUri = "";
+    /**
+     * string
+     */
+    private $redirectUri = "";
 
     private $javascript_name;
     private $template_name;

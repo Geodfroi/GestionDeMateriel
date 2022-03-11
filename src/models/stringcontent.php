@@ -21,7 +21,7 @@ class StringContent
     /**
      * string
      */
-    private string $content;
+    private $content;
 
     /**
      * Load StringContent instance from database row.
