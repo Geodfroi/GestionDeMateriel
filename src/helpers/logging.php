@@ -30,7 +30,7 @@ class Logging
 
         if (!array_key_exists($channel, Logging::$channels)) {
 
-            Util::eraseOldFiles(AppPaths::LOG_FOLDER, $channel, 'log', Settings::LOG_FILES_MAX);
+            Util::eraseOldFiles(AppPaths::LOG_FOLDER, $channel, 'log', LOG_FILES_MAX);
             $channels[$channel] = new Logger($channel);
             $log_name = sprintf('%s_%s.log', $channel, (new DateTime('now'))->format('Ymd'));
             $channels[$channel]->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $log_name, Logger::DEBUG));

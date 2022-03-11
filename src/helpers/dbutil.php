@@ -105,7 +105,7 @@ class DBUtil
      * @param int $max_files Maximum # of backup files in folder. Older files are deleted first.
      * @return bool True is successful.
      */
-    public static function backup_db($conn, $backup_folder, $max_files = Settings::BACKUP_FILES_MAX): bool
+    public static function backup_db($conn, $backup_folder, $max_files = BACKUP_FILES_MAX): bool
     {
         $current_date = (new DateTime('now'))->format('Ymd');
         $path = $backup_folder . DIRECTORY_SEPARATOR . 'backup_' . $current_date . '.db';

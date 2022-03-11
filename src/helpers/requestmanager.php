@@ -391,8 +391,8 @@ class RequestManager
         }
 
         //validate alias
-        if (strlen($alias) > 0 && strlen($alias) < Settings::USER_ALIAS_MIN_LENGHT) {
-            return RequestManager::issueWarnings($json, ['alias' => sprintf(Warning::ALIAS_TOO_SHORT, Settings::USER_ALIAS_MIN_LENGHT)]);
+        if (strlen($alias) > 0 && strlen($alias) < USER_ALIAS_MIN_LENGHT) {
+            return RequestManager::issueWarnings($json, ['alias' => sprintf(Warning::ALIAS_TOO_SHORT, USER_ALIAS_MIN_LENGHT)]);
         }
         $alias_arg = $alias ? $alias : $user->getLoginEmail();
         if ($existing_user = Database::users()->queryByAlias($alias_arg)) {

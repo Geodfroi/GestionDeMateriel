@@ -60,7 +60,7 @@ abstract class BaseRoute
      */
     public function getHeaderTitle(): string
     {
-        return Settings::APP_NAME;
+        return APP_NAME;
     }
 
     /**

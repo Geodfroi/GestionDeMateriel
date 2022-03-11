@@ -46,7 +46,7 @@ class Util
         return [
             'type' => $alert_array[0],
             'msg' => $alert_array[1],
-            'timer' => Settings::ALERT_TIMER,
+            'timer' => ALERT_TIMER,
         ];
     }
 
@@ -123,7 +123,7 @@ class Util
      */
     public static function getRandomPassword()
     {
-        $password_candidate = Util::randomString(Settings::USER_PASSWORD_DEFAULT_LENGTH);
+        $password_candidate = Util::randomString(USER_PASSWORD_DEFAULT_LENGTH);
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if ($has_number && $has_letters) {

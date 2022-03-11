@@ -111,7 +111,7 @@ use app\helpers\Authenticate;
                     <div class="col-3 text-end"> <a href="/contact">Contacter-nous.</a></div>
                 </div>
                 <div class="row">
-                    <span class="text-muted h6 col-12"><?php echo Settings::LAST_MODIFICATION ?></span>
+                    <span class="text-muted h6 col-12"><?php echo LAST_MODIFICATION ?></span>
                 </div>
             </div>
         </footer>

@@ -1,5 +1,5 @@
 #############################
-##Joël Piguet - 2022.03.10##
+##Joël Piguet - 2022.03.11##
 ###########################
 
 PHP v7.4.25 with Composer, coded with VSCode.
@@ -16,9 +16,6 @@ config.php: variables controlant le comportement de l'application, le serveur ou
     server:
         server.php: server side app to check expiration dates and send reminder emails.
         src: source files and html templates.
-
-    web:
-        Web app folder.
 
     vendor:
         Composer folder: handle dependency in php.
@@ -47,5 +44,3 @@ Sqlite implementation on top of mysql for local testing (change in config.json).
 Use own gmail address to send reminder emails.
 Server backup to sqlite local db each day.
 App was created to work on both desktop and smartphone. Use chrome or edge devKit to switch to phone view to see the result.
-
-Reminder: modify const APP_FULL_URL to proper url once the app is online.

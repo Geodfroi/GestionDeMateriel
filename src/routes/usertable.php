@@ -47,7 +47,7 @@ class UserTable extends BaseRoute
 
         $_SESSION[Session::USERS_DISPLAY] = json_encode($display_data);
 
-        $display_count = Settings::TABLE_DISPLAY_COUNT;
+        $display_count = TABLE_DISPLAY_COUNT;
         $item_count = Database::users()->queryCount(false);
         $offset =   ($display_data['page'] - 1) *      $display_count;
         $page_count = ceil($item_count /      $display_count);

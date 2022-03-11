@@ -29,12 +29,12 @@ class Validation
             return Warning::ARTICLE_ADD_EMPTY;
         }
 
-        if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
-            return sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT);
+        if (strlen($article_name) < ARTICLE_NAME_MIN_LENGHT) {
+            return sprintf(Warning::ARTICLE_NAME_TOO_SHORT, ARTICLE_NAME_MIN_LENGHT);
         }
 
-        if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
-            return sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH);
+        if (strlen($article_name) > ARTICLE_NAME_MAX_LENGTH) {
+            return sprintf(Warning::ARTICLE_NAME_TOO_LONG, ARTICLE_NAME_MAX_LENGTH);
         }
         return "";
     }
@@ -47,8 +47,8 @@ class Validation
      */
     public static function validateComments(string &$comments): string
     {
-        if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
-            return sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT);
+        if (strlen($comments) > ARTICLE_COMMENTS_MAX_LENGHT) {
+            return sprintf(Warning::COMMENTS_NAME_TOO_LONG, ARTICLE_COMMENTS_MAX_LENGHT);
         }
         return "";
     }
@@ -97,7 +97,7 @@ class Validation
 
         static $future_limit;
         if (is_null($future_limit)) {
-            $future_limit = DateTime::createFromFormat('Y-m-d', Settings::ARTICLE_DATE_FUTURE_LIMIT);
+            $future_limit = DateTime::createFromFormat('Y-m-d', ARTICLE_DATE_FUTURE_LIMIT);
         }
 
         if ($validated_date >= $future_limit) {
@@ -120,12 +120,12 @@ class Validation
         }
 
         $location = ucwords($location);
-        if (strlen($location) < Settings::ARTICLE_LOCATION_MIN_LENGHT) {
-            return sprintf(Warning::LOCATION_TOO_SHORT, Settings::ARTICLE_LOCATION_MIN_LENGHT);
+        if (strlen($location) < ARTICLE_LOCATION_MIN_LENGHT) {
+            return sprintf(Warning::LOCATION_TOO_SHORT, ARTICLE_LOCATION_MIN_LENGHT);
         }
 
-        if (strlen($location) > Settings::ARTICLE_LOCATION_MAX_LENGHT) {
-            return sprintf(Warning::LOCATION_TOO_LONG, Settings::ARTICLE_LOCATION_MAX_LENGHT);
+        if (strlen($location) > ARTICLE_LOCATION_MAX_LENGHT) {
+            return sprintf(Warning::LOCATION_TOO_LONG, ARTICLE_LOCATION_MAX_LENGHT);
         }
         return "";
     }
@@ -182,8 +182,8 @@ class Validation
         if ($password_candidate === '') {
             return Warning::PASSWORD_EMPTY;
         }
-        if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            return sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH);
+        if (strlen($password_candidate) < USER_PASSWORD_MIN_LENGTH) {
+            return sprintf(Warning::PASSWORD_SHORT, USER_PASSWORD_MIN_LENGTH);
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);

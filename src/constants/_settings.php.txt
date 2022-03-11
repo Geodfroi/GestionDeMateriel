@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\constants;
@@ -13,19 +13,14 @@ namespace app\constants;
  */
 class Settings
 {
-    /**
-     * If DEBUG_MODE is active, all emails are sent from and to this address.
-     */
-    const DEBUG_EMAIL = 'innov.heds@gmail.com';
     const APP_NAME = "HEdS Gestionnaire d'inventaire";
 
-    const APP_URL_DEBUG = "http://localhost:8085/";
 
     /**
      * Used as hyperlink in emails; must be set to proper url once the project is online. 
      */
-    const APP_URL = '';
-    const LAST_MODIFICATION = '20 janvier 2022';
+    const APP_URL = 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
+    const LAST_MODIFICATION = '11 mars 2022';
 
     /**
      * Time until alert is dismissed in milliseconds.
