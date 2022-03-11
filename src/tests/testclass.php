@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
-namespace app\helpers;
+namespace app\tests;
 
 use app\constants\AppPaths;
 use app\helpers\Logging;

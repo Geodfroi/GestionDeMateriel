@@ -3,15 +3,15 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
+
 
 use app\constants\ArtFilter;
 use app\constants\OrderBy;
 use app\helpers\db\ArticleQueries;
-// use app\helpers\Logging;
-use app\helpers\TestClass;
 use app\models\Article;
+use app\tests\TestClass;
 
 
 use function PHPUnit\Framework\assertNotSame;

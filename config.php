@@ -15,7 +15,7 @@ const LOG_CHANNEL = "app";
 /**
  * Use local sqlite db instead of mySql for testing the application.
  */
-const USE_SQLITE = true;
+const USE_SQLITE = false;
 
 
 /**

@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 use app\constants\OrderBy;
 // use app\helpers\Logging;
-use app\helpers\TestClass;
 use app\helpers\db\UserQueries;
 use app\models\User;
+use app\tests\TestClass;
 
 use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertNotNull;

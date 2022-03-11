@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.09 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
+
 
 use app\helpers\db\LocationQueries;
 // use app\helpers\Logging;
-use app\helpers\TestClass;
+use app\tests\TestClass;
 
 use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNotSame;
