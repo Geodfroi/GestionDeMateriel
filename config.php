@@ -5,7 +5,7 @@
 ##############################
 
 /**
- * Verbose logging to help debugging.
+ * Verbose logging to help debugging; all reminder emails are sent to the development email instead of user emails.
  */
 const DEBUG_MODE = true;
 /**

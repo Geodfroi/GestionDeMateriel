@@ -12,6 +12,7 @@ config.php: variables controlant le comportement de l'application, le serveur ou
 
     _util:
         mysql_populate.SQL : utiliser dans mySQL pour créer schémas et nouvelles entrées pour tester MySQL.
+        createlocaldb : create new dummy sqlite db for testing.
 
     server:
         server.php: server side app to check expiration dates and send reminder emails.
@@ -29,7 +30,7 @@ config.php: variables controlant le comportement de l'application, le serveur ou
 
 Setup mySQL for testing:
 Deploy dependencies through composer if not already done.
-Fill in mysql and email info under src/constants/privatesettings.php
+Fill in mysql and email info in local/localsettings.php
 
 Fake credentials to use the app:
 login noel.biquet@gmail.com
