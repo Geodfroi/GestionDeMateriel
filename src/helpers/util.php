@@ -3,26 +3,91 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
 
-use app\constants\Alert;
-use app\constants\AlertType;
+use DateTime;
+use DirectoryIterator;
+
 use app\constants\LogInfo;
+use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
-use app\routes\BaseRoute;
-
-use DateTime;
 
 /**
  * Utility class containing useful static functions.
  */
 class Util
 {
+    /**
+     * Display a popup alert message recovered from SESSION storage.
+     */
+    public static function displayAlert()
+    {
+        if (!isset($_SESSION[SESSION::ALERT])) {
+            return [];
+        }
+
+        $alert_array = $_SESSION[SESSION::ALERT];
+        Logging::debug('alert_array', $alert_array);
+        //check if it is the correct page to display stored alert.
+        if ($alert_array[2] != $_SESSION['route']) {
+            return [];
+        }
+
+        unset($_SESSION[SESSION::ALERT]);
+
+        if (DEBUG_MODE) {
+            Logging::debug('alert', $alert_array);
+        }
+        return [
+            'type' => $alert_array[0],
+            'msg' => $alert_array[1],
+            'timer' => ALERT_TIMER,
+        ];
+    }
+
+    /**
+     * Erase old files from the specified folder, starting from the oldest, when they are appened with "_YYYYmmdd" date suffix. Used to remove old logs or old db backups.
+     * 
+     * @param $folder
+     * @param $file_name File original name.
+     * @param $file_ext File extension without dot.
+     * @param int $max_files Maximum # of files left in folder. 
+     */
+    public static function eraseOldFiles(string $folder, string $file_root, string $file_ext, int $max_count)
+    {
+        $dates = [];
+
+        // find files in folder and extract their date component.
+        foreach (new DirectoryIterator($folder) as $file) {
+            if (!$file->isDot()) {
+                $file_name = $file->getFilename();
+
+                // check if file name match the pattern. e.g. find 'backup_20220101.db' with regex
+                $pattern = "/^" . $file_root . "_\d{8}\." . $file_ext . "$/";
+                if (preg_match($pattern, $file_name)) {
+                    // recover date from file name; e.g. recover '20211215' string from 'backup_20211215.db'
+                    $str_date = substr($file_name, strlen($file_root) + 1, 8);
+                    array_push($dates, $str_date);
+                }
+            }
+        }
+
+        // sort date array in reverse alphabetical order => oldest date will be last in array.
+        rsort($dates);
+
+        // cull oldest files when the number of file exceeds $max_files limit.
+        for ($n = $max_count; $n < count($dates); $n++) {
+            $date = $dates[$n];
+            $file_path = $folder . DIRECTORY_SEPARATOR . $file_root . '_' . $date . '.' . $file_ext;
+            unlink($file_path);
+        }
+    }
+
     /**
      * Encrypt password in plain text into a 30 caracters encrypted hashed string.
      * 
@@ -58,7 +123,7 @@ class Util
      */
     public static function getRandomPassword()
     {
-        $password_candidate = Util::randomString(Settings::DEFAULT_PASSWORD_LENGTH);
+        $password_candidate = Util::randomString(USER_PASSWORD_DEFAULT_LENGTH);
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if ($has_number && $has_letters) {
@@ -108,6 +173,49 @@ class Util
     }
 
     /**
+     * Send a header to the browser requesting a redirection to the path provided. Optionaly display an alert after redirection.
+     * 
+     * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
+     * @param string $alert_type Optional alert type. Use AlertType const.
+     * @param string $alert_msg Optional alert message to be displayed after redirection.
+     * @return string Return empty string.
+     */
+    public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = ""): string
+    {
+        if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
+            Util::storeAlert($uri, $alert_type, $alert_msg);
+        }
+        //The header php function will send a header message to the browser, here signaling for redirection.
+        header("Location: $uri", true);
+        return "";
+    }
+
+    /**
+     * Store alert content to be fetched in next page display.
+     * 
+     * @param string $msg Alert message.
+     * @param string $type Alert type. Use AlertType const.
+     * @param string $display_page Page on which to display the alert.
+     */
+    public static function storeAlert(string $display_page, string $type, string $msg)
+    {
+        $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
+    }
+
+    /**
+     * https://stackoverflow.com/questions/834303/startswith-and-endswith-functions-in-php
+     * 
+     * @param string $haystack;
+     * @param string $needle;
+     * @return bool True if $haystack start with $needle.
+     */
+    public static function startsWith(string $haystack, string $needle): bool
+    {
+        $length = strlen($needle);
+        return substr($haystack, 0, $length) === $needle;
+    }
+
+    /**
      * Load a php template in memory and returns a content string.
      *
      * @param string $name The name of the template.
@@ -132,10 +240,10 @@ class Util
     /**
      * Create a new password, send a renewal email and modify database record. Includes logging.
      * 
-     * @param BaseRoute Route receiving the alerts.
      * @param User User.
+     * @return bool True if successful.
      */
-    public static function renewPassword(BaseRoute $route, User $user)
+    public static function renewPassword(User $user): bool
     {
         $former_password = $user->getPassword();
 
@@ -145,19 +253,18 @@ class Util
         if (Database::users()->updatePassword($user->getId(), $encrypted)) {
 
             if (Mailing::passwordChangeNotification($user,  $plain_password)) {
-                $route->showAlert(AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
 
                 Logging::info(LogInfo::NEW_PASSWORD_ISSUED, [
                     'user-id' => $user->getId(),
                     'login' => $user->getLoginEmail()
                 ]);
 
-                return;
+                return true;
             }
             // attempt to roll back update.
             Database::users()->updatePassword($user->getId(), $former_password);
         }
-        $route->showAlert(AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+        return false;
     }
 
     /**
@@ -203,3 +310,15 @@ class Util
         return DateTime::createFromFormat('Y-m-d', $date->format('Y-m-d'));
     }
 }
+
+    // /**
+    //  * Turn an associative array into a string.
+    //  */
+    // public static function associativeToString(array $array): string
+    // {
+    //     $str = "";
+    //     foreach ($array as $key => $val) {
+    //         $str = $str . strval($key) . '=' . strval($val) . ';';
+    //     }
+    //     return $str;
+    // }

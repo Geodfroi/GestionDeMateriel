@@ -1,16 +1,17 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\routes;
 
+use app\constants\AppPaths;
 use app\constants\Route;
 use app\constants\LogInfo;
-use app\helpers\App;
 use app\helpers\Authenticate;
 use app\helpers\Logging;
+use app\helpers\Util;
 
 /**
  * Contains route const bundled into a class as well as getRoute() static function.
@@ -23,13 +24,16 @@ class Router
      * 
      * @return BaseRoute an instance of a class inheriting BaseRoute.
      */
-    public static function getRoute(): BaseRoute
+    private static function getRoute(): BaseRoute
     {
         $route = $_SERVER['PATH_INFO'] ?? Route::HOME;
 
         //logging route if logged-in and in debug mode.
-        if (App::isDebugMode() && Authenticate::isLoggedIn()) {
-            Logging::debug(LogInfo::ROUTING, ['route' => $route, 'user-id' => Authenticate::getUserId()]);
+        if (DEBUG_MODE && Authenticate::isLoggedIn()) {
+            Logging::debug(LogInfo::ROUTING, [
+                'route' => $route,
+                'user-id' => Authenticate::getUserId()
+            ]);
         }
 
         switch ($route) {
@@ -59,5 +63,25 @@ class Router
             default:
                 return new Home();
         }
+    }
+
+    /**
+     * Each route correspond to a path (i.e '/login') and is responsible to dynamically generate customized html content.
+     */
+    public static function renderRoute(): String
+    {
+        if ($route = Router::getRoute()) {
+            if (!$route->isRedirecting()) {
+                $templateData['page_title'] = $route->getHeaderTitle();
+                $templateData['page_content'] = $route->getBodyContent();
+                $templateData['page_script'] = $route->getScript();
+                $templateData['show_header'] = $route->showHeader();
+                $templateData['show_footer'] = $route->showFooter();
+                $templateData['alert'] = Util::displayAlert();
+                $templateData['json_data'] = $route->getJSONData();
+            }
+        }
+        // insert dynamically generated html content into the main template.
+        return Util::renderTemplate('main_template', $templateData, AppPaths::TEMPLATES);
     }
 }

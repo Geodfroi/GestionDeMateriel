@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+// use app\helpers\Logging;
 use DateTime;
-use app\helpers\Logging;
 
 /**
  * Utility class containing useful static functions.
@@ -24,7 +24,6 @@ class Convert
      */
     public static function toDateTime(string $str): DateTime
     {
-        // Logging::debug('toDateTime', ['str' => $str]);
         $res = DateTime::createFromFormat('Y-m-d H:i:s', $str);
         if ($res) {
             return $res;

@@ -3,20 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
-use app\constants\AppPaths;
-use app\constants\Mode;
 use app\constants\OrderBy;
-use app\helpers\App;
-use app\helpers\Database;
-use app\helpers\Logging;
-use app\helpers\TestUtil;
+// use app\helpers\Logging;
+use app\helpers\TestClass;
 use app\helpers\db\UserQueries;
 use app\models\User;
-
-use PHPUnit\Framework\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertNotNull;
@@ -25,66 +19,32 @@ use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class UserQueriesTest extends TestCase
+final class UserQueriesTest extends TestClass
 {
     private static UserQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setMode(Mode::TESTS_SUITE);
-
-        if (APP::useSQLite()) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsers.db';
-            $conn = TestUtil::localDBSetup($local_path, true);;
-        } else {
-            $conn = Database::getMySQLConn();
-        }
-
-        UserQueriesTest::$queries = new UserQueries($conn);
+        UserQueriesTest::$queries = new UserQueries(TestClass::getConn());
     }
 
     public static function tearDownAfterClass(): void
     {
     }
 
-    public static function testBackup()
+    public function testInsert()
     {
-        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testUsersBackup.db';
-        $backup_conn = TestUtil::localDBSetup($local_path, false);
-        assertNotNull($backup_conn);
-
-        assertTrue(UserQueriesTest::$queries->backup($backup_conn));
+        $user = User::fromForm('my.email@gmail.com', '0123456789', true);
+        $id = UserQueriesTest::$queries->insert($user);
+        assertNotSame($id, 0);
+        assertSame(UserQueriesTest::$queries->queryById($id)->getLoginEmail(), 'my.email@gmail.com');
     }
 
     public function testDelete()
     {
-        assertTrue(UserQueriesTest::$queries->delete(3));
-    }
-
-
-    public function testInsert()
-    {
-        $user = User::fromForm('my.email@gmail.com', '0123456789', true);
-
-        $count = UserQueriesTest::$queries->queryCount(false);
+        $user = User::fromForm('my.email@camamail.com', 'abcd', false);
         $id = UserQueriesTest::$queries->insert($user);
-
-        assertNotSame($id, 0);
-        assertSame($count + 1, UserQueriesTest::$queries->queryCount(false));
-        // Logging::info('testInsert', ['queryCount' => strval($count)]);
-    }
-
-    /**
-     * @dataProvider queryByAliasProvider
-     */
-    public function testQueryByAlias(string $alias, bool $is_present): void
-    {
-        $user = UserQueriesTest::$queries->queryByAlias($alias);
-        if ($is_present) {
-            assertNotNull($user);
-        } else {
-            assertNull($user);
-        }
+        assertTrue(UserQueriesTest::$queries->delete($id));
     }
 
     public function queryByAliasProvider(): array
@@ -97,17 +57,18 @@ final class UserQueriesTest extends TestCase
     }
 
     /**
-     * @dataProvider queryByEmailProvider
+     * @dataProvider queryByAliasProvider
      */
-    public function testQueryByEmail(string $email, bool $is_present): void
+    public function testQueryByAlias(string $alias, bool $is_present): void
     {
-        $user = UserQueriesTest::$queries->queryByEmail($email);
+        $user = UserQueriesTest::$queries->queryByAlias($alias, !$is_present);
         if ($is_present) {
             assertNotNull($user);
         } else {
             assertNull($user);
         }
     }
+
 
     public function queryByEmailProvider(): array
     {
@@ -117,13 +78,12 @@ final class UserQueriesTest extends TestCase
             ['', false], //not present
         ];
     }
-
     /**
-     * @dataProvider queryByIdProvider
+     * @dataProvider queryByEmailProvider
      */
-    public function testQueryById(int $id, bool $is_present): void
+    public function testQueryByEmail(string $email, bool $is_present): void
     {
-        $user = UserQueriesTest::$queries->queryById($id);
+        $user = UserQueriesTest::$queries->queryByEmail($email, !$is_present);
         if ($is_present) {
             assertNotNull($user);
         } else {
@@ -139,6 +99,19 @@ final class UserQueriesTest extends TestCase
             [0, false], //not present
         ];
     }
+    /**
+     * @dataProvider queryByIdProvider
+     */
+    public function testQueryById(int $id, bool $is_present): void
+    {
+        $user = UserQueriesTest::$queries->queryById($id, !$is_present);
+        if ($is_present) {
+            assertNotNull($user);
+        } else {
+            assertNull($user);
+        }
+    }
+
 
     public function testQueryAll()
     {

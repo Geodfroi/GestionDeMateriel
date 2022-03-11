@@ -3,12 +3,11 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers\db;
 
-use Exception;
 use SQLite3;
 
 use app\constants\LogError;
@@ -22,13 +21,30 @@ use app\models\StringContent;
 class LocationQueries extends Queries
 {
     /**
-     * @param SQlite3 $backup_conn Db backup connection.
+     * @param SQlite3| $backup_conn Db backup connection.
      * @return True if backup is successful.
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        Logging::debug('location debug not implemented');
-        return false;
+        $query_stmt = $this->conn->prepare("SELECT * FROM locations");
+        $r = $query_stmt->execute();
+
+        while ($row = $this->fetchRow($r, $query_stmt)) {
+            $id  = (int)($row['id'] ?? 0);
+            $str_content = (string)($row['str_content'] ?? '');
+
+            $insert_stmt = $backup_conn->prepare('INSERT INTO locations (id, str_content) VALUES (:id, :str)');
+
+            $insert_stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':str', $str_content, SQLITE3_TEXT);
+
+            if (!$insert_stmt->execute()) {
+                Logging::error('failure to insert location in backup db', ['location' => $str_content]);
+                return false;
+            };
+        }
+
+        return true;
     }
 
     /**
@@ -141,7 +157,7 @@ class LocationQueries extends Queries
         $stmt->bindParam(':str', $content, $this->data_types['str']);
         $r = $stmt->execute();
         if ($r) {
-            if (App::useSQLite()) {
+            if (USE_SQLITE) {
                 return $r->numColumns() === 1;
             }
             $c = $stmt->fetchColumn();

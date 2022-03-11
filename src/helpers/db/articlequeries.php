@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers\db;
@@ -25,17 +25,17 @@ use app\models\Article;
 class ArticleQueries extends Queries
 {
     /**
+     * Transfer article rows to local sqlite db.
+     * 
      * @param SQlite3 $backup_conn Db backup connection.
      * @return True if backup is successful.
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        Logging::debug('article backup not implemented');
+        $query_stmt = $this->conn->prepare("SELECT * FROM articles");
+        $r = $query_stmt->execute();
 
-        $stmt = $this->conn->prepare("SELECT * FROM articles");
-        $r = $stmt->execute();
-
-        while ($row = $this->fetchRow($r, $stmt)) {
+        while ($row = $this->fetchRow($r, $query_stmt)) {
             $id  = (int)($row['id'] ?? 0);
             $user_id = (int)($row['user_id'] ?? 0);
             $article_name = (string)($row['article_name'] ?? '');
@@ -44,9 +44,9 @@ class ArticleQueries extends Queries
             $expiration_date = (string)$row['expiration_date'];
             $creation_date = (string)$row['creation_date'];
 
-            $query = <<<TEXT
-            INSERT INTO articles 
-            (   id,
+            $insert_stmt = $backup_conn->prepare('INSERT INTO articles 
+            (   
+                id,
                 user_id, 
                 article_name, 
                 location, 
@@ -56,20 +56,25 @@ class ArticleQueries extends Queries
             ) 
             VALUES 
             (
-                $id,
-                $user_id,  
-                '$article_name',  
-                '$location', 
-                '$comments',
-                '$expiration_date',
-                '$creation_date'
-            )
-            TEXT;
-            Logging::debug('articles backup', ['query' => $query]);
+                :id,
+                :user_id,  
+                :article_name,  
+                :location, 
+                :comments,
+                :expiration_date,
+                :creation_date
+            )');
 
-            //insert in backup db;
-            if (!$backup_conn->exec($query)) {
-                Logging::error('failure to insert article in backup db', ['article' => $article_name->_toString()]);
+            $insert_stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':user_id', $user_id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':article_name', $article_name, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':location', $location, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':comments', $comments, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':expiration_date', $expiration_date, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
+
+            if (!$insert_stmt->execute()) {
+                Logging::error('failure to insert article in backup db', ['article' => $article_name]);
                 return false;
             };
         }
@@ -107,7 +112,7 @@ class ArticleQueries extends Queries
 
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
-            $str .= App::useSQLite() ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
+            $str .= USE_SQLITE ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
             $count += 1;
         }
 
@@ -115,22 +120,27 @@ class ArticleQueries extends Queries
             if ($count > 1) {
                 $str .= ' AND ';
             }
-            $str .= App::useSQLite() ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
+            $str .= USE_SQLITE ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
             $count += 1;
         }
 
-        if (isset($filters[ArtFilter::DATE_BEFORE]) && $filters[ArtFilter::DATE_BEFORE]) {
-            if ($count > 1) {
-                $str .= ' AND ';
+        if (isset($filters[ArtFilter::DATE_VALUE]) && $filters[ArtFilter::DATE_VALUE]) {
+            if (isset($filters[ArtFilter::DATE_TYPE]) && $filters[ArtFilter::DATE_TYPE]) {
+
+                $date = $filters[ArtFilter::DATE_VALUE];
+                $type = $filters[ArtFilter::DATE_TYPE];
+
+                if ($count > 1) {
+                    $str .= ' AND ';
+                }
+
+                if ($type === ArtFilter::DATE_BEFORE) {
+                    $str .= USE_SQLITE ? "(expiration_date < '{$date}')" : "expiration_date < :fdate";
+                } else {
+                    $str .= USE_SQLITE ? "(expiration_date > '{$date}')" : "expiration_date > :fdate";
+                }
+                $count += 1;
             }
-            $str .= App::useSQLite() ? "(expiration_date < '{$filters[ArtFilter::DATE_BEFORE]}')" : "expiration_date < :fbefore";
-            $count += 1;
-        } else if (isset($filters[ArtFilter::DATE_AFTER]) && $filters[ArtFilter::DATE_AFTER]) {
-            if ($count > 0) {
-                $str .= ' AND ';
-            }
-            $str .= App::useSQLite() ? "(expiration_date > '{$filters[ArtFilter::DATE_AFTER]}')" : "expiration_date > :fafter";
-            $count += 1;
         }
 
         if (!isset($filters[ArtFilter::SHOW_EXPIRED])) {
@@ -149,10 +159,10 @@ class ArticleQueries extends Queries
     /**
      * Compose ORDER BY clause.
      * 
-     * @param int $param OrderBy constant value.
+     * @param string $param OrderBy constant value.
      * @return string orderby clause.
      */
-    public static function printOrderStatement(int $param): string
+    public static function printOrderStatement(string $param): string
     {
         // CURRENT_TIMESTAMP - expiration_date <- Order old articles at the end.
 
@@ -222,7 +232,9 @@ class ArticleQueries extends Queries
 
         $r = $stmt->execute();
         if ($r) {
-            return $this->rowId();
+            $id = $this->rowId();
+            $article->setId($id);
+            return $id;
         }
         Logging::error(LogError::ARTICLE_INSERT, ['error' => $this->error($stmt)]);
         return 0;
@@ -282,11 +294,8 @@ class ArticleQueries extends Queries
         if (Util::str_contains($filter_statement, ':floc')) {
             $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], $this->data_types['str']);
         }
-        if (Util::str_contains($filter_statement, ':fbefore')) {
-            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], $this->data_types['str']);
-        }
-        if (Util::str_contains($filter_statement, ':fafter')) {
-            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], $this->data_types['str']);
+        if (Util::str_contains($filter_statement, ':fdate')) {
+            $stmt->bindParam(':fdate', $filters[ArtFilter::DATE_VALUE], $this->data_types['str']);
         }
 
         $r = $stmt->execute();
@@ -303,11 +312,11 @@ class ArticleQueries extends Queries
      * 
      * @param int $limit The maximum number of items to be returned.
      * @param int $offset The number of result items to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use OrderBy constants as parameter.
+     * @param string $orderby Order parameter. Use OrderBy constants as parameter.
      * @param array $filters Array of ArtFilter instances.
      * @return array An array of articles.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::DELAY_ASC, array $filters = []): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, string $orderby = OrderBy::DELAY_ASC, array $filters = []): array
     {
         // Logging::debug('queryAll', $filters);
 
@@ -342,14 +351,9 @@ class ArticleQueries extends Queries
         if (Util::str_contains($filter_statement, ':floc')) {
             $stmt->bindParam(':floc', $filters[ArtFilter::LOCATION], $this->data_types['str']);
         }
-        if (Util::str_contains($filter_statement, ':fbefore')) {
-            $stmt->bindParam(':fbefore', $filters[ArtFilter::DATE_BEFORE], $this->data_types['str']);
+        if (Util::str_contains($filter_statement, ':fdate')) {
+            $stmt->bindParam(':fdate', $filters[ArtFilter::DATE_VALUE], $this->data_types['str']);
         }
-        if (Util::str_contains($filter_statement, ':fafter')) {
-            Logging::debug(':fafter');
-            $stmt->bindParam(':fafter', $filters[ArtFilter::DATE_AFTER], $this->data_types['str']);
-        }
-
         $stmt->bindParam(':lim', $limit, $this->data_types['int']);
         $stmt->bindParam(':off', $offset, $this->data_types['int']);
 

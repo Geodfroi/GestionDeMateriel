@@ -70,5 +70,5 @@ if ($is_alias_address) {
         }
     } ?>
     <br>
-    <div>&emsp;Vous pouvez modifier le délai de rappel dans l'onglet <i>Profile</i> au sein de <a href="<?php echo $url ?>">l'application.</a></div>
+    <div>&emsp;Vous pouvez modifier le délai de rappel dans l'onglet <i>Profil</i> au sein de <a href="<?php echo $url ?>">l'application.</a></div>
 </div>

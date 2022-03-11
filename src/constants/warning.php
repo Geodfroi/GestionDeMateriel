@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.14 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\constants;
@@ -28,14 +28,17 @@ class Warning
     const LOCATION_PRESET_EXISTS = "Cet emplacement est déjà présent dans la liste.";
 
     //login warnings
-    const LOGIN_EMAIL_EMPTY = 'Un e-mail est nécessaire pour vous connecter.';
+    const LOGIN_ALIAS_NOT_FOUND = "Il n'existe pas d'usager correspondant à cet alias.";
+    const LOGIN_EMPTY = 'Une adresse e-mail ou un alias est nécessaire.';
+    const LOGIN_EMAIL_EMPTY = 'Une adresse e-mail valide est nécessaire.';
     const LOGIN_PASSWORD_EMPTY = 'Il vous faut fournir un mot de passe.';
     const LOGIN_EMAIL_INVALID = "Il ne s'agit pas d'une adresse e-mail valide.";
-    const LOGIN_NOT_FOUND = "Il n'existe pas d'usager employant cette adresse e-mail.";
+    const LOGIN_EMAIL_NOT_FOUND = "Il n'existe pas d'usager employant cette adresse e-mail.";
     const LOGIN_INVALID_PASSWORD = "Le mot de passe n'est pas correct.";
 
     //profile warnings
     const ALIAS_TOO_SHORT = "Votre alias doit au moins mesurer %s caractères.";
+    const ALIAS_ALREADY_EXISTS = "Un autre utilisateur utilise déjà cet alias.";
     const DELAYS_NONE = "Il est nécessaire de cocher au moins une option.";
     const PASSWORD_DIFFERENT = "Ce mot de passe n'est pas identique au précédent.";
     const PASSWORD_REPEAT_NULL = "Il vous faut répéter votre mot de passe";

@@ -1,22 +1,17 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.12 ###
+## Joël Piguet - 2022.01.30 ###
 ##############################
 
 namespace app\routes;
 
-use app\constants\Alert;
-use app\constants\AlertType;
-use app\constants\LogInfo;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
 use app\constants\Settings;
 use app\helpers\Authenticate;
 use app\helpers\Database;
-use app\helpers\Logging;
-use app\helpers\Util;
 
 /**
  * Route class containing behavior linked to admin_template. This route handles all admin related tasks.
@@ -25,7 +20,7 @@ class UserTable extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('user_table_template', Route::USERS_TABLE);
+        parent::__construct(Route::USERS_TABLE, 'user_table_template', 'user_table_script');
     }
 
     public function getBodyContent(): string
@@ -34,60 +29,34 @@ class UserTable extends BaseRoute
             $this->requestRedirect(Route::LOGIN);
         }
 
-        $_SESSION[Session::USERS_PAGE] ??= 1;
-        $_SESSION[Session::USERS_ORDERBY] ??= OrderBy::EMAIL_ASC;
-
-        if (isset($_GET['alert'])) {
-            if ($_GET['alert'] === 'added_success') {
-                $this->showAlert(AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
-            } else if ($_GET['alert'] === 'added_failure') {
-                $this->showAlert(AlertType::FAILURE, Alert::USER_ADD_FAILURE);
-            }
-            goto end;
+        $display_data = isset($_SESSION[Session::USERS_DISPLAY]) ? json_decode($_SESSION[Session::USERS_DISPLAY], true) : [];
+        if (!isset($display_data['page'])) {
+            $display_data['page'] = 1;
         }
-
-        if (isset($_GET['renew'])) {
-            $user = Database::users()->queryById(intval($_GET['renew']));
-            Util::renewPassword($this, $user);
-            goto end;
+        if (!isset($display_data['orderby'])) {
+            $display_data['orderby'] = OrderBy::EMAIL_ASC;
         }
 
         if (isset($_GET['orderby'])) {
-            $_SESSION[Session::USERS_ORDERBY] = intval($_GET['orderby']);
-            goto end;
+            $display_data['orderby'] = $_GET['orderby'];
         }
 
         if (isset($_GET['page'])) {
-            $_SESSION[Session::USERS_PAGE] = intval($_GET['page']);
-            goto end;
+            $display_data['page'] = intval($_GET['page']);
         }
 
-        if (isset($_GET['delete'])) {
-            $user_id = $_GET['delete'];
+        $_SESSION[Session::USERS_DISPLAY] = json_encode($display_data);
 
-            if (Database::users()->delete($user_id)) {
-
-                Logging::info(LogInfo::USER_DELETED, [
-                    'admin-id' => Authenticate::getUserId(),
-                    'user-id' => $user_id
-                ]);
-
-                $this->showAlert(AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
-            } else {
-                $this->showAlert(AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
-            }
-            goto end;
-        }
-
-        end:
-
+        $display_count = TABLE_DISPLAY_COUNT;
         $item_count = Database::users()->queryCount(false);
-        $offset =   ($_SESSION[Session::USERS_PAGE] - 1) * Settings::TABLE_DISPLAY_COUNT;
-        $page_count = ceil($item_count / Settings::TABLE_DISPLAY_COUNT);
-        $users = Database::users()->queryAll(Settings::TABLE_DISPLAY_COUNT, $offset, $_SESSION[Session::USERS_ORDERBY], false);
+        $offset =   ($display_data['page'] - 1) *      $display_count;
+        $page_count = ceil($item_count /      $display_count);
+
+        $users = Database::users()->queryAll($display_count, $offset, $display_data['orderby'], false);
 
         return $this->renderTemplate([
             'users' =>  $users,
+            'display_data' => $display_data,
             'page_count' => $page_count,
         ]);
     }

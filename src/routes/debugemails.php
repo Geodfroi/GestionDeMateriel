@@ -16,7 +16,7 @@ class DebugEmails extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct('debug_emails_template', Route::DEBUG_EMAILS, false, false);
+        parent::__construct(Route::DEBUG_EMAILS, 'debug_emails_template', "", false, false);
     }
 
     public function getBodyContent(): string
@@ -55,6 +55,6 @@ class DebugEmails extends BaseRoute
         return $this->renderTemplate([
             'html_template' =>  $html_template ?? '',
             'plaintext' =>  $plaintext ?? '',
-        ]);
+        ], false);
     }
 }

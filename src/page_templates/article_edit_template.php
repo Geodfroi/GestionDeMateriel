@@ -1,96 +1,91 @@
 <?php
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.30 ###
 ##############################
 
 use app\constants\Route;
-use app\helpers\Database;
-
-$loc_presets = Database::locations()->queryAll();
 
 ?>
 
-<div class="container">
-    <div class="row col-8">
-        <form method="post" action="<?php echo Route::ART_EDIT ?>">
-            <label class="h4 m-4">Ajouter un article</article></label>
+<div class="container mt-4">
 
-            <input type="hidden" name="id" value="<?php echo $id ?>">
+    <form>
+        <div class="row">
+            <label id='form-label' class="h4 text-center">Ajouter un article</label>
+        </div>
 
-            <div class="mb-2">
-                <label for="form-name" class="form-label col-3">Nom de l'article:</label>
-                <input id="form-name" name="article-name" type="text" value="<?php echo htmlentities($article_name) ?>" class="form-control
-                    <?php echo isset($warnings['article-name']) ? ' is-invalid' : '' ?>
-                    <?php echo $article_name ? ' is-valid' : '' ?>">
-                <?php if (isset($warnings['article-name'])) { ?>
-                    <div class='invalid-feedback'><?php echo $warnings['article-name'] ?> </div>
-                <?php } ?>
+        <div class="row">
+            <div for="article-name" class="form-label col-lg-8 mx-auto">Nom de l'article:</div>
+        </div>
+
+        <div class="row">
+            <div class="mb-2 col-lg-8 mx-auto">
+                <input id="article-name" name="article-name" type="text" class="form-control">
+                <div id="article-name-feedback" class='invalid-feedback'></div>
             </div>
+        </div>
 
-            <div class="mb-2">
-                <label for="form-location" class="form-label col-3">Emplacement:</label>
+        <div class="row">
+            <div for="location" class="form-label col-lg-8 mx-auto">Emplacement:</div>
+        </div>
 
+        <div class="row d-lg-none mb-1 mx-auto">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <?php foreach ($loc_presets as $item) { ?>
+                    <li><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
+                <?php } ?>
+            </ul>
+        </div>
+
+
+        <div class="row mb-1">
+            <div class="col-lg-8 mx-auto">
                 <div class="input-group">
-                    <input id="form-location" name="location" type="text" value="<?php echo htmlentities($location) ?>" class="form-control
-                        <?php echo isset($warnings['location']) ? ' is-invalid' : '' ?>
-                        <?php echo $location ? ' is-valid' : '' ?>">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
+                    <input id="location" name="location" type="text" class="form-control">
+
+                    <button class="btn btn-outline-secondary dropdown-toggle d-none d-lg-block" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
                     <ul class="dropdown-menu dropdown-menu-end">
-
                         <?php foreach ($loc_presets as $item) { ?>
-                            <li id="loc-preset-" <?php echo $item->getId() ?>><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
+                            <li><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
                         <?php } ?>
-
                     </ul>
-                    <?php if (isset($warnings['location'])) { ?>
-                        <div class='invalid-feedback'><?php echo $warnings['location'] ?></div>
-                    <?php } ?>
+                    <div id="location-feedback" class='invalid-feedback'></div>
                 </div>
             </div>
+        </div>
 
-            <div class=" mb-2">
-                <label for="form-expiration" class="form-label col-3">Date de péremption:</label>
-                <input id="form-expiration" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> value="<?php echo htmlentities($expiration_date) ?>" class="form-control 
-                    <?php echo isset($warnings['expiration-date']) ? ' is-invalid' : '' ?>
-                    <?php echo $expiration_date ? ' is-valid' : '' ?>">
-                <?php if (isset($warnings['expiration-date'])) { ?>
-                    <div class='invalid-feedback'><?php echo $warnings['expiration-date'] ?></div>
-                <?php } ?>
+        <div class="row">
+            <div for="expiration-date" class="form-label col-lg-8 mx-auto">Date de péremption:</div>
+        </div>
 
+        <div class="row">
+            <div class="mb-2 col-lg-8 mx-auto">
+                <input id="expiration-date" name="expiration-date" type="date" placeholder=<?php echo date('d/m/Y'); ?> class="form-control">
+                <div id="expiration-date-feedback" class='invalid-feedback'></div>
             </div>
+        </div>
 
-            <div class=" mb-2">
-                <textarea id="form-comments" name="comments" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments" class="form-control 
-                    <?php echo isset($warnings['comments']) ? ' is-invalid' : '' ?>
-                    <?php echo $comments ? ' is-valid' : '' ?>">
-                </textarea>
+        <div class="row mb-2">
+            <div class="col-lg-8 mx-auto">
+                <textarea id="comments" name="comments" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments" class="form-control"></textarea>
                 <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>
-                <?php if (isset($warnings['comments'])) { ?>
-                    <div class='invalid-feedback'><?php echo $warnings['comments'] ?></div>
-                <?php } ?>
+                <div id="comments-feedback" class='invalid-feedback'></div>
             </div>
+        </div>
 
-            <button type="submit" name="<?php echo $id === 'no-id' ? 'new-article' : 'update-article' ?>" class="btn btn-primary">
-                <?php if ($id === 'no-id') { ?>
-                    Ajouter
-                <?php } else { ?>
-                    Modifier
-                <?php } ?>
-            </button>
-            <a href="<?php echo Route::ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
-        </form>
+        <div class="row">
+            <div class="col-8 mx-auto d-none d-lg-flex justify-content-end">
+                <a href="<?php echo Route::ART_TABLE ?>" class="btn btn-secondary col-2">Annuler</a>
+                <button type="submit" class="submit-btn btn btn-primary col-2 ms-1">Ajouter</button>
+            </div>
+        </div>
 
-    </div>
+        <div class="row mx-auto mb-1 d-lg-none mb-1">
+            <a href=" <?php echo Route::ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
+        </div>
+        <div class="row mx-auto mb-1 d-lg-none mb-4">
+            <button type="submit" class="submit-btn btn btn-primary">Ajouter</button>
+        </div>
+    </form>
 </div>
-
-<script>
-    let loc_input = document.getElementById('form-location');
-
-    let collection = document.getElementsByClassName('loc-preset');
-    for (let index = 0; index < collection.length; index++) {
-        const element = collection[index];
-        element.addEventListener('click', e => {
-            loc_input.value = element.innerText;
-        });
-    }
-</script>

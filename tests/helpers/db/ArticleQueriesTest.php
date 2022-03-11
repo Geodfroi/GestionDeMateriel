@@ -3,107 +3,95 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
-use app\constants\AppPaths;
 use app\constants\ArtFilter;
-use app\constants\Mode;
 use app\constants\OrderBy;
-use app\helpers\App;
 use app\helpers\db\ArticleQueries;
-use app\helpers\Database;
-use app\helpers\Logging;
-use app\helpers\TestUtil;
+// use app\helpers\Logging;
+use app\helpers\TestClass;
 use app\models\Article;
 
-use function PHPUnit\Framework\assertNotNull;
+
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
-use PHPUnit\Framework\TestCase;
 
 /**
  * https://phpunit.readthedocs.io/en/9.5/writing-tests-for-phpunit.html
  * cmd: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --testdox tests
  */
-final class ArticleQueriesTest extends TestCase
+final class ArticleQueriesTest extends TestClass
 {
     private static ArticleQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setMode(Mode::TESTS_SUITE);
-
-        if (APP::useSQLite()) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testArticles.db';
-            $conn = TestUtil::localDBSetup($local_path, true);;
-        } else {
-            $conn = Database::getMySQLConn();
-        }
-        ArticleQueriesTest::$queries = new ArticleQueries($conn);
+        ArticleQueriesTest::$queries = new ArticleQueries(ArticleQueriesTest::getConn());
     }
 
     public static function tearDownAfterClass(): void
     {
     }
 
-    public static function testBackup()
+    public static function testTrue()
     {
-        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testArticlesBackup.db';
-        $backup_conn = TestUtil::localDBSetup($local_path, false);
-        assertNotNull($backup_conn);
-
-        assertTrue(ArticleQueriesTest::$queries->backup($backup_conn));
+        assertTrue(true);
     }
 
-    public function testDelete()
-    {
-        $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
-        // Logging::info('testDelete', ['queryCount' => strval($count)]);
-        assertTrue(ArticleQueriesTest::$queries->delete(2));
-
-        assertSame($count - 1, ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]));
-    }
+    // public static function testBackup()
+    // {
+    //     $backup_conn = DBUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'articles_backup', false);
+    //     assertNotNull($backup_conn);
+    //     assertTrue(ArticleQueriesTest::$queries->backup($backup_conn));
+    // }
 
     public function testInsert()
     {
-        $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
-        // Logging::info('testInsert', ['queryCount' => strval($count)]);
-
         $article = Article::fromForm(0, 'Pneu', 'Garage', '2021-12-19');
         $id = ArticleQueriesTest::$queries->insert($article);
         assertNotSame($id, 0);
-
-        assertSame($count + 1, ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]));
+        assertSame(ArticleQueriesTest::$queries->queryById($id)->getArticleName(), 'Pneu');
     }
 
-    public function testQueryById(): Article
+    public function testInsertDelete()
     {
-        $article = ArticleQueriesTest::$queries->queryById(1);
-        assertNotNull($article);
-        return $article;
-        // Logging::debug($article->__toString());
+        $article = Article::fromForm(0, 'Carambole', 'Armoire à jeux', '2022-01-08');
+        $id = ArticleQueriesTest::$queries->insert($article);
+        assertNotSame($id, 0);
+        assertTrue(ArticleQueriesTest::$queries->delete($id));
+    }
+
+    public function testQueryById()
+    {
+        $article = Article::fromForm(0, 'Pied de biche', 'Garage', '2022-01-10');
+        $id = ArticleQueriesTest::$queries->insert($article);
+
+        $article = ArticleQueriesTest::$queries->queryById($id);
+        assertSame($article->getLocation(), 'Garage');
     }
 
     public function testQueryCount(): void
     {
+        $article = Article::fromForm(0, 'Colle', 'trousse', '2022-01-11');
+        ArticleQueriesTest::$queries->insert($article);
+        $article = Article::fromForm(0, 'Assiette x10', 'armoire', '2022-01-12');
+        ArticleQueriesTest::$queries->insert($article);
+
         $count = ArticleQueriesTest::$queries->queryCount([ArtFilter::SHOW_EXPIRED => true]);
-        $this->assertTrue($count > 0);
-        // Logging::info('testQueryCount', ['count' => strval($count)]);
+        $this->assertTrue($count > 2);
     }
 
     /**
-     * @dataProvider queryAllProvider
+     * @depends testQueryById
      */
-    public function testQueryAll(array $filters, int $order_by): void
+    public function testUpdate($article): void
     {
-        $array = ArticleQueriesTest::$queries->queryAll(PHP_INT_MAX, 0, $order_by, $filters);
-        // foreach ($array as $art) {
-        //     Logging::debug($art->__tostring());
-        // }
-        // Logging::debug('testQueryAll', ['count' => strval(count($array))]);
-        $this->assertNotTrue(count($array) === 0);
+        $article = Article::fromForm(0, 'Colle', 'trousse', '2022-01-11');
+        ArticleQueriesTest::$queries->insert($article);
+
+        $this->assertTrue(ArticleQueriesTest::$queries->update($article));
     }
 
     public function queryAllProvider(): array
@@ -114,19 +102,25 @@ final class ArticleQueriesTest extends TestCase
             [[ArtFilter::SHOW_EXPIRED => true], OrderBy::DELAY_ASC],
             [[ArtFilter::NAME => 'Pro'], OrderBy::DELAY_ASC],
             [[ArtFilter::DATE_AFTER => '2022-01-01'], OrderBy::DELAY_ASC],
-            [[ArtFilter::DATE_BEFORE => '2022-01-01'], OrderBy::DELAY_ASC],
             [[
                 ArtFilter::DATE_AFTER => '2022-01-01',
                 ArtFilter::NAME => 'Pro'
             ], OrderBy::DELAY_ASC],
+            [[ArtFilter::DATE_BEFORE => '2022-01-01'], OrderBy::DELAY_ASC],
         ];
     }
 
     /**
-     * @depends testQueryById
+     * @dataProvider queryAllProvider
      */
-    public function testUpdate($article): void
+    public function testQueryAll(array $filters, string $order_by): void
     {
-        $this->assertTrue(ArticleQueriesTest::$queries->update($article));
+        $array = ArticleQueriesTest::$queries->queryAll(PHP_INT_MAX, 0, $order_by, $filters);
+        // assert($array);
+        // foreach ($array as $art) {
+        //     Logging::debug($art->__tostring());
+        // }
+        // Logging::debug('testQueryAll', ['count' => strval(count($array))]);
+        $this->assertNotTrue(count($array) === 0);
     }
 }

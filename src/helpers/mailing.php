@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.20 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
@@ -14,9 +14,6 @@ use PHPMailer\PHPMailer\Exception;
 
 use app\constants\AppPaths;
 use app\constants\Mail;
-use app\constants\PrivateSettings;
-use app\constants\Settings;
-use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\User;
@@ -26,10 +23,6 @@ use app\models\User;
  */
 class Mailing
 {
-    private static function appUrl(): string
-    {
-        return App::isDebugMode() ? Settings::APP_URL_DEBUG : Settings::APP_URL;
-    }
 
     /**
      * Return html page to be inserted inside an email.
@@ -74,8 +67,8 @@ class Mailing
     public static function passwordChangeNotificationBody(string $recipient, string $password): array
     {
         return Mailing::formatBody('newpassword', [
-            'app_name' => Settings::APP_NAME,
-            'url' => Mailing::appUrl(),
+            'app_name' => APP_NAME,
+            'url' => APP_URL,
             'alias' => $recipient,
             'password' => $password,
         ]);
@@ -105,8 +98,8 @@ class Mailing
     public static function peremptionNotificationBody(string $recipient, array $reminders): array
     {
         return Mailing::formatBody('reminder', [
-            'app_name' => Settings::APP_NAME,
-            'url' => Mailing::appUrl(),
+            'app_name' => APP_NAME,
+            'url' => APP_URL,
             'alias' => $recipient,
             'reminders' => $reminders,
         ]);
@@ -135,8 +128,8 @@ class Mailing
     public static function userInviteNotificationBody(string $login, string $password_plain): array
     {
         return Mailing::formatBody('userinvite', [
-            'app_name' => Settings::APP_NAME,
-            'url' => Mailing::appUrl(),
+            'app_name' => APP_NAME,
+            'url' => APP_URL,
             'login' => $login,
             'password' => $password_plain,
         ]);
@@ -154,8 +147,8 @@ class Mailing
      */
     private static function send(array $recipients, string $subject, string $html_content, string $plain_content): bool
     {
-        if (App::isDebugMode()) {
-            $recipients = [SETTINGS::DEBUG_EMAIL];
+        if (DEBUG_MODE) {
+            $recipients = [APP_EMAIL];
         }
 
         $mail = new PHPMailer(true);
@@ -171,11 +164,11 @@ class Mailing
 
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
 
-            $mail->Username = PrivateSettings::APP_EMAIL;
-            $mail->Password = PrivateSettings::APP_EMAIL_PASSWORD;
+            $mail->Username = APP_EMAIL;
+            $mail->Password = APP_EMAIL_PASSWORD;
 
             // Sender and recipient settings
-            $mail->setFrom(PrivateSettings::APP_EMAIL, Mail::SENDER);
+            $mail->setFrom(APP_EMAIL, Mail::SENDER);
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }

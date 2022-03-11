@@ -1,12 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
+use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Settings;
-use app\helpers\App;
 use app\helpers\Authenticate;
 
 ?>
@@ -14,22 +14,35 @@ use app\helpers\Authenticate;
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 
+<!-- insert $json_data string into an empty div attribute to be made available to javascript. -->
+<div id="php-data" hidden><?php echo $json_data ?></div>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> <?php echo isset($page_title) ? $page_title : "Application"; ?> </title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- bootstrap css from static folder -->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap-icons.css" />
+
+    <!-- bootstrap css by CDN -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css"> -->
+
 </head>
 
 <body class="d-flex flex-column h-100">
 
     <?php if ($show_header) { ?>
         <header>
-            <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
                 <div class="container-fluid">
-                    <span class="navbar-brand me-4" href="#">HEdS - Gestionnaire d'inventaire</span>
+                    <span class="navbar-brand me-4 d-lg-none" href="#">Gestionnaire d'inv.</span>
+                    <span class="navbar-brand me-4 d-none d-lg-inline" href="#">HEdS - Gestionnaire d'inventaire</span>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -46,11 +59,11 @@ use app\helpers\Authenticate;
                                     <a class="nav-link <?php echo $_SESSION['route'] === Route::ART_TABLE ? 'active' : '' ?>" href="<?php echo Route::ART_TABLE ?>">Articles</a>
                                 </li>
                                 <li class="nav-item active">
-                                    <a class="nav-link <?php echo $_SESSION['route'] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profile</a>
+                                    <a class="nav-link <?php echo $_SESSION['route'] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profil</a>
                                 </li>
                             <?php } ?>
 
-                            <?php if (App::isDebugMode()) { ?>
+                            <?php if (DEBUG_MODE) { ?>
                                 <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
                                 <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
                             <?php } ?>
@@ -60,7 +73,7 @@ use app\helpers\Authenticate;
                             <li class="nav-item ms-auto">
                                 <?php if (Authenticate::isLoggedIn()) { ?>
                                     <div>
-                                        <a class="nav-link" href="<?php echo Route::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
+                                        <a class="nav-link" href="<?php echo Requests::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
                                     </div>
                                 <?php } else { ?>
                                     <a class="nav-link" href="<?php echo Route::LOGIN ?>">Connexion</a>
@@ -68,17 +81,20 @@ use app\helpers\Authenticate;
                             </li>
                         </ul>
                     </div>
+                </div>
+            </nav>
 
-                    <!-- show alert message over navbar -->
-                    <div class="row fixed-top">
-                        <div class="col-12">
-                            <?php if (isset($alert['type'])) { ?>
-                                <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
-                                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                                </div>
-                            <?php } ?>
+            <!-- show alert message over navbar -->
+            <?php if (isset($alert['type'])) { ?>
+                <div class="row fixed-top">
+                    <div class="col-12">
+                        <div class='text-center alert alert-<?php echo $alert['type'] ?> alert-dismissible fade show' role='alert'><?php echo $alert['msg'] ?>
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                         </div>
                     </div>
+                </div>
+            <?php } ?>
+
         </header>
     <?php } ?>
 
@@ -95,14 +111,22 @@ use app\helpers\Authenticate;
                     <div class="col-3 text-end"> <a href="/contact">Contacter-nous.</a></div>
                 </div>
                 <div class="row">
-                    <span class="text-muted h6 col-12"><?php echo Settings::LAST_MODIFICATION ?></span>
+                    <span class="text-muted h6 col-12"><?php echo LAST_MODIFICATION ?></span>
                 </div>
             </div>
         </footer>
     <?php } ?>
 
+    <!-- bootstrap javascript from static folder -->
+    <script src="/static/js/bootstrap.bundle.min.js"> </script>
+
     <!-- bootstrap javascript by CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
+
+    <script src="/static/js/bs-detect-breakpoints.js"></script>
+
+    <!-- javascript utility functions -->
+    <script src="/static/js/main.js"></script>
 
     <!-- bootstrap javascript to activate tooltips -->
     <script>
@@ -111,6 +135,20 @@ use app\helpers\Authenticate;
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     </script>
+
+    <!-- route specific script -->
+    <script>
+        <?php echo isset($page_script) ? $page_script : ""; ?>
+    </script>
+
+    <!-- dismiss alert after timer -->
+    <?php if (isset($alert['type'])) { ?>
+        <script>
+            let alert = document.getElementsByClassName('alert')[0];
+            let time = <?php echo $alert['timer'] ?>;
+            window.setTimeout(() => alert.classList.remove('show'), time);
+        </script>
+    <?php } ?>
 </body>
 
 </html>

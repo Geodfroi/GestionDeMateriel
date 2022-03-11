@@ -3,25 +3,25 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.09 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\constants;
 
 class OrderBy
 {
-    const CREATED_ASC = 0;
-    const CREATED_DESC = 1;
-    const DELAY_ASC = 2;
-    const DELAY_DESC = 3;
-    const EMAIL_ASC = 4;
-    const EMAIL_DESC = 5;
-    const LOCATION_ASC = 6;
-    const LOCATION_DESC = 7;
-    const NAME_ASC = 8;
-    const NAME_DESC = 9;
-    const LOGIN_ASC = 10;
-    const LOGIN_DESC = 11;
-    const OWNED_BY_ASC = 12;
-    const OWNED_BY_DESC = 13;
+    const CREATED_ASC = "CREATED_ASC";
+    const CREATED_DESC = "CREATED_DESC";
+    const DELAY_ASC = "DELAY_ASC";
+    const DELAY_DESC = "DELAY_DESC";
+    const EMAIL_ASC = 'EMAIL_ASC';
+    const EMAIL_DESC = 'EMAIL_DESC';
+    const LOCATION_ASC = 'LOCATION_ASC';
+    const LOCATION_DESC = 'LOCATION_DESC';
+    const NAME_ASC = 'NAME_ASC';
+    const NAME_DESC = 'NAME_DESC';
+    const LOGIN_ASC = "LOGIN_ASC";
+    const LOGIN_DESC = "LOGIN_DESC";
+    const OWNED_BY_ASC = "OWNED_BY_ASC";
+    const OWNED_BY_DESC = "OWNED_BY_DESC";
 }

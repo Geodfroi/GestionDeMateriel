@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.13###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\helpers;
@@ -12,280 +12,203 @@ use DateTime;
 
 use app\constants\Settings;
 use app\constants\Warning;
+
 // use app\helpers\Logging;
-use app\routes\BaseRoute;
 
 class Validation
 {
     /**
-     * Validate user alias. Alias can be set to empty string in which cas e-mail root is used in the app.
-     * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param string|null $alias Optional alias by reference.
-     * @return bool True if Alias is conform or empty.
-     */
-    public static function validateAlias(BaseRoute $route, &$alias): bool
-    {
-        $alias = trim($_POST['alias']) ?? '';
-        if ($alias === '') {
-            return true;
-        }
-        if (strlen($alias) < Settings::ALIAS_MIN_LENGHT) {
-            $route->showWarning('alias', sprintf(Warning::ALIAS_TOO_SHORT, Settings::ALIAS_MIN_LENGHT));
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Article name validation. Article name must not be empty, exceed a set length and under a set number of caracters.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param array &$string $article_name Article name by reference.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateArticleName(BaseRoute $route, ?string &$article_name): bool
+    public static function validateArticleName(string &$article_name): string
     {
-        $article_name = trim($_POST['article-name']) ?? '';
-
-        if (
-            $article_name === ''
-        ) {
-            $route->showWarning('article-name', Warning::ARTICLE_ADD_EMPTY);
-            return false;
+        if ($article_name === '') {
+            return Warning::ARTICLE_ADD_EMPTY;
         }
 
-        if (strlen($article_name) < Settings::ARTICLE_NAME_MIN_LENGHT) {
-            $route->showWarning('article-name', sprintf(Warning::ARTICLE_NAME_TOO_SHORT, Settings::ARTICLE_NAME_MIN_LENGHT));
-            return false;
+        if (strlen($article_name) < ARTICLE_NAME_MIN_LENGHT) {
+            return sprintf(Warning::ARTICLE_NAME_TOO_SHORT, ARTICLE_NAME_MIN_LENGHT);
         }
 
-        if (strlen($article_name) > Settings::ARTICLE_NAME_MAX_LENGTH) {
-            $route->showWarning('article-name', sprintf(Warning::ARTICLE_NAME_TOO_LONG, Settings::ARTICLE_NAME_MAX_LENGTH));
-            return false;
+        if (strlen($article_name) > ARTICLE_NAME_MAX_LENGTH) {
+            return sprintf(Warning::ARTICLE_NAME_TOO_LONG, ARTICLE_NAME_MAX_LENGTH);
         }
-        return true;
+        return "";
     }
 
     /**
      * Comments validation. Comments can be empty string but be under a set number of caracters.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string &$comments Comments to be attached to the reminder by reference.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateComments(BaseRoute $route, ?string &$comments): bool
+    public static function validateComments(string &$comments): string
     {
-        $comments = trim($_POST['comments']) ?? '';
-
-        if (strlen($comments) > Settings::ARTICLE_COMMENTS_MAX_LENGHT) {
-            $route->showWarning('comments', sprintf(Warning::COMMENTS_NAME_TOO_LONG, Settings::ARTICLE_COMMENTS_MAX_LENGHT));
-            return false;
+        if (strlen($comments) > ARTICLE_COMMENTS_MAX_LENGHT) {
+            return sprintf(Warning::COMMENTS_NAME_TOO_LONG, ARTICLE_COMMENTS_MAX_LENGHT);
         }
-        return true;
+        return "";
     }
 
     /**
      * Validate contact email. Email must a valid email format or set to null.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param string|null $contact_email Contact e-mail by reference.
-     * @return bool True if e-mail is set to empty string or is a valid email format.
+     * @param string $contact_email Contact e-mail candidate.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateContactEmail(BaseRoute $route, &$email): bool
+    public static function validateContactEmail(string $email): string
     {
-        $email = trim($_POST['contact-email']) ?? '';
-
         if ($email  === '') {
-            return true;
+            return "";
         }
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
         if (!$email) {
-            $route->showWarning('contact-email', Warning::LOGIN_EMAIL_INVALID);
-            return false;
+            return Warning::LOGIN_EMAIL_INVALID;
         }
-        return true;
+        return "";
     }
 
     /**
      * Date validation. Date must not be empty and correspond to format yyyy-mm-dd
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string &$validated_date Validated expiration date.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateExpirationDate(BaseRoute $route, ?string &$date): bool
+    public static function validateExpirationDate(string &$date): string
     {
-        $date = trim($_POST['expiration-date'] ?? '');
-
         if ($date === '') {
-            $route->showWarning('expiration-date', Warning::DATE_EMPTY);
-            return false;
+            return Warning::DATE_EMPTY;
         }
 
+        // verify than the date can be created from format.
         $validated_date = DateTime::createFromFormat('Y-m-d', $date);
+        if (!$validated_date) {
+            return Warning::DATE_INVALID;
+        }
+
         $date = $validated_date->format('Y-m-d');
+
+        if ($validated_date < new DateTime()) {
+            return Warning::DATE_PAST;
+        }
 
         static $future_limit;
         if (is_null($future_limit)) {
-            $future_limit = DateTime::createFromFormat('Y-m-d', Settings::ARTICLE_DATE_FUTURE_LIMIT);
+            $future_limit = DateTime::createFromFormat('Y-m-d', ARTICLE_DATE_FUTURE_LIMIT);
         }
 
-        if ($validated_date) {
-
-            if ($validated_date < new DateTime()) {
-                $route->showWarning('expiration-date', Warning::DATE_PAST);
-                return false;
-            }
-
-            if ($validated_date >= $future_limit) {
-                $route->showWarning('expiration-date', Warning::DATE_FUTURE);
-                return false;
-            }
-
-            return true;
+        if ($validated_date >= $future_limit) {
+            return Warning::DATE_FUTURE;
         }
 
-        $route->showWarning('expiration-date', Warning::DATE_INVALID);
-        return false;
-    }
-
-    /**
-     * Validate input and fill $errors array with proper email error text to be displayed if it fails.
-     * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param ?string $email User email by reference.
-     * @return bool True if properly filled-in.
-     */
-    public static function validateLoginEmail(BaseRoute $route, ?string &$email): bool
-    {
-        $email = trim($_POST['login-email']) ?? '';
-
-        if ($email  === '') {
-            $route->showWarning('login-email', Warning::LOGIN_EMAIL_EMPTY);
-            return false;
-        }
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            $route->showWarning('login-email', Warning::LOGIN_EMAIL_INVALID);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
-     * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param string $password User password by reference
-     * @return bool True if properly filled;
-     */
-    public static function validateLoginPassword(BaseRoute $route, &$password)
-    {
-        $password = trim($_POST['password']) ?? '';
-        if ($password === '') {
-            $route->showWarning('password', Warning::LOGIN_PASSWORD_EMPTY);
-            return false;
-        }
-        return true;
+        return "";
     }
 
     /**
      * Location validation. Location must not be empty and under a set number of caracters.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string &$location Article's location within the school by reference.
-     * @return bool True if validated.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateLocation(BaseRoute $route, ?string &$location): bool
+    public static function validateLocation(string &$location): string
     {
-        $location = trim($_POST['location']) ?? '';
-
         if (strlen($location) === 0) {
-            $route->showWarning('location', Warning::LOCATION_EMPTY);
-            return false;
+            return  Warning::LOCATION_EMPTY;
         }
 
         $location = ucwords($location);
-        if (strlen($location) < Settings::LOCATION_MIN_LENGHT) {
-            $route->showWarning('location', sprintf(Warning::LOCATION_TOO_SHORT, Settings::LOCATION_MIN_LENGHT));
-            return false;
+        if (strlen($location) < ARTICLE_LOCATION_MIN_LENGHT) {
+            return sprintf(Warning::LOCATION_TOO_SHORT, ARTICLE_LOCATION_MIN_LENGHT);
         }
 
-        if (strlen($location) > Settings::LOCATION_MAX_LENGHT) {
-            $route->showWarning('location', sprintf(Warning::LOCATION_TOO_LONG, Settings::LOCATION_MAX_LENGHT));
-            return false;
+        if (strlen($location) > ARTICLE_LOCATION_MAX_LENGHT) {
+            return sprintf(Warning::LOCATION_TOO_LONG, ARTICLE_LOCATION_MAX_LENGHT);
         }
-        return true;
+        return "";
     }
 
     /**
-     * Validate input and fill $errors array with proper email error text to be displayed if it fails.
+     * Location preset validation. Location must not be empty, under a set number of caracters and not yet exist.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
-     * @param ?string $email User email by reference.
-     * @return bool True if properly filled-in.
+     * @param string &$location Article's location within the school by reference.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewLogin(BaseRoute $route, ?string &$email): bool
+    public static function validateLocationPreset(string &$location): string
     {
-        if (!Validation::validateLoginEmail($route, $email)) {
-            return false;
+        if ($warning = Validation::validateLocation($location)) {
+            return $warning;
+        }
+        if (Database::locations()->contentExists($location)) {
+            return Warning::LOCATION_PRESET_EXISTS;
+        }
+        return "";
+    }
+
+    /**
+     * Validate input and fill $errors array with proper error text to be displayed if it fails.
+     * 
+     * @param ?string $email User email by reference.
+     * @return string Empty string if value is validated or warning message in case of failure.
+     */
+    public static function validateNewLogin(?string &$email): string
+    {
+        if ($email  === '') {
+            return Warning::LOGIN_EMAIL_EMPTY;
+        }
+
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+        if (!$email) {
+            return Warning::LOGIN_EMAIL_INVALID;
         }
 
         if (Database::users()->queryByEmail($email)) {
-            $route->showWarning('login-email', Warning::USER_EMAIL_USED);
-            return false;
+            return Warning::USER_EMAIL_USED;
         }
-        return true;
+        return "";
     }
 
     /**
-     * Validate input and fill $errors array with proper password error text to be displayed if it fails.
+     * Validate input and fill $warning array with proper warning to be displayed in case of failure.
      * https://www.codexworld.com/how-to/validate-password-strength-in-php/
      * 
-     * @param BaseRoute $route Route to forward error messages.
-     * @param string|null $password_candidate Proposed user password by reference.
-     * @return bool True if password is properly formatted;
+     * @param string $password_candidate Proposed user password by reference.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewPassword(BaseRoute $route, ?string &$password_candidate): bool
+    public static function validateNewPassword(string &$password_candidate): string
     {
-        $password_candidate = trim($_POST['password']) ?? '';
         if ($password_candidate === '') {
-            $route->showWarning('password', Warning::PASSWORD_EMPTY);
-            return false;
+            return Warning::PASSWORD_EMPTY;
         }
-        if (strlen($password_candidate) < Settings::USER_PASSWORD_MIN_LENGTH) {
-            $route->showWarning('password', sprintf(Warning::PASSWORD_SHORT, Settings::USER_PASSWORD_MIN_LENGTH));
-            return false;
+        if (strlen($password_candidate) < USER_PASSWORD_MIN_LENGTH) {
+            return sprintf(Warning::PASSWORD_SHORT, USER_PASSWORD_MIN_LENGTH);
         }
         $has_number = preg_match('@[0-9]@', $password_candidate);
         $has_letters = preg_match('@[a-zA-Z]@', $password_candidate);
         if (!$has_number || (!$has_letters)) {
-            $route->showWarning('password', Warning::PASSWORD_WEAK);
-            return false;
+            return Warning::PASSWORD_WEAK;
         }
-        return true;
+        return "";
     }
 
     /**
      * Validate the repeated password.
      * 
-     * @param BaseRoute $route Route to forward error messages. 
      * @param string $password_first Proposed user password entered in first field.
-     * @return bool True if repeat-password corresponds to first entry.
+     * @param string $password_repeat Repeat of proposed password to filter typing mishaps.
+     * @return string Empty string if value is validated or warning message in case of failure.
      */
-    public static function validateNewPasswordRepeat(BaseRoute $route, string $password_first): bool
+    public static function validateNewPasswordRepeat(string $password_first, string $password_repeat): string
     {
-        $password_repeat = trim($_POST['password-repeat']) ?? '';
         if (!$password_repeat) {
-            $route->showWarning('password-repeat', Warning::PASSWORD_REPEAT_NULL);
-            return false;
+            return Warning::PASSWORD_REPEAT_NULL;
         }
 
         if ($password_first !== $password_repeat) {
-            $route->showWarning('password-repeat', Warning::PASSWORD_DIFFERENT);
-            return false;
+            return Warning::PASSWORD_DIFFERENT;
         }
-        return true;
+        return "";
     }
 }

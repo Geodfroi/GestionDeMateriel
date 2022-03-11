@@ -5,7 +5,7 @@ Un compte utilisateur pour l'application [$app_name] a été créé pour votre b
 Votre login est [$login]. 
 Votre mot de passe est [$password].
 
-Une fois connecté, votre mot de passe peut être modifié sous l'onglet [Profile].
+Une fois connecté, votre mot de passe peut être modifié sous l'onglet [Profil].
 
 HEdS - Service des innovations pédagogiques.
 Prière de ne pas répondre à cet email qui a été généré automatiquement.

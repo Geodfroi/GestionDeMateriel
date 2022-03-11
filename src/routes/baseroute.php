@@ -1,14 +1,13 @@
 <?php
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\AppPaths;
 use app\constants\Settings;
-use app\helpers\App;
 use app\helpers\Logging;
 use app\helpers\Util;
 
@@ -18,30 +17,33 @@ use app\helpers\Util;
 abstract class BaseRoute
 {
     private string $redirectUri = "";
-    private $alert = [];
-    private $warnings = [];
 
+    private $javascript_name;
     private $template_name;
     private $show_header;
     private $show_footer;
 
     /**
+     * Set data to be accessible by javascript scripts. Data is encoded to a json string inserted as inner text to a hidden div in main html file.
+     */
+    private $json_data;
+
+    /**
      * Link a Route with its designated template in the constructor.
      * 
+     * @param string $route Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
      * @param string $template_name Template to use in renderTemplate call.
-     * @param string $route Route's name to store in SESSION global variable (used to highlight current page in nav bar).
+     * @param string $javascript_name Optional javascript file to execute in the page.
+     * @param bool $show_header The page display the AppBar header.
+     * @param bool $show_footer The page display the school info footer.
      */
-    public function __construct(string $template_name, string $route, bool $show_header = true, bool $show_footer = true)
+    public function __construct(string $route, string $template_name = "", string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
     {
         $_SESSION['route'] = $route;
         $this->template_name = $template_name;
+        $this->javascript_name = $javascript_name;
         $this->show_header = $show_header;
         $this->show_footer = $show_footer;
-    }
-
-    public function getAlert()
-    {
-        return $this->alert ?? [];
     }
 
     /**
@@ -58,7 +60,31 @@ abstract class BaseRoute
      */
     public function getHeaderTitle(): string
     {
-        return Settings::APP_NAME;
+        return APP_NAME;
+    }
+
+    /**
+     * Get json so that variables are also available in javascript scripts.
+     * 
+     * @return string JSON encoded as a single string.
+     */
+    public function getJSONData()
+    {
+        return $this->json_data;
+    }
+
+    /**
+     * Get js script to be executed on the page.
+     * 
+     * @return string Javascript text.
+     */
+    public function getScript()
+    {
+        if (strlen($this->javascript_name) == 0)
+            return "";
+
+        $script_path = AppPaths::SCRIPTS . DIRECTORY_SEPARATOR . $this->javascript_name . '.js';
+        return file_get_contents($script_path);
     }
 
     /**
@@ -72,12 +98,14 @@ abstract class BaseRoute
     /** 
      * Load a php template in memory and returns a content string.
      * 
-     * @param array $data The variables to be used in php templates.
+     * @param array $data Associative array to be made avaible in both php templates and javascript scripts.
+     * @param bool $encodeInJSON Encode data as a json string to be made available to javascript.
+     * @return string templated html
      */
-    protected function renderTemplate(array $data = []): string
+    protected function renderTemplate(array $data = [], bool $encodeInJSON = true): string
     {
         // log post and get request if debug is active
-        if (App::isDebugMode()) {
+        if (DEBUG_MODE) {
             if (count($_GET) > 0) {
                 Logging::debug('GET', $_GET);
             }
@@ -86,51 +114,22 @@ abstract class BaseRoute
             }
         }
 
-        $data['warnings'] = $this->warnings ?? [];
+        $this->json_data = $encodeInJSON ? json_encode($data, JSON_UNESCAPED_UNICODE) : '{}';
         return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES);
     }
 
     /**
-     * Send a header to the browser requesting a redirection to the path provided.
+     * Send a header to the browser requesting a redirection to the path provided. Optionaly display an alert after redirection.
      * 
      * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
+     * @param string $alert_type Optional alert type. Use AlertType const.
+     * @param string $alert_msg Optional alert message to be displayed after redirection.
+     * @return string Return empty string.
      */
-    protected function requestRedirect(string $uri)
+    protected function requestRedirect(string $uri, string $alert_type = "", $alert_msg = ""): string
     {
         $this->redirectUri = $uri;
-
-        //The header php function will send a header message to the browser, here signaling for redirection.
-        header("Location: $uri", true);
-    }
-
-    /**
-     * Set an popup alert message to be displayed.
-     * 
-     * @param string $type Alert type which defines alert colour; use const defined in AlertType class.
-     * @param string $msg Alert message to be displayed.
-     */
-    public function showAlert(string $type, string $msg)
-    {
-        if (App::isDebugMode()) {
-            Logging::debug('alert', [$type => $msg]);
-        }
-
-        $this->alert = [
-            'type' => $type,
-            'msg' => $msg,
-        ];
-    }
-
-    /**
-     * Set a warning to be displayed beneath invalid input in forms.
-     */
-    public function showWarning(string $key, string $content)
-    {
-        if (App::isDebugMode()) {
-            Logging::debug('warning', [$key => $content]);
-        }
-
-        $this->warnings[$key] = $content;
+        return Util::requestRedirect($uri, $alert_type, $alert_msg);
     }
 
     /**
@@ -148,3 +147,15 @@ abstract class BaseRoute
         return $this->show_header;
     }
 }
+
+    // /**
+    //  * Set a warning to be displayed beneath invalid input in forms.
+    //  */
+    // public function showWarning(string $key, string $content)
+    // {
+    //     if (DEBUG_MODE) {
+    //         Logging::debug('warning', [$key => $content]);
+    //     }
+
+    //     $this->warnings[$key] = $content;
+    // }

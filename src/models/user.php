@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2022.01.17 ###
 ##############################
 
 namespace app\models;
@@ -143,6 +143,28 @@ class User
     public function isAdmin(): bool
     {
         return $this->is_admin;
+    }
+
+    public function setId(int $value)
+    {
+        $this->id = $value;
+    }
+
+    /**
+     * Return as JSON data.
+     */
+    public function toJSON()
+    {
+        $array = [
+            'id' => $this->id,
+            'alias' => $this->alias,
+            'contact-delay' => $this->contact_delay,
+            'contact-email' => $this->contact_email,
+            'creation-date' => $this->creation_date->format('Y-m-d'),
+            'is-admin' => $this->is_admin,
+            'last-login' => $this->last_login->format('Y-m-d'),
+        ];
+        return json_encode($array);
     }
 
     /**

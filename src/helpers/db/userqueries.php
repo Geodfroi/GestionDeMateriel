@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
 namespace app\helpers\db;
@@ -27,8 +27,61 @@ class UserQueries extends Queries
      */
     public function backup(SQlite3 $backup_conn): bool
     {
-        Logging::debug('location debug not implemented');
-        return false;
+        $query_stmt = $this->conn->prepare("SELECT * FROM users");
+        $r = $query_stmt->execute();
+
+        while ($row = $this->fetchRow($r, $query_stmt)) {
+            $id  = (int)($row['id'] ?? 0);
+            $alias = (string)($row['alias'] ?? '');
+            $contact_delay = (string)($row['contact_delay'] ?? '');
+            $contact_email = (string)($row['contact_email'] ?? '');
+            $creation_date = (string)($row['creation_date'] ?? '');
+            $login_email = (string)($row['login_email'] ?? '');
+            $is_admin  = (bool)($row['is_admin'] ?? 0);
+            $last_login = (string)($row['last_login'] ?? '');
+            $password = (string)($row['password'] ?? '');
+
+            $insert_stmt = $backup_conn->prepare('INSERT INTO users 
+            (   
+                id,
+                alias, 
+                contact_delay, 
+                contact_email, 
+                creation_date,
+                login_email,
+                is_admin,
+                last_login,
+                password
+            ) 
+            VALUES 
+            (
+                :id,
+                :alias, 
+                :contact_delay, 
+                :contact_email, 
+                :creation_date,
+                :login_email,
+                :is_admin,
+                :last_login,
+                :password
+            )');
+
+            $insert_stmt->bindParam(':id', $id, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':alias', $alias, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':contact_delay', $contact_delay, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':contact_email', $contact_email, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':creation_date', $creation_date, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':login_email', $login_email, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':is_admin', $is_admin, SQLITE3_INTEGER);
+            $insert_stmt->bindParam(':last_login', $last_login, SQLITE3_TEXT);
+            $insert_stmt->bindParam(':password', $password, SQLITE3_TEXT);
+
+            if (!$insert_stmt->execute()) {
+                Logging::error('failure to insert user in backup db', ['user' => $login_email]);
+                return false;
+            };
+        }
+        return true;
     }
 
     /**
@@ -56,10 +109,10 @@ class UserQueries extends Queries
     /**
      * Compose ORDER BY clause.
      * 
-     * @param int $param OrderBy constant value.
+     * @param string $param OrderBy constant value.
      * @return string orderby clause.
      */
-    public static function getOrderStatement(int $param): string
+    public static function getOrderStatement(string $param): string
     {
         switch ($param) {
                 //simply by email which are unique.
@@ -122,7 +175,9 @@ class UserQueries extends Queries
 
         $r = $stmt->execute();
         if ($r) {
-            return $this->rowId();
+            $id = $this->rowId();
+            $user->setId($id);
+            return $id;
         }
 
         Logging::error(LogError::USER_INSERT, ['error' => $this->error($stmt)]);
@@ -133,9 +188,10 @@ class UserQueries extends Queries
      * Return a single User data by alias.
      * 
      * @param int $id User alias.
+     * @param bool suppress error logging
      * @return ?User User class instance.
      */
-    public function queryByAlias(string $alias): ?User
+    public function queryByAlias(string $alias, $suppress_error = false): ?User
     {
         $stmt = $this->conn->prepare('SELECT 
             id, 
@@ -157,14 +213,17 @@ class UserQueries extends Queries
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
-            Logging::error(LogError::USER_QUERY, ['alias' => $alias]);
+            if (!$suppress_error) {
+                Logging::error(LogError::USER_QUERY, ['alias' => $alias]);
+            }
             return null;
         }
-
-        Logging::error(LogError::USER_QUERY, [
-            'alias' => $alias,
-            'error' => $this->error($stmt)
-        ]);
+        if (!$suppress_error) {
+            Logging::error(LogError::USER_QUERY, [
+                'alias' => $alias,
+                'error' => $this->error($stmt)
+            ]);
+        }
         return null;
     }
 
@@ -172,9 +231,10 @@ class UserQueries extends Queries
      * Return a single User data by id.
      * 
      * @param int $id User id.
+     * @param bool suppress error logging
      * @return ?User User class instance.
      */
-    public function queryById(int $id): ?User
+    public function queryById(int $id, $suppress_error = false): ?User
     {
         $stmt = $this->conn->prepare('SELECT 
             id, 
@@ -196,14 +256,19 @@ class UserQueries extends Queries
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
-            Logging::error(LogError::USER_QUERY, ['id' => $id]);
+            if (!$suppress_error) {
+                Logging::error(LogError::USER_QUERY, ['id' => $id]);
+            }
+
             return null;
         }
+        if (!$suppress_error) {
+            Logging::error(LogError::USER_QUERY, [
+                'id' => $id,
+                'error' => $this->error($stmt)
+            ]);
+        }
 
-        Logging::error(LogError::USER_QUERY, [
-            'id' => $id,
-            'error' => $this->error($stmt)
-        ]);
         return null;
     }
 
@@ -211,9 +276,10 @@ class UserQueries extends Queries
      * Return a single user data by their login email.
      * 
      * @param string $login_email User login email.
+     *     * @param bool suppress error logging
      * @return ?User User class instance or null.
      */
-    public function queryByEmail(string $login_email): ?User
+    public function queryByEmail(string $login_email, $suppress_error = false): ?User
     {
         $query = 'SELECT 
             id, 
@@ -236,14 +302,18 @@ class UserQueries extends Queries
             if ($row) {
                 return User::fromDatabaseRow($row);
             }
-            Logging::error(LogError::USER_QUERY, ['login_email' => $login_email,]);
+            if (!$suppress_error) {
+                Logging::error(LogError::USER_QUERY, ['login_email' => $login_email,]);
+            }
             return null;
         }
+        if (!$suppress_error) {
+            Logging::error(LogError::USER_QUERY, [
+                'login_email' => $login_email,
+                'error' => $this->error($stmt)
+            ]);
+        }
 
-        Logging::error(LogError::USER_QUERY, [
-            'login_email' => $login_email,
-            'error' => $this->error($stmt)
-        ]);
         return null;
     }
 
@@ -279,11 +349,11 @@ class UserQueries extends Queries
      * 
      * @param int $limit The maximum number of users to be returned.
      * @param int $offset The number of result users to be skipped before including them to the result array.
-     * @param int $orderby Order parameter. Use OrderBy constants as parameter.
+     * @param string $orderby Order parameter. Use OrderBy constants as parameter.
      * @param bool $excludeAdmins Count only common users.
      * @return array Array of users.
      */
-    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, int $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
+    public function queryAll(int $limit = PHP_INT_MAX, int $offset = 0, string $orderby = OrderBy::EMAIL_ASC, bool $excludeAdmins = false): array
     {
         $order_statement = UserQueries::getOrderStatement($orderby);
         $filter_statement = $excludeAdmins ? ' WHERE is_admin = False' : '';

@@ -3,61 +3,48 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.01.09 ###
 ##############################
 
-use app\constants\AppPaths;
-use app\constants\Mode;
-use app\helpers\App;
-use app\helpers\Database;
 use app\helpers\db\LocationQueries;
-use app\helpers\Logging;
-use app\helpers\TestUtil;
-use app\models\StringContent;
+// use app\helpers\Logging;
+use app\helpers\TestClass;
 
-use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 
-final class LocationQueriesTest extends TestCase
+final class LocationQueriesTest extends TestClass
 {
     private static LocationQueries $queries;
 
     public static function setUpBeforeClass(): void
     {
-        App::setMode(Mode::TESTS_SUITE);
-
-        if (APP::useSQLite()) {
-            $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocations.db';
-            $conn = TestUtil::localDBSetup($local_path, true);;
-        } else {
-            $conn = Database::getMySQLConn();
-        }
-        LocationQueriesTest::$queries = new LocationQueries($conn);
+        LocationQueriesTest::$queries = new LocationQueries(LocationQueriesTest::getConn());
     }
 
     public static function tearDownAfterClass(): void
     {
     }
 
-    public static function testBackup()
+    // public static function testBackup()
+    // {
+    //     $backup_conn = DBUtil::localDBSetup(AppPaths::TEST_DB_FOLDER, 'locations_backup', false);
+    //     assertNotNull($backup_conn);
+    //     assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
+    // }
+
+    public function insertProvider(): array
     {
-        $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'testLocationsBackup.db';
-        $backup_conn = TestUtil::localDBSetup($local_path, false);
-        assertNotNull($backup_conn);
-
-        assertTrue(LocationQueriesTest::$queries->backup($backup_conn));
+        return [
+            ['', true],
+            [null, true],
+            ['behind the sofa', false],
+        ];
     }
-
-    public function testDelete(): void
-    {
-        assertTrue(LocationQueriesTest::$queries->delete(2));
-    }
-
     /**
-     * @dataProvider stringProvider
+     * @dataProvider insertProvider
      */
     public function testInsert(?string $str, bool $isZero): void
     {
@@ -70,21 +57,18 @@ final class LocationQueriesTest extends TestCase
         }
     }
 
-    public function stringProvider(): array
+    public function testInsertDelete(): void
     {
-        return [
-            ['', true],
-            [null, true],
-            ['behind the sofa', false],
-        ];
+        $id =  LocationQueriesTest::$queries->insert("new entry str");
+        assertTrue(LocationQueriesTest::$queries->delete($id));
     }
 
-    public function testQueryById(): StringContent
+
+    public function testQueryById(): void
     {
-        $loc = LocationQueriesTest::$queries->queryById(1);
+        $id =  LocationQueriesTest::$queries->insert("another str");
+        $loc = LocationQueriesTest::$queries->queryById($id);
         assertNotNull($loc);
-        // Logging::debug($loc->__toString());
-        return $loc;
     }
 
 
@@ -100,17 +84,16 @@ final class LocationQueriesTest extends TestCase
 
     public function testContentExists(): void
     {
-        $content = LocationQueriesTest::$queries->queryById(1)->getContent();
-        assertTrue(LocationQueriesTest::$queries->contentExists($content));
+        LocationQueriesTest::$queries->insert("yet another str");
+        assertTrue(LocationQueriesTest::$queries->contentExists("yet another str"));
     }
 
-    /**
-     * @depends testQueryById
-     */
-    public function testUpdate(StringContent $content): void
+
+    public function testUpdate(): void
     {
-        assertTrue(LocationQueriesTest::$queries->update($content->getId(), "On top of the chimney"));
-        $q = LocationQueriesTest::$queries->queryById($content->getId());
+        $id =  LocationQueriesTest::$queries->insert("yet another another str");
+        assertTrue(LocationQueriesTest::$queries->update($id, "On top of the chimney"));
+        $q = LocationQueriesTest::$queries->queryById($id);
         assertSame($q->getContent(), "On top of the chimney");
     }
 }

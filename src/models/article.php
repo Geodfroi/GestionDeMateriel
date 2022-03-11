@@ -3,33 +3,35 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.15 ###
+## Joël Piguet - 2022.01.19 ###
 ##############################
 
 namespace app\models;
 
-use app\helpers\Convert;
-
 use DateTime;
+
+use app\helpers\Convert;
+use app\helpers\Database;
+// use app\helpers\Logging;
 
 class Article
 {
     private int $id;
 
-    private int $user_id;
-
     private string $article_name;
-
-    private string $location;
-
-    private DateTime $expiration_date;
-
-    private DateTime $creation_date;
 
     /**
      * Free comments set by the user appended to the email remainder sent when the expiration date is close.
      */
     private string $comments;
+
+    private string $location;
+
+    private DateTime $creation_date;
+
+    private DateTime $expiration_date;
+
+    private int $user_id;
 
     /**
      * Load article instance from database row.
@@ -104,9 +106,48 @@ class Article
         return $this->location;
     }
 
+    /**
+     * Get article creator's alias.
+     * 
+     * @return string Article owner display alias.
+     */
+    public function getOwner(): string
+    {
+        $user = Database::users()->queryById($this->user_id);
+        if ($user) {
+            //take only caracters before @ if it is an email.
+            $alias  = explode('@', $user->getAlias())[0];
+            return sprintf("%s (%s)", $alias, $this->creation_date->format('d.m.Y'));
+        }
+        return "Inconnu";
+    }
+
     public function getUserId(): int
     {
         return $this->user_id;
+    }
+
+    public function setId($value)
+    {
+        $this->id = $value;
+    }
+
+    /**
+     * Return as associative array.
+     * 
+     * @return array
+     */
+    public function asArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'article-name' => $this->article_name,
+            'comments' => $this->comments,
+            'location' => $this->location,
+            'creation-date' => $this->creation_date->format('Y-m-d'),
+            'expiration-date' => $this->expiration_date->format('Y-m-d'),
+            'user-id' => $this->user_id
+        ];
     }
 
     /**

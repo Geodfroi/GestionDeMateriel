@@ -3,16 +3,14 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 use app\constants\AppPaths;
-use app\constants\Mode;
-use app\helpers\App;
-use app\helpers\TestUtil;
+use app\helpers\DBUtil;
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
-App::setMode(Mode::WEB_APP);
 
-$local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
-$conn = TestUtil::localDBSetup($local_path, true);
+const DEBUG_MODE = true;
+const LOG_CHANNEL = "create-db";
+$conn = DBUtil::localDBSetup(AppPaths::LOCAL_DB_FOLDER . DIRECTORY_SEPARATOR . 'localDB.db', true);

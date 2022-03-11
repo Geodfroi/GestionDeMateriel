@@ -28,6 +28,6 @@ use app\helpers\Util;
         </tr>
     </table>
     <br><br>
-    <div>&emsp;Une fois connecté, votre mot de passe peut être modifié sous l'onglet <i>Profile</i>.
+    <div>&emsp;Une fois connecté, votre mot de passe peut être modifié sous l'onglet <i>Profil</i>.
     </div>
 </div>

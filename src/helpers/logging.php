@@ -3,15 +3,15 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.21 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
 
+use DateTime;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use app\constants\AppPaths;
-use app\helpers\App;
 
 /**
  * Wrapper for Monolog php framework; used to log to file.
@@ -24,11 +24,14 @@ class Logging
 
     private static function getChannel(?string $channel)
     {
-        $channel = is_null($channel) ? App::logChannel() : $channel;
+        $channel = is_null($channel) ? LOG_CHANNEL : $channel;
 
         if (!array_key_exists($channel, Logging::$channels)) {
+
+            Util::eraseOldFiles(AppPaths::LOG_FOLDER, $channel, 'log', LOG_FILES_MAX);
             $channels[$channel] = new Logger($channel);
-            $channels[$channel]->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . "$channel.log", Logger::DEBUG));
+            $log_name = sprintf('%s_%s.log', $channel, (new DateTime('now'))->format('Ymd'));
+            $channels[$channel]->pushHandler(new StreamHandler(AppPaths::LOG_FOLDER . DIRECTORY_SEPARATOR . $log_name, Logger::DEBUG));
         }
         return $channels[$channel];
     }

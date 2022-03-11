@@ -1,7 +1,4 @@
+_backups/
+local/
+tests/output/
 vendor/
-privatesettings.php
-local/logs/
-local/database/testArticles.db
-local/database/testLocations.db
-local/database/testUsers.db
-local/database/testArticlesBackup.db

@@ -3,20 +3,18 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.22 ###
+## Joël Piguet - 2022.03.10 ###
 ##############################
 
 namespace app\helpers;
 
-use Exception;
 use \PDO;
 use PDOException;
 use SQLite3;
 
 use app\constants\AppPaths;
 use app\constants\LogError;
-use app\constants\PrivateSettings;
-use app\helpers\App;
+use app\helpers\DBUtil;
 use app\helpers\Logging;
 use app\helpers\db\ArticleQueries;
 use app\helpers\db\LocationQueries;
@@ -29,6 +27,7 @@ class Database
 {
     const SQLITE_CONN = 'Failure to establish sqlite3 connection';
 
+    private $conn;
     private LocationQueries $locations;
     private UserQueries $users;
     private ArticleQueries $articles;
@@ -41,20 +40,10 @@ class Database
      */
     function __construct($conn)
     {
+        $this->conn = $conn;
         $this->locations = new LocationQueries($conn);
         $this->users = new UserQueries($conn);
         $this->articles = new ArticleQueries($conn);
-    }
-
-    /**
-     * Backup whole database to file.
-     */
-    public static function backup()
-    {
-        throw new Exception('backup not implemented');
-        // Database::getInstance()->articles()->backup();
-        // Database::getInstance()->locations()->backup();
-        // Database::getInstance()->users()->backup();
     }
 
     /**
@@ -67,6 +56,11 @@ class Database
         return Database::getInstance()->articles;
     }
 
+    public static function backup()
+    {
+        return DBUtil::backup_db(Database::getInstance()->conn, AppPaths::BACKUP_FOLDER);
+    }
+
     /**
      * Simpleton pattern insures there is only one instance of Database class in the whole application
      * 
@@ -77,12 +71,15 @@ class Database
         static $instance;
         if (is_null($instance)) {
             try {
-                $local_path = AppPaths::TEST_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
-                $conn = APP::useSQLite() ? Database::getSQLiteConn($local_path) : Database::getMySQLConn();
+                if (USE_SQLITE) {
+                    $local_path = AppPaths::LOCAL_DB_FOLDER . DIRECTORY_SEPARATOR  . 'localDB.db';
+                    $instance = new static(DBUtil::getSQLiteConn($local_path));
+                } else {
+                    $instance = new static(DBUtil::getMySQLConn());
+                }
             } catch (PDOException $e) {
                 Logging::error(LogError::CONN_FAILURE, ['error' =>  $e->getMessage()]);
             }
-            $instance = new static($conn);
         }
         return $instance;
     }
@@ -105,42 +102,5 @@ class Database
     public static function users(): UserQueries
     {
         return Database::getInstance()->users;
-    }
-
-    /**
-     * Get connection to MySQL database using PDO. Only one connection can ever exist.
-     */
-    public static function getMySQLConn(): PDO
-    {
-        static $instance;
-        if (is_null($instance)) {
-            $dsn = 'mysql:host=' . PrivateSettings::MYSQL_HOST . ';port=' . PrivateSettings::MYSQL_PORT . ';dbname=' . PrivateSettings::MYSQL_SCHEMA . ';charset=utf8mb4';
-            $options = [
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ];
-            $instance = new PDO($dsn, PrivateSettings::MYSQL_ADMIN_ID, PrivateSettings::MYSQL_ADMIN_PASSWORD, $options);
-
-            if (App::isDebugMode()) {
-                Logging::info('Connection to mysql', ['schema' => PrivateSettings::MYSQL_SCHEMA]);
-            }
-        }
-        return $instance;
-    }
-
-    /**
-     * Get connection to local database using SQLite3.
-     * https://www.tutorialspoint.com/sqlite/sqlite_php.htm
-     * 
-     * @param string $local_path Path to local sqlite db. Several connections can exist to different local db.
-     * @return SQLite3 SQLite3 conn.
-     */
-    public static function getSQLiteConn(string $local_path): SQLite3
-    {
-        $conn = new SQLite3($local_path);
-
-        if (App::isDebugMode()) {
-            Logging::info('Connection to SQLITE DB', ['path' => $local_path]);
-        }
-        return $conn;
     }
 }
