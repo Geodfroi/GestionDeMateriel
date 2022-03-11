@@ -26,15 +26,12 @@ config.php: variables controlant le comportement de l'application, le serveur ou
         phpunit tests
         https://phpunit.readthedocs.io/en/9.5/index.html
         http://nlslack.com/getting-started-with-phpunit-7-using-composer/
-        run in terminal: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --testdox tests
+        run in terminal:
+        ./vendor/bin/phpunit --bootstrap tests/bootstrap.php --testdox tests
 
 Setup mySQL for testing:
 Deploy dependencies through composer if not already done.
 Fill in mysql and email info in local/localsettings.php
-
-Fake credentials to use the app:
-login noel.biquet@gmail.com
-password: 123123
 
 Debug mode:
 verbose logging in local/logs.
