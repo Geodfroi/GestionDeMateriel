@@ -12,7 +12,6 @@ use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Authenticate;
 use app\helpers\Database;
-use app\helpers\Logging;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list.
