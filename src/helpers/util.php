@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
@@ -13,7 +13,6 @@ use DirectoryIterator;
 
 use app\constants\LogInfo;
 use app\constants\Session;
-use app\constants\Settings;
 use app\helpers\Logging;
 use app\models\User;
 

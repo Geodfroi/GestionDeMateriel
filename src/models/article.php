@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\models;
@@ -12,26 +12,43 @@ use DateTime;
 
 use app\helpers\Convert;
 use app\helpers\Database;
-// use app\helpers\Logging;
 
 class Article
 {
-    private int $id;
-
-    private string $article_name;
+    /**
+     * int 
+     */
+    private $id;
 
     /**
-     * Free comments set by the user appended to the email remainder sent when the expiration date is close.
+     * string 
      */
-    private string $comments;
+    private $article_name;
 
-    private string $location;
+    /**
+     * string Free comments set by the user appended to the email remainder sent when the expiration date is close.
+     */
+    private $comments;
 
-    private DateTime $creation_date;
+    /**
+     * string
+     */
+    private  $location;
 
-    private DateTime $expiration_date;
+    /**
+     * DateTime
+     */
+    private $creation_date;
 
-    private int $user_id;
+    /**
+     * DateTime
+     */
+    private $expiration_date;
+
+    /**
+     * int
+     */
+    private $user_id;
 
     /**
      * Load article instance from database row.

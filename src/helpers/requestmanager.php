@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
@@ -12,7 +12,6 @@ use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Route;
-use app\constants\Settings;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\Database;

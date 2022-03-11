@@ -20,7 +20,10 @@ use app\constants\AppPaths;
  */
 class Logging
 {
-    private static array $channels = [];
+    /**
+     * array
+     */
+    private static $channels = [];
 
     private static function getChannel(?string $channel)
     {

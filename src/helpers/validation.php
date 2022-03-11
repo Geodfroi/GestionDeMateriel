@@ -3,14 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
 
 use DateTime;
 
-use app\constants\Settings;
 use app\constants\Warning;
 
 // use app\helpers\Logging;

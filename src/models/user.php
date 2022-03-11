@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\models;
@@ -14,24 +14,45 @@ use app\helpers\Convert;
 
 class User
 {
-    private int $id;
+    /**
+     * int
+     */
+    private $id;
 
     /**
-     * Display alias in table instead of e-mail to identify the user.
+     * string Display alias in table instead of e-mail to identify the user.
      */
-    private string $alias;
+    private $alias;
 
-    private string $contact_delay;
+    /**
+     * string
+     */
+    private $contact_delay;
 
-    private string $contact_email;
+    /**
+     * string
+     */
+    private $contact_email;
 
-    private DateTime $creation_date;
+    /**
+     * DateTime
+     */
+    private $creation_date;
 
-    private string $login_email;
+    /**
+     * string
+     */
+    private $login_email;
 
-    private bool $is_admin;
+    /**
+     * bool
+     */
+    private $is_admin;
 
-    private DateTime $last_login;
+    /**
+     * DateTime 
+     * */
+    private $last_login;
 
     /**
      * Password hash encrypted with PASSWORD_BCRYPT algorithm. No plaintext password are ever stored into the database.

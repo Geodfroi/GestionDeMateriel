@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2021.12.01 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\models;
@@ -13,7 +13,14 @@ namespace app\models;
  */
 class StringContent
 {
-    private int $id;
+    /**
+     * int
+     */
+    private $id;
+
+    /**
+     * string
+     */
     private string $content;
 
     /**

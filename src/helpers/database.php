@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
@@ -28,9 +28,9 @@ class Database
     const SQLITE_CONN = 'Failure to establish sqlite3 connection';
 
     private $conn;
-    private LocationQueries $locations;
-    private UserQueries $users;
-    private ArticleQueries $articles;
+    private $locations;
+    private $users;
+    private $articles;
 
     /**
      * Initialise connection to the MySQL inside the constructor dunder method.

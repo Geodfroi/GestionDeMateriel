@@ -18,7 +18,11 @@ use SQLite3;
 class Queries
 {
     protected $conn;
-    protected array $data_types;
+
+    /**
+     * array
+     */
+    protected $data_types;
 
     /**
      * @param PDO|SQlite3 $conn Db connection.
