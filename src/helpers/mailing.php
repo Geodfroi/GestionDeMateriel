@@ -14,7 +14,6 @@ use PHPMailer\PHPMailer\Exception;
 
 use app\constants\AppPaths;
 use app\constants\Mail;
-use app\constants\PrivateSettings;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\User;
@@ -149,7 +148,7 @@ class Mailing
     private static function send(array $recipients, string $subject, string $html_content, string $plain_content): bool
     {
         if (DEBUG_MODE) {
-            $recipients = [PrivateSettings::APP_EMAIL];
+            $recipients = [APP_EMAIL];
         }
 
         $mail = new PHPMailer(true);
@@ -165,11 +164,11 @@ class Mailing
 
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
 
-            $mail->Username = PrivateSettings::APP_EMAIL;
-            $mail->Password = PrivateSettings::APP_EMAIL_PASSWORD;
+            $mail->Username = APP_EMAIL;
+            $mail->Password = APP_EMAIL_PASSWORD;
 
             // Sender and recipient settings
-            $mail->setFrom(PrivateSettings::APP_EMAIL, Mail::SENDER);
+            $mail->setFrom(APP_EMAIL, Mail::SENDER);
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }

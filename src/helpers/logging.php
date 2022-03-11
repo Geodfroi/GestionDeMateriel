@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
@@ -11,9 +11,7 @@ namespace app\helpers;
 use DateTime;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-
 use app\constants\AppPaths;
-use app\constants\Settings;
 
 /**
  * Wrapper for Monolog php framework; used to log to file.

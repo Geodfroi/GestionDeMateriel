@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../local/localsettings.php';
 
 use app\helpers\Database;
 use app\helpers\Logging;

@@ -3,14 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.11 ###
 ##############################
 
 namespace app\helpers;
 
 use app\constants\AppPaths;
-use app\constants\PrivateSettings;
-use app\constants\Settings;
 use app\helpers\db\ArticleQueries;
 use app\helpers\db\LocationQueries;
 use app\helpers\db\UserQueries;
@@ -27,14 +25,14 @@ class DBUtil
      */
     public static function getMySQLConn(): PDO
     {
-        $dsn = 'mysql:host=' . PrivateSettings::MYSQL_HOST . ';port=' . PrivateSettings::MYSQL_PORT . ';dbname=' . PrivateSettings::MYSQL_SCHEMA . ';charset=utf8mb4';
+        $dsn = 'mysql:host=' . MYSQL_HOST . ';port=' . MYSQL_PORT . ';dbname=' . MYSQL_SCHEMA . ';charset=utf8mb4';
         $options = [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ];
-        $instance = new PDO($dsn, PrivateSettings::MYSQL_ADMIN_ID, PrivateSettings::MYSQL_ADMIN_PASSWORD, $options);
+        $instance = new PDO($dsn, MYSQL_ADMIN_ID, MYSQL_ADMIN_PASSWORD, $options);
 
         if (DEBUG_MODE) {
-            Logging::info('Connection to mysql', ['schema' => PrivateSettings::MYSQL_SCHEMA]);
+            Logging::info('Connection to mysql', ['schema' => MYSQL_SCHEMA]);
         }
 
         return $instance;

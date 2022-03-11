@@ -1,6 +1,4 @@
-vendor/
-privatesettings.php
-local/logs/
-tests/output/
 _backups/
-gestion_app_220208.zip
+local/
+tests/output/
+vendor/
