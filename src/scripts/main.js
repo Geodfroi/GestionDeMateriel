@@ -5,16 +5,14 @@
 //#region fetch
 
 /**
- * Use javascript fetch ajax method to send a GET request.
+ * Use javascript fetch ajax method to send a GET request. In this app, all GET and POST requests are sent to the same url route.
  *
  * @param {*} req request identifier.
  * @param {*} json json data used to construct the GET request path.
- * @param {*} url server route; 'requests' by default.
  */
-function getRequest(url, json = null) {
+function getRequest(json = null) {
   // let url = new URL(url, window.location.origin);
-  url ??= "requests";
-  url = `${root_url}/${url}`;
+  url = `${root_url}/requests`;
   console.log("get url : " + url);
 
   json ??= {};
@@ -28,14 +26,13 @@ function getRequest(url, json = null) {
 }
 
 /**
- * Use javascript fetch ajax method to post data to the server and handle the server response.
+ * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, all GET and POST requests are sent to the same url route.
  *
  * @param {*} req request identifier.
  * @param {*} callback function handling the server response to the fetch request.
  * @param {*} data json data package to sent to server.
- * @param {*} url server route without leading slash; 'requests' by default.
  */
-function postRequest(req, callback = null, data = null, url = null) {
+function postRequest(req, callback = null, data = null) {
   data ??= {};
   data["req"] = req;
   const options = {
@@ -47,11 +44,9 @@ function postRequest(req, callback = null, data = null, url = null) {
     },
   };
 
-  url ??= "requests";
-  url = `${root_url}/${url}`;
-  // url = new URL(url, window.location.origin);
-
+  url = `${root_url}/requests`;
   console.log("post url : " + url);
+
   fetch(url, options)
     .then((res) => {
       return res.json();

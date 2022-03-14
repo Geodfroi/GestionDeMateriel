@@ -62,6 +62,17 @@ abstract class BaseRoute
     }
 
     /**
+     * Get utility function script shared by all pages.
+     * 
+     * @return string Javascript text.
+     */
+    private static function getMainScript()
+    {
+        $script_path = AppPaths::SCRIPTS . DIRECTORY_SEPARATOR . 'main.js';
+        return file_get_contents($script_path);
+    }
+
+    /**
      * Get js script to be executed on the page.
      * 
      * @return string Javascript text.
@@ -74,6 +85,7 @@ abstract class BaseRoute
         $script_path = AppPaths::SCRIPTS . DIRECTORY_SEPARATOR . $this->javascript_name . '.js';
         return file_get_contents($script_path);
     }
+
 
     /**
      * As a redirecting uri has been provided. Further rendering of this route is to be cancelled.
@@ -143,6 +155,7 @@ abstract class BaseRoute
             $templateData['page_title'] = $this->getHeaderTitle();
             $templateData['page_content'] = $this->getBodyContent();
             $templateData['page_script'] = $this->getScript();
+            $templateData['main_script'] = BaseRoute::getMainScript();
             $templateData['show_header'] = $this->showHeader();
             $templateData['show_footer'] = $this->showFooter();
             $templateData['alert'] = Util::displayAlert();
@@ -152,13 +165,3 @@ abstract class BaseRoute
         return Util::renderTemplate('main_template', $templateData, AppPaths::TEMPLATES);
     }
 }
-
-    // /**
-    //  * Get json so that variables are also available in javascript scripts.
-    //  * 
-    //  * @return string JSON encoded as a single string.
-    //  */
-    // protected function getJSONData()
-    // {
-    //     return $this->json_data;
-    // }
