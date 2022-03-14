@@ -385,17 +385,3 @@ function toDate(str) {
 
   return new Date(year, month, day);
 }
-
-// json_data = retrieveRouteData();
-// console.dir(json_data);
-
-// /**
-//  * Fetch json object containing data defined in Route::renderTemplate function.
-//  *
-//  * @returns JSON object.
-//  */
-// function retrieveRouteData() {
-//   let data_element = document.getElementById("php-data");
-//   let json_str = data_element.innerText;
-//   return JSON.parse(json_str);
-// }

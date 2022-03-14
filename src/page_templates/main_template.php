@@ -6,6 +6,7 @@
 
 use app\constants\Requests;
 use app\constants\Route;
+use app\constants\Session;
 use app\helpers\Authenticate;
 
 ?>
@@ -48,20 +49,20 @@ use app\helpers\Authenticate;
                             <?php if (Authenticate::isLoggedIn()) { ?>
                                 <?php if (Authenticate::isAdmin()) { ?>
                                     <li class="nav-item active">
-                                        <a class="nav-link <?php echo $_SESSION['route'] === Route::ADMIN ? 'active' : '' ?>" href="<?php echo Route::ADMIN ?>">Admin</a>
+                                        <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::ADMIN ? 'active' : '' ?>" href="<?php echo Route::ADMIN ?>">Admin</a>
                                     </li>
                                 <?php } ?>
                                 <li class="nav-item active">
-                                    <a class="nav-link <?php echo $_SESSION['route'] === Route::ART_TABLE ? 'active' : '' ?>" href="<?php echo Route::ART_TABLE ?>">Articles</a>
+                                    <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::ART_TABLE ? 'active' : '' ?>" href="<?php echo Route::ART_TABLE ?>">Articles</a>
                                 </li>
                                 <li class="nav-item active">
-                                    <a class="nav-link <?php echo $_SESSION['route'] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profil</a>
+                                    <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profil</a>
                                 </li>
                             <?php } ?>
 
                             <?php if (DEBUG_MODE) { ?>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
-                                <a class="nav-link <?php echo $_SESSION['route'] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
                             <?php } ?>
 
                         </ul>
@@ -134,8 +135,8 @@ use app\helpers\Authenticate;
 
     <!-- route specific script -->
     <script>
-        let root_url = "<?php echo $_SESSION['root_url'] ?>";
-        let page_url = "<?php echo $_SESSION['page_url'] ?>";
+        let root_url = "<?php echo $_SESSION[Session::ROOT] ?>";
+        let page_url = "<?php echo $_SESSION[Session::PAGE] ?>";
         <?php echo isset($page_script) ? $page_script : ""; ?>
     </script>
 

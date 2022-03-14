@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\constants;
@@ -13,9 +13,6 @@ namespace app\constants;
  */
 class Session
 {
-    // const USERS_ORDERBY = 'admin_orderby';
-    // const USERS_PAGE = 'admin_page';
-
     const ARTICLES_DISPLAY = 'articles_display_json';
     const USERS_DISPLAY = 'users_display_json';
 
@@ -23,4 +20,6 @@ class Session
     const IS_ADMIN = 'is_admin';
 
     const ALERT = 'alert';
+    const PAGE = 'page_url';
+    const ROOT = 'root_url';
 }

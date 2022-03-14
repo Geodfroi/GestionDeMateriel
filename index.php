@@ -7,17 +7,22 @@ declare(strict_types=1);
 ##############################
 
 use app\constants\Route;
+use app\constants\Session;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\helpers\Authenticate;
 
+
+
 require_once __DIR__ . '/loader.php';
 require_once __DIR__ . '/vendor/autoload.php'; // use composer to load autofile.
 // initiate session allowing for data permanence in _SESSION array as long as the browser is open.
+
 session_start();
+$_SESSION[Session::ROOT] = APP_URL;
 
 Logging::debug("root");
-$_SESSION['root_url'] = APP_URL;
+
 
 if (Authenticate::isLoggedIn()) {
     Logging::debug("logged in");

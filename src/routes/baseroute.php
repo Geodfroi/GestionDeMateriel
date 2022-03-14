@@ -7,6 +7,7 @@
 namespace app\routes;
 
 use app\constants\AppPaths;
+use app\constants\Session;
 use app\helpers\Logging;
 use app\helpers\Util;
 
@@ -28,15 +29,15 @@ abstract class BaseRoute
     /**
      * Link a Route with its designated template in the constructor.
      * 
-     * @param string $route Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
+     * @param string $page_url Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
      * @param string $template_name Template to use in renderTemplate call.
      * @param string $javascript_name Optional javascript file to execute in the page.
      * @param bool $show_header The page display the AppBar header.
      * @param bool $show_footer The page display the school info footer.
      */
-    public function __construct(string $route, string $template_name = "", string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
+    public function __construct(string $page_url, string $template_name = "", string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
     {
-        $_SESSION['page_url'] = $route;
+        $_SESSION[Session::PAGE] = $page_url;
         $this->template_name = $template_name;
         $this->javascript_name = $javascript_name;
         $this->show_header = $show_header;

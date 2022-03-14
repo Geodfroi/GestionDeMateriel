@@ -6,7 +6,7 @@
  * Display caret icon besides table header to show orderby value.
  */
 function displayCarets() {
-  let orderby = json_data.display_data.orderby;
+  let orderby = display_data.orderby;
 
   const email_header = document.getElementById("email-header");
   const creation_header = document.getElementById("creation-header");
@@ -65,7 +65,7 @@ function renewModalShown(e, modal) {
  * Set header links depending on orderby value.
  */
 function setHeaderLinks() {
-  let orderby = json_data.display_data.orderby;
+  let orderby = display_data.orderby;
 
   const email_header = document.getElementById("email-header");
   const creation_header = document.getElementById("creation-header");

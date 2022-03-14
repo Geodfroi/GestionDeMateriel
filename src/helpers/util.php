@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\helpers;
@@ -33,7 +33,7 @@ class Util
         $alert_array = $_SESSION[SESSION::ALERT];
         Logging::debug('alert_array', $alert_array);
         //check if it is the correct page to display stored alert.
-        if ($alert_array[2] != $_SESSION['route']) {
+        if ($alert_array[2] != $_SESSION[SESSION::PAGE]) {
             return [];
         }
 
