@@ -113,11 +113,10 @@ class ArticleTable extends BaseRoute
         );
 
         Logging::debug('display_data: ', $display_data);
+        $display_data['page_count'] = $page_count;
         return $this->renderTemplate([
             'articles' =>  $articles,
             'display_data' => $display_data,
-            'page' =>   $display_data['page'],
-            'page_count' => $page_count,
         ]);
     }
 }

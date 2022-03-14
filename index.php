@@ -17,6 +17,7 @@ require_once __DIR__ . '/vendor/autoload.php'; // use composer to load autofile.
 session_start();
 
 Logging::debug("root");
+$_SESSION['root_url'] = APP_URL;
 
 if (Authenticate::isLoggedIn()) {
     Logging::debug("logged in");

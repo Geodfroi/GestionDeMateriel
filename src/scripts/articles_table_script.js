@@ -148,7 +148,7 @@ function setHeaderLinks() {
   const date_header = document.getElementById("per-date-header");
   const owner_header = document.getElementById("owner-header");
 
-  let root_href = `${ART_TABLE}?orderby=`;
+  let root_href = `${page_url}?orderby=`;
 
   article_header
     .querySelector("a")
@@ -252,6 +252,6 @@ hookModalShown("filter-modal", filterModalShown);
 
 displayCarets();
 displayCountNavbar();
-displayPageNavbar(ART_TABLE);
+displayPageNavbar();
 setHeaderLinks();
 displayFilter();

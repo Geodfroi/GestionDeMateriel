@@ -36,7 +36,7 @@ abstract class BaseRoute
      */
     public function __construct(string $route, string $template_name = "", string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
     {
-        $_SESSION['route'] = $route;
+        $_SESSION['page_url'] = $route;
         $this->template_name = $template_name;
         $this->javascript_name = $javascript_name;
         $this->show_header = $show_header;
@@ -137,7 +137,6 @@ abstract class BaseRoute
     public function renderRoute(): String
     {
         $templateData = [];
-        $templateData["root_url"] = APP_URL;
 
         if (!$this->isRedirecting()) {
             $templateData['page_title'] = $this->getHeaderTitle();

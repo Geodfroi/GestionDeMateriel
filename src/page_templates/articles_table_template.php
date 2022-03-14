@@ -135,8 +135,8 @@ use app\helpers\Util;
                     </a>
                 </li>
 
-                <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
-                    <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
+                <?php for ($n = 1; $n <= $display_data['page_count']; $n++) {  ?>
+                    <li class="page-item <?php echo $n == $display_data['page'] ? 'active' : '' ?>">
                         <a href="<?php echo Route::ART_TABLE . '?page=' . $n ?>" class="page-link"><?php echo $n ?></a>
                     </li>
                 <?php  } ?>

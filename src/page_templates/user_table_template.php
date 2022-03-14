@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.30 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 use app\constants\Requests;
@@ -148,3 +148,8 @@ use app\constants\Route;
         </div>
     </div>
 </div>
+
+<script>
+    let display_data = <?php echo json_encode($display_data, JSON_UNESCAPED_UNICODE) ?>;
+    console.dir(display_data);
+</script>

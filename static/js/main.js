@@ -103,23 +103,21 @@ function clearWarningsAndInputs() {
 
 /**
  * Configure display of page navigation navbar.
- *
- * @param {*} route
  */
-function displayPageNavbar(route) {
-  let current_page = json_data.display_data.page;
-  let page_count = json_data.page_count;
+function displayPageNavbar() {
+  let current_page = display_data.page;
+  let page_count = display_data.page_count;
 
   const page_last = document.getElementById("page-last");
   const page_next = document.getElementById("page-next");
 
   page_last
     .querySelector("a")
-    .setAttribute("href", `${route}?page=${current_page - 1}`);
+    .setAttribute("href", `${page_url}?page=${current_page - 1}`);
 
   page_next
     .querySelector("a")
-    .setAttribute("href", `${route}?page=${current_page + 1}`);
+    .setAttribute("href", `${page_url}?page=${current_page + 1}`);
 
   if (current_page == 1) {
     page_last.classList.add("disabled");

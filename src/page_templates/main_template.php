@@ -134,7 +134,8 @@ use app\helpers\Authenticate;
 
     <!-- route specific script -->
     <script>
-        let root_url = "<?php echo $root_url ?>";
+        let root_url = "<?php echo $_SESSION['root_url'] ?>";
+        let page_url = "<?php echo $_SESSION['page_url'] ?>";
         <?php echo isset($page_script) ? $page_script : ""; ?>
     </script>
 

@@ -71,7 +71,7 @@ function setHeaderLinks() {
   const creation_header = document.getElementById("creation-header");
   const login_header = document.getElementById("last-login-header");
 
-  let root_href = `${USERS_TABLE}?orderby=`;
+  let root_href = `${page_url}?orderby=`;
 
   email_header
     .querySelector("a")
@@ -138,4 +138,4 @@ hookModalShown("renew-modal", renewModalShown);
 
 displayCarets();
 setHeaderLinks();
-displayPageNavbar(USERS_TABLE);
+displayPageNavbar();
