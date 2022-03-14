@@ -66,16 +66,6 @@ abstract class BaseRoute
     }
 
     /**
-     * Get json so that variables are also available in javascript scripts.
-     * 
-     * @return string JSON encoded as a single string.
-     */
-    protected function getJSONData()
-    {
-        return $this->json_data;
-    }
-
-    /**
      * Get js script to be executed on the page.
      * 
      * @return string Javascript text.
@@ -155,6 +145,7 @@ abstract class BaseRoute
     public function renderRoute(): String
     {
         $templateData = [];
+        $templateData["root_url"] = LOCAL_SERVER ? "/" : APP_URL;
 
         if (!$this->isRedirecting()) {
             $templateData['page_title'] = $this->getHeaderTitle();
@@ -163,10 +154,20 @@ abstract class BaseRoute
             $templateData['show_header'] = $this->showHeader();
             $templateData['show_footer'] = $this->showFooter();
             $templateData['alert'] = Util::displayAlert();
-            $templateData['json_data'] = $this->getJSONData();
+            // $templateData['json_data'] = $this->getJSONData();
         }
 
         // insert dynamically generated html content into the main template.
         return Util::renderTemplate('main_template', $templateData, AppPaths::TEMPLATES);
     }
 }
+
+    // /**
+    //  * Get json so that variables are also available in javascript scripts.
+    //  * 
+    //  * @return string JSON encoded as a single string.
+    //  */
+    // protected function getJSONData()
+    // {
+    //     return $this->json_data;
+    // }

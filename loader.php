@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 require_once __DIR__ . '/config.php';
@@ -45,11 +45,10 @@ require_once __DIR__ . '/src/routes/articleedit.php';
 require_once __DIR__ . '/src/routes/articletable.php';
 require_once __DIR__ . '/src/routes/contact.php';
 require_once __DIR__ . '/src/routes/debugemails.php';
-require_once __DIR__ . '/src/routes/debugpage.php';
-require_once __DIR__ . '/src/routes/home.php';
+// require_once __DIR__ . '/src/routes/debugpage.php';
+// require_once __DIR__ . '/src/routes/home.php';
 require_once __DIR__ . '/src/routes/locationlist.php';
 require_once __DIR__ . '/src/routes/login.php';
 require_once __DIR__ . '/src/routes/profile.php';
-require_once __DIR__ . '/src/routes/router.php';
 require_once __DIR__ . '/src/routes/useredit.php';
 require_once __DIR__ . '/src/routes/usertable.php';

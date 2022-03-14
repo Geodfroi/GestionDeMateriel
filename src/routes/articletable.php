@@ -10,7 +10,6 @@ use app\constants\ArtFilter;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
-use app\helpers\Authenticate;
 use app\helpers\Database;
 
 /**

@@ -19,9 +19,6 @@ class Admin extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Route::LOGIN);
-        }
 
         return $this->renderTemplate([
             'locations' => $locations ?? []

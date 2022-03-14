@@ -1,21 +1,17 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.10 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 use app\constants\Requests;
 use app\constants\Route;
-use app\constants\Settings;
 use app\helpers\Authenticate;
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en" class="h-100">
-
-<!-- insert $json_data string into an empty div attribute to be made available to javascript. -->
-<div id="php-data" hidden><?php echo $json_data ?></div>
 
 <head>
     <meta charset="UTF-8">
@@ -138,6 +134,7 @@ use app\helpers\Authenticate;
 
     <!-- route specific script -->
     <script>
+        let root_url = "<?php echo $root_url ?>";
         <?php echo isset($page_script) ? $page_script : ""; ?>
     </script>
 

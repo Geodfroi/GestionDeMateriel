@@ -1,13 +1,12 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.17 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\routes;
 
 use app\constants\Route;
-use app\helpers\Authenticate;
 
 /**
  * Route class containing behavior linked to login_template
@@ -21,7 +20,6 @@ class Login extends BaseRoute
 
     public function getBodyContent(): string
     {
-
         return $this->renderTemplate();
     }
 }

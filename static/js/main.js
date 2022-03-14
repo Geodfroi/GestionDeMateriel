@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.01.31 ###
+// ## Joël Piguet - 2022.03.14 ###
 // ##############################
 
 /**
@@ -8,7 +8,7 @@
  * @param {*} req request identifier.
  * @param {*} callback function handling the server response to the fetch request.
  * @param {*} data json data package to sent to server.
- * @param {*} req server route; '/request' by default.
+ * @param {*} url server route without leading slash; 'requests' by default.
  */
 function postRequest(req, callback = null, data = null, url = null) {
   data ??= {};
@@ -22,7 +22,9 @@ function postRequest(req, callback = null, data = null, url = null) {
     },
   };
 
-  url ??= "/requests";
+  url ??= "requests";
+  url = new URL(url, window.location.origin);
+
   fetch(url, options)
     .then((res) => {
       return res.json();
@@ -297,17 +299,6 @@ function isSmallScreen() {
   );
 }
 
-/**
- * Fetch json object containing data defined in Route::renderTemplate function.
- *
- * @returns JSON object.
- */
-function retrieveRouteData() {
-  let data_element = document.getElementById("php-data");
-  let json_str = data_element.innerText;
-  return JSON.parse(json_str);
-}
-
 function setCheckboxValue(id, status) {
   let element = document.getElementById(id);
   element.checked = status;
@@ -344,7 +335,7 @@ function setValidTag(id, status) {
  *
  * @param {*} req request identifier.
  * @param {*} json json data used to construct the GET request path.
- * @param {*} url server route; '/request' by default.
+ * @param {*} url server route; 'requests' by default.
  */
 function getRequest(url, json = null) {
   let url_inst = new URL(url, window.location.origin);
@@ -387,5 +378,16 @@ function toDate(str) {
   return new Date(year, month, day);
 }
 
-json_data = retrieveRouteData();
+// json_data = retrieveRouteData();
 // console.dir(json_data);
+
+// /**
+//  * Fetch json object containing data defined in Route::renderTemplate function.
+//  *
+//  * @returns JSON object.
+//  */
+// function retrieveRouteData() {
+//   let data_element = document.getElementById("php-data");
+//   let json_str = data_element.innerText;
+//   return JSON.parse(json_str);
+// }

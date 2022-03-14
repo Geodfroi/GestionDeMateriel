@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.01.30 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\routes;
@@ -9,8 +9,6 @@ namespace app\routes;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
-use app\constants\Settings;
-use app\helpers\Authenticate;
 use app\helpers\Database;
 
 /**
