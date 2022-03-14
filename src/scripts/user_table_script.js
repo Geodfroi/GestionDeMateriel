@@ -1,8 +1,6 @@
 // ################################
-// ## Joël Piguet - 2022.01.30 ###
+// ## Joël Piguet - 2022.03.14 ###
 // ##############################
-
-const USERS_TABLE = "/usersTable";
 
 /**
  * Display caret icon besides table header to show orderby value.

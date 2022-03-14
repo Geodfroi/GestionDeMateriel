@@ -32,3 +32,7 @@ class ArticleEdit extends BaseRoute
         ]);
     }
 }
+
+     // $data['json_data'] = $data;
+    // $data['json_data'] = $encodeInJSON ?  : '{}';
+    // Logging::debug("json_data: " . $data['json_data']);

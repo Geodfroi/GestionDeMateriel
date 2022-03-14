@@ -6,7 +6,6 @@
  * Customize form if it is used to edit an article instead of creating a new one.
  */
 function customizeForm() {
-  let article = json_data.article;
   if (article) {
     document.getElementById("form-label").innerText = "Modifier l'article.";
 
@@ -33,8 +32,8 @@ function getFormData() {
     "location",
     "comments",
   ]);
-  if (json_data.article) {
-    json.id = json_data.article.id;
+  if (article) {
+    json.id = article.id;
   }
   return json;
 }
@@ -60,9 +59,7 @@ function setLocationInput(_, btn) {
 }
 
 function submitArticle() {
-  let article = json_data.article;
   let call_id = article ? "update-article" : "add-article";
-
   postRequest(call_id, handleValidation, getFormData());
 }
 

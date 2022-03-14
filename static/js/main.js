@@ -2,6 +2,31 @@
 // ## Joël Piguet - 2022.03.14 ###
 // ##############################
 
+//#region fetch
+
+/**
+ * Use javascript fetch ajax method to send a GET request.
+ *
+ * @param {*} req request identifier.
+ * @param {*} json json data used to construct the GET request path.
+ * @param {*} url server route; 'requests' by default.
+ */
+function getRequest(url, json = null) {
+  // let url = new URL(url, window.location.origin);
+  url ??= "requests";
+  url = `${root_url}/${url}`;
+  console.log("get url : " + url);
+
+  json ??= {};
+  let keys = Object.keys(json);
+  for (let index = 0; index < keys.length; index++) {
+    let key = keys[index];
+    url.searchParams.append(key, json[key]);
+  }
+
+  fetch(url);
+}
+
 /**
  * Use javascript fetch ajax method to post data to the server and handle the server response.
  *
@@ -23,8 +48,10 @@ function postRequest(req, callback = null, data = null, url = null) {
   };
 
   url ??= "requests";
-  url = new URL(url, window.location.origin);
+  url = `${root_url}/${url}`;
+  // url = new URL(url, window.location.origin);
 
+  console.log("post url : " + url);
   fetch(url, options)
     .then((res) => {
       return res.json();
@@ -40,6 +67,8 @@ function postRequest(req, callback = null, data = null, url = null) {
       }
     });
 }
+
+//#endregion
 
 /**
  * Clear input valu.
@@ -328,25 +357,6 @@ function setValidTag(id, status) {
   } else {
     input.classList.add("is-invalid");
   }
-}
-
-/**
- * Use javascript fetch ajax method to send a GET request.
- *
- * @param {*} req request identifier.
- * @param {*} json json data used to construct the GET request path.
- * @param {*} url server route; 'requests' by default.
- */
-function getRequest(url, json = null) {
-  let url_inst = new URL(url, window.location.origin);
-  json ??= {};
-  let keys = Object.keys(json);
-  for (let index = 0; index < keys.length; index++) {
-    let key = keys[index];
-    url_inst.searchParams.append(key, json[key]);
-  }
-
-  fetch(url_inst);
 }
 
 /**

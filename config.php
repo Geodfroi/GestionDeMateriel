@@ -1,22 +1,27 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 /**
  * Verbose logging to help debugging; all reminder emails are sent to the development email instead of user emails.
  */
 const DEBUG_MODE = true;
+
 /**
  * "Name log file in log folder.
  */
 const LOG_CHANNEL = "app";
+
 /**
  * Use local sqlite db instead of mySql for testing the application.
  */
 const USE_SQLITE = false;
 
+/**
+ * Set to true if localhost, false once uploaded to server.
+ */
 const LOCAL_SERVER = true;
 
 
@@ -28,8 +33,8 @@ const APP_NAME = "HEdS Gestionnaire d'inventaire";
 /**
  * Used as hyperlink in emails; must be set to proper url once the project is online. 
  */
-const APP_URL = 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
-const LAST_MODIFICATION = '11 mars 2022';
+const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
+const LAST_MODIFICATION = '14 mars 2022';
 
 /**
  * Time until alert is dismissed in milliseconds.

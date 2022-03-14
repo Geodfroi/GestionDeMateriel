@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\routes;
@@ -11,6 +11,7 @@ use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Database;
+use app\helpers\Logging;
 
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list.
@@ -111,6 +112,7 @@ class ArticleTable extends BaseRoute
             $display_data['filters']
         );
 
+        Logging::debug('display_data: ', $display_data);
         return $this->renderTemplate([
             'articles' =>  $articles,
             'display_data' => $display_data,

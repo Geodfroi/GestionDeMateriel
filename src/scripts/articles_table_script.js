@@ -1,8 +1,6 @@
 // ################################
-// ## Joël Piguet - 2022.01.30 ###
+// ## Joël Piguet - 2022.03.14 ###
 // ##############################
-
-const ART_TABLE = "/articlesTable";
 
 const DATE_BEFORE = "before";
 const DATE_AFTER = "after";
@@ -15,7 +13,7 @@ function clearFilter() {
  * Display caret icon besides table header to show orderby value.
  */
 function displayCarets() {
-  let orderby = json_data.display_data.orderby;
+  let orderby = display_data.orderby;
 
   const article_header = document.getElementById("article-header");
   const location_header = document.getElementById("location-header");
@@ -52,7 +50,7 @@ function displayCarets() {
  * Configure display of item count navbar.
  */
 function displayCountNavbar() {
-  let count = json_data.display_data.display_count;
+  let count = display_data.display_count;
 
   // show selection
   let id = `display-${count}`;
@@ -66,7 +64,7 @@ function displayCountNavbar() {
  * Display current applied filters.
  */
 function displayFilter() {
-  let filters = json_data.display_data.filters;
+  let filters = display_data.filters;
 
   let str = "Filtres";
   if (filters.name) {
@@ -109,7 +107,7 @@ function deleteModalShown(e, modal) {
 }
 
 function filterModalShown(_, modal) {
-  let filters = json_data.display_data.filters;
+  let filters = display_data.filters;
 
   // name
   modal.querySelector("#filter-name").value = filters.name ? filters.name : "";
@@ -143,7 +141,7 @@ function filterModalShown(_, modal) {
  * Set header links depending on orderby value.
  */
 function setHeaderLinks() {
-  let orderby = json_data.display_data.orderby;
+  let orderby = display_data.orderby;
 
   const article_header = document.getElementById("article-header");
   const location_header = document.getElementById("location-header");

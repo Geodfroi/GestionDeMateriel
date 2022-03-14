@@ -26,11 +26,6 @@ abstract class BaseRoute
     private $show_footer;
 
     /**
-     * Set data to be accessible by javascript scripts. Data is encoded to a json string inserted as inner text to a hidden div in main html file.
-     */
-    private $json_data;
-
-    /**
      * Link a Route with its designated template in the constructor.
      * 
      * @param string $route Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
@@ -91,10 +86,9 @@ abstract class BaseRoute
      * Load a php template in memory and returns a content string.
      * 
      * @param array $data Associative array to be made avaible in both php templates and javascript scripts.
-     * @param bool $encodeInJSON Encode data as a json string to be made available to javascript.
      * @return string templated html
      */
-    protected function renderTemplate(array $data = [], bool $encodeInJSON = true): string
+    protected function renderTemplate(array $data = []): string
     {
         // log post and get request if debug is active
         if (DEBUG_MODE) {
@@ -105,8 +99,6 @@ abstract class BaseRoute
                 Logging::debug('Post', $_POST);
             }
         }
-
-        $this->json_data = $encodeInJSON ? json_encode($data, JSON_UNESCAPED_UNICODE) : '{}';
         return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES);
     }
 
@@ -145,7 +137,7 @@ abstract class BaseRoute
     public function renderRoute(): String
     {
         $templateData = [];
-        $templateData["root_url"] = LOCAL_SERVER ? "/" : APP_URL;
+        $templateData["root_url"] = APP_URL;
 
         if (!$this->isRedirecting()) {
             $templateData['page_title'] = $this->getHeaderTitle();
@@ -154,7 +146,6 @@ abstract class BaseRoute
             $templateData['show_header'] = $this->showHeader();
             $templateData['show_footer'] = $this->showFooter();
             $templateData['alert'] = Util::displayAlert();
-            // $templateData['json_data'] = $this->getJSONData();
         }
 
         // insert dynamically generated html content into the main template.

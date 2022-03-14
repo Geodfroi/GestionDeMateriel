@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.30 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 use app\constants\Route;
@@ -82,10 +82,17 @@ use app\constants\Route;
         </div>
 
         <div class="row mx-auto mb-1 d-lg-none mb-1">
-            <a href=" <?php echo Route::ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
+            <a href="<?php echo Route::ART_TABLE ?>" class="btn btn-secondary">Annuler</a>
         </div>
         <div class="row mx-auto mb-1 d-lg-none mb-4">
             <button type="submit" class="submit-btn btn btn-primary">Ajouter</button>
         </div>
     </form>
 </div>
+
+<script>
+    let article = <?php echo $article ? json_encode($article, JSON_UNESCAPED_UNICODE) : "false" ?>;
+    console.dir(article);
+    let mode = "<?php echo $mode ?>";
+    console.log(mode);
+</script>

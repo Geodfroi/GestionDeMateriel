@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 /**
@@ -20,6 +20,11 @@ const LOG_CHANNEL = "server";
 const USE_SQLITE = false;
 
 /**
+ * Set to true if localhost, false once uploaded to server.
+ */
+const LOCAL_SERVER = true;
+
+/**
  * Appear by default as html title.
  */
 const APP_NAME = "HEdS Gestionnaire d'inventaire";
@@ -27,7 +32,7 @@ const APP_NAME = "HEdS Gestionnaire d'inventaire";
 /**
  * Used as hyperlink in emails; must be set to proper url once the project is online. 
  */
-const APP_URL = 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
+const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
 const LAST_MODIFICATION = '11 mars 2022';
 
 /**
