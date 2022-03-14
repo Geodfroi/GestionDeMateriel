@@ -145,7 +145,10 @@ use app\helpers\Authenticate;
         <script>
             let alert = document.getElementsByClassName('alert')[0];
             let time = <?php echo $alert['timer'] ?>;
-            window.setTimeout(() => alert.classList.remove('show'), time);
+            window.setTimeout(() => {
+                // alert.classList.remove('show');
+                alert.style.display = 'None';
+            }, time);
         </script>
     <?php } ?>
 </body>
