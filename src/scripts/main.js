@@ -46,6 +46,7 @@ function postRequest(req, callback = null, data = null) {
 
   url = `${root_url}/requests`;
   console.log("post url : " + url);
+  console.dir(options);
 
   fetch(url, options)
     .then((res) => {

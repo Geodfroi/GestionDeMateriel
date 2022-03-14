@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\helpers;
@@ -48,7 +48,9 @@ class Logging
      */
     public static function debug(string $msg, array $context = [], string $channel = null)
     {
-        Logging::getChannel($channel)->debug($msg, $context);
+        if (DEBUG_MODE) {
+            Logging::getChannel($channel)->debug($msg, $context);
+        }
     }
 
     /**

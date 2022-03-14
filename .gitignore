@@ -1,4 +1,4 @@
 _backups/
-local/
+_local/
 tests/output/
 vendor/

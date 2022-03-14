@@ -5,7 +5,7 @@
 ##############################
 
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/local/localsettings.php';
+require_once __DIR__ . '/_local/localsettings.php';
 
 require_once __DIR__ . '/src/constants/alert.php';
 require_once __DIR__ . '/src/constants/alerttype.php';
@@ -31,7 +31,7 @@ require_once __DIR__ . '/src/helpers/database.php';
 require_once __DIR__ . '/src/helpers/dbutil.php';
 require_once __DIR__ . '/src/helpers/logging.php';
 require_once __DIR__ . '/src/helpers/mailing.php';
-require_once __DIR__ . '/src/helpers/requestmanager.php';
+// require_once __DIR__ . '/src/helpers/requestmanager.php';
 require_once __DIR__ . '/src/helpers/util.php';
 require_once __DIR__ . '/src/helpers/validation.php';
 

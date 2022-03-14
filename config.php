@@ -17,13 +17,12 @@ const LOG_CHANNEL = "app";
 /**
  * Use local sqlite db instead of mySql for testing the application.
  */
-const USE_SQLITE = false;
+const USE_SQLITE = true;
 
 /**
  * Set to true if localhost, false once uploaded to server.
  */
 const LOCAL_SERVER = true;
-
 
 /**
  * Appear by default as html title.
