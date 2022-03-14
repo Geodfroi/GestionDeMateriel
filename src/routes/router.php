@@ -64,24 +64,4 @@ class Router
                 return new Home();
         }
     }
-
-    /**
-     * Each route correspond to a path (i.e '/login') and is responsible to dynamically generate customized html content.
-     */
-    public static function renderRoute(): String
-    {
-        if ($route = Router::getRoute()) {
-            if (!$route->isRedirecting()) {
-                $templateData['page_title'] = $route->getHeaderTitle();
-                $templateData['page_content'] = $route->getBodyContent();
-                $templateData['page_script'] = $route->getScript();
-                $templateData['show_header'] = $route->showHeader();
-                $templateData['show_footer'] = $route->showFooter();
-                $templateData['alert'] = Util::displayAlert();
-                $templateData['json_data'] = $route->getJSONData();
-            }
-        }
-        // insert dynamically generated html content into the main template.
-        return Util::renderTemplate('main_template', $templateData, AppPaths::TEMPLATES);
-    }
 }

@@ -22,11 +22,6 @@ class Profile extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Route::LOGIN);
-            return '';
-        }
-
         $user  = Authenticate::getUser();
         if (!$user) {
             return $this->requestRedirect(Route::HOME);

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.03.14 ###
 ##############################
 
 namespace app\routes;
@@ -53,14 +53,14 @@ abstract class BaseRoute
      * 
      * @return string HTML content to be inserted into the main template body.
      */
-    public abstract function getBodyContent(): string;
+    protected abstract function getBodyContent(): string;
 
     /**
      * Allow to customize a title for each path. If the function is not overloaded in a route, a default title is return instead.
      * 
      * @return string Title to be displayed in browser.
      */
-    public function getHeaderTitle(): string
+    protected function getHeaderTitle(): string
     {
         return APP_NAME;
     }
@@ -70,7 +70,7 @@ abstract class BaseRoute
      * 
      * @return string JSON encoded as a single string.
      */
-    public function getJSONData()
+    protected function getJSONData()
     {
         return $this->json_data;
     }
@@ -80,7 +80,7 @@ abstract class BaseRoute
      * 
      * @return string Javascript text.
      */
-    public function getScript()
+    protected function getScript()
     {
         if (strlen($this->javascript_name) == 0)
             return "";
@@ -92,7 +92,7 @@ abstract class BaseRoute
     /**
      * As a redirecting uri has been provided. Further rendering of this route is to be cancelled.
      */
-    public function isRedirecting(): bool
+    protected function isRedirecting(): bool
     {
         return strlen($this->redirectUri) > 0;
     }
@@ -137,27 +137,36 @@ abstract class BaseRoute
     /**
      * Display html footer.
      */
-    public function showFooter(): bool
+    protected function showFooter(): bool
     {
         return $this->show_footer;
     }
     /**
      * Display html header. 
      */
-    public function showHeader(): bool
+    protected function showHeader(): bool
     {
         return $this->show_header;
     }
+
+    /**
+     * Each route correspond to a path (i.e '/login') and is responsible to dynamically generate customized html content.
+     */
+    public function renderRoute(): String
+    {
+        $templateData = [];
+
+        if (!$this->isRedirecting()) {
+            $templateData['page_title'] = $this->getHeaderTitle();
+            $templateData['page_content'] = $this->getBodyContent();
+            $templateData['page_script'] = $this->getScript();
+            $templateData['show_header'] = $this->showHeader();
+            $templateData['show_footer'] = $this->showFooter();
+            $templateData['alert'] = Util::displayAlert();
+            $templateData['json_data'] = $this->getJSONData();
+        }
+
+        // insert dynamically generated html content into the main template.
+        return Util::renderTemplate('main_template', $templateData, AppPaths::TEMPLATES);
+    }
 }
-
-    // /**
-    //  * Set a warning to be displayed beneath invalid input in forms.
-    //  */
-    // public function showWarning(string $key, string $content)
-    // {
-    //     if (DEBUG_MODE) {
-    //         Logging::debug('warning', [$key => $content]);
-    //     }
-
-    //     $this->warnings[$key] = $content;
-    // }

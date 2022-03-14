@@ -19,15 +19,7 @@ class UserEdit extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Route::LOGIN);
-            return '';
-        }
 
-        if (!Authenticate::isAdmin()) {
-            $this->requestRedirect(Route::HOME);
-            return '';
-        }
 
         return $this->renderTemplate(['password' => $password_plain ?? Util::getRandomPassword()]);
     }

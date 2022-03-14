@@ -25,10 +25,6 @@ class ArticleTable extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Route::LOGIN);
-        }
-
         $display_data = isset($_SESSION[Session::ARTICLES_DISPLAY]) ? json_decode($_SESSION[Session::ARTICLES_DISPLAY], true) : [];
         // logging::debug('display_data', $display_data);
         if (!isset($display_data['page'])) {

@@ -37,7 +37,7 @@ class RequestManager
             return RequestManager::handlePostRequests();
         }
         Logging::error('Invalid request call');
-        return null;
+        return "";
     }
 
     /**
@@ -170,6 +170,7 @@ class RequestManager
         if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
             Util::storeAlert($url, $alert_type, $alert_msg);
         }
+        Logging::debug('redirect_url: ' . $url);
         return json_encode(['url' => $url]);
     }
 
@@ -329,7 +330,7 @@ class RequestManager
         return json_encode(['password' => Util::getRandomPassword()]);
     }
 
-    private static function submitLogin($json): string
+    public static function submitLogin($json): string
     {
         $login = isset($json['login']) ? $json['login'] : "";
         $password = isset($json['password']) ? $json['password'] : "";

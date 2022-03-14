@@ -25,10 +25,6 @@ class UserTable extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Route::LOGIN);
-        }
-
         $display_data = isset($_SESSION[Session::USERS_DISPLAY]) ? json_decode($_SESSION[Session::USERS_DISPLAY], true) : [];
         if (!isset($display_data['page'])) {
             $display_data['page'] = 1;

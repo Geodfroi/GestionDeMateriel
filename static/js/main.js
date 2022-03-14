@@ -22,13 +22,14 @@ function postRequest(req, callback = null, data = null, url = null) {
     },
   };
 
-  url ??= "/request";
+  url ??= "/requests";
   fetch(url, options)
     .then((res) => {
       return res.json();
     })
     .then((json) => {
       if ("url" in json) {
+        console.log(json.url);
         window.location.replace(json.url);
         return;
       }

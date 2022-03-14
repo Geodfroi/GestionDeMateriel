@@ -17,6 +17,8 @@ const LOG_CHANNEL = "app";
  */
 const USE_SQLITE = false;
 
+const LOCAL_SERVER = true;
+
 
 /**
  * Appear by default as html title.

@@ -15,10 +15,6 @@ function callback(json) {
   }
 }
 
-function compileData() {
-  return getFormValues(["login", "password"]);
-}
-
 function showPassword(_, btn) {
   const input = document.getElementById("password");
   const img = btn.querySelector("i");
@@ -35,7 +31,8 @@ function showPassword(_, btn) {
 }
 
 function submit_login() {
-  postRequest("submit-login", callback, compileData());
+  $data = getFormValues(["login", "password"]);
+  postRequest("submit-login", callback, $data);
 }
 
 hookBtn("submit-btn", submit_login);

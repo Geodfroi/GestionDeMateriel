@@ -20,9 +20,6 @@ class LocationList extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (!Authenticate::isLoggedIn()) {
-            $this->requestRedirect(Route::LOGIN);
-        }
 
         $locations = Database::locations()->queryAll();
 

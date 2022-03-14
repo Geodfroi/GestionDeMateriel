@@ -8,7 +8,6 @@ namespace app\routes;
 
 use app\constants\Route;
 use app\helpers\Authenticate;
-// use app\helpers\Logging;
 
 /**
  * Route class containing behavior linked to login_template
@@ -22,9 +21,6 @@ class Login extends BaseRoute
 
     public function getBodyContent(): string
     {
-        if (Authenticate::isLoggedIn()) {
-            return $this->requestRedirect(Route::HOME);
-        }
 
         return $this->renderTemplate();
     }
