@@ -1,19 +1,19 @@
 // ################################
-// ## Joël Piguet - 2022.03.14 ###
+// ## Joël Piguet - 2022.03.15 ###
 // ##############################
 
 //#region fetch
 
 /**
- * Use javascript fetch ajax method to send a GET request. In this app, all GET and POST requests are sent to the same url route.
+ * Use javascript fetch ajax method to send a GET request. In this app, post request are made to the current page url.
  *
  * @param {*} req request identifier.
  * @param {*} json json data used to construct the GET request path.
  */
 function getRequest(json = null) {
   // let url = new URL(url, window.location.origin);
-  url = `${root_url}/requests`;
-  console.log("get url : " + url);
+  url = page_url;
+  console.log("GET request at: " + url);
 
   json ??= {};
   let keys = Object.keys(json);
@@ -26,15 +26,15 @@ function getRequest(json = null) {
 }
 
 /**
- * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, all GET and POST requests are sent to the same url route.
+ * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, post request are made to the current page url.
  *
- * @param {*} req request identifier.
+ * @param {*} request_name request identifier.
  * @param {*} callback function handling the server response to the fetch request.
  * @param {*} data json data package to sent to server.
  */
-function postRequest(req, callback = null, data = null) {
+function postRequest(request_name, callback = null, data = null) {
   data ??= {};
-  data["req"] = req;
+  data[request_name] = true;
   const options = {
     method: "POST",
     body: JSON.stringify(data),
@@ -44,15 +44,19 @@ function postRequest(req, callback = null, data = null) {
     },
   };
 
-  url = `${root_url}/requests`;
-  console.log("post url : " + url);
+  url = page_url;
+  console.log("POST request at : " + page_url);
   console.dir(options);
 
-  fetch(url, options)
+  fetch(page_url, options)
     .then((res) => {
+      console.log(`${request_name} POST response`);
+      console.dir(res);
       return res.json();
     })
     .then((json) => {
+      console.log(`${request_name} POST json`);
+      console.dir(json);
       if ("url" in json) {
         console.log(json.url);
         window.location.replace(json.url);
@@ -61,7 +65,8 @@ function postRequest(req, callback = null, data = null) {
       if (callback != null) {
         callback(json);
       }
-    });
+    })
+    .catch((e) => console.log(e));
 }
 
 //#endregion

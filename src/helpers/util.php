@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.03.15 ###
 ##############################
 
 namespace app\helpers;
@@ -188,6 +188,7 @@ class Util
         header("Location: $uri", true);
         return "";
     }
+
 
     /**
      * Store alert content to be fetched in next page display.

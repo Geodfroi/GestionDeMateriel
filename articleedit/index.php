@@ -6,19 +6,106 @@ declare(strict_types=1);
 ## Joël Piguet - 2022.03.14 ###
 ##############################
 
+use app\constants\Alert;
+use app\constants\AlertType;
+use app\constants\LogInfo;
 use app\constants\Route;
 use app\helpers\Authenticate;
+use app\helpers\Database;
 use app\helpers\Logging;
+use app\helpers\RequestUtil;
 use app\helpers\Util;
-use app\routes\ArticleEdit;
+use app\models\Article;
+use app\routes\BaseRoute;
 
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
 
 Logging::debug("articleedit route");
-if (!Authenticate::isLoggedIn()) {
-    Util::requestRedirect(Route::LOGIN);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $json = RequestUtil::retrievePOSTData();
+    Logging::debug("articleedit POST request", $json);
+
+    if (isset($json['add-article'])) {
+        echo addArticle($json);
+    } else if (isset($json['update-article'])) {
+        echo updateArticle($json);
+    }
 } else {
-    echo (new ArticleEdit())->renderRoute();
+    if (!Authenticate::isLoggedIn()) {
+        Util::requestRedirect(Route::LOGIN);
+    } else {
+        echo (new ArticleEdit())->renderRoute();
+    }
+}
+
+class ArticleEdit extends BaseRoute
+{
+    function __construct()
+    {
+        parent::__construct(Route::ART_EDIT, 'article_edit_template', 'article_edit_script');
+    }
+
+    public function getBodyContent(): string
+    {
+        $mode = 'add';
+        if (isset($_GET['update'])) {
+            $article = Database::articles()->queryById($_GET['update']);
+            $mode = 'update';
+        }
+
+        return $this->renderTemplate([
+            'article' => $mode == 'update' ? $article->asArray() : '',
+            'mode' =>  $mode,
+            'loc_presets' =>  Database::locations()->queryAll(),
+        ]);
+    }
+}
+
+function addArticle($json): string
+{
+    $article_name = isset($json['article-name']) ? $json['article-name'] : "";
+    $location = isset($json['location']) ? $json['location'] : "";
+    $exp_date_str = isset($json['expiration-date']) ? $json['expiration-date'] : "";
+    $comments = isset($json['comments']) ? $json['comments'] : "";
+    $warnings = [];
+
+    if (validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
+        $user_id = Authenticate::getUserId();
+        $article = Article::fromForm($user_id, $article_name, $location, $exp_date_str, $comments);
+
+        $article_id = Database::articles()->insert($article);
+        if ($article_id) {
+            Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article_id]);
+            return RequestUtil::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_ADD_SUCCESS);
+        }
+        return RequestUtil::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
+    }
+    return RequestUtil::issueWarnings($json, $warnings);
+}
+
+function updateArticle($json): string
+{
+    $article_id  = intval($json['id']);
+    $article_name = isset($json['article-name']) ? $json['article-name'] : "";
+    $location = isset($json['location']) ? $json['location'] : "";
+    $exp_date_str = isset($json['expiration-date']) ? $json['expiration-date'] : "";
+    $comments = isset($json['comments']) ? $json['comments'] : "";
+    $warnings = [];
+
+    if (validateArticleInputs($article_name, $location, $exp_date_str, $comments, $warnings)) {
+        $user_id = Authenticate::getUserId();
+        $article = Database::articles()->queryById($article_id);
+        $article->updateFields($article_name, $location, $exp_date_str, $comments);
+
+        if (Database::articles()->update($article)) {
+            Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article_id]);
+            return RequestUtil::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
+        }
+        return RequestUtil::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
+    }
+    Logging::debug('warnings-update', ['warnings' => $warnings]);
+    return RequestUtil::issueWarnings($json, $warnings);
 }
