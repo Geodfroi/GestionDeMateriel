@@ -39,11 +39,3 @@ require_once __DIR__ . '/src/helpers/validation.php';
 require_once __DIR__ . '/src/models/article.php';
 require_once __DIR__ . '/src/models/stringcontent.php';
 require_once __DIR__ . '/src/models/user.php';
-
-// require_once __DIR__ . '/src/routes/articleedit.php';
-require_once __DIR__ . '/src/routes/articletable.php';
-require_once __DIR__ . '/src/routes/debugemails.php';
-require_once __DIR__ . '/src/routes/locationlist.php';
-require_once __DIR__ . '/src/routes/profile.php';
-require_once __DIR__ . '/src/routes/useredit.php';
-require_once __DIR__ . '/src/routes/usertable.php';

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.15 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 use app\constants\Alert;
@@ -11,6 +11,7 @@ use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Route;
 use app\helpers\Authenticate;
+use app\helpers\BaseRoute;
 use app\helpers\Database;
 use app\helpers\Mailing;
 use app\helpers\RequestUtil;
@@ -18,33 +19,23 @@ use app\helpers\Util;
 use app\helpers\Validation;
 use app\helpers\Logging;
 use app\models\User;
-use app\routes\UserEdit;
 
 
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
 
-Logging::debug("useredit route");
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $json = RequestUtil::retrievePOSTData();
-    Logging::debug("useredit POST request", $json);
-
-    if (isset($json['add-user'])) {
-        echo addNewUser($json);
-    } else if (isset($json['validate-user'])) {
-        echo validateNewUser($json);
-    } else if (isset($json['regen-password'])) {
-        echo regenPassword($json);
+class UserEdit extends BaseRoute
+{
+    function __construct()
+    {
+        parent::__construct(Route::USER_EDIT, 'user_edit_template', 'user_edit_script');
     }
-} else {
-    if (!Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::LOGIN);
-    } else if (!Authenticate::isAdmin()) {
-        Util::requestRedirect(Route::HOME);
-    } else {
-        echo (new UserEdit())->renderRoute();
+
+    public function getBodyContent(): string
+    {
+        return $this->renderTemplate(['password' => $password_plain ?? Util::getRandomPassword()]);
     }
 }
 
@@ -93,4 +84,28 @@ function validateNewUser($json): string
     $json['validated'] = !$login_warning && !$password_warning;
 
     return json_encode($json);
+}
+
+
+Logging::debug("useredit route");
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $json = RequestUtil::retrievePOSTData();
+    Logging::debug("useredit POST request", $json);
+
+    if (isset($json['add-user'])) {
+        echo addNewUser($json);
+    } else if (isset($json['validate-user'])) {
+        echo validateNewUser($json);
+    } else if (isset($json['regen-password'])) {
+        echo regenPassword($json);
+    }
+} else {
+    if (!Authenticate::isLoggedIn()) {
+        Util::requestRedirect(Route::LOGIN);
+    } else if (!Authenticate::isAdmin()) {
+        Util::requestRedirect(Route::HOME);
+    } else {
+        echo (new UserEdit())->renderRoute();
+    }
 }

@@ -28,7 +28,7 @@ class Login extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct(Route::LOGIN, 'login_template', 'login_script');
+        parent::__construct('login');
     }
 
     public function getBodyContent(): string

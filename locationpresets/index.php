@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.15 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 use app\constants\Alert;
@@ -11,34 +11,33 @@ use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Route;
 use app\helpers\Authenticate;
+use app\helpers\BaseRoute;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\RequestUtil;
 use app\helpers\Validation;
 use app\helpers\Util;
-use app\routes\LocationList;
 
 
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
 
-Logging::debug("locationpresets route");
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $json = RequestUtil::retrievePOSTData();
-    Logging::debug("locationpresets POST request", $json);
-
-    if (isset($json['add-loc-preset'])) {
-        echo addLocationPreset($json);
-    } else if (isset($json['update-loc-preset'])) {
-        echo updateLocationPreset($json);
+class LocationList extends BaseRoute
+{
+    function __construct()
+    {
+        parent::__construct(Route::LOCAL_PRESETS, 'location_presets_template', 'location_presets_script');
     }
-} else {
-    if (!Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::LOGIN);
-    } else {
-        echo (new LocationList())->renderRoute();
+
+    public function getBodyContent(): string
+    {
+
+        $locations = Database::locations()->queryAll();
+
+        return $this->renderTemplate([
+            'locations' => $locations ?? []
+        ]);
     }
 }
 
@@ -92,4 +91,23 @@ function updateLocationPreset($json): string
         return RequestUtil::redirect(Route::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
     }
     return RequestUtil::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
+}
+
+Logging::debug("locationpresets route");
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $json = RequestUtil::retrievePOSTData();
+    Logging::debug("locationpresets POST request", $json);
+
+    if (isset($json['add-loc-preset'])) {
+        echo addLocationPreset($json);
+    } else if (isset($json['update-loc-preset'])) {
+        echo updateLocationPreset($json);
+    }
+} else {
+    if (!Authenticate::isLoggedIn()) {
+        Util::requestRedirect(Route::LOGIN);
+    } else {
+        echo (new LocationList())->renderRoute();
+    }
 }

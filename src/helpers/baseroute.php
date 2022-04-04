@@ -29,19 +29,28 @@ abstract class BaseRoute
     /**
      * Link a Route with its designated template in the constructor.
      * 
-     * @param string $page_url Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
-     * @param string $template_name Template to use in renderTemplate call.
-     * @param string $javascript_name Optional javascript file to execute in the page.
+     * @param string $route_folder Route's uri to be collated after app URI.
+     * @param string $template_name Template to use in renderTemplate call. If left empty it defaults to <route>_template.
+     * @param string $javascript_name Optional javascript file to execute in the page. If left empty it defaults to <route>_script.
      * @param bool $show_header The page display the AppBar header.
      * @param bool $show_footer The page display the school info footer.
      */
-    public function __construct(string $page_url, string $template_name = "", string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
+    public function __construct(string $route_folder, string $template_name = "", string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
     {
-        $_SESSION[Session::PAGE] = $page_url;
-        $this->template_name = $template_name;
-        $this->javascript_name = $javascript_name;
+        // $page_url Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
+        $_SESSION[Session::PAGE] = APP_URL . $route_folder;
         $this->show_header = $show_header;
         $this->show_footer = $show_footer;
+
+        if (strlen($template_name) === 0) {
+            $template_name = $route_folder . '_template';
+        }
+        $this->template_name = $template_name;
+
+        if (strlen($template_name) === 0) {
+            $template_name = $route_folder . '_script';
+        }
+        $this->javascript_name = $javascript_name;
     }
 
     /**
@@ -82,7 +91,7 @@ abstract class BaseRoute
         if (strlen($this->javascript_name) == 0)
             return "";
 
-        $script_path = AppPaths::SCRIPTS . DIRECTORY_SEPARATOR . $this->javascript_name . '.js';
+        $script_path = $this->javascript_name . '.js';
         return file_get_contents($script_path);
     }
 
@@ -112,7 +121,8 @@ abstract class BaseRoute
                 Logging::debug('Post', $_POST);
             }
         }
-        return Util::renderTemplate($this->template_name, $data, AppPaths::TEMPLATES);
+
+        return Util::renderTemplate($this->template_name, $data);
     }
 
     /**
