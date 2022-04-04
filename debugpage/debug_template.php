@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 ?>
@@ -12,7 +12,7 @@
 <div>
     <textarea style="width: 100%; height : 40vh" name="" id="" cols="30" rows="10">
     #############################
-    ##Joël Piguet - 2022.03.10##
+    ##Joël Piguet - 2022.04.04##
     ###########################
 
     PHP v7.4.25 with Composer, coded with VSCode.
@@ -28,8 +28,7 @@
     <div>TODO::</div>
     <br>
     <div>Bug with expiration date before filter in sqlite</div>
-    <div>CONTACT: create contact page</div>
-    <div>ADMIN - access user contact posts.</div>
     <div>ARTICLES: filter with created by</div>
     <div>LOGIN: replace with proper favicon</div>
+    <div>LOGIN: offer new password</div>
 </div>

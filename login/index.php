@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\Route;
 use app\constants\Warning;
 use app\helpers\Authenticate;
@@ -18,8 +20,6 @@ use app\helpers\RequestUtil;
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
-
-const ROUTE_FOLDER = APP_URL . 'login';
 
 /**
  * Route class containing behavior linked to login_template
@@ -69,7 +69,7 @@ function loginattempt($json): string
         $warnings['password'] = Warning::LOGIN_PASSWORD_EMPTY;
     } else {
         if ($user) {
-            $json['display_renew'] = true;
+            $json['display_renew_btn'] = true;
             if ($user->verifyPassword($password)) {
                 Authenticate::login($user);
                 return RequestUtil::redirect(Route::HOME);
@@ -81,17 +81,45 @@ function loginattempt($json): string
     return RequestUtil::issueWarnings($json, $warnings);
 }
 
+/**
+ * Called from login screen when the user can't log-in.
+ */
+function renewForgottenPassword($login_email): string
+{
+    // handle demand for new password.
+    $user = Database::users()->queryByEmail($login_email);
+
+    if (isset($user)) {
+        if (Util::renewPassword($user)) {
+            return Util::requestRedirect(
+                Route::LOGIN,
+                AlertType::SUCCESS,
+                sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail())
+            );
+        }
+    }
+    return Util::requestRedirect(
+        Route::LOGIN,
+        AlertType::FAILURE,
+        Alert::NEW_PASSWORD_FAILURE
+    );
+}
 
 Logging::debug("login route");
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    print('post');
     $json = RequestUtil::retrievePOSTData();
     Logging::debug("login POST request", $json);
     echo loginattempt($json);
 } else {
-    if (Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::HOME);
+    if (isset($_GET['forgottenpassword'])) {
+        $email = trim($_GET['forgottenpassword']);
+        return renewForgottenPassword($email);
     } else {
-        echo (new Login())->renderRoute();
+        if (Authenticate::isLoggedIn()) {
+            Util::requestRedirect(Route::HOME);
+        } else {
+            echo (new Login())->renderRoute();
+        }
     }
 }

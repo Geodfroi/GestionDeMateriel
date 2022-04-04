@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 namespace app\helpers;
@@ -35,11 +35,11 @@ class Mailing
     {
         Logging::debug('params', $params);
 
-        $html_content = Util::renderTemplate($email_template, $params, AppPaths::EMAIL_TEMPLATES);
-        $plain_content = Util::readFile(AppPaths::EMAIL_TEMPLATES . DIRECTORY_SEPARATOR . $email_template, $params);
+        $html_content = Util::renderTemplate($email_template, $params, AppPaths::TEMPLATES);
+        $plain_content = Util::readFile(AppPaths::TEMPLATES . DIRECTORY_SEPARATOR . $email_template, $params);
 
         return [
-            Util::renderTemplate('email_base', ['content' => $html_content], AppPaths::EMAIL_TEMPLATES),
+            Util::renderTemplate('email_base', ['content' => $html_content], AppPaths::TEMPLATES),
             $plain_content,
         ];
     }

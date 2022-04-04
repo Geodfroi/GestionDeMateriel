@@ -3,16 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.15 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 namespace app\helpers;
 
-use app\constants\LogInfo;
-use app\constants\Session;
 use app\helpers\Logging;
-use app\models\User;
-use PhpParser\Node\Stmt\Break_;
 
 class RequestUtil
 {

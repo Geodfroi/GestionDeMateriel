@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.03.15 ###
+// ## Joël Piguet - 2022.04.04 ###
 // ##############################
 
 //#region fetch
@@ -65,8 +65,7 @@ function postRequest(request_name, callback = null, data = null) {
       if (callback != null) {
         callback(json);
       }
-    })
-    .catch((e) => console.log(e));
+    });
 }
 
 //#endregion

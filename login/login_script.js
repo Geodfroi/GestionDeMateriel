@@ -1,11 +1,12 @@
 // ################################
-// ## Joël Piguet - 2022.01.31 ###
+// ## Joël Piguet - 2022.04.04 ###
 // ##############################
 
 function callback(json) {
   displayWarnings(json, "login", "password");
 
   if (json.display_renew_btn) {
+    console.log("display");
     document.getElementById("rewew-div").removeAttribute("hidden");
     let btn = document.getElementById("renew-link");
 

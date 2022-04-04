@@ -156,7 +156,7 @@ abstract class BaseRoute
         if (!$this->isRedirecting()) {
             $templateData['page_title'] = $this->getHeaderTitle();
             $templateData['page_content'] = $this->getBodyContent();
-            $templateData['page_script'] = $this->getScript();
+            $templateData['page_script'] = $this->getScriptURL();
             $templateData['main_script'] = BaseRoute::getMainScript();
             $templateData['show_header'] = $this->showHeader();
             $templateData['show_footer'] = $this->showFooter();

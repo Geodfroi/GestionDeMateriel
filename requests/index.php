@@ -68,10 +68,7 @@ function handleGetRequests(): string
         return renewUserPassword($id);
     }
 
-    if (isset($_GET['forgottenpassword'])) {
-        $email = trim($_GET['forgottenpassword']);
-        return renewForgottenPassword($email);
-    }
+
     Logging::error("Invalid get request to server", ['args' => $_GET]);
     return "Invalid get request to server";
 }
@@ -181,30 +178,6 @@ function renewUserPassword($id): string
         return Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
     }
     return Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
-}
-
-/**
- * Called from login screen when the user can't log-in.
- */
-function renewForgottenPassword($login_email): string
-{
-    // handle demand for new password.
-    $user = Database::users()->queryByEmail($login_email);
-
-    if (isset($user)) {
-        if (Util::renewPassword($user)) {
-            return Util::requestRedirect(
-                Route::LOGIN,
-                AlertType::SUCCESS,
-                sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail())
-            );
-        }
-    }
-    return Util::requestRedirect(
-        Route::LOGIN,
-        AlertType::FAILURE,
-        Alert::NEW_PASSWORD_FAILURE
-    );
 }
 
 #endregion
