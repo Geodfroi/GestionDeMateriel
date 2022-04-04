@@ -20,7 +20,6 @@ use app\helpers\Logging;
 use app\helpers\RequestUtil;
 use app\helpers\Util;
 use app\helpers\Validation;
-use app\models\Article;
 
 
 require_once __DIR__ . '/../loader.php';

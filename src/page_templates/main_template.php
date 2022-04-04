@@ -105,7 +105,7 @@ use app\helpers\Authenticate;
             <div class="container">
                 <div class="row">
                     <div class="text-muted h5 col-9 me-auto">HEdS - Service des innovations pédagogiques.</div>
-                    <div class="col-3 text-end"> <a href="/contact">Contacter-nous.</a></div>
+                    <div class="col-3 text-end"> <a href="mailto:<?php echo CONTACT_EMAIL ?>">Contacter-nous.</a></div>
                 </div>
                 <div class="row">
                     <span class="text-muted h6 col-12"><?php echo LAST_MODIFICATION ?></span>

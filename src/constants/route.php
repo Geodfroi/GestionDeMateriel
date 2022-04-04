@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 namespace app\constants;
@@ -11,35 +11,16 @@ namespace app\constants;
 class Route
 {
     // routes
-    const ADMIN = LOCAL_SERVER ? '/admin' : "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/admin";
-    const ART_TABLE = LOCAL_SERVER ? '/articletable' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/articletable";
-    const ART_EDIT = LOCAL_SERVER ? '/articleedit' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/articleedit";
-
-    const DEBUG_EMAILS = LOCAL_SERVER ? '/debugmails' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/debugmails";
-
-    const DEBUG_PAGE = LOCAL_SERVER ? '/debugpage' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/debugpage";
-
-    const CONTACT = LOCAL_SERVER ? '/contact' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/CONTACT";
-
-    const LOCAL_PRESETS =  LOCAL_SERVER ? '/locationpresets' : "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/locationpresets";
-
-    const LOGIN = LOCAL_SERVER ? '/login' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/login";
-
-    const HOME = LOCAL_SERVER ? '/' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/login";
-
-    const PROFILE = LOCAL_SERVER ? '/profile' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/profile";
-
-    const USER_EDIT = LOCAL_SERVER ? '/useredit'
-        : "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/useredit";
-
-    const USERS_TABLE = LOCAL_SERVER ? '/usertable' :
-        "http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/usertable";
+    const ADMIN = APP_URL . '/admin';
+    const ART_TABLE = APP_URL  . '/articletable';
+    const ART_EDIT = APP_URL . '/articleedit';
+    const DEBUG_EMAILS = APP_URL . '/debugmails';
+    const DEBUG_PAGE = APP_URL . '/debugpage';
+    const CONTACT = APP_URL . '/contact';
+    const LOCAL_PRESETS =  APP_URL . '/locationpresets';
+    const LOGIN = APP_URL . '/login';
+    const HOME = APP_URL;
+    const PROFILE = APP_URL . '/profile';
+    const USER_EDIT = APP_URL . '/useredit';
+    const USERS_TABLE = APP_URL . '/usertable';
 }

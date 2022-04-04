@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 /**
@@ -28,6 +28,11 @@ const LOCAL_SERVER = true;
  * Appear by default as html title.
  */
 const APP_NAME = "HEdS Gestionnaire d'inventaire";
+
+/**
+ * Linked in "contact us" in html footer.
+ */
+const CONTACT_EMAIL = "innov.heds@gmail.com";
 
 /**
  * Used as hyperlink in emails; must be set to proper url once the project is online. 
