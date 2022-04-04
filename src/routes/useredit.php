@@ -7,6 +7,7 @@
 namespace app\routes;
 
 use app\constants\Route;
+use app\helpers\BaseRoute;
 use app\helpers\Util;
 
 class UserEdit extends BaseRoute

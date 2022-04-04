@@ -9,6 +9,7 @@ namespace app\routes;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
+use app\helpers\BaseRoute;
 use app\helpers\Database;
 
 /**

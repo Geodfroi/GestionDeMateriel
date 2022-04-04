@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.15 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 require_once __DIR__ . '/config.php';
@@ -26,6 +26,7 @@ require_once __DIR__ . '/src/helpers/db/locationqueries.php';
 require_once __DIR__ . '/src/helpers/db/userqueries.php';
 
 require_once __DIR__ . '/src/helpers/authenticate.php';
+require_once __DIR__ . '/src/helpers/baseroute.php';
 require_once __DIR__ . '/src/helpers/convert.php';
 require_once __DIR__ . '/src/helpers/database.php';
 require_once __DIR__ . '/src/helpers/dbutil.php';
@@ -39,14 +40,10 @@ require_once __DIR__ . '/src/models/article.php';
 require_once __DIR__ . '/src/models/stringcontent.php';
 require_once __DIR__ . '/src/models/user.php';
 
-require_once __DIR__ . '/src/routes/baseroute.php'; // base class must be first in paragraph
-require_once __DIR__ . '/src/routes/admin.php';
 // require_once __DIR__ . '/src/routes/articleedit.php';
 require_once __DIR__ . '/src/routes/articletable.php';
-require_once __DIR__ . '/src/routes/contact.php';
 require_once __DIR__ . '/src/routes/debugemails.php';
 require_once __DIR__ . '/src/routes/locationlist.php';
-// require_once __DIR__ . '/src/routes/login.php';
 require_once __DIR__ . '/src/routes/profile.php';
 require_once __DIR__ . '/src/routes/useredit.php';
 require_once __DIR__ . '/src/routes/usertable.php';

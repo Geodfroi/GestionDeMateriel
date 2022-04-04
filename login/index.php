@@ -5,19 +5,21 @@ declare(strict_types=1);
 use app\constants\Route;
 use app\constants\Warning;
 use app\helpers\Authenticate;
+use app\helpers\BaseRoute;
 use app\helpers\Database;
 use app\helpers\Util;
 use app\helpers\Logging;
 use app\helpers\RequestUtil;
-use app\routes\BaseRoute;
 
 ################################
-## Joël Piguet - 2022.03.15 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
+
+const ROUTE_FOLDER = APP_URL . 'login';
 
 /**
  * Route class containing behavior linked to login_template

@@ -1,10 +1,10 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
-namespace app\routes;
+namespace app\helpers;
 
 use app\constants\AppPaths;
 use app\constants\Session;

@@ -8,6 +8,7 @@ namespace app\routes;
 
 use app\constants\Route;
 use app\helpers\Authenticate;
+use app\helpers\BaseRoute;
 use app\helpers\Database;
 // use app\helpers\Logging;
 
