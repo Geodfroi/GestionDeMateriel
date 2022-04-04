@@ -24,7 +24,7 @@ class Profile extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::PROFILE, 'profile_template', 'profile_script');
+        parent::__construct('profile', 'profile_template', 'profile_script');
     }
 
     public function getBodyContent(): string

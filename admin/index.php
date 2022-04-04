@@ -20,7 +20,7 @@ class Admin extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::ADMIN, 'admin_template');
+        parent::__construct('admin', 'admin_template');
     }
 
     public function getBodyContent(): string

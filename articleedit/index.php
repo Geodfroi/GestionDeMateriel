@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 use app\constants\Alert;
@@ -11,41 +11,22 @@ use app\constants\AlertType;
 use app\constants\LogInfo;
 use app\constants\Route;
 use app\helpers\Authenticate;
+use app\helpers\BaseRoute;
 use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\RequestUtil;
 use app\helpers\Util;
 use app\models\Article;
-use app\routes\BaseRoute;
 
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
 
-Logging::debug("articleedit route");
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $json = RequestUtil::retrievePOSTData();
-    Logging::debug("articleedit POST request", $json);
-
-    if (isset($json['add-article'])) {
-        echo addArticle($json);
-    } else if (isset($json['update-article'])) {
-        echo updateArticle($json);
-    }
-} else {
-    if (!Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::LOGIN);
-    } else {
-        echo (new ArticleEdit())->renderRoute();
-    }
-}
-
 class ArticleEdit extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::ART_EDIT, 'article_edit_template', 'article_edit_script');
+        parent::__construct('articleedit', 'articleedit_template', 'articleedit_script');
     }
 
     public function getBodyContent(): string
@@ -108,4 +89,23 @@ function updateArticle($json): string
     }
     Logging::debug('warnings-update', ['warnings' => $warnings]);
     return RequestUtil::issueWarnings($json, $warnings);
+}
+
+Logging::debug("articleedit route");
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $json = RequestUtil::retrievePOSTData();
+    Logging::debug("articleedit POST request", $json);
+
+    if (isset($json['add-article'])) {
+        echo addArticle($json);
+    } else if (isset($json['update-article'])) {
+        echo updateArticle($json);
+    }
+} else {
+    if (!Authenticate::isLoggedIn()) {
+        Util::requestRedirect(Route::LOGIN);
+    } else {
+        echo (new ArticleEdit())->renderRoute();
+    }
 }

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
 namespace app\constants;
@@ -11,9 +11,10 @@ namespace app\constants;
 class AppPaths
 {
     //app folders
-    const EMAIL_TEMPLATES = __DIR__ . '/../email_templates';
-    const SCRIPTS =  __DIR__ . '/../scripts';
-    const TEMPLATES = __DIR__ . '/../page_templates';
+    const TEMPLATES = __DIR__ . '/../app_templates';
+
+    // main script
+    const MAIN_SCRIPT =  __DIR__ . '/../../static/js/main_script.js';
 
     const LOG_FOLDER = __DIR__ . '/../../_local/logs';
     const LOCAL_DB_FOLDER = __DIR__ . '/../../_local';

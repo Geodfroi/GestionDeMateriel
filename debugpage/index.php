@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.04 ###
 ##############################
 
-use app\constants\AppPaths;
 use app\helpers\Logging;
 use app\helpers\Util;
 
@@ -16,4 +15,4 @@ require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofi
 session_start();
 
 Logging::debug("debug page");
-echo Util::renderTemplate('debug_template', [], AppPaths::TEMPLATES);
+echo Util::renderTemplate('debug_template');

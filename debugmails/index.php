@@ -6,7 +6,6 @@ declare(strict_types=1);
 ## Joël Piguet - 2022.04.04 ###
 ##############################
 
-use app\constants\Route;
 use app\helpers\BaseRoute;
 use app\helpers\Logging;
 use app\helpers\Mailing;
@@ -23,7 +22,7 @@ class DebugEmails extends BaseRoute
 {
     function __construct()
     {
-        parent::__construct(Route::DEBUG_EMAILS, 'debug_emails_template', "", false, false);
+        parent::__construct('debugmails', 'debugemails_template', "", false, false);
     }
 
     public function getBodyContent(): string
