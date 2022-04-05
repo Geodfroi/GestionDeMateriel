@@ -21,6 +21,7 @@ use app\helpers\RequestUtil;
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
+$_SESSION[Session::ROOT] = APP_URL;
 
 /**
  * Route class containing behavior linked to login_template
@@ -38,6 +39,9 @@ class Login extends BaseRoute
     }
 }
 
+/**
+ * @return string json response.
+ */
 function loginattempt($json): string
 {
     $login = isset($json['login']) ? $json['login'] : "";
@@ -84,6 +88,8 @@ function loginattempt($json): string
 
 /**
  * Called from login screen when the user can't log-in.
+ * 
+ * @return string json response.
  */
 function renewForgottenPassword($login_email): string
 {
@@ -107,7 +113,6 @@ function renewForgottenPassword($login_email): string
 }
 
 Logging::debug("login route");
-$_SESSION[Session::ROOT] = APP_URL;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $json = RequestUtil::retrievePOSTData();
     Logging::debug("login POST request", $json);

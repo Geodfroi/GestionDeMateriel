@@ -1,12 +1,12 @@
 // ################################
-// ## Joël Piguet - 2022.03.14 ###
+// ## Joël Piguet - 2022.04.05 ###
 // ##############################
 
 /**
  * Display caret icon besides table header to show orderby value.
  */
 function displayCarets() {
-  let orderby = display_data.orderby;
+  const orderby = display_data.orderby;
 
   const email_header = document.getElementById("email-header");
   const creation_header = document.getElementById("creation-header");
@@ -33,31 +33,31 @@ function displayCarets() {
 
 function deleteModalShown(e, modal) {
   if (e.relatedTarget) {
-    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
-    let email = getParentAttribute(e.relatedTarget, "data-bs-email");
+    const id_ = getParentAttribute(e.relatedTarget, "data-bs-id");
+    const email = getParentAttribute(e.relatedTarget, "data-bs-email");
 
     modal.querySelector(
       ".modal-body"
     ).innerText = `Voulez-vous vraiment supprimer le compte utilisateur [${email}] ? `;
 
-    let btn = modal.querySelector(".btn-primary");
-    let href_start = btn.getAttribute("href-start");
-    btn.setAttribute("href", href_start + id);
+    const btn = modal.querySelector(".btn-primary");
+    const href = `${page_url}?deleteuser=${id_}`;
+    btn.setAttribute("href", href);
   }
 }
 
 function renewModalShown(e, modal) {
   if (e.relatedTarget) {
-    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
-    let email = getParentAttribute(e.relatedTarget, "data-bs-email");
+    const id_ = getParentAttribute(e.relatedTarget, "data-bs-id");
+    const email = getParentAttribute(e.relatedTarget, "data-bs-email");
 
     modal.querySelector(
       ".modal-body"
     ).innerText = `Envoyer un nouveau mot de passe à [${email}] ? `;
 
-    let btn = modal.querySelector(".btn-primary");
-    let href_start = btn.getAttribute("href-start");
-    btn.setAttribute("href", href_start + id);
+    const btn = modal.querySelector(".btn-primary");
+    const href = `${page_url}?renewuserpassword=${id_}`;
+    btn.setAttribute("href", href);
   }
 }
 
@@ -65,13 +65,13 @@ function renewModalShown(e, modal) {
  * Set header links depending on orderby value.
  */
 function setHeaderLinks() {
-  let orderby = display_data.orderby;
+  const orderby = display_data.orderby;
 
   const email_header = document.getElementById("email-header");
   const creation_header = document.getElementById("creation-header");
   const login_header = document.getElementById("last-login-header");
 
-  let root_href = `${page_url}?orderby=`;
+  const root_href = `${page_url}?orderby=`;
 
   email_header
     .querySelector("a")
@@ -109,14 +109,14 @@ function selectRow(_, row) {
   if (!isSmallScreen()) {
     return;
   }
-  let is_admin = row.getAttribute("data-bs-admin");
+  const is_admin = row.getAttribute("data-bs-admin");
   if (is_admin) {
     return;
   }
 
   showModal("action-modal", (modal) => {
-    let user_id = row.getAttribute("data-bs-id");
-    let user_email = row.getAttribute("data-bs-email");
+    const user_id = row.getAttribute("data-bs-id");
+    const user_email = row.getAttribute("data-bs-email");
 
     if (is_admin) {
       close;

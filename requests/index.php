@@ -54,17 +54,6 @@ function handleGetRequests(): string
         return deleteLocationPreset($id);
     }
 
-    if (isset($_GET['deleteuser'])) {
-        $id = intval($_GET['deleteuser']);
-        return deleteUser($id);
-    }
-
-    if (isset($_GET['renewuserpassword'])) {
-        $id = intval($_GET['renewuserpassword']);
-        return renewUserPassword($id);
-    }
-
-
     Logging::error("Invalid get request to server", ['args' => $_GET]);
     return "Invalid get request to server";
 }
@@ -145,31 +134,7 @@ function deleteLocationPreset($id): string
     return  Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
 }
 
-function deleteUser($id): string
-{
-    if (Database::users()->delete($id)) {
 
-        Logging::info(LogInfo::USER_DELETED, [
-            'admin-id' => Authenticate::getUserId(),
-            'user-id' => $id
-        ]);
-        return Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
-    }
-    return Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
-}
-
-
-/**
- * Called by admin on user-table to re-issue user a new password.
- */
-function renewUserPassword($id): string
-{
-    $user = Database::users()->queryById(intval($id));
-    if (Util::renewPassword($user)) {
-        return Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
-    }
-    return Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
-}
 
 #endregion
 

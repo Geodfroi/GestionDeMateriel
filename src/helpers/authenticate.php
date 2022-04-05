@@ -12,7 +12,6 @@ use app\constants\LogInfo;
 use app\constants\Session;
 use app\helpers\Logging;
 use app\models\User;
-use SebastianBergmann\Environment\Console;
 
 /**
  * Collection of static functions linked to authentification bundled into a class. 

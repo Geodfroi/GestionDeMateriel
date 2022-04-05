@@ -9,7 +9,6 @@ function callback(json) {
     document.getElementById("rewew-div").removeAttribute("hidden");
     const btn = document.getElementById("renew-link");
     const href = `${page_url}?forgottenpassword=${json.login}`;
-    console.log(href);
     btn.setAttribute("href", href);
     btn.innerText = `Envoyer un nouveau mot de passe à ${json.login} ?`;
   }
