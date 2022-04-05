@@ -70,7 +70,7 @@ use app\helpers\Authenticate;
                             <li class="nav-item ms-auto">
                                 <?php if (Authenticate::isLoggedIn()) { ?>
                                     <div>
-                                        <a class="nav-link" href="<?php echo Requests::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
+                                        <a class="nav-link" href="<?php echo Route::LOGOUT ?>"><?php echo Authenticate::getUser()->getLoginEmail() . '  ' ?><i class="bi bi-box-arrow-in-right"></i></a>
                                     </div>
                                 <?php } else { ?>
                                     <a class="nav-link" href="<?php echo Route::LOGIN ?>">Connexion</a>
@@ -134,10 +134,9 @@ use app\helpers\Authenticate;
     <script>
         let root_url = "<?php echo $_SESSION[Session::ROOT] ?>";
         let page_url = "<?php echo $_SESSION[Session::PAGE] ?>";
-
-        <?php echo $main_script; ?>
-        <?php echo isset($page_script) ? $page_script : ""; ?>
     </script>
+    <script src="<?php echo $_SESSION[Session::ROOT] ?>/static/js/main-script.js"></script>
+    <script src="<?php echo $_SESSION[Session::PAGE] . '/' . $script_name . '.js' ?>"></script>
 
     <!-- dismiss alert after timer -->
     <?php if (isset($alert['type'])) { ?>

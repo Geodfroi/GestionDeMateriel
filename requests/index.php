@@ -59,10 +59,6 @@ function handleGetRequests(): string
         return deleteUser($id);
     }
 
-    if (isset($_GET['logout'])) {
-        return logout();
-    }
-
     if (isset($_GET['renewuserpassword'])) {
         $id = intval($_GET['renewuserpassword']);
         return renewUserPassword($id);
@@ -162,11 +158,6 @@ function deleteUser($id): string
     return Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
 }
 
-function logout(): string
-{
-    Authenticate::logout();
-    return Util::requestRedirect(Route::LOGIN);
-}
 
 /**
  * Called by admin on user-table to re-issue user a new password.

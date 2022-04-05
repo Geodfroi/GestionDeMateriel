@@ -73,19 +73,19 @@ abstract class BaseRoute
         return file_get_contents(AppPaths::MAIN_SCRIPT);
     }
 
-    /**
-     * Get js script to be executed on the page.
-     * 
-     * @return string Javascript text.
-     */
-    protected function getScript()
-    {
-        if (strlen($this->javascript_name) == 0)
-            return "";
+    // /**
+    //  * Get js script to be executed on the page.
+    //  * 
+    //  * @return string Javascript text.
+    //  */
+    // protected function getScript()
+    // {
+    //     if (strlen($this->javascript_name) == 0)
+    //         return "";
 
-        $script_path = $this->javascript_name . '.js';
-        return file_get_contents($script_path);
-    }
+    //     $script_path = $this->javascript_name . '.js';
+    //     return file_get_contents($script_path);
+    // }
 
 
     /**
@@ -156,8 +156,7 @@ abstract class BaseRoute
         if (!$this->isRedirecting()) {
             $templateData['page_title'] = $this->getHeaderTitle();
             $templateData['page_content'] = $this->getBodyContent();
-            $templateData['page_script'] = $this->getScriptURL();
-            $templateData['main_script'] = BaseRoute::getMainScript();
+            $templateData['script_name'] = $this->javascript_name;
             $templateData['show_header'] = $this->showHeader();
             $templateData['show_footer'] = $this->showFooter();
             $templateData['alert'] = Util::displayAlert();

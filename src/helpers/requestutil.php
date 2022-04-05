@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 namespace app\helpers;
@@ -24,12 +24,10 @@ class RequestUtil
         $json['validated'] = false;
         $json['warnings'] = $warnings;
 
+        // header('Content-Type: application/json; charset=utf-8');
+        header('Content-Type: application/json');
         $str = json_encode($json);
-        if (!$str) {
-            return "";
-        }
-        header('Content-Type: application/json; charset=utf-8');
-        return $str;
+        return $str ? $str : '{}';
     }
 
     /**

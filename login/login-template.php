@@ -1,9 +1,7 @@
 <?php
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
-
-use app\constants\Route;
 
 ?>
 
@@ -36,16 +34,12 @@ use app\constants\Route;
     </form>
 
     <div id="rewew-div" class="row-12 justify-content-center" hidden>
-        <div class="col-6 mx-auto">
+        <div class="col-6 mx-auto mt-3">
             <!-- Display a link to propose to send a new password to email. -->
             <a id="renew-link" href="#">Envoyer un nouveau mot de passe à </a>
         </div>
     </div>
 </div>
-
-<script>
-    // href - start = "<?php echo Route::LOGIN . '/forgottenpassword' ?>"
-</script>
 
 <div>debug</div>
 <div>alias: noel.biquet@gmail.com</div>

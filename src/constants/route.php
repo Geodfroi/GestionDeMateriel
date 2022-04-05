@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 namespace app\constants;
@@ -19,6 +19,7 @@ class Route
     const CONTACT = APP_URL . '/contact';
     const LOCAL_PRESETS =  APP_URL . '/locationpresets';
     const LOGIN = APP_URL . '/login';
+    const LOGOUT = APP_URL . '/logout';
     const HOME = APP_URL;
     const PROFILE = APP_URL . '/profile';
     const USER_EDIT = APP_URL . '/useredit';

@@ -1,17 +1,16 @@
 // ################################
-// ## Joël Piguet - 2022.04.04 ###
+// ## Joël Piguet - 2022.04.05 ###
 // ##############################
 
 function callback(json) {
   displayWarnings(json, "login", "password");
 
   if (json.display_renew_btn) {
-    console.log("display");
     document.getElementById("rewew-div").removeAttribute("hidden");
-    let btn = document.getElementById("renew-link");
-
-    let href_start = btn.getAttribute("href-start");
-    btn.setAttribute("href", href_start + json.login);
+    const btn = document.getElementById("renew-link");
+    const href = `${page_url}?forgottenpassword=${json.login}`;
+    console.log(href);
+    btn.setAttribute("href", href);
     btn.innerText = `Envoyer un nouveau mot de passe à ${json.login} ?`;
   }
 }

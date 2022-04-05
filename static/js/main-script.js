@@ -43,22 +43,32 @@ function postRequest(request_name, callback = null, data = null) {
       Accept: "application/json",
     },
   };
-
   url = page_url;
-  console.log("POST request at : " + page_url);
-  console.dir(options);
+  console.log(url);
+
+  // fetch(page_url, options)
+  //   .then((res) => {
+  //     console.log(`${request_name} POST response`);
+  //     console.dir(res);
+  //     return res.text();
+  //   })
+
+  //   .then((txt) => console.log(txt));
 
   fetch(page_url, options)
     .then((res) => {
-      console.log(`${request_name} POST response`);
-      console.dir(res);
+      // console.log(`${request_name} POST response`);
+      // console.dir(res);
+      console.log(res.headers);
+
       return res.json();
     })
     .then((json) => {
-      console.log(`${request_name} POST json`);
-      console.dir(json);
+      // console.log(typeof json);
+      // console.log(`${request_name} POST json`);
+      // console.dir(json);
       if ("url" in json) {
-        console.log(json.url);
+        // console.log(json.url);
         window.location.replace(json.url);
         return;
       }

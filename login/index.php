@@ -5,6 +5,7 @@ declare(strict_types=1);
 use app\constants\Alert;
 use app\constants\AlertType;
 use app\constants\Route;
+use app\constants\Session;
 use app\constants\Warning;
 use app\helpers\Authenticate;
 use app\helpers\BaseRoute;
@@ -14,7 +15,7 @@ use app\helpers\Logging;
 use app\helpers\RequestUtil;
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 require_once __DIR__ . '/../loader.php';
@@ -28,7 +29,7 @@ class Login extends BaseRoute
 {
     public function __construct()
     {
-        parent::__construct('login', 'login_template', 'login_script');
+        parent::__construct('login', 'login-template', 'login-script');
     }
 
     public function getBodyContent(): string
@@ -106,15 +107,15 @@ function renewForgottenPassword($login_email): string
 }
 
 Logging::debug("login route");
+$_SESSION[Session::ROOT] = APP_URL;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    print('post');
     $json = RequestUtil::retrievePOSTData();
     Logging::debug("login POST request", $json);
     echo loginattempt($json);
 } else {
     if (isset($_GET['forgottenpassword'])) {
         $email = trim($_GET['forgottenpassword']);
-        return renewForgottenPassword($email);
+        echo renewForgottenPassword($email);
     } else {
         if (Authenticate::isLoggedIn()) {
             Util::requestRedirect(Route::HOME);
