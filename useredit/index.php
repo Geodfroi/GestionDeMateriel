@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 use app\constants\Alert;
@@ -39,7 +39,7 @@ class UserEdit extends BaseRoute
     }
 }
 
-function addNewUser($json): string
+function addNewUser($json)
 {
     $login_email = isset($json['login-email']) ? $json['login-email'] : "";
     $password_plain = isset($json['password']) ? $json['password'] : "";
@@ -53,19 +53,26 @@ function addNewUser($json): string
                 'admin-id' => Authenticate::getUserId(),
                 'new-user' => $login_email
             ]);
-            return RequestUtil::redirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
+            Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
+            return;
         }
         //attempt to roll back adding new user to db.
         Database::users()->delete($id);
     }
-    return RequestUtil::redirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
+    Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
 }
 
+/**
+ * @return string json response.
+ */
 function regenPassword(): string
 {
     return json_encode(['password' => Util::getRandomPassword()]);
 }
 
+/**
+ * @return string json response.
+ */
 function validateNewUser($json): string
 {
     $login_email = isset($json['login-email']) ? $json['login-email'] : "";

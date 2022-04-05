@@ -31,7 +31,7 @@ function showPassword(_, btn) {
 
 function submit_login() {
   data = getFormValues(["login", "password"]);
-  postRequest("submit-login", callback, data);
+  postReceiveJSON("submit-login", callback, data);
 }
 
 hookBtn("submit-btn", submit_login);

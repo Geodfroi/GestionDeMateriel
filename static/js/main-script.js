@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.04.04 ###
+// ## Joël Piguet - 2022.04.05 ###
 // ##############################
 
 //#region fetch
@@ -26,13 +26,12 @@ function getRequest(json = null) {
 }
 
 /**
- * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, post request are made to the current page url.
+ * Use javascript fetch ajax method to post data to the server. In this app, post request are always made to the current page url.
  *
  * @param {*} request_name request identifier.
- * @param {*} callback function handling the server response to the fetch request.
  * @param {*} data json data package to sent to server.
  */
-function postRequest(request_name, callback = null, data = null) {
+function post(request_name, data = null) {
   data ??= {};
   data[request_name] = true;
   const options = {
@@ -44,31 +43,24 @@ function postRequest(request_name, callback = null, data = null) {
     },
   };
   url = page_url;
-  console.log(url);
 
-  // fetch(page_url, options)
-  //   .then((res) => {
-  //     console.log(`${request_name} POST response`);
-  //     console.dir(res);
-  //     return res.text();
-  //   })
+  return fetch(page_url, options);
+}
 
-  //   .then((txt) => console.log(txt));
-
-  fetch(page_url, options)
+/**
+ * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, post request are always made to the current page url.
+ *
+ * @param {*} request_name request identifier.
+ * @param {*} callback function handling the server response to the fetch request.
+ * @param {*} data json data package to sent to server.
+ */
+function postReceiveJSON(request_name, callback = null, data = null) {
+  post(request_name, data)
     .then((res) => {
-      // console.log(`${request_name} POST response`);
-      // console.dir(res);
-      console.log(res.headers);
-
       return res.json();
     })
     .then((json) => {
-      // console.log(typeof json);
-      // console.log(`${request_name} POST json`);
-      // console.dir(json);
       if ("url" in json) {
-        // console.log(json.url);
         window.location.replace(json.url);
         return;
       }

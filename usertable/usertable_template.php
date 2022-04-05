@@ -152,3 +152,5 @@ use app\constants\Route;
     let display_data = <?php echo json_encode($display_data, JSON_UNESCAPED_UNICODE) ?>;
     console.dir(display_data);
 </script>
+
+<div class="ms-3 mt-5">DEBUG: Renouveler le mot de passe échoue car la fonctionalité email n'est pas installée.</div>

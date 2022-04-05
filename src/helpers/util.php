@@ -179,6 +179,8 @@ class Util
         Util::storeAlert($alert_type, $alert_msg);
         //The header php function will send a header message to the browser, here signaling for redirection.
         header("Location: $uri", true);
+        // other method: return javascript:
+        // return "<script> window.location.replace('$uri')</script>";
     }
 
     /**

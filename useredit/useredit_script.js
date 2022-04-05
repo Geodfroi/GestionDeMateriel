@@ -1,9 +1,9 @@
 // ################################
-// ## Joël Piguet - 2022.01.31 ###
+// ## Joël Piguet - 2022.04.05 ###
 // ##############################
 
 function getFormData() {
-  let json = getFormValues(["login-email", "password"]);
+  const json = getFormValues(["login-email", "password"]);
   json["is-admin"] = getCheckboxValue("is-admin");
   return json;
 }
@@ -17,20 +17,21 @@ function handleValidation(json) {
 }
 
 function regenPassword() {
-  postRequest("regen-password", (json) => {
+  postReceiveJSON("regen-password", (json) => {
     displayInputValue(json, "password");
   });
 }
 
 function postUser() {
-  postRequest("add-user", null, getFormData());
+  post("add-user", getFormData());
+  window.location.replace(`${root_url}usertable`);
 }
 
 /**
  * Validate user data before calling user create confirmation modal.
  */
 function validateUser() {
-  postRequest("validate-user", handleValidation, getFormData());
+  postReceiveJSON("validate-user", handleValidation, getFormData());
 }
 
 hookBtn("regen-password", regenPassword);
