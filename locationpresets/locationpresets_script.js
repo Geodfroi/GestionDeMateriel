@@ -4,8 +4,8 @@
 
 function deleteModalShown(e, modal) {
   if (e.relatedTarget) {
-    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
-    let content = getParentAttribute(e.relatedTarget, "data-bs-content");
+    const id = getParentAttribute(e.relatedTarget, "data-bs-id");
+    const content = getParentAttribute(e.relatedTarget, "data-bs-content");
     modal.querySelector(
       ".modal-body"
     ).innerText = `Voulez-vous vraiment supprimer [${content}] ?`;
@@ -40,7 +40,7 @@ function submitEdit() {
   let preset_id = document.getElementById("id").value;
   let call_id = preset_id ? "update-loc-preset" : "add-loc-preset";
 
-  postRequest(
+  postReceiveJSON(
     call_id,
     (json) => displayWarnings(json, "content"),
     getFormValues(["id", "content"])

@@ -8,7 +8,7 @@ const delays = ["3", "7", "14", "30"];
  * fetch and display user alias when modal is opened.
  */
 function aliasModalShown() {
-  postRequest("get-user", (json) => {
+  postReceiveJSON("get-user", (json) => {
     clearWarnings("alias");
     displayInputValue(json, "alias");
   });
@@ -18,7 +18,7 @@ function aliasModalShown() {
  * Fetch and display user contact email when modal is opened.
  */
 function contactModalShown() {
-  postRequest("get-user", (json) => {
+  postReceiveJSON("get-user", (json) => {
     clearWarnings("contact-email");
     displayInputValue(json, "contact-email");
   });
@@ -28,7 +28,7 @@ function contactModalShown() {
  * Fetch and display user delay options when modal is opened.
  */
 function delayModalShown() {
-  postRequest("get-user", (json) => {
+  postReceiveJSON("get-user", (json) => {
     clearWarnings("delay-3", "delay-7", "delay-14", "delay-30");
     let json_delays = json["contact-delay"].split("-");
     for (let index = 0; index < 4; index++) {
@@ -40,11 +40,11 @@ function delayModalShown() {
 }
 
 function deleteAlias() {
-  postRequest("update-alias", null, { alias: "" });
+  postReceiveJSON("update-alias", null, { alias: "" });
 }
 
 function deleteContactEmail() {
-  postRequest("update-contact-email", null, { "contact-email": "" });
+  postReceiveJSON("update-contact-email", null, { "contact-email": "" });
 }
 
 function displayDelayWarnings(json) {
@@ -76,7 +76,7 @@ function getFormDelays() {
  * Clear password fields when modal is opened.
  */
 function passwordModalShown() {
-  postRequest("get-user", () => {
+  postReceiveJSON("get-user", () => {
     clearWarningsAndInputs("password", "password-repeat");
   });
 }
@@ -85,7 +85,7 @@ function passwordModalShown() {
  * Post alias change
  */
 function submitAlias() {
-  postRequest(
+  postReceiveJSON(
     "update-alias",
     (json) => displayWarnings(json, "alias"),
     getFormValues(["alias"])
@@ -96,7 +96,7 @@ function submitAlias() {
  * Post contact email change
  */
 function submitContactEmail() {
-  postRequest(
+  postReceiveJSON(
     "update-contact-email",
     (json) => displayWarnings(json, "contact-email"),
     getFormValues(["contact-email"])
@@ -107,7 +107,7 @@ function submitContactEmail() {
  * Post peremption delay change
  */
 function submitDelay() {
-  postRequest(
+  postReceiveJSON(
     "update-delay",
     (json) => displayDelayWarnings(json),
     getFormDelays()
@@ -118,7 +118,7 @@ function submitDelay() {
  * Post password change
  */
 function submitPassword() {
-  postRequest(
+  postReceiveJSON(
     "update-password",
     (json) => displayWarnings(json, "password", "password-repeat"),
     getFormValues(["password", "password-repeat"])

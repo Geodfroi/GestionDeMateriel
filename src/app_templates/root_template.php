@@ -4,6 +4,7 @@
 ## Joël Piguet - 2022.04.05 ###
 ##############################
 
+use app\constants\Page;
 use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Authenticate;
@@ -48,20 +49,20 @@ use app\helpers\Authenticate;
                             <?php if (Authenticate::isLoggedIn()) { ?>
                                 <?php if (Authenticate::isAdmin()) { ?>
                                     <li class="nav-item active">
-                                        <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::ADMIN ? 'active' : '' ?>" href="<?php echo Route::ADMIN ?>">Admin</a>
+                                        <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Page::ADMIN ? 'active' : '' ?>" href="<?php echo Route::ADMIN ?>">Admin</a>
                                     </li>
                                 <?php } ?>
                                 <li class="nav-item active">
-                                    <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::ART_TABLE ? 'active' : '' ?>" href="<?php echo Route::ART_TABLE ?>">Articles</a>
+                                    <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Page::ART_TABLE ? 'active' : '' ?>" href="<?php echo Route::ART_TABLE ?>">Articles</a>
                                 </li>
                                 <li class="nav-item active">
-                                    <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profil</a>
+                                    <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Page::PROFILE ? 'active' : '' ?>" href="<?php echo Route::PROFILE ?> ">Profil</a>
                                 </li>
                             <?php } ?>
 
                             <?php if (DEBUG_MODE) { ?>
-                                <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
-                                <a class="nav-link <?php echo $_SESSION[Session::PAGE] === Route::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test Page [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test PAGE_URL [debug]</a>
                             <?php } ?>
 
                         </ul>
@@ -95,7 +96,7 @@ use app\helpers\Authenticate;
     <?php } ?>
 
     <main class="flex-shrink-0 mt-5">
-        <?php echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page"; ?>
+        <?php echo isset($page_content) ? $page_content : "Erreur: le contenu n'a pas été défini pour cette page."; ?>
     </main>
 
     <?php if ($show_footer) { ?>
@@ -132,12 +133,12 @@ use app\helpers\Authenticate;
     <!-- custom scripts -->
     <script>
         let root_url = "<?php echo $_SESSION[Session::ROOT] ?>";
-        let page_url = "<?php echo $_SESSION[Session::PAGE] ?>";
+        let page_url = "<?php echo $_SESSION[Session::PAGE_URL] ?>";
     </script>
     <script src="<?php echo $_SESSION[Session::ROOT] ?>/static/js/main-script.js"></script>
 
     <?php if ($script_name) { ?>
-        <script src="<?php echo $_SESSION[Session::PAGE] . '/' . $script_name . '.js' ?>"></script>
+        <script src="<?php echo $_SESSION[Session::PAGE_URL] . '/' . $script_name . '.js' ?>"></script>
     <?php } ?>
 
     <!-- dismiss alert after timer -->

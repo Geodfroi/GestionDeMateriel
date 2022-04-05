@@ -38,7 +38,8 @@ abstract class BaseRoute
     public function __construct(string $route_folder, string $template_name, string $javascript_name = "", bool $show_header = true, bool $show_footer = true)
     {
         // $page_url Route's uri to store in SESSION global variable (used to highlight current page in nav bar).
-        $_SESSION[Session::PAGE] = APP_URL . $route_folder;
+        $_SESSION[Session::PAGE] = $route_folder;
+        $_SESSION[Session::PAGE_URL] = APP_URL . $route_folder;
         $this->show_header = $show_header;
         $this->show_footer = $show_footer;
         $this->javascript_name = $javascript_name;
@@ -102,7 +103,8 @@ abstract class BaseRoute
     protected function requestRedirect(string $uri, string $alert_type = "", $alert_msg = ""): string
     {
         $this->redirectUri = $uri;
-        return Util::requestRedirect($uri, $alert_type, $alert_msg);
+        Util::requestRedirect($uri, $alert_type, $alert_msg);
+        return "";
     }
 
     /**

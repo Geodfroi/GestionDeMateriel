@@ -88,28 +88,28 @@ function loginattempt($json): string
 
 /**
  * Called from login screen when the user can't log-in.
- * 
- * @return string json response.
  */
-function renewForgottenPassword($login_email): string
+function renewForgottenPassword($login_email)
 {
     // handle demand for new password.
     $user = Database::users()->queryByEmail($login_email);
 
     if (isset($user)) {
         if (Util::renewPassword($user)) {
-            return Util::requestRedirect(
+            Util::requestRedirect(
                 Route::LOGIN,
                 AlertType::SUCCESS,
                 sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail())
             );
+            return;
         }
     }
-    return Util::requestRedirect(
+    Util::requestRedirect(
         Route::LOGIN,
         AlertType::FAILURE,
         Alert::NEW_PASSWORD_FAILURE
     );
+    return;
 }
 
 Logging::debug("login route");

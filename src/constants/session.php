@@ -20,6 +20,7 @@ class Session
     const IS_ADMIN = 'is_admin';
 
     const ALERT = 'alert';
-    const PAGE = 'page_url';
+    const PAGE = 'page';
+    const PAGE_URL = 'page_url';
     const ROOT = 'root_url';
 }

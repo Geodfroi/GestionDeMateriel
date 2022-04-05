@@ -60,7 +60,7 @@ function setLocationInput(_, btn) {
 
 function submitArticle() {
   let call_id = article ? "update-article" : "add-article";
-  postRequest(call_id, handleValidation, getFormData());
+  postReceiveJSON(call_id, handleValidation, getFormData());
 }
 
 hookBtnCollection("submit-btn", submitArticle);
