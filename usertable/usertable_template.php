@@ -1,9 +1,8 @@
 <?php
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
-use app\constants\Requests;
 use app\constants\Route;
 
 ?>
@@ -109,7 +108,7 @@ use app\constants\Route;
             </div>
             <div class="modal-body">Voulez-vous vraiment supprimer le compte utilisateur [] ? </div>
             <div class="modal-footer">
-                <a href-start="<?php echo Requests::DELETE_USER ?>" class="btn btn-primary">Confirmer</a>
+                <a href="#" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>
@@ -125,7 +124,7 @@ use app\constants\Route;
             </div>
             <div class="modal-body">Envoyer un nouveau mot de passe à [] ? </div>
             <div class="modal-footer">
-                <a href-start="<?php echo Requests::RENEW_USER_PASSWORD ?>" class="btn btn-primary">Confirmer</a>
+                <a href="#" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>

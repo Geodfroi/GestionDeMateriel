@@ -76,8 +76,9 @@ function deleteUser($id)
             'user-id' => $id
         ]);
         Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
+    } else {
+        Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
     }
-    Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
 }
 
 /**
@@ -88,8 +89,9 @@ function renewUserPassword($id)
     $user = Database::users()->queryById(intval($id));
     if (Util::renewPassword($user)) {
         Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
+    } else {
+        Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
     }
-    Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
 }
 
 Logging::debug("usertable route");

@@ -1,10 +1,9 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
-use app\constants\Requests;
 use app\constants\Route;
 use app\constants\Session;
 use app\helpers\Authenticate;
@@ -136,7 +135,10 @@ use app\helpers\Authenticate;
         let page_url = "<?php echo $_SESSION[Session::PAGE] ?>";
     </script>
     <script src="<?php echo $_SESSION[Session::ROOT] ?>/static/js/main-script.js"></script>
-    <script src="<?php echo $_SESSION[Session::PAGE] . '/' . $script_name . '.js' ?>"></script>
+
+    <?php if ($script_name) { ?>
+        <script src="<?php echo $_SESSION[Session::PAGE] . '/' . $script_name . '.js' ?>"></script>
+    <?php } ?>
 
     <!-- dismiss alert after timer -->
     <?php if (isset($alert['type'])) { ?>

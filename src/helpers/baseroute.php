@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 namespace app\helpers;
@@ -61,32 +61,6 @@ abstract class BaseRoute
     {
         return APP_NAME;
     }
-
-    /**
-     * Get utility function script shared by all pages.
-     * 
-     * @return string Javascript text.
-     */
-    private static function getMainScript()
-    {
-        // $script_path = AppPaths::SCRIPTS . DIRECTORY_SEPARATOR . 'main.js';
-        return file_get_contents(AppPaths::MAIN_SCRIPT);
-    }
-
-    // /**
-    //  * Get js script to be executed on the page.
-    //  * 
-    //  * @return string Javascript text.
-    //  */
-    // protected function getScript()
-    // {
-    //     if (strlen($this->javascript_name) == 0)
-    //         return "";
-
-    //     $script_path = $this->javascript_name . '.js';
-    //     return file_get_contents($script_path);
-    // }
-
 
     /**
      * As a redirecting uri has been provided. Further rendering of this route is to be cancelled.

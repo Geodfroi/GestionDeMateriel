@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.0 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 namespace app\helpers;
@@ -32,10 +32,6 @@ class Util
 
         $alert_array = $_SESSION[SESSION::ALERT];
         Logging::debug('alert_array', $alert_array);
-        //check if it is the correct page to display stored alert.
-        if ($alert_array[2] != $_SESSION[SESSION::PAGE]) {
-            return [];
-        }
 
         unset($_SESSION[SESSION::ALERT]);
 
@@ -172,34 +168,30 @@ class Util
     }
 
     /**
-     * Send a header to the browser requesting a redirection to the path provided. Optionaly display an alert after redirection.
+     * Send a header to the browser requesting a redirection to the path provided. 
      * 
      * @param string $uri The redirection path. Use the constants in Routes class to avoir typing mistakes.
      * @param string $alert_type Optional alert type. Use AlertType const.
      * @param string $alert_msg Optional alert message to be displayed after redirection.
-     * @return string Return empty string.
      */
-    public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = ""): string
+    public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = "")
     {
-        if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            Util::storeAlert($uri, $alert_type, $alert_msg);
-        }
+        Util::storeAlert($alert_type, $alert_msg);
         //The header php function will send a header message to the browser, here signaling for redirection.
         header("Location: $uri", true);
-        return "";
     }
 
-
     /**
-     * Store alert content to be fetched in next page display.
+     * Store alert content to be displayed after redirection.
      * 
      * @param string $msg Alert message.
      * @param string $type Alert type. Use AlertType const.
-     * @param string $display_page Page on which to display the alert.
      */
-    public static function storeAlert(string $display_page, string $type, string $msg)
+    public static function storeAlert(string $type, string $msg)
     {
-        $_SESSION[SESSION::ALERT] = [$type, $msg, $display_page];
+        if (strlen($type) != 0 && strlen($msg) != 0) {
+            $_SESSION[SESSION::ALERT] = [$type, $msg];
+        }
     }
 
     /**
