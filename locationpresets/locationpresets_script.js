@@ -1,35 +1,35 @@
 // ################################
-// ## Joël Piguet - 2022.01.30 ###
+// ## Joël Piguet - 2022.04.05 ###
 // ##############################
 
 function deleteModalShown(e, modal) {
   if (e.relatedTarget) {
-    const id = getParentAttribute(e.relatedTarget, "data-bs-id");
+    const id_ = getParentAttribute(e.relatedTarget, "data-bs-id");
     const content = getParentAttribute(e.relatedTarget, "data-bs-content");
     modal.querySelector(
       ".modal-body"
     ).innerText = `Voulez-vous vraiment supprimer [${content}] ?`;
 
     const btn = modal.querySelector(".btn-primary");
-    let href_start = btn.getAttribute("href-start");
-    btn.setAttribute("href", href_start + id);
+    const href = `${page_url}?deletelocpreset=${id_}`;
+    btn.setAttribute("href", href);
   }
 }
 
 function editModalShown(e, modal) {
-  let id = getParentAttribute(e.relatedTarget, "data-bs-id");
+  const id_ = getParentAttribute(e.relatedTarget, "data-bs-id");
 
-  modal.querySelector("#modal-title").innerText = id
+  modal.querySelector("#modal-title").innerText = id_
     ? "Modifier le contenu"
     : "Nouvelle saisie";
 
-  modal.querySelector("#submit-edit-btn").innerText = id
+  modal.querySelector("#submit-edit-btn").innerText = id_
     ? "Modifier"
     : "Ajouter";
 
-  if (id) {
-    let content = getParentAttribute(e.relatedTarget, "data-bs-content");
-    modal.querySelector("#id").value = id;
+  if (id_) {
+    const content = getParentAttribute(e.relatedTarget, "data-bs-content");
+    modal.querySelector("#id").value = id_;
     modal.querySelector("#content").value = content;
   } else {
     modal.querySelector("#content").value = "";
@@ -37,8 +37,8 @@ function editModalShown(e, modal) {
 }
 
 function submitEdit() {
-  let preset_id = document.getElementById("id").value;
-  let call_id = preset_id ? "update-loc-preset" : "add-loc-preset";
+  const preset_id = document.getElementById("id").value;
+  const call_id = preset_id ? "update-loc-preset" : "add-loc-preset";
 
   postReceiveJSON(
     call_id,
@@ -59,8 +59,8 @@ function selectRow(_, row) {
   }
 
   showModal("action-modal", (modal) => {
-    let location_id = row.getAttribute("data-bs-id");
-    let location_content = row.getAttribute("data-bs-content");
+    const location_id = row.getAttribute("data-bs-id");
+    const location_content = row.getAttribute("data-bs-content");
 
     modal.setAttribute("data-bs-id", location_id);
     modal.setAttribute("data-bs-content", location_content);

@@ -49,11 +49,6 @@ function handleGetRequests(): string
         return deleteArticle($id);
     }
 
-    if (isset($_GET['deletelocpreset'])) {
-        $id = intval($_GET['deletelocpreset']);
-        return deleteLocationPreset($id);
-    }
-
     Logging::error("Invalid get request to server", ['args' => $_GET]);
     return "Invalid get request to server";
 }
@@ -117,21 +112,6 @@ function deleteArticle($id): string
         return Util::requestRedirect(ROUTE::ART_TABLE, AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
     }
     return Util::requestRedirect(ROUTE::ART_TABLE, AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
-}
-
-function deleteLocationPreset($id): string
-{
-    $former_location = Database::locations()->queryById($id);
-    if (Database::locations()->delete($id)) {
-
-        $user_id = Authenticate::getUserId();
-        Logging::info(LogInfo::LOCATION_DELETED, [
-            'user-id' => $user_id,
-            'former-value' => $former_location
-        ]);
-        return Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
-    }
-    return  Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
 }
 
 

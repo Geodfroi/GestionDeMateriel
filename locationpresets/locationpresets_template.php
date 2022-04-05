@@ -1,9 +1,8 @@
 <?php
 ################################
-## Joël Piguet - 2022.01.30 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
-use app\constants\Requests;
 
 ?>
 
@@ -64,7 +63,7 @@ use app\constants\Requests;
                 Voulez-vous vraiment supprimer [] ?
             </div>
             <div class="modal-footer">
-                <a href-start="<?php echo Requests::DELETE_LOC_PRESET ?>" href="" class="btn btn-primary">Confirmer</a>
+                <a href="#" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>

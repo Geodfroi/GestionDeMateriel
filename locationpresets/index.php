@@ -62,6 +62,22 @@ function addLocationPreset($json): string
     return RequestUtil::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
 }
 
+function deleteLocationPreset($id)
+{
+    $former_location = Database::locations()->queryById($id);
+    if (Database::locations()->delete($id)) {
+
+        $user_id = Authenticate::getUserId();
+        Logging::info(LogInfo::LOCATION_DELETED, [
+            'user-id' => $user_id,
+            'former-value' => $former_location
+        ]);
+        Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
+        return;
+    }
+    Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
+}
+
 function updateLocationPreset($json): string
 {
     $id = intval($json['id']);
@@ -94,11 +110,9 @@ function updateLocationPreset($json): string
 }
 
 Logging::debug("locationpresets route");
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $json = RequestUtil::retrievePOSTData();
-    Logging::debug("locationpresets POST request", $json);
-
+    // Logging::debug("locationpresets POST request", $json);
     if (isset($json['add-loc-preset'])) {
         echo addLocationPreset($json);
     } else if (isset($json['update-loc-preset'])) {
@@ -108,6 +122,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!Authenticate::isLoggedIn()) {
         Util::requestRedirect(Route::LOGIN);
     } else {
-        echo (new LocationList())->renderRoute();
+        if (isset($_GET['deletelocpreset'])) {
+            $id = intval($_GET['deletelocpreset']);
+            return deleteLocationPreset($id);
+        } else {
+            echo (new LocationList())->renderRoute();
+        }
     }
 }

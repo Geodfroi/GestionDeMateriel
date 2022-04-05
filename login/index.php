@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     if (isset($_GET['forgottenpassword'])) {
         $email = trim($_GET['forgottenpassword']);
-        echo renewForgottenPassword($email);
+        renewForgottenPassword($email);
     } else {
         if (Authenticate::isLoggedIn()) {
             Util::requestRedirect(Route::HOME);

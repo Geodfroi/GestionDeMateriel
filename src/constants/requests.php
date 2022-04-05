@@ -12,5 +12,4 @@ namespace app\constants;
 class Requests
 {
     const DELETE_ARTICLE = APP_URL . DIRECTORY_SEPARATOR . 'requests?deletearticle=';
-    const DELETE_LOC_PRESET =  APP_URL . DIRECTORY_SEPARATOR . 'requests?deletelocpreset=';
 }
