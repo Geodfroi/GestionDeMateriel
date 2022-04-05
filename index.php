@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 use app\constants\Route;
@@ -26,11 +26,11 @@ if (Authenticate::isLoggedIn()) {
     Logging::debug("logged in");
     if (Authenticate::isAdmin()) {
         Logging::debug("is admin");
-        Util::requestRedirect(Route::ADMIN);
+        Util::redirectTo(Route::ADMIN);
     } else {
-        Util::requestRedirect(Route::ART_TABLE);
+        Util::redirectTo(Route::ART_TABLE);
     }
 } else {
     Logging::debug("redirect: login");
-    Util::requestRedirect(Route::LOGIN);
+    Util::redirectTo(Route::LOGIN);
 }

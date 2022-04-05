@@ -31,14 +31,14 @@ class RequestUtil
     }
 
     /**
-     * Instruct js fetch function to redirect to url.
+     * Send a json response to js fetch operation instructing browser to redirect to new url.
      * 
      * @param string $url The redirection path. Use the constants in Routes class to avoir typing mistakes.
      * @param string $alert_type Optional alert type. Use AlertType const.
      * @param string $alert_msg Optional alert message to be displayed after redirection.
      * @return string json response.
      */
-    public static function redirect(string $url, string $alert_type = "", string $alert_msg = ""): string
+    public static function redirectJSON(string $url, string $alert_type = "", string $alert_msg = ""): string
     {
         if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
             Util::storeAlert($url, $alert_type, $alert_msg);

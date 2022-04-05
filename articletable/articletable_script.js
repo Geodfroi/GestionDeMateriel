@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.03.14 ###
+// ## Joël Piguet - 2022.04.05 ###
 // ##############################
 
 const DATE_BEFORE = "before";
@@ -50,11 +50,11 @@ function displayCarets() {
  * Configure display of item count navbar.
  */
 function displayCountNavbar() {
-  let count = display_data.display_count;
+  const count = display_data.display_count;
 
   // show selection
-  let id = `display-${count}`;
-  let selection_link = document.getElementById(id);
+  const id_ = `display-${count}`;
+  const selection_link = document.getElementById(id_);
   selection_link.setAttribute("active", true);
   selection_link.classList.add("text-secondary");
   selection_link.classList.add("text-decoration-underline");
@@ -64,7 +64,7 @@ function displayCountNavbar() {
  * Display current applied filters.
  */
 function displayFilter() {
-  let filters = display_data.filters;
+  const filters = display_data.filters;
 
   let str = "Filtres";
   if (filters.name) {
@@ -76,7 +76,7 @@ function displayFilter() {
   }
 
   if (filters.peremption_value && filters.peremption_type) {
-    let date = toDate(filters.peremption_value);
+    const date = toDate(filters.peremption_value);
     if (filters.peremption_type == DATE_BEFORE) {
       str += ` [péremption avant le: ${frenchFormat(date)}]`;
     } else if (filters.peremption_type == DATE_AFTER) {
@@ -93,21 +93,21 @@ function displayFilter() {
 
 function deleteModalShown(e, modal) {
   if (e.relatedTarget) {
-    let id = getParentAttribute(e.relatedTarget, "data-bs-id");
-    let article_name = getParentAttribute(e.relatedTarget, "data-bs-name");
+    const id_ = getParentAttribute(e.relatedTarget, "data-bs-id");
+    const article_name = getParentAttribute(e.relatedTarget, "data-bs-name");
 
     modal.querySelector(
       ".modal-body"
     ).innerText = `Voulez-vous vraiment supprimer l'article [${article_name}] ?`;
 
     const btn = modal.querySelector(".btn-primary");
-    let href_start = btn.getAttribute("href-start");
-    btn.setAttribute("href", href_start + id);
+    const href = `${page_url}?deletearticle=${id_}`;
+    btn.setAttribute("href", href);
   }
 }
 
 function filterModalShown(_, modal) {
-  let filters = display_data.filters;
+  const filters = display_data.filters;
 
   // name
   modal.querySelector("#filter-name").value = filters.name ? filters.name : "";
@@ -118,8 +118,8 @@ function filterModalShown(_, modal) {
     : "";
 
   // peremption date
-  let date_defined = filters.peremption_type && filters.peremption_value;
-  let is_before = date_defined && filters.peremption_type === DATE_BEFORE;
+  const date_defined = filters.peremption_type && filters.peremption_value;
+  const is_before = date_defined && filters.peremption_type === DATE_BEFORE;
 
   setFilterDropdownLabel(
     is_before ? "Péremption avant le" : "Péremption après le"
@@ -141,14 +141,14 @@ function filterModalShown(_, modal) {
  * Set header links depending on orderby value.
  */
 function setHeaderLinks() {
-  let orderby = display_data.orderby;
+  const orderby = display_data.orderby;
 
   const article_header = document.getElementById("article-header");
   const location_header = document.getElementById("location-header");
   const date_header = document.getElementById("per-date-header");
   const owner_header = document.getElementById("owner-header");
 
-  let root_href = `${page_url}?orderby=`;
+  const root_href = `${page_url}?orderby=`;
 
   article_header
     .querySelector("a")
@@ -197,8 +197,8 @@ function selectRow(_, row) {
   }
 
   showModal("action-modal", (modal) => {
-    let article_name = row.getAttribute("data-bs-name");
-    let article_id = row.getAttribute("data-bs-id");
+    const article_name = row.getAttribute("data-bs-name");
+    const article_id = row.getAttribute("data-bs-id");
 
     modal.setAttribute("data-bs-id", article_id);
     modal.setAttribute("data-bs-name", article_name);
@@ -222,7 +222,7 @@ function setDateFilter(_, element) {
   //change btn label.
   setFilterDropdownLabel(element.innerText);
   // set hidden post value.
-  let date_input = document.getElementById("filter-date-type");
+  const date_input = document.getElementById("filter-date-type");
   if (element.getAttribute("filter-value") === "filter-date-before") {
     date_input.value = DATE_BEFORE;
   } else {
@@ -236,7 +236,7 @@ function setDateFilter(_, element) {
  * @param {*} label
  */
 function setFilterDropdownLabel(label) {
-  let btns = document.getElementsByClassName("filter-date-dropdown");
+  const btns = document.getElementsByClassName("filter-date-dropdown");
   for (let index = 0; index < btns.length; index++) {
     const btn = btns[index];
     btn.innerText = label;

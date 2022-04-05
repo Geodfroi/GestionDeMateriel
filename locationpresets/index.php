@@ -57,9 +57,9 @@ function addLocationPreset($json): string
             'user-id' => Authenticate::getUserId(),
             'content' => $content
         ]);
-        return RequestUtil::redirect(Route::LOCAL_PRESETS);
+        return RequestUtil::redirectJSON(Route::LOCAL_PRESETS);
     }
-    return RequestUtil::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
+    return RequestUtil::redirectJSON(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOCATION_PRESET_INSERT);
 }
 
 function deleteLocationPreset($id)
@@ -72,10 +72,10 @@ function deleteLocationPreset($id)
             'user-id' => $user_id,
             'former-value' => $former_location
         ]);
-        Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
+        Util::redirectTo(ROUTE::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_REMOVE_SUCCESS);
         return;
     }
-    Util::requestRedirect(ROUTE::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
+    Util::redirectTo(ROUTE::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_REMOVE_FAILURE);
 }
 
 function updateLocationPreset($json): string
@@ -88,7 +88,7 @@ function updateLocationPreset($json): string
 
     // no change to content
     if (strcasecmp($content, $former_content) == 0) {
-        return RequestUtil::redirect(Route::LOCAL_PRESETS);
+        return RequestUtil::redirectJSON(Route::LOCAL_PRESETS);
     }
 
     // strcasecmp must be placed before, otherwise validation will always be invalid and show LOCATION_PRESET_EXISTS warning.
@@ -104,9 +104,9 @@ function updateLocationPreset($json): string
             'former-value' => $former_content,
             'new-value' => $content
         ]);
-        return RequestUtil::redirect(Route::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
+        return RequestUtil::redirectJSON(Route::LOCAL_PRESETS, AlertType::SUCCESS, Alert::LOC_PRESET_UPDATE_SUCCESS);
     }
-    return RequestUtil::redirect(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
+    return RequestUtil::redirectJSON(Route::LOCAL_PRESETS, AlertType::FAILURE, Alert::LOC_PRESET_UPDATE_FAILURE);
 }
 
 Logging::debug("locationpresets route");
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     if (!Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::LOGIN);
+        Util::redirectTo(Route::LOGIN);
     } else {
         if (isset($_GET['deletelocpreset'])) {
             $id = intval($_GET['deletelocpreset']);

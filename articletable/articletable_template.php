@@ -1,9 +1,8 @@
 <?php
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
-use app\constants\Requests;
 use app\constants\Route;
 use app\helpers\Util;
 
@@ -168,7 +167,7 @@ use app\helpers\Util;
                 Voulez-vous vraiment supprimer l'article [] ?
             </div>
             <div class="modal-footer">
-                <a href-start="<?php echo Requests::DELETE_ARTICLE ?>" href="" class="btn btn-primary">Confirmer</a>
+                <a href="#" class="btn btn-primary">Confirmer</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
         </div>

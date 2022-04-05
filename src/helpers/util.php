@@ -174,7 +174,7 @@ class Util
      * @param string $alert_type Optional alert type. Use AlertType const.
      * @param string $alert_msg Optional alert message to be displayed after redirection.
      */
-    public static function requestRedirect(string $uri, string $alert_type = "", string $alert_msg = "")
+    public static function redirectTo(string $uri, string $alert_type = "", string $alert_msg = "")
     {
         Util::storeAlert($alert_type, $alert_msg);
         //The header php function will send a header message to the browser, here signaling for redirection.

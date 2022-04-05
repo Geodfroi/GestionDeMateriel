@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 use app\constants\Alert;
@@ -33,7 +33,8 @@ class ArticleEdit extends BaseRoute
     {
         $mode = 'add';
         if (isset($_GET['update'])) {
-            $article = Database::articles()->queryById($_GET['update']);
+            $id_ = intval($_GET['update']);
+            $article = Database::articles()->queryById($id_);
             $mode = 'update';
         }
 
@@ -45,6 +46,9 @@ class ArticleEdit extends BaseRoute
     }
 }
 
+/**
+ * @return string json response.
+ */
 function addArticle($json): string
 {
     $article_name = isset($json['article-name']) ? $json['article-name'] : "";
@@ -60,13 +64,16 @@ function addArticle($json): string
         $article_id = Database::articles()->insert($article);
         if ($article_id) {
             Logging::info(LogInfo::ARTICLE_CREATED, ['user-id' => $user_id, 'article-id' => $article_id]);
-            return RequestUtil::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_ADD_SUCCESS);
+            return RequestUtil::redirectJSON(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_ADD_SUCCESS);
         }
-        return RequestUtil::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
+        return RequestUtil::redirectJSON(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_ADD_FAILURE);
     }
     return RequestUtil::issueWarnings($json, $warnings);
 }
 
+/**
+ * @return string json response.
+ */
 function updateArticle($json): string
 {
     $article_id  = intval($json['id']);
@@ -83,9 +90,9 @@ function updateArticle($json): string
 
         if (Database::articles()->update($article)) {
             Logging::info(LogInfo::ARTICLE_UPDATED, ['user-id' => $user_id, 'article-id' => $article_id]);
-            return RequestUtil::redirect(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
+            return RequestUtil::redirectJSON(Route::ART_TABLE, AlertType::SUCCESS, ALERT::ARTICLE_UPDATE_SUCCESS);
         }
-        return RequestUtil::redirect(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
+        return RequestUtil::redirectJSON(Route::ART_TABLE, AlertType::FAILURE, ALERT::ARTICLE_UPDATE_FAILURE);
     }
     Logging::debug('warnings-update', ['warnings' => $warnings]);
     return RequestUtil::issueWarnings($json, $warnings);
@@ -104,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     if (!Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::LOGIN);
+        Util::redirectTo(Route::LOGIN);
     } else {
         echo (new ArticleEdit())->renderRoute();
     }

@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
 require_once __DIR__ . '/config.php';
@@ -15,12 +15,11 @@ require_once __DIR__ . '/src/constants/logerror.php';
 require_once __DIR__ . '/src/constants/loginfo.php';
 require_once __DIR__ . '/src/constants/mail.php';
 require_once __DIR__ . '/src/constants/orderby.php';
-require_once __DIR__ . '/src/constants/requests.php';
 require_once __DIR__ . '/src/constants/route.php';
 require_once __DIR__ . '/src/constants/session.php';
 require_once __DIR__ . '/src/constants/warning.php';
 
-require_once __DIR__ . '/src/helpers/db/queries.php'; // base class must be first in paragraph
+require_once __DIR__ . '/src/helpers/db/queries.php'; // abstract class must be first in paragraph
 require_once __DIR__ . '/src/helpers/db/articlequeries.php';
 require_once __DIR__ . '/src/helpers/db/locationqueries.php';
 require_once __DIR__ . '/src/helpers/db/userqueries.php';

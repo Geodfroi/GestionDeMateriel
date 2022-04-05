@@ -28,30 +28,13 @@ session_start();
 
 Logging::debug('server data', $_SERVER);
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    echo handleGetRequests();
-} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo handlePostRequests();
 } else {
     Logging::error('Invalid request call');
     echo 'Invalid request call';
 }
 
-/**
- * Note: Get requests use Util::requestRedirect for redirection (use header php function to signal browser)
- */
-function handleGetRequests(): string
-{
-    Logging::debug("GET request to server", ['args' => $_GET]);
-
-    if (isset($_GET['deletearticle'])) {
-        $id = intval($_GET['deletearticle']);
-        return deleteArticle($id);
-    }
-
-    Logging::error("Invalid get request to server", ['args' => $_GET]);
-    return "Invalid get request to server";
-}
 
 /**
  * Note: Post requests use redirect for redirection (signal javascript to redirect)
@@ -103,16 +86,6 @@ function handlePostRequests(): string
 }
 
 #region GET requests
-
-function deleteArticle($id): string
-{
-    if (Database::articles()->delete($id)) {
-        $user_id = Authenticate::getUserId();
-        Logging::info(LogInfo::ARTICLE_DELETED, ['user-id' => $user_id, 'article-id' => $id]);
-        return Util::requestRedirect(ROUTE::ART_TABLE, AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
-    }
-    return Util::requestRedirect(ROUTE::ART_TABLE, AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
-}
 
 
 

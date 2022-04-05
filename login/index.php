@@ -77,7 +77,7 @@ function loginattempt($json): string
             $json['display_renew_btn'] = true;
             if ($user->verifyPassword($password)) {
                 Authenticate::login($user);
-                return RequestUtil::redirect(Route::HOME);
+                return RequestUtil::redirectJSON(Route::HOME);
             } else {
                 $warnings['password'] = Warning::LOGIN_INVALID_PASSWORD;
             }
@@ -96,7 +96,7 @@ function renewForgottenPassword($login_email)
 
     if (isset($user)) {
         if (Util::renewPassword($user)) {
-            Util::requestRedirect(
+            Util::redirectTo(
                 Route::LOGIN,
                 AlertType::SUCCESS,
                 sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail())
@@ -104,7 +104,7 @@ function renewForgottenPassword($login_email)
             return;
         }
     }
-    Util::requestRedirect(
+    Util::redirectTo(
         Route::LOGIN,
         AlertType::FAILURE,
         Alert::NEW_PASSWORD_FAILURE
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         renewForgottenPassword($email);
     } else {
         if (Authenticate::isLoggedIn()) {
-            Util::requestRedirect(Route::HOME);
+            Util::redirectTo(Route::HOME);
         } else {
             echo (new Login())->renderRoute();
         }

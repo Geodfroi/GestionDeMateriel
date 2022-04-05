@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.05 ###
 ##############################
 
+use app\constants\Alert;
+use app\constants\AlertType;
 use app\constants\ArtFilter;
+use app\constants\LogInfo;
 use app\constants\OrderBy;
 use app\constants\Route;
 use app\constants\Session;
@@ -70,7 +73,7 @@ class ArticleTable extends BaseRoute
 
             if ($_GET['filter'] === 'clearAll') {
                 $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
-                return $this->requestRedirect(Route::ART_TABLE);
+                return $this->redirectTo(Route::ART_TABLE);
             }
 
             if ($_GET['filter-name']) {
@@ -128,10 +131,25 @@ class ArticleTable extends BaseRoute
     }
 }
 
+function deleteArticle($id)
+{
+    if (Database::articles()->delete($id)) {
+        $user_id = Authenticate::getUserId();
+        Logging::info(LogInfo::ARTICLE_DELETED, ['user-id' => $user_id, 'article-id' => $id]);
+        Util::redirectTo(ROUTE::ART_TABLE, AlertType::SUCCESS, Alert::ARTICLE_REMOVE_SUCCESS);
+        return;
+    }
+    Util::redirectTo(ROUTE::ART_TABLE, AlertType::FAILURE, Alert::ARTICLE_REMOVE_FAILURE);
+}
 
 Logging::debug("articletable route");
 if (!Authenticate::isLoggedIn()) {
-    Util::requestRedirect(Route::LOGIN);
+    Util::redirectTo(Route::LOGIN);
 } else {
-    echo (new ArticleTable())->renderRoute();
+    if (isset($_GET['deletearticle'])) {
+        $id = intval($_GET['deletearticle']);
+        deleteArticle($id);
+    } else {
+        echo (new ArticleTable())->renderRoute();
+    }
 }
