@@ -197,6 +197,12 @@ use app\helpers\Util;
                         <div class="input-group mb-2">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par emplacement:</span>
                             <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-location">
+                            <button class="btn btn-outline-secondary dropdown-toggle col-12 col-lg-auto" type="button" data-bs-toggle="dropdown" aria-expanded="false">Prédéfinis</button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php foreach ($loc_presets as $item) { ?>
+                                    <li><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
+                                <?php } ?>
+                            </ul>
                         </div>
                     </div>
                     <div class="mb-2">

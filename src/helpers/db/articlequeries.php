@@ -107,32 +107,28 @@ class ArticleQueries extends Queries
      */
     public function printFilterStatement(array $filters): string
     {
-        $str = 'WHERE ';
-        $count = 0;
+        $str = '';
 
         //is key-value set and value not null or empty
         if (isset($filters[ArtFilter::NAME]) && $filters[ArtFilter::NAME]) {
             $str .= USE_SQLITE ? "(article_name LIKE '%{$filters[ArtFilter::NAME]}%')" : "article_name LIKE CONCAT ('%', :fname, '%')";
-            $count += 1;
         }
 
         if (isset($filters[ArtFilter::LOCATION]) && $filters[ArtFilter::LOCATION]) {
-            if ($count > 1) {
+            if (strlen($str) > 0) {
                 $str .= ' AND ';
             }
             $str .= USE_SQLITE ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
-            $count += 1;
         }
 
         if (isset($filters[ArtFilter::AUTHOR]) && $filters[ArtFilter::AUTHOR]) {
             $user = Database::users()->queryByAlias($filters[ArtFilter::AUTHOR]);
             if ($user) {
-                if ($count > 1) {
+                if (strlen($str) > 0) {
                     $str .= ' AND ';
                 }
                 $user_id = $user->getId();
                 $str .= USE_SQLITE ? "(user_id = {$user_id})" : "user_id = :fuid";
-                $count += 1;
             }
         }
 
@@ -142,7 +138,7 @@ class ArticleQueries extends Queries
                 $date = $filters[ArtFilter::DATE_VALUE];
                 $type = $filters[ArtFilter::DATE_TYPE];
 
-                if ($count > 1) {
+                if (strlen($str) > 0) {
                     $str .= ' AND ';
                 }
 
@@ -151,21 +147,19 @@ class ArticleQueries extends Queries
                 } else {
                     $str .= USE_SQLITE ? "(expiration_date > '{$date}')" : "expiration_date > :fdate";
                 }
-                $count += 1;
             }
         }
 
         if (!isset($filters[ArtFilter::SHOW_EXPIRED])) {
 
             // Logging::debug('printFilterStatement');
-            if ($count > 0) {
+            if (strlen($str) > 0) {
                 $str .= ' AND ';
             }
             $str .= "(expiration_date > CURRENT_TIMESTAMP)";
-            $count += 1;
         }
 
-        return $count > 0 ? $str : '';
+        return strlen($str) > 0 ? 'WHERE ' . $str  : '';
     }
 
     /**
@@ -308,6 +302,13 @@ class ArticleQueries extends Queries
         }
         if (Util::str_contains($filter_statement, ':fdate')) {
             $stmt->bindParam(':fdate', $filters[ArtFilter::DATE_VALUE], $this->data_types['str']);
+        }
+        if (Util::str_contains($filter_statement, ':fuid')) {
+            $user = Database::users()->queryByAlias($filters[ArtFilter::AUTHOR]);
+            if ($user) {
+                $user_id = $user->getId();
+                $stmt->bindParam(':fuid', $user_id, $this->data_types['int']);
+            }
         }
 
         $r = $stmt->execute();

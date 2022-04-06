@@ -276,10 +276,18 @@ function setFilterDropdownLabel(label) {
   }
 }
 
+/**
+ * Set location input value from location presets
+ */
+function setLocationInput(_, btn) {
+  document.getElementById("filter-location").value = btn.innerText;
+}
+
 hookBtnCollection("clear-filter", clearFilter);
 hookBtnCollection("filter-dropdown-item", setDateFilter);
 hookBtnCollection("table-row", selectRow, false);
 hookBtnCollection("author-preset", setAuthorInput);
+hookBtnCollection("loc-preset", setLocationInput);
 
 hookModalShown("delete-modal", deleteModalShown);
 hookModalShown("filter-modal", filterModalShown);

@@ -141,6 +141,7 @@ class ArticleTable extends BaseRoute
             'articles' =>  $articles,
             'authors' => Database::users()->queryAll(),
             'display_data' => $display_data,
+            'loc_presets' => Database::locations()->queryAll(),
         ]);
     }
 }
