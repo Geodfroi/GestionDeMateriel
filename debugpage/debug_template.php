@@ -29,5 +29,4 @@
     <br>
     <div>Bug with expiration date before filter in sqlite</div>
     <div>article filter: button: my articles</div>
-    <div>par emplacement preset in filters</div>
 </div>
