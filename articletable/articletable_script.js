@@ -6,7 +6,7 @@ const DATE_BEFORE = "before";
 const DATE_AFTER = "after";
 
 function clearFilter() {
-  document.getElementById("filter-date-val").value = "";
+  document.querySelector("#filter-date-val").value = "";
 }
 
 /**
@@ -15,10 +15,10 @@ function clearFilter() {
 function displayCarets() {
   let orderby = display_data.orderby;
 
-  const article_header = document.getElementById("article-header");
-  const location_header = document.getElementById("location-header");
-  const date_header = document.getElementById("per-date-header");
-  const owner_header = document.getElementById("owner-header");
+  const article_header = document.querySelector("#article-header");
+  const location_header = document.querySelector("#location-header");
+  const date_header = document.querySelector("#per-date-header");
+  const owner_header = document.querySelector("#owner-header");
 
   // display carets
   if (orderby === "NAME_ASC") {
@@ -240,7 +240,7 @@ function setDateFilter(_, element) {
   //change btn label.
   setFilterDropdownLabel(element.innerText);
   // set hidden post value.
-  const date_input = document.getElementById("filter-date-type");
+  const date_input = document.querySelector("#filter-date-type");
   if (element.getAttribute("filter-value") === "filter-date-before") {
     date_input.value = DATE_BEFORE;
   } else {
@@ -261,6 +261,21 @@ function setFilterDropdownLabel(label) {
   }
 }
 
+/**
+ * Display placeholder text in input fields when screen is smallsized.
+ */
+function displayPlaceholders() {
+  const name_input = document.querySelector("#filter-name");
+  const location_input = document.querySelector("#filter-location");
+  if (isSmallScreen()) {
+    name_input.setAttribute("placeholder", "Par nom d'article");
+    location_input.setAttribute("placeholder", "Par emplacement");
+  } else {
+    name_input.removeAttribute("placeholder");
+    location_input.removeAttribute("placeholder");
+  }
+}
+
 hookBtnCollection("clear-filter", clearFilter);
 hookBtnCollection("filter-dropdown-item", setDateFilter);
 hookBtnCollection("table-row", selectRow, false);
@@ -274,3 +289,9 @@ displayCountNavbar();
 displayPageNavbar();
 setHeaderLinks();
 displayFilter();
+displayPlaceholders();
+breakpoints_init();
+
+document.addEventListener("bs.breakpoint.change", () => {
+  displayPlaceholders();
+});

@@ -24,7 +24,6 @@ require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofi
 session_start();
 
 
-
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list.
  */
@@ -77,7 +76,6 @@ class ArticleTable extends BaseRoute
 
         if (isset($_GET['filter'])) {
 
-            // $display_data['filters'] = [];
             ArticleTable::resetFilters($display_data);
 
             if ($_GET['filter'] === 'clear-all') {

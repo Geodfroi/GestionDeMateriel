@@ -88,7 +88,7 @@ let currentBreakpoint = getCurrentBreakpoint();
  *
  * @fires initEvent|newBreakpointEvent
  */
-const init = () => {
+const breakpoints_init = () => {
   /**
    * @type object
    * @event bs.breakpoint.init

@@ -33,7 +33,7 @@ class Article
     /**
      * string
      */
-    private  $location;
+    private $location;
 
     /**
      * DateTime

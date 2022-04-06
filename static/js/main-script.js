@@ -309,16 +309,12 @@ function htmlEntities(str) {
 }
 
 function isSmallScreen() {
-  let currentBreakpoint = getCurrentBreakpoint();
-  return (
-    currentBreakpoint.name == "xs" ||
-    currentBreakpoint.name == "sm" ||
-    currentBreakpoint == "md"
-  );
+  const currentBreakpoint = getCurrentBreakpoint();
+  return currentBreakpoint.index < 3;
 }
 
 function setCheckboxValue(id, status) {
-  let element = document.getElementById(id);
+  const element = document.getElementById(id);
   element.checked = status;
 }
 

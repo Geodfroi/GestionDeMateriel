@@ -181,20 +181,19 @@ use app\helpers\Util;
 
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="filter-modal-label">Filtrer les articles selon les paramètres suivants: </h5>
+                <h5 class="modal-title d-none d-lg-block" id="filter-modal-label">Filtrer les articles selon les paramètres suivants: </h5>
+                <h3 class="modal-title d-lg-none" id="filter-modal-label">Filtres</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="GET" action="<?php echo Route::ART_TABLE ?>">
                 <div class="modal-body">
                     <div class="mb-2">
-                        <label class="d-lg-none" for="filter-name">Par nom d'article:</label>
                         <div class="input-group">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par nom d'article:</span>
-                            <input id="filter-name" name="filter-name" class="form-control" type="text" aria-label="Filter-name">
+                            <input class="form-control" id="filter-name" name="filter-name" type="text" aria-label="Filter-name">
                         </div>
                     </div>
                     <div class="mb-2">
-                        <label class="d-lg-none" for="filter-location">Par emplacement:</label>
                         <div class="input-group mb-2">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par emplacement:</span>
                             <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-location">
@@ -202,9 +201,10 @@ use app\helpers\Util;
                     </div>
                     <div class="mb-2">
                         <label class="d-lg-none" for="filter-author">Par créateur:</label>
+                        <input id="filter-author" name="filter-author" type="text" hidden>
+
                         <div class="input-group mb-2">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par créateur:</span>
-                            <input id="filter-author" name="filter-author" type="text" hidden>
                             <button id="label-author" class=" btn btn-outline-secondary dropdown-toggle d-none d-lg-block form-control" type=" button" data-bs-toggle="dropdown" aria-expanded="false"><?php echo $display_data['filters'][ArtFilter::AUTHOR] ?></button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><span class="dropdown-item author-preset"><?php echo ArtFilter::EVERYONE ?></span></li>
@@ -217,7 +217,7 @@ use app\helpers\Util;
                     <div class="mb-2">
                         <input id="filter-date-type" name="filter-date-type" type="hidden">
 
-                        <div class="d-lg-none mb-1 row mx-auto ">
+                        <div class="d-lg-none mb-1 row mx-auto">
                             <button class="filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -227,20 +227,14 @@ use app\helpers\Util;
                         </div>
 
                         <div class="input-group">
-                            <!-- <div class="d-none d-lg-block"> -->
                             <button class="d-none d-lg-block filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>
                                 <li><span filter-value="filter-date-after" class="dropdown-item filter-dropdown-item">Péremption après le</span></li>
                             </ul>
-                            <!-- </div> -->
                             <input id="filter-date-val" name="filter-date-val" class="form-control" type="date">
-                            <button class="d-none d-lg-block clear-filter btn btn-outline-primary">Effacer</button>
-                        </div>
-
-                        <div class="row mx-auto mt-1 d-lg-none">
-                            <button class="clear-filter col-12 btn btn-outline-primary">Effacer la date</button>
+                            <button class="clear-filter btn btn-outline-primary">Effacer</button>
                         </div>
                     </div>
 
@@ -274,7 +268,6 @@ use app\helpers\Util;
                 <div class="row mt-2"><a id="delete-btn" type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#delete-modal">Supprimer</a></div>
                 <div class="row mt-2"><a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</a></div>
             </div>
-
         </div>
     </div>
 </div>

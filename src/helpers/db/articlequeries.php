@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 namespace app\helpers\db;
@@ -14,6 +14,7 @@ use SQLite3;
 use app\constants\ArtFilter;
 use app\constants\LogError;
 use app\constants\OrderBy;
+use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\Util;
 use app\models\Article;
@@ -121,6 +122,18 @@ class ArticleQueries extends Queries
             }
             $str .= USE_SQLITE ? "(location LIKE '%{$filters[ArtFilter::LOCATION]}%')" : "location LIKE CONCAT ('%', :floc, '%')";
             $count += 1;
+        }
+
+        if (isset($filters[ArtFilter::AUTHOR]) && $filters[ArtFilter::AUTHOR]) {
+            $user = Database::users()->queryByAlias($filters[ArtFilter::AUTHOR]);
+            if ($user) {
+                if ($count > 1) {
+                    $str .= ' AND ';
+                }
+                $user_id = $user->getId();
+                $str .= USE_SQLITE ? "(user_id = {$user_id})" : "user_id = :fuid";
+                $count += 1;
+            }
         }
 
         if (isset($filters[ArtFilter::DATE_VALUE]) && $filters[ArtFilter::DATE_VALUE]) {
@@ -353,6 +366,15 @@ class ArticleQueries extends Queries
         if (Util::str_contains($filter_statement, ':fdate')) {
             $stmt->bindParam(':fdate', $filters[ArtFilter::DATE_VALUE], $this->data_types['str']);
         }
+
+        if (Util::str_contains($filter_statement, ':fuid')) {
+            $user = Database::users()->queryByAlias($filters[ArtFilter::AUTHOR]);
+            if ($user) {
+                $user_id = $user->getId();
+                $stmt->bindParam(':fuid', $user_id, $this->data_types['int']);
+            }
+        }
+
         $stmt->bindParam(':lim', $limit, $this->data_types['int']);
         $stmt->bindParam(':off', $offset, $this->data_types['int']);
 
