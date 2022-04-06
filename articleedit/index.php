@@ -147,3 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo (new ArticleEdit())->renderRoute();
     }
 }
+
+// case 'get-article':
+    // $article = Database::articles()->queryById(intval($data['id']));
+    // return json_encode($article->asArray());

@@ -3,15 +3,13 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.04 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 use app\helpers\BaseRoute;
 use app\helpers\Logging;
 use app\helpers\Mailing;
 use app\models\Article;
-
-use Exception;
 
 require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
@@ -48,10 +46,10 @@ class DebugEmails extends BaseRoute
                         'delay' => 7,
                     ]);
 
-                    [$html_template, $plaintext] = Mailing::peremptionNotificationBody('noël.biquet@gmail.com', $array);
+                    [$html_template, $plaintext] = Mailing::peremptionNotificationBody('noel.biquet@gmail.com', $array);
                     break;
                 case 'userinvite':
-                    [$html_template, $plaintext] = Mailing::userInviteNotificationBody('noël.biquet@gmail.com', 'HEDS3000');
+                    [$html_template, $plaintext] = Mailing::userInviteNotificationBody('noel.biquet@gmail.com', 'HEDS3000');
                     break;
                 default:
                     throw new Exception('Invalid parameter');

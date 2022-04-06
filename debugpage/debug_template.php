@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 ?>
@@ -10,7 +10,7 @@
 
 <br><br>
 <div>
-    <textarea style="width: 100%; height : 40vh" name="" id="" cols="30" rows="10">
+    <textarea style="width: 100%; height : 40vh" name="" id="" cols="30" rows="10" readonly>
     #############################
     ##Joël Piguet - 2022.04.05##
     ###########################

@@ -31,7 +31,7 @@ class Route
     const ART_TABLE = APP_URL  . '/' .  Page::ART_TABLE;
     const ART_EDIT = APP_URL . '/' .  Page::ART_EDIT;
     const DEBUG_EMAILS = APP_URL . '/' .  Page::DEBUG_EMAILS;
-    const DEBUG_PAGE = APP_URL . '/' .  Page::ADMIN;
+    const DEBUG_PAGE = APP_URL . '/' .  Page::DEBUG_PAGE;
     const CONTACT = APP_URL . '/' .  Page::CONTACT;
     const LOCAL_PRESETS =  APP_URL . '/' .  Page::LOCAL_PRESETS;
     const LOGIN = APP_URL . '/' .  Page::LOGIN;

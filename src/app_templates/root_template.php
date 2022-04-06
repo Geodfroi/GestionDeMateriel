@@ -62,7 +62,7 @@ use app\helpers\Authenticate;
 
                             <?php if (DEBUG_MODE) { ?>
                                 <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
-                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">Test PAGE_URL [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">test page [debug]</a>
                             <?php } ?>
 
                         </ul>
