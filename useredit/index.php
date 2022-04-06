@@ -53,13 +53,13 @@ function addNewUser($json)
                 'admin-id' => Authenticate::getUserId(),
                 'new-user' => $login_email
             ]);
-            Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
+            Util::redirectTo(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_ADD_SUCCESS);
             return;
         }
         //attempt to roll back adding new user to db.
         Database::users()->delete($id);
     }
-    Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
+    Util::redirectTo(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_ADD_FAILURE);
 }
 
 /**
@@ -109,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     if (!Authenticate::isLoggedIn()) {
-        Util::requestRedirect(Route::LOGIN);
+        Util::redirectTo(Route::LOGIN);
     } else if (!Authenticate::isAdmin()) {
-        Util::requestRedirect(Route::HOME);
+        Util::redirectTo(Route::HOME);
     } else {
         echo (new UserEdit())->renderRoute();
     }

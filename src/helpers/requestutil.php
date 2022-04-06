@@ -57,6 +57,8 @@ class RequestUtil
         // Takes raw data from the request
         $json = file_get_contents('php://input');
         // Converts it into a PHP object
-        return json_decode($json, true);
+        $array = json_decode($json, true);
+        Logging::debug("retrieved POST data", $array);
+        return $array;
     }
 }

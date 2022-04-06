@@ -1,37 +1,38 @@
 // ################################
-// ## Joël Piguet - 2022.04.05 ###
+// ## Joël Piguet - 2022.04.06 ###
 // ##############################
 
 //#region fetch
 
+// /**
+//  * Use javascript fetch ajax method to send a GET request. In this app, post request are made to the current page url.
+//  *
+//  * @param {*} req request identifier.
+//  * @param {*} json json data used to construct the GET request path.
+//  */
+// function getRequest(json = null) {
+//   // let url = new URL(url, window.location.origin);
+//   url = page_url;
+//   console.log("GET request at: " + url);
+
+//   json ??= {};
+//   let keys = Object.keys(json);
+//   for (let index = 0; index < keys.length; index++) {
+//     let key = keys[index];
+//     url.searchParams.append(key, json[key]);
+//   }
+
+//   fetch(url);
+// }
+
 /**
- * Use javascript fetch ajax method to send a GET request. In this app, post request are made to the current page url.
- *
- * @param {*} req request identifier.
- * @param {*} json json data used to construct the GET request path.
- */
-function getRequest(json = null) {
-  // let url = new URL(url, window.location.origin);
-  url = page_url;
-  console.log("GET request at: " + url);
-
-  json ??= {};
-  let keys = Object.keys(json);
-  for (let index = 0; index < keys.length; index++) {
-    let key = keys[index];
-    url.searchParams.append(key, json[key]);
-  }
-
-  fetch(url);
-}
-
-/**
- * Use javascript fetch ajax method to post data to the server. In this app, post request are always made to the current page url.
+ * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, post request are always made to the current page url.
  *
  * @param {*} request_name request identifier.
+ * @param {*} callback function handling the server response to the fetch request.
  * @param {*} data json data package to sent to server.
  */
-function post(request_name, data = null) {
+function postReceiveJSON(request_name, callback = null, data = null) {
   data ??= {};
   data[request_name] = true;
   const options = {
@@ -43,19 +44,7 @@ function post(request_name, data = null) {
     },
   };
   url = page_url;
-
-  return fetch(page_url, options);
-}
-
-/**
- * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, post request are always made to the current page url.
- *
- * @param {*} request_name request identifier.
- * @param {*} callback function handling the server response to the fetch request.
- * @param {*} data json data package to sent to server.
- */
-function postReceiveJSON(request_name, callback = null, data = null) {
-  post(request_name, data)
+  fetch(page_url, options)
     .then((res) => {
       return res.json();
     })

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.19 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 namespace app\constants;
@@ -19,7 +19,7 @@ class Warning
     const ARTICLE_NAME_TOO_LONG = "Le nom de l'article ne doit pas dépasser %s caractères.";
     const COMMENTS_NAME_TOO_LONG = "Les commentaires ne doivent pas dépasser %s caractèrs.";
 
-    const DATE_EMPTY = "Il est nécessaire d'entrer la date d'expiration.";
+    const DATE_EMPTY = "Il est nécessaire de spécifier une date de péremption.";
     const DATE_PAST = "La date fournie doit être dans le future.";
     const DATE_INVALID = "La date fournie est invalide.";
     const DATE_FUTURE = "La date fournie est trop loin dans le future.";

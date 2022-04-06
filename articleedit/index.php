@@ -135,8 +135,6 @@ Logging::debug("articleedit route");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $json = RequestUtil::retrievePOSTData();
-    Logging::debug("articleedit POST request", $json);
-
     if (isset($json['add-article'])) {
         echo addArticle($json);
     } else if (isset($json['update-article'])) {

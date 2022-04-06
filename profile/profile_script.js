@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.03.14 ###
+// ## Joël Piguet - 2022.04.06 ###
 // ##############################
 
 const delays = ["3", "7", "14", "30"];
@@ -30,10 +30,10 @@ function contactModalShown() {
 function delayModalShown() {
   postReceiveJSON("get-user", (json) => {
     clearWarnings("delay-3", "delay-7", "delay-14", "delay-30");
-    let json_delays = json["contact-delay"].split("-");
+    const json_delays = json["contact-delay"].split("-");
     for (let index = 0; index < 4; index++) {
       const key = delays[index];
-      let input_id = "delay-" + key;
+      const input_id = "delay-" + key;
       setCheckboxValue(input_id, json_delays.includes(key));
     }
   });
@@ -48,7 +48,7 @@ function deleteContactEmail() {
 }
 
 function displayDelayWarnings(json) {
-  let warning = getJSONWarning(json, "delay");
+  const warning = getJSONWarning(json, "delay");
   if (warning) {
     setValidTag("delay-3", false);
     setValidTag("delay-7", false);
@@ -59,14 +59,14 @@ function displayDelayWarnings(json) {
 }
 
 function getFormDelays() {
-  let checked_array = [];
+  const checked_array = [];
   for (let index = 0; index < delays.length; index++) {
     const form_id = "delay-" + delays[index];
     if (getCheckboxValue(form_id)) {
       checked_array.push(delays[index]);
     }
   }
-  let json = { delay: checked_array.join("-") };
+  const json = { delay: checked_array.join("-") };
   console.log("getFormDelays");
   console.log(json);
   return json;

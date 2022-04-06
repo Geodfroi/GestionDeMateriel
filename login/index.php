@@ -115,7 +115,6 @@ function renewForgottenPassword($login_email)
 Logging::debug("login route");
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $json = RequestUtil::retrievePOSTData();
-    Logging::debug("login POST request", $json);
     echo loginattempt($json);
 } else {
     if (isset($_GET['forgottenpassword'])) {
