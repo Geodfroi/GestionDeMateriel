@@ -24,5 +24,5 @@ class ArtFilter
     const DATE_AFTER = 'after';
 
     // filter defaults
-    const EVERYONE = 'tous le monde';
+    const EVERYONE = 'Tous le monde';
 }

@@ -200,12 +200,10 @@ use app\helpers\Util;
                         </div>
                     </div>
                     <div class="mb-2">
-                        <label class="d-lg-none" for="filter-author">Par créateur:</label>
                         <input id="filter-author" name="filter-author" type="text" hidden>
-
                         <div class="input-group mb-2">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par créateur:</span>
-                            <button id="label-author" class=" btn btn-outline-secondary dropdown-toggle d-none d-lg-block form-control" type=" button" data-bs-toggle="dropdown" aria-expanded="false"><?php echo $display_data['filters'][ArtFilter::AUTHOR] ?></button>
+                            <button id="filter-author-dropdown" class=" btn btn-outline-secondary dropdown-toggle form-control" type=" button" data-bs-toggle="dropdown" aria-expanded="false"><?php echo $display_data['filters'][ArtFilter::AUTHOR] ?></button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><span class="dropdown-item author-preset"><?php echo ArtFilter::EVERYONE ?></span></li>
                                 <?php foreach ($authors as $author) { ?>

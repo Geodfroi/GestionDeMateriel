@@ -110,6 +110,21 @@ function deleteModalShown(e, modal) {
   }
 }
 
+/**
+ * Display placeholder text in input fields when screen is smallsized.
+ */
+function displayPlaceholders() {
+  const name_input = document.querySelector("#filter-name");
+  const location_input = document.querySelector("#filter-location");
+  if (isSmallScreen()) {
+    name_input.setAttribute("placeholder", "Par nom d'article");
+    location_input.setAttribute("placeholder", "Par emplacement");
+  } else {
+    name_input.removeAttribute("placeholder");
+    location_input.removeAttribute("placeholder");
+  }
+}
+
 function filterModalShown(_, modal) {
   const filters = display_data.filters;
 
@@ -227,7 +242,7 @@ function selectRow(_, row) {
 function setAuthorInput(_, btn) {
   console.log(btn.innerText);
   document.querySelector("#filter-author").value = btn.innerText;
-  document.querySelector("#label-author").innerHTML = btn.innerText;
+  document.querySelector("#filter-author-dropdown").innerHTML = btn.innerText;
 }
 
 /**
@@ -258,21 +273,6 @@ function setFilterDropdownLabel(label) {
   for (let index = 0; index < btns.length; index++) {
     const btn = btns[index];
     btn.innerText = label;
-  }
-}
-
-/**
- * Display placeholder text in input fields when screen is smallsized.
- */
-function displayPlaceholders() {
-  const name_input = document.querySelector("#filter-name");
-  const location_input = document.querySelector("#filter-location");
-  if (isSmallScreen()) {
-    name_input.setAttribute("placeholder", "Par nom d'article");
-    location_input.setAttribute("placeholder", "Par emplacement");
-  } else {
-    name_input.removeAttribute("placeholder");
-    location_input.removeAttribute("placeholder");
   }
 }
 
