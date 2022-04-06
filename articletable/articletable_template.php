@@ -214,18 +214,8 @@ use app\helpers\Util;
                     </div>
                     <div class="mb-2">
                         <input id="filter-date-type" name="filter-date-type" type="hidden">
-
-                        <div class="d-lg-none mb-1 row mx-auto">
-                            <button class="filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>
-                                <li><span filter-value="filter-date-after" class="dropdown-item filter-dropdown-item">Péremption après le</span></li>
-                            </ul>
-                        </div>
-
                         <div class="input-group">
-                            <button class="d-none d-lg-block filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
+                            <button class="filter-date-dropdown btn btn-outline-secondary dropdown-toggle col-12 col-lg-3" aria-expanded="false" data-bs-toggle="dropdown">
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><span filter-value="filter-date-before" class="dropdown-item filter-dropdown-item">Péremption avant le</span></li>

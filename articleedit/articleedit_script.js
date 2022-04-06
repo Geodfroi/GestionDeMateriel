@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.04.05 ###
+// ## Joël Piguet - 2022.04.06 ###
 // ##############################
 
 /**
@@ -22,6 +22,21 @@ function customizeForm() {
       "location",
       "comments"
     );
+  }
+}
+
+/**
+ * Display placeholder text in input fields when screen is smallsized.
+ */
+function displayPlaceholders() {
+  const name_input = document.querySelector("#article-name");
+  const location_input = document.querySelector("#location");
+  if (isSmallScreen()) {
+    name_input.setAttribute("placeholder", "Nom de l'article");
+    location_input.setAttribute("placeholder", "Emplacement");
+  } else {
+    name_input.removeAttribute("placeholder");
+    location_input.removeAttribute("placeholder");
   }
 }
 
@@ -59,5 +74,10 @@ function submitArticle() {
 
 hookBtnCollection("submit-btn", submitArticle);
 hookBtnCollection("loc-preset", setLocationInput);
-
 customizeForm();
+displayPlaceholders();
+breakpoints_init();
+
+document.addEventListener("bs.breakpoint.change", () => {
+  displayPlaceholders();
+});

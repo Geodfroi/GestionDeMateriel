@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.03.14 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 use app\constants\Route;
@@ -14,7 +14,7 @@ use app\constants\Route;
             <label id='form-label' class="h4 text-center">Ajouter un article</label>
         </div>
 
-        <div class="row">
+        <div class="row d-none d-lg-block">
             <div for="article-name" class="form-label col-lg-8 mx-auto">Nom de l'article:</div>
         </div>
 
@@ -25,25 +25,15 @@ use app\constants\Route;
             </div>
         </div>
 
-        <div class="row">
+        <div class="row d-none d-lg-block">
             <div for="location" class="form-label col-lg-8 mx-auto">Emplacement:</div>
         </div>
-
-        <div class="row d-lg-none mb-1 mx-auto">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <?php foreach ($loc_presets as $item) { ?>
-                    <li><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
-                <?php } ?>
-            </ul>
-        </div>
-
 
         <div class="row mb-1">
             <div class="col-lg-8 mx-auto">
                 <div class="input-group">
                     <input id="location" name="location" type="text" class="form-control">
-                    <button class="btn btn-outline-secondary dropdown-toggle d-none d-lg-block" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
+                    <button class="btn btn-outline-secondary dropdown-toggle col-12 col-lg-auto" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <?php foreach ($loc_presets as $item) { ?>
                             <li><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>

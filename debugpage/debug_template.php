@@ -28,7 +28,5 @@
     <div>TODO::</div>
     <br>
     <div>Bug with expiration date before filter in sqlite</div>
-    <div>ARTICLES: filter with created by</div>
-    <div>ARTICLE_TABLE: set peremption item visible by default</div>
-    <div>button: my articles</div>
+    <div>article filter: button: my articles</div>
 </div>
