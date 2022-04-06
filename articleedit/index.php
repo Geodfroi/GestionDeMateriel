@@ -16,6 +16,7 @@ use app\helpers\Database;
 use app\helpers\Logging;
 use app\helpers\RequestUtil;
 use app\helpers\Util;
+use app\helpers\Validation;
 use app\models\Article;
 
 require_once __DIR__ . '/../loader.php';
@@ -96,6 +97,38 @@ function updateArticle($json): string
     }
     Logging::debug('warnings-update', ['warnings' => $warnings]);
     return RequestUtil::issueWarnings($json, $warnings);
+}
+
+/**
+ * Validate form inputs before using it to add/update article.
+ * 
+ * @param array &$string $article_name Article name by reference.
+ * @param string &$location Article's location within the school by reference.
+ * @param string &$exp_date Expiration date.
+ * @param string &$comments Comments to be attached to the reminder by reference.
+ * @param array $warnings Array filled with warning messages if validation is unsuccessfull by reference.
+ * @return bool True if validation is successful.
+ */
+function validateArticleInputs(string &$article_name, string &$location, string &$exp_date, string &$comments, array &$warnings): bool
+{
+    Logging::debug('validateArticleInputs');
+    if ($article_warning = Validation::validateArticleName($article_name)) {
+        $warnings['article-name'] = $article_warning;
+    }
+    Logging::debug('$warnings', ['w' => $warnings]);
+    if ($location_warning = Validation::validateLocation($location)) {
+        $warnings['location']  = $location_warning;
+    }
+    Logging::debug('$warnings', ['w' => $warnings]);
+    if ($exp_warning = Validation::validateExpirationDate($exp_date)) {
+        $warnings['expiration-date']  = $exp_warning;
+    }
+    Logging::debug('$warnings', ['w' => $warnings]);
+    if ($comments_warning = Validation::validateComments($comments)) {
+        $warnings['comments']  = $comments_warning;
+    }
+
+    return count($warnings) == 0;
 }
 
 Logging::debug("articleedit route");

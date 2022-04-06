@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.15 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 /**
  * This route handle app fetch requests for data from javascript.
@@ -34,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Logging::error('Invalid request call');
     echo 'Invalid request call';
 }
-
 
 /**
  * Note: Post requests use redirect for redirection (signal javascript to redirect)
@@ -85,22 +84,11 @@ function handlePostRequests(): string
     return json_encode($data);
 }
 
-#region GET requests
-
-
-
-#endregion
-
-#region POST requests
-
-
-
-
 function updateAlias($json): string
 {
     $user  = Authenticate::getUser();
     if (!$user) {
-        return RequestUtil::redirect(Route::HOME);
+        return RequestUtil::redirectJSON(Route::HOME);
     }
 
     $user_id = $user->getId();
@@ -108,7 +96,7 @@ function updateAlias($json): string
 
     // alias was not actually changed
     if ($alias === $user->getAlias()) {
-        return RequestUtil::redirect(Route::PROFILE);
+        return RequestUtil::redirectJSON(Route::PROFILE);
     }
 
     //validate alias
@@ -131,11 +119,11 @@ function updateAlias($json): string
         ]);
 
         if ($alias) {
-            return RequestUtil::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::ALIAS_UPDATE_SUCCESS);
+            return RequestUtil::redirectJSON(Route::PROFILE, AlertType::SUCCESS, Alert::ALIAS_UPDATE_SUCCESS);
         }
-        return RequestUtil::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
+        return RequestUtil::redirectJSON(Route::PROFILE, AlertType::SUCCESS, Alert::ALIAS_DELETE_SUCCESS);
     }
-    return RequestUtil::redirect(Route::PROFILE, AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
+    return RequestUtil::redirectJSON(Route::PROFILE, AlertType::FAILURE, Alert::ALIAS_UPDATE_FAILURE);
 }
 
 
@@ -144,7 +132,7 @@ function updateDelays($json): string
 {
     $user  = Authenticate::getUser();
     if (!$user) {
-        return RequestUtil::redirect(Route::HOME);
+        return RequestUtil::redirectJSON(Route::HOME);
     }
 
     $user_id = $user->getId();
@@ -162,9 +150,9 @@ function updateDelays($json): string
             'new-contact-delays' => $delay
         ]);
 
-        return RequestUtil::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
+        return RequestUtil::redirectJSON(Route::PROFILE, AlertType::SUCCESS, Alert::DELAY_SET_SUCCESS);
     }
-    return RequestUtil::redirect(
+    return RequestUtil::redirectJSON(
         Route::PROFILE,
         AlertType::FAILURE,
         Alert::DELAY_SET_FAILURE
@@ -175,7 +163,7 @@ function updateContactEmail($json): string
 {
     $user  = Authenticate::getUser();
     if (!$user) {
-        return RequestUtil::redirect(Route::HOME);
+        return RequestUtil::redirectJSON(Route::HOME);
     }
 
     $user_id = $user->getId();
@@ -198,15 +186,15 @@ function updateContactEmail($json): string
 
         // if contact is null or empty, then contact is the login email.
         if (strlen($contact_email) > 0) {
-            return RequestUtil::redirect(Route::PROFILE, AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
+            return RequestUtil::redirectJSON(Route::PROFILE, AlertType::SUCCESS, sprintf(Alert::CONTACT_SET_SUCCESS, $contact_email));
         }
-        return RequestUtil::redirect(
+        return RequestUtil::redirectJSON(
             Route::PROFILE,
             AlertType::SUCCESS,
             sprintf(Alert::CONTACT_RESET_SUCCESS, $user->getLoginEmail())
         );
     }
-    return RequestUtil::redirect(
+    return RequestUtil::redirectJSON(
         Route::PROFILE,
         AlertType::FAILURE,
         Alert::CONTACT_SET_FAILURE
@@ -217,7 +205,7 @@ function updatePassword($json): string
 {
     $user = Authenticate::getUser();
     if (!$user) {
-        return RequestUtil::redirect(Route::HOME);
+        return RequestUtil::redirectJSON(Route::HOME);
     }
     $user_id = $user->getId();
     $password_plain = isset($json["password"]) ? $json["password"] : "";
@@ -246,41 +234,7 @@ function updatePassword($json): string
             'user-id' => $user_id,
             'new-password' => '*********'
         ]);
-        return RequestUtil::redirect(Route::PROFILE, AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
+        return RequestUtil::redirectJSON(Route::PROFILE, AlertType::SUCCESS, Alert::PASSWORD_UPDATE_SUCCESS);
     }
-    return RequestUtil::redirect(Route::PROFILE, AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
+    return RequestUtil::redirectJSON(Route::PROFILE, AlertType::FAILURE, Alert::PASSWORD_UPDATE_FAILURE);
 }
-
-/**
- * Validate form inputs before using it to add/update article.
- * 
- * @param array &$string $article_name Article name by reference.
- * @param string &$location Article's location within the school by reference.
- * @param string &$exp_date Expiration date.
- * @param string &$comments Comments to be attached to the reminder by reference.
- * @param array $warnings Array filled with warning messages if validation is unsuccessfull by reference.
- * @return bool True if validation is successful.
- */
-function validateArticleInputs(string &$article_name, string &$location, string &$exp_date, string &$comments, array &$warnings): bool
-{
-    Logging::debug('validateArticleInputs');
-    if ($article_warning = Validation::validateArticleName($article_name)) {
-        $warnings['article-name'] = $article_warning;
-    }
-    Logging::debug('$warnings', ['w' => $warnings]);
-    if ($location_warning = Validation::validateLocation($location)) {
-        $warnings['location']  = $location_warning;
-    }
-    Logging::debug('$warnings', ['w' => $warnings]);
-    if ($exp_warning = Validation::validateExpirationDate($exp_date)) {
-        $warnings['expiration-date']  = $exp_warning;
-    }
-    Logging::debug('$warnings', ['w' => $warnings]);
-    if ($comments_warning = Validation::validateComments($comments)) {
-        $warnings['comments']  = $comments_warning;
-    }
-
-    return count($warnings) == 0;
-}
-
-#endregion

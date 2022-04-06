@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 namespace app\helpers;
@@ -41,7 +41,7 @@ class RequestUtil
     public static function redirectJSON(string $url, string $alert_type = "", string $alert_msg = ""): string
     {
         if (strlen($alert_type) != 0 && strlen($alert_msg) != 0) {
-            Util::storeAlert($url, $alert_type, $alert_msg);
+            Util::storeAlert($alert_type, $alert_msg);
         }
         Logging::debug('redirect_url: ' . $url);
         return json_encode(['url' => $url]);
