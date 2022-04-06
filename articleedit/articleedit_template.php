@@ -43,7 +43,6 @@ use app\constants\Route;
             <div class="col-lg-8 mx-auto">
                 <div class="input-group">
                     <input id="location" name="location" type="text" class="form-control">
-
                     <button class="btn btn-outline-secondary dropdown-toggle d-none d-lg-block" type="button" data-bs-toggle="dropdown" aria-expanded="false">Emplacements prédéfinis</button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <?php foreach ($loc_presets as $item) { ?>

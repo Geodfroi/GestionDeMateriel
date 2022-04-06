@@ -37,12 +37,9 @@ function handleValidation(json) {
 
 /**
  * Set location input value from location presets
- * @param {*} e
- * @param {*} btn
- * @returns
  */
 function setLocationInput(_, btn) {
-  return (document.getElementById("location").value = btn.innerText);
+  document.getElementById("location").value = btn.innerText;
 }
 
 function submitArticle() {

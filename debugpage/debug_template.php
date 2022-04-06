@@ -29,7 +29,6 @@
     <br>
     <div>Bug with expiration date before filter in sqlite</div>
     <div>ARTICLES: filter with created by</div>
-    <div>LOGIN: replace with proper favicon</div>
-    <div>LOGIN: offer new password</div>
     <div>ARTICLE_TABLE: set peremption item visible by default</div>
+    <div>button: my articles</div>
 </div>

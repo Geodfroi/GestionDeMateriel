@@ -1,8 +1,9 @@
 <?php
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
+use app\constants\ArtFilter;
 use app\constants\Route;
 use app\helpers\Util;
 
@@ -189,14 +190,28 @@ use app\helpers\Util;
                         <label class="d-lg-none" for="filter-name">Par nom d'article:</label>
                         <div class="input-group">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par nom d'article:</span>
-                            <input id="filter-name" name="filter-name" class="form-control" type="text">
+                            <input id="filter-name" name="filter-name" class="form-control" type="text" aria-label="Filter-name">
                         </div>
                     </div>
                     <div class="mb-2">
                         <label class="d-lg-none" for="filter-location">Par emplacement:</label>
                         <div class="input-group mb-2">
                             <span class="d-none d-lg-block input-group-text col-lg-3">Par emplacement:</span>
-                            <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-name">
+                            <input id="filter-location" name="filter-location" class="form-control" type="text" aria-label="Filter-location">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="d-lg-none" for="filter-author">Par créateur:</label>
+                        <div class="input-group mb-2">
+                            <span class="d-none d-lg-block input-group-text col-lg-3">Par créateur:</span>
+                            <input id="filter-author" name="filter-author" type="text" hidden>
+                            <button id="label-author" class=" btn btn-outline-secondary dropdown-toggle d-none d-lg-block form-control" type=" button" data-bs-toggle="dropdown" aria-expanded="false"><?php echo $display_data['filters'][ArtFilter::AUTHOR] ?></button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><span class="dropdown-item author-preset"><?php echo ArtFilter::EVERYONE ?></span></li>
+                                <?php foreach ($authors as $author) { ?>
+                                    <li><span class="dropdown-item author-preset"><?php echo $author->getAlias() ?></span></li>
+                                <?php } ?>
+                            </ul>
                         </div>
                     </div>
                     <div class="mb-2">
@@ -237,7 +252,7 @@ use app\helpers\Util;
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary col-12 col-lg-2" data-bs-dismiss="modal">Annuler</button>
-                    <a class="btn btn-light col-12 col-lg-3" href="<?php echo Route::ART_TABLE . "?filter=clearAll" ?>" id="clear-filters-btn" type="button">Enlever tous les filtres</a>
+                    <a class="btn btn-light col-12 col-lg-3" href="<?php echo Route::ART_TABLE . "?filter=clear-all" ?>" id="clear-filters-btn" type="button">Enlever tous les filtres</a>
                     <button type="submit" class="btn btn-primary col-12 col-lg-2" name="filter">Filtrer</button>
                 </div>
 
@@ -265,6 +280,7 @@ use app\helpers\Util;
 </div>
 
 <script>
-    let display_data = <?php echo json_encode($display_data, JSON_UNESCAPED_UNICODE) ?>;
-    console.dir(display_data);
+    const display_data = <?php echo json_encode($display_data, JSON_UNESCAPED_UNICODE) ?>;
+    const everyone_preset = '<?php echo ArtFilter::EVERYONE ?>';
+    // console.dir(display_data);
 </script>

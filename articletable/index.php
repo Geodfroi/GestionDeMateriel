@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.04.06 ###
 ##############################
 
 use app\constants\Alert;
@@ -23,6 +23,8 @@ require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
 
+
+
 /**
  * Route class containing behavior linked to user_template. This route display an user Article list.
  */
@@ -31,6 +33,13 @@ class ArticleTable extends BaseRoute
     public function __construct()
     {
         parent::__construct('articletable', 'articletable_template', 'articletable_script');
+    }
+
+    function resetFilters(&$display_data)
+    {
+        $display_data['filters'] = [];
+        $display_data['filters'][ArtFilter::AUTHOR] = ArtFilter::EVERYONE;
+        $display_data['filters'][ArtFilter::SHOW_EXPIRED] = true;
     }
 
     public function getBodyContent(): string
@@ -45,7 +54,7 @@ class ArticleTable extends BaseRoute
                 TABLE_DISPLAY_COUNT;
         }
         if (!isset($display_data['filters'])) {
-            $display_data['filters'] = [];
+            ArticleTable::resetFilters($display_data);
         }
         if (!isset($display_data['orderby'])) {
             $display_data['orderby'] = OrderBy::DELAY_ASC;
@@ -68,10 +77,10 @@ class ArticleTable extends BaseRoute
 
         if (isset($_GET['filter'])) {
 
-            // logging::debug('filter', $_GET);
-            $display_data['filters'] = [];
+            // $display_data['filters'] = [];
+            ArticleTable::resetFilters($display_data);
 
-            if ($_GET['filter'] === 'clearAll') {
+            if ($_GET['filter'] === 'clear-all') {
                 $_SESSION[Session::ARTICLES_DISPLAY] = json_encode($display_data);
                 return $this->redirectTo(Route::ART_TABLE);
             }
@@ -87,6 +96,12 @@ class ArticleTable extends BaseRoute
                 $display_data['filters'][ArtFilter::LOCATION] = $_GET['filter-location'];
             } else {
                 unset($display_data['filters'][ArtFilter::LOCATION]);
+            }
+
+            if ($_GET['filter-author']) {
+                $display_data['filters'][ArtFilter::AUTHOR] = $_GET['filter-author'];
+            } else {
+                $display_data['filters'][ArtFilter::AUTHOR] = ArtFilter::EVERYONE;
             }
 
             if (isset($_GET['filter-date-val'])) {
@@ -126,6 +141,7 @@ class ArticleTable extends BaseRoute
         $display_data['page_count'] = $page_count;
         return $this->renderTemplate([
             'articles' =>  $articles,
+            'authors' => Database::users()->queryAll(),
             'display_data' => $display_data,
         ]);
     }

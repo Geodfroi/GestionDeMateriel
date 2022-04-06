@@ -51,8 +51,8 @@ INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (2, 'Papier A4 x 1000', 'bureau 202', '2022-06-01' );
 
 INSERT INTO articles (user_id, article_name, location, expiration_date, comments) VALUES (3, 'Produit nettoyage A1', 'Placard 3A', '2021-08-01', 'this is a comment');
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2', 'Placard 3B', '2022-03-28' );
-INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2b', 'Placard 3B', '2022-03-29' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2', 'Placard 3B', '2022-05-28' );
+INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A2b', 'Placard 3B', '2022-04-29' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A3', 'Placard 3B', '2021-12-07' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A3b', 'Placard 3A', '2021-02-07' );
 INSERT INTO articles (user_id, article_name, location, expiration_date) VALUES (3, 'Produit nettoyage A4', 'Placard 4A', '2021-12-26' );

@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.04.05 ###
+// ## Joël Piguet - 2022.04.06 ###
 // ##############################
 
 const DATE_BEFORE = "before";
@@ -75,6 +75,10 @@ function displayFilter() {
     str += ` [location: ${filters.location}]`;
   }
 
+  if (filters.author && filters.author != everyone_preset) {
+    str += ` [créateur: ${filters.author}]`;
+  }
+
   if (filters.peremption_value && filters.peremption_type) {
     const date = toDate(filters.peremption_value);
     if (filters.peremption_type == DATE_BEFORE) {
@@ -115,6 +119,11 @@ function filterModalShown(_, modal) {
   // location
   modal.querySelector("#filter-location").value = filters.location
     ? filters.location
+    : "";
+
+  // author
+  modal.querySelector("#filter-author").value = filters.author
+    ? filters.author
     : "";
 
   // peremption date
@@ -213,6 +222,15 @@ function selectRow(_, row) {
 }
 
 /**
+ * Set hidden author input value from author presets
+ */
+function setAuthorInput(_, btn) {
+  console.log(btn.innerText);
+  document.querySelector("#filter-author").value = btn.innerText;
+  document.querySelector("#label-author").innerHTML = btn.innerText;
+}
+
+/**
  * Set date filter btn inner text and fill date type input value.
  *
  * @param {*} e
@@ -246,6 +264,7 @@ function setFilterDropdownLabel(label) {
 hookBtnCollection("clear-filter", clearFilter);
 hookBtnCollection("filter-dropdown-item", setDateFilter);
 hookBtnCollection("table-row", selectRow, false);
+hookBtnCollection("author-preset", setAuthorInput);
 
 hookModalShown("delete-modal", deleteModalShown);
 hookModalShown("filter-modal", filterModalShown);
