@@ -56,4 +56,4 @@ const LOG_FILES_MAX = 7;
 /**
  * # of elements displayed by default in a table.
  */
-const TABLE_DISPLAY_COUNT = 20;
+const TABLE_DISPLAY_COUNT = 10;

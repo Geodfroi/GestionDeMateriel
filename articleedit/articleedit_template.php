@@ -39,7 +39,9 @@ use app\constants\Route;
                             <li><span class="dropdown-item loc-preset"><?php echo $item->getContent() ?></span></li>
                         <?php } ?>
                     </ul>
-                    <div id="location-feedback" class='invalid-feedback'></div>
+                    <a href="<?php echo Route::LOCAL_PRESETS ?>" class="btn btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Modifier la liste des emplacements prédéfinis"><i class="bi bi-list-ul"></i></a>
+                    <div id=" location-feedback" class='invalid-feedback'>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,7 +60,7 @@ use app\constants\Route;
         <div class="row mb-2">
             <div class="col-lg-8 mx-auto">
                 <textarea id="comments" name="comments" rows="4" placeholder="Vos commentaires." aria-describedby="id-comments" class="form-control"></textarea>
-                <div id="id-comments" class="form-text">Vos commentaires vous seront rappelés dans le message d'alerte.</div>
+                <div id="id-comments" class="form-text">Les commentaires seront mentionnés dans le message d'alerte.</div>
                 <div id="comments-feedback" class='invalid-feedback'></div>
             </div>
         </div>
