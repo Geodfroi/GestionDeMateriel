@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.04.06 ###
+## Joël Piguet - 2022.04.07 ###
 ##############################
 
 ?>
@@ -28,5 +28,4 @@
     <div>TODO::</div>
     <br>
     <div>Bug with expiration date before filter in sqlite</div>
-    <div>article filter: button: my articles</div>
 </div>

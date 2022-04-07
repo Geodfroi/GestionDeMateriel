@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.04.07 ###
 ##############################
 
 namespace app\models;
@@ -126,6 +126,14 @@ class User
     public function getContactEmail(): string
     {
         return $this->contact_email;
+    }
+
+    /**
+     * Take only caracters before @ if alias is an email.
+     */
+    public function getDisplayAlias(): string
+    {
+        return explode('@', $this->getAlias())[0];
     }
 
     public function getLoginEmail(): string

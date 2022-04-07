@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.04.07 ###
 ##############################
 
 namespace app\models;
@@ -132,9 +132,7 @@ class Article
     {
         $user = Database::users()->queryById($this->user_id);
         if ($user) {
-            //take only caracters before @ if it is an email.
-            $alias  = explode('@', $user->getAlias())[0];
-            return sprintf("%s (%s)", $alias, $this->creation_date->format('d.m.Y'));
+            return sprintf("%s (%s)", $user->getDisplayAlias(), $this->creation_date->format('d.m.Y'));
         }
         return "Inconnu";
     }
