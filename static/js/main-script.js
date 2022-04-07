@@ -1,5 +1,5 @@
 // ################################
-// ## Joël Piguet - 2022.04.06 ###
+// ## Joël Piguet - 2022.04.07 ###
 // ##############################
 
 //#region fetch
@@ -43,8 +43,7 @@ function postReceiveJSON(request_name, callback = null, data = null) {
       Accept: "application/json",
     },
   };
-  url = page_url;
-  fetch(page_url, options)
+  fetch(page_url + "/", options)
     .then((res) => {
       return res.json();
     })
