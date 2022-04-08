@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.06 ###
+## Joël Piguet - 2022.04.08 ###
 ##############################
 
 /**
@@ -69,4 +69,4 @@ const LOG_FILES_MAX = 7;
 /**
  * # of elements displayed by default in a table.
  */
-const TABLE_DISPLAY_COUNT = 20;
+const TABLE_DISPLAY_COUNT = 10;
