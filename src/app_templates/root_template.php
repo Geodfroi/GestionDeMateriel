@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.04.08 ###
 ##############################
 
 use app\constants\Page;
@@ -20,7 +20,7 @@ use app\helpers\Authenticate;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> <?php echo isset($page_title) ? $page_title : "Application"; ?> </title>
 
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="<?php echo $_SESSION[Session::ROOT] ?>/favicon.ico" type="image/x-icon" />
 
     <!-- bootstrap css from static folder -->
     <link rel="stylesheet" href="<?php echo $_SESSION[Session::ROOT] ?>/static/css/bootstrap.min.css" />
