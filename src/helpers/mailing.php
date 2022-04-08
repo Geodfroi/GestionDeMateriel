@@ -147,48 +147,48 @@ class Mailing
      */
     private static function send(array $recipients, string $subject, string $html_content, string $plain_content): bool
     {
-        Logging::debug('sending email not implemented');
-        return false;
-        // if (DEBUG_MODE) {
-        //     $recipients = [APP_EMAIL];
-        // }
-
-        // $mail = new PHPMailer(true);
-
-        // try {
-        //     // Server settings
-        //     // $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
-        //     $mail->isSMTP();
-        //     $mail->Host = 'smtp.gmail.com';
-        //     $mail->SMTPAuth = true;
-        //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        //     $mail->Port = 587;
-
-        //     $mail->CharSet = PHPMailer::CHARSET_UTF8;
-
-        //     $mail->Username = APP_EMAIL;
-        //     $mail->Password = APP_EMAIL_PASSWORD;
-
-        //     // Sender and recipient settings
-        //     $mail->setFrom(APP_EMAIL, Mail::SENDER);
-        //     foreach ($recipients as $recipient) {
-        //         $mail->addAddress($recipient);
-        //     }
-        //     // $mail->addReplyTo('innov.heds@gmail.com', 'Sender Name'); // allow answer back
-
-        //     // Setting the email content
-        //     $mail->IsHTML(true);
-        //     $mail->Subject = $subject;
-        //     $mail->Body = $html_content;
-        //     $mail->AltBody = $plain_content;
-
-        //     if ($mail->send()) {
-        //         return true;
-        //     }
-        //     Logging::error('Failure to send email.', ['error' => $mail->ErrorInfo]);
-        // } catch (Exception $e) {
-        //     Logging::error('Error in sending email.', ['error' => $e->errorMessage()]);
-        // }
+        // Logging::debug('sending email not implemented');
         // return false;
+        if (DEBUG_MODE) {
+            $recipients = [APP_EMAIL];
+        }
+
+        $mail = new PHPMailer(true);
+
+        try {
+            // Server settings
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER; // for detailed debug output
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+
+            $mail->CharSet = PHPMailer::CHARSET_UTF8;
+
+            $mail->Username = APP_EMAIL;
+            $mail->Password = APP_EMAIL_PASSWORD;
+
+            // Sender and recipient settings
+            $mail->setFrom(APP_EMAIL, Mail::SENDER);
+            foreach ($recipients as $recipient) {
+                $mail->addAddress($recipient);
+            }
+            // $mail->addReplyTo('innov.heds@gmail.com', 'Sender Name'); // allow answer back
+
+            // Setting the email content
+            $mail->IsHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $html_content;
+            $mail->AltBody = $plain_content;
+
+            if ($mail->send()) {
+                return true;
+            }
+            Logging::error('Failure to send email.', ['error' => $mail->ErrorInfo]);
+        } catch (Exception $e) {
+            Logging::error('Error in sending email.', ['error' => $e->errorMessage()]);
+        }
+        return false;
     }
 }

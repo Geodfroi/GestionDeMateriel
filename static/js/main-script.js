@@ -1,29 +1,28 @@
 // ################################
-// ## Joël Piguet - 2022.04.07 ###
+// ## Joël Piguet - 2022.04.08 ###
 // ##############################
 
 //#region fetch
 
-// /**
-//  * Use javascript fetch ajax method to send a GET request. In this app, post request are made to the current page url.
-//  *
-//  * @param {*} req request identifier.
-//  * @param {*} json json data used to construct the GET request path.
-//  */
-// function getRequest(json = null) {
-//   // let url = new URL(url, window.location.origin);
-//   url = page_url;
-//   console.log("GET request at: " + url);
-
-//   json ??= {};
-//   let keys = Object.keys(json);
-//   for (let index = 0; index < keys.length; index++) {
-//     let key = keys[index];
-//     url.searchParams.append(key, json[key]);
-//   }
-
-//   fetch(url);
-// }
+/**
+ * Use javascript fetch ajax method to post data to the server. In this app, post request are always made to the current page url.
+ *
+ * @param {*} request_name request identifier.
+ * @param {*} data json data package to sent to server.
+ */
+function post(request_name, data = null) {
+  data ??= {};
+  data[request_name] = true;
+  const options = {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  };
+  fetch(page_url + "/", options);
+}
 
 /**
  * Use javascript fetch ajax method to post data to the server and handle the server response. In this app, post request are always made to the current page url.
