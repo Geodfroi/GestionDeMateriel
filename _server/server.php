@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.01.10 ###
+## Joël Piguet - 2022.04.11 ###
 ##############################
 
+require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/../local/localsettings.php';
+// require_once __DIR__ . '/config.php';
 
 use app\helpers\Database;
 use app\helpers\Logging;
@@ -23,6 +23,7 @@ function sendPeremptionWarnings()
     // iterate through users and articles to flag articles that are soon due.
     $articles = Database::articles()->queryAll();
     $users = Database::users()->queryAll();
+
 
     Logging::info('Starting server script.');
 
