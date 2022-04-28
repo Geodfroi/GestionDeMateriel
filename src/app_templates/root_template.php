@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.08 ###
+## Joël Piguet - 2022.04.28 ###
 ##############################
 
 use app\constants\Page;
@@ -29,7 +29,6 @@ use app\helpers\Authenticate;
     <!-- bootstrap css by CDN -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css"> -->
-
 </head>
 
 <body class="d-flex flex-column h-100">
@@ -38,8 +37,8 @@ use app\helpers\Authenticate;
         <header>
             <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
                 <div class="container-fluid">
-                    <span class="navbar-brand me-4 d-lg-none" href="#">Gestionnaire d'inv.</span>
-                    <span class="navbar-brand me-4 d-none d-lg-inline" href="#">HEdS - Gestionnaire d'inventaire</span>
+                    <span class="navbar-brand me-4 d-lg-none" href="#"><?php echo strlen(APP_NAME) > 12 ? substr(APP_NAME, 0, 12) . '..' : APP_NAME ?></span>
+                    <span class="navbar-brand me-4 d-none d-lg-inline" href="#"><?php echo APP_NAME ?></span>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>

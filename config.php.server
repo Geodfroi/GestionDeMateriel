@@ -27,7 +27,7 @@ const LOCAL_SERVER = false;
 /**
  * Appear by default as html title.
  */
-const APP_NAME = "HEdS Gestionnaire d'inventaire";
+const APP_NAME = "HEdS Mdatapp";
 
 /**
  * Linked in "contact us" in html footer.

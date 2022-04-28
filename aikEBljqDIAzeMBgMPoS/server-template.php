@@ -6,6 +6,9 @@
 ?>
 
 <div class="container">
+
+    <div class="h3"><?php echo APP_NAME ?></div>
+    <div>................................................</div>
     <?php if ($backup_success) { ?>
         <div class="h4">Backup de la base de donnée au format ".sqlite" dans le dossier "_backups."'</div>
     <?php } ?>
@@ -24,18 +27,20 @@
                 <span><?php echo $user->getLastLogin()->format('d-m-Y H:i:s') ?></span>
             </div>
             <?php if ($user_email->hasEmails()) {
-                if ($user_email->wasSent()) {
-                    foreach ($user_email->getEmails() as $array) { ?>
-                        <div class="mx-3">
-                            <?php echo $array['article']; ?>
-                        </div>
-                    <?php } ?>
-                    <div class="mx-3"> rappels envoyé.</div>
+                if ($user_email->wasSent()) { ?>
+                    <ul class="mx-3">
+                        <?php foreach ($user_email->getEmails() as $array) { ?>
+                            <li>
+                                <?php echo $array['article']; ?>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                    <div class="mx-3"> Rappels envoyé.</div>
                 <?php } else {  ?>
                     <div class="h5">Erreur lors de l'envoi des emails de rappels à cet utilisateur</div>
                 <?php }
             } else {  ?>
-                <div class="h5">Pas de notices de péremptions à envoyer à cet utilisateur aujourd'hui.</div>
+                <div class="mx-3">Pas de notices de péremptions à envoyer à cet utilisateur aujourd'hui.</div>
     <?php }
         }
     } ?>
