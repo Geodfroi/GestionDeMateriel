@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.08 ###
+## Joël Piguet - 2022.04.28 ###
 ##############################
 
 /**
@@ -37,8 +37,10 @@ const CONTACT_EMAIL = "innov.heds@gmail.com";
 /**
  * Used as hyperlink in emails; must be set to proper url once the project is online. 
  */
-const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
-const LAST_MODIFICATION = '06 avril 2022';
+//const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
+const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/sip-app-heds/Mdatapp/';
+
+const LAST_MODIFICATION = 28 avril 2022';
 
 /**
  * Time until alert is dismissed in milliseconds.

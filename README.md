@@ -1,5 +1,5 @@
 #############################
-##Joël Piguet - 2022.03.11##
+##Joël Piguet - 2022.04.28##
 ###########################
 
 PHP v7.4.25 with Composer, coded with VSCode.
@@ -13,10 +13,6 @@ config.php: variables controlant le comportement de l'application, le serveur ou
     _util:
         mysql_populate.SQL : utiliser dans mySQL pour créer schémas et nouvelles entrées pour tester MySQL.
         createlocaldb : create new dummy sqlite db for testing.
-
-    server:
-        server.php: server side app to check expiration dates and send reminder emails.
-        src: source files and html templates.
 
     vendor:
         Composer folder: handle dependency in php.
