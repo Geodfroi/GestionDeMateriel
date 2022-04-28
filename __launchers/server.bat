@@ -1,3 +1,4 @@
-cd "C:\--Code--\@Projects\GestionDeMateriel\_server"
-php server.php 
-pause
+start msedge "http://localhost:8085/aikEBljqDIAzeMBgMPoS
+
+cd "C:\--Code--\@Projects\GestionDeMateriel\"
+php -S localhost:8085

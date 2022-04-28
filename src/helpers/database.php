@@ -56,7 +56,7 @@ class Database
         return Database::getInstance()->articles;
     }
 
-    public static function backup()
+    public static function backup(): bool
     {
         return DBUtil::backup_db(Database::getInstance()->conn, AppPaths::BACKUP_FOLDER);
     }

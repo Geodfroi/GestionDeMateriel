@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.03.11 ###
+## Joël Piguet - 2022.04.28 ###
 ##############################
 
 namespace app\helpers;
@@ -115,7 +115,6 @@ class DBUtil
         $backup_users = (new UserQueries($conn))->backup($backup_conn);
         $backup_articles = (new ArticleQueries($conn))->backup($backup_conn);
 
-        $path_info = pathinfo($path);
         Util::eraseOldFiles($backup_folder, 'backup', 'db', $max_files);
 
         return $backup_loc &&  $backup_users && $backup_articles;
