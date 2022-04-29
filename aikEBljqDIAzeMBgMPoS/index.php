@@ -5,11 +5,12 @@ declare(strict_types=1);
 use app\constants\Session;
 use app\helpers\BaseRoute;
 use app\helpers\Database;
+use app\helpers\Mailing;
 use app\helpers\Util;
 use app\models\User;
 
 ################################
-## Joël Piguet - 2022.04.28 ###
+## Joël Piguet - 2022.04.29 ###
 ##############################
 # 
 
@@ -17,6 +18,24 @@ require_once __DIR__ . '/../loader.php';
 require_once __DIR__ . '/../vendor/autoload.php'; // use composer to load autofile.
 session_start();
 $_SESSION[Session::ROOT] = APP_URL;
+
+const LAST_CHECKED_FILE = "last-checked.txt";
+
+/**
+ * Check if logic has already run today. Avoid sending emails twice if the route is refreshed in the browser.
+ * Put last check date in check file.
+ */
+function checkSentToday(): bool
+{
+    $str = file_get_contents(LAST_CHECKED_FILE);
+    $today = (new DateTime())->format('Y-m-d');
+    if ($str && $str === $today) {
+        return true;
+    }
+    $check_file = fopen(LAST_CHECKED_FILE, "w");
+    fwrite($check_file, $today);
+    return false;
+}
 
 class UserEmails
 {
@@ -51,8 +70,7 @@ class UserEmails
 
     public function send_reminders()
     {
-        // $this->was_sent = Mailing::peremptionNotification($this->user, $this->emails);
-        $this->was_sent = true;
+        $this->was_sent = Mailing::peremptionNotification($this->user, $this->emails);
     }
 
     public function setEmail($article, $delay)
@@ -111,13 +129,21 @@ class Server extends BaseRoute
 
     public function getBodyContent(): string
     {
-        $reminders = fetchPeremptionReminders();
-        foreach ($reminders as $user_email) {
-            $user_email->send_reminders();
+        $already_checked_today = checkSentToday();
+        $reminders = null;
+
+        if (!$already_checked_today) {
+            $reminders = fetchPeremptionReminders();
+            foreach ($reminders as $user_email) {
+                if ($user_email->hasEmails()) {
+                    $user_email->send_reminders();
+                }
+            }
         }
 
         return $this->renderTemplate([
-            'backup_success' =>  Database::backup(),
+            'already_checked' => $already_checked_today,
+            // 'backup_success' =>  Database::backup(),
             'reminders' => $reminders,
         ]);
     }
