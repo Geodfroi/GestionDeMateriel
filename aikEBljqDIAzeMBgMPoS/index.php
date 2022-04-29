@@ -5,7 +5,6 @@ declare(strict_types=1);
 use app\constants\Session;
 use app\helpers\BaseRoute;
 use app\helpers\Database;
-use app\helpers\Mailing;
 use app\helpers\Util;
 use app\models\User;
 

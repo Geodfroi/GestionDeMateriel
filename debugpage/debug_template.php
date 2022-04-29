@@ -1,13 +1,18 @@
 <?php
 ################################
-## Joël Piguet - 2022.04.07 ###
+## Joël Piguet - 2022.04.29 ###
 ##############################
 
+use app\constants\Route;
 ?>
 
 <div class="container">
 </div>
 
+<br><br>
+<a href="<?php echo Route::DEBUG_EMAILS ?>">Voir templates des emails de rappels.</a>
+<br><br>
+<a href="<?php echo Route::SERVER ?>">Lancer la distribution des emails de rappels.</a>
 <br><br>
 <div>
     <textarea style="width: 100%; height : 40vh" name="" id="" cols="30" rows="10" readonly>

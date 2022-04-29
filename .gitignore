@@ -2,3 +2,4 @@ _backups/
 _local/
 tests/output/
 vendor/
+*.zip

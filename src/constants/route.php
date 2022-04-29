@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.04.29 ###
 ##############################
 
 namespace app\constants;
@@ -38,6 +38,7 @@ class Route
     const LOGOUT = APP_URL . '/' .  Page::LOGOUT;
     const HOME = APP_URL;
     const PROFILE = APP_URL . '/' .  Page::PROFILE;
+    const SERVER = APP_URL . '/aikEBljqDIAzeMBgMPoS';
     const USER_EDIT = APP_URL . '/' .  Page::USER_EDIT;
     const USERS_TABLE = APP_URL . '/' .  Page::USERS_TABLE;
 }
