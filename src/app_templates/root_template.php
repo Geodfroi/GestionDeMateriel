@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.28 ###
+## Joël Piguet - 2022.04.29 ###
 ##############################
 
 use app\constants\Page;
@@ -60,8 +60,7 @@ use app\helpers\Authenticate;
                             <?php } ?>
 
                             <?php if (DEBUG_MODE) { ?>
-                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_EMAILS ? 'active' : '' ?>" href="<?php echo Route::DEBUG_EMAILS ?> ">Email templates [debug]</a>
-                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">test page [debug]</a>
+                                <a class="nav-link <?php echo $_SESSION[Session::PAGE_URL] === Page::DEBUG_PAGE ? 'active' : '' ?>" href="<?php echo Route::DEBUG_PAGE ?> ">[debug]</a>
                             <?php } ?>
 
                         </ul>
