@@ -40,7 +40,3 @@
         </div>
     </div>
 </div>
-
-<div>debug</div>
-<div>alias: noel.biquet@gmail.com</div>
-<div>password: 123123</div>
