@@ -35,7 +35,7 @@ class Admin extends BaseRoute
 
 Logging::debug("admin route");
 if (!Authenticate::isLoggedIn()) {
-    Util::requestRedirect(Route::LOGIN);
+    Util::redirectTo(Route::LOGIN);
 } else {
     echo (new Admin())->renderRoute();
 }

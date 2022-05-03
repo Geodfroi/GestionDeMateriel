@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.05.03 ###
 ##############################
 
 use app\constants\OrderBy;
@@ -54,15 +54,14 @@ class UserTable extends BaseRoute
 
         $display_count = TABLE_DISPLAY_COUNT;
         $item_count = Database::users()->queryCount(false);
-        $offset =   ($display_data['page'] - 1) *      $display_count;
-        $page_count = ceil($item_count /      $display_count);
+        $offset =   ($display_data['page'] - 1) * $display_count;
+        $display_data['page_count'] = ceil($item_count / $display_count);
 
         $users = Database::users()->queryAll($display_count, $offset, $display_data['orderby'], false);
 
         return $this->renderTemplate([
             'users' =>  $users,
             'display_data' => $display_data,
-            'page_count' => $page_count,
         ]);
     }
 }
@@ -75,9 +74,9 @@ function deleteUser($id)
             'admin-id' => Authenticate::getUserId(),
             'user-id' => $id
         ]);
-        Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
+        Util::redirectTo(Route::USERS_TABLE, AlertType::SUCCESS, Alert::USER_REMOVE_SUCCESS);
     } else {
-        Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
+        Util::redirectTo(Route::USERS_TABLE, AlertType::FAILURE, Alert::USER_REMOVE_FAILURE);
     }
 }
 
@@ -88,17 +87,17 @@ function renewUserPassword($id)
 {
     $user = Database::users()->queryById(intval($id));
     if (Util::renewPassword($user)) {
-        Util::requestRedirect(Route::USERS_TABLE, AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
+        Util::redirectTo(Route::USERS_TABLE, AlertType::SUCCESS, sprintf(Alert::NEW_PASSWORD_SUCCESS, $user->getLoginEmail()));
     } else {
-        Util::requestRedirect(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
+        Util::redirectTo(Route::USERS_TABLE, AlertType::FAILURE, Alert::NEW_PASSWORD_FAILURE);
     }
 }
 
 Logging::debug("usertable route");
 if (!Authenticate::isLoggedIn()) {
-    Util::requestRedirect(Route::LOGIN);
+    Util::redirectTo(Route::LOGIN);
 } else if (!Authenticate::isAdmin()) {
-    Util::requestRedirect(Route::HOME);
+    Util::redirectTo(Route::HOME);
 } else {
     if (isset($_GET['deleteuser'])) {
         $id_ = intval($_GET['deleteuser']);

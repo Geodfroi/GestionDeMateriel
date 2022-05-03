@@ -1,7 +1,7 @@
 <?php
 
 ################################
-## Joël Piguet - 2022.04.28 ###
+## Joël Piguet - 2022.05.03 ###
 ##############################
 
 /**
@@ -39,7 +39,7 @@ const CONTACT_EMAIL = "innov.heds@gmail.com";
  */
 //const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/innovations-pedagogiques-heds/gestion-inventaire/';
 const APP_URL = LOCAL_SERVER ? "http://localhost:8085/" : 'http://campus.hesge.ch/sip-app-heds/Mdatapp/';
-const LAST_MODIFICATION = '29 avril 2022';
+const LAST_MODIFICATION = '03 mai 2022';
 
 /**
  * Time until alert is dismissed in milliseconds.

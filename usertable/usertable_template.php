@@ -1,6 +1,6 @@
 <?php
 ################################
-## Joël Piguet - 2022.04.05 ###
+## Joël Piguet - 2022.05.03 ###
 ##############################
 
 use app\constants\Route;
@@ -80,8 +80,8 @@ use app\constants\Route;
                 </a>
             </li>
 
-            <?php for ($n = 1; $n <= $page_count; $n++) {  ?>
-                <li class="page-item <?php echo $n == $page ? 'active' : '' ?>">
+            <?php for ($n = 1; $n <= $display_data['page_count']; $n++) {  ?>
+                <li class="page-item <?php echo $n ==  $display_data['page']  ? 'active' : '' ?>">
                     <a href="<?php echo Route::USERS_TABLE . '?page=' . $n ?>" class="page-link"><?php echo $n ?></a>
                 </li>
             <?php  } ?>
