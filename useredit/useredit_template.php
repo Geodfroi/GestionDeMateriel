@@ -77,5 +77,3 @@ use app\constants\Route;
         </div>
     </div>
 </div>
-
-<div class="ms-3">DEBUG: créer nouveau utilisateur échoue car la fonctionalité email n'est pas installée.</div>
